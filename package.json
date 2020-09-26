@@ -1,0 +1,79 @@
+{
+  "name": "monopoly-clone",
+  "version": "0.1.0",
+  "private": true,
+  "proxy": "http://localhost:4000",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.30",
+    "@fortawesome/free-regular-svg-icons": "^5.14.0",
+    "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@fortawesome/react-fontawesome": "^0.1.11",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/styles": "^4.10.0",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^24.9.1",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "axios": "^0.20.0",
+    "bluebird": "^3.7.2",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "errorhandler": "^1.5.1",
+    "express": "^4.17.1",
+    "http-errors": "^1.8.0",
+    "mongoose": "^5.10.7",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.3",
+    "typescript": "^3.9.7",
+    "wait-on": "^5.2.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-node-externals": "^2.5.2",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.7",
+    "@types/errorhandler": "^1.5.0",
+    "@types/express": "^4.17.8",
+    "@types/http-errors": "^1.8.0",
+    "@types/material-ui": "^0.21.8",
+    "@types/mongoose": "^5.7.36",
+    "@types/node": "^12.12.62",
+    "@types/winston": "^2.4.4",
+    "concurrently": "^5.3.0",
+    "nodemon": "^2.0.4",
+    "ts-loader": "^8.0.4",
+    "ts-node": "^9.0.0",
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+    "dev": "concurrently -p name -c \"yellow,magenta,blue\" -n \"webpack-server,nodemon-server,CRA\" \"npm run-script dev:server:webpack\" \"npm run-script dev:server:nodemon\" \"npm run-script dev:client\"",
+    "dev:client": "react-scripts start",
+    "dev:server": "concurrently -p name -c \"yellow,magenta\" -n \"webpack-server,nodemon-server\" \"npm run-script dev:server:webpack\" \"npm run-script dev:server:nodemon\"",
+    "dev:server:webpack": "webpack --config webpack.config.server.js --watch",
+    "dev:server:nodemon": "wait-on -l build/server.js && nodemon build/server.js",
+    "build:client": "react-scripts build",
+    "build:server": "webpack --config webpack.config.server.js"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
