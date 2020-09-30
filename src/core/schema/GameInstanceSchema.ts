@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
+import { PlayerSchema } from "./PlayerSchema";
 
 export type GameInstanceDocument = mongoose.Document & {
-  id: string;
   name: string;
 };
 
 const gameInstanceSchema = new mongoose.Schema(
   {
-    id: { type: String, unique: true, required: true },
     name: String,
+    players: [PlayerSchema],
   },
   { timestamps: true }
 );
