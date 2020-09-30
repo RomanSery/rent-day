@@ -9,6 +9,7 @@ const gameInstanceSchema = new mongoose.Schema(
   {
     name: String,
     players: [PlayerSchema],
+    theme: Map,
   },
   { timestamps: true }
 );
