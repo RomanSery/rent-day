@@ -1,6 +1,6 @@
 import React from "react";
 
-import GameBoard from "./GameBoard";
+import GameBoard from "./components/GameBoard";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 function App() {

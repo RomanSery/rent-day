@@ -1,8 +1,8 @@
 import React from "react";
-import { BoardSection } from "../core/enums/BoardSection";
-import { SquareConfigDataMap } from "../core/config/SquareData";
+import { BoardSection } from "../../core/enums/BoardSection";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
-import { SquareType } from "../core/enums/SquareType";
+import { SquareType } from "../../core/enums/SquareType";
 
 interface Props {
   id: number;

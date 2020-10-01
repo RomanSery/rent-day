@@ -1,12 +1,12 @@
 import React from "react";
-import { SquareConfigDataMap } from "../core/config/SquareData";
-import { SquareType } from "../core/enums/SquareType";
-import { AirportDisplay } from "./squares/AirportDisplay";
-import { ChanceDisplay } from "./squares/ChanceDisplay";
-import { PropertyDisplay } from "./squares/PropertyDisplay";
-import { CentralParkDisplay } from "./squares/CentralParkDisplay";
-import { GoDisplay } from "./squares/GoDisplay";
-import { UtilityDisplay } from "./squares/UtilityDisplay";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
+import { AirportDisplay } from "../squares/AirportDisplay";
+import { ChanceDisplay } from "../squares/ChanceDisplay";
+import { PropertyDisplay } from "../squares/PropertyDisplay";
+import { CentralParkDisplay } from "../squares/CentralParkDisplay";
+import { GoDisplay } from "../squares/GoDisplay";
+import { UtilityDisplay } from "../squares/UtilityDisplay";
 
 
 interface Props {
