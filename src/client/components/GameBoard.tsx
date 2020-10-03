@@ -1,8 +1,15 @@
 import React from "react";
+import { GameState } from "../../core/types/GameState";
 import { CenterDisplay } from "./CenterDisplay";
 import { GameSquare } from "./GameSquare";
 
-export default function GameBoard() {
+
+interface Props {
+  /*gameInstance: GameState;*/
+}
+
+export const GameBoard: React.FC<Props> = () => {
+
   const num_squares: Array<number> = Array.from(Array(40));
 
   return (

@@ -1,13 +1,16 @@
-import { GameInstance } from "../schema/GameInstanceSchema";
-import { NyThemeData } from "./NyTheme";
+import { GameInstance } from "../core/schema/GameInstanceSchema";
+import { NyThemeData } from "../core/config/NyTheme";
 import _ from "lodash";
-import { SquareThemeData } from "../types/SquareThemeData";
+import { SquareThemeData } from "../core/types/SquareThemeData";
 
 export const createTestGame = async () => {
   const player1 = { name: "roman", position: 0, money: 2000 };
   const player2 = { name: "igor", position: 0, money: 2000 };
 
   const themeData = new Map<string, SquareThemeData>();
+
+  await GameInstance.deleteMany({});
+
   NyThemeData.forEach((value: SquareThemeData, key: number) => {
     themeData.set(_.toString(key), value);
   });
@@ -18,12 +21,7 @@ export const createTestGame = async () => {
     theme: themeData,
   });
 
-  await GameInstance.deleteMany({});
+  await testGame.save();
 
-  testGame.save((err) => {
-    if (err) {
-      console.log(err);
-    }
-    console.log(testGame.id);
-  });
+  return testGame.id;
 };

@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import bluebird from "bluebird";
 import mongoose from "mongoose";
 import { MONGODB_URI } from "./util/secrets";
-import { createTestGame } from "../core/config/TestGameSetup";
 
 // Controllers (route handlers)
 import * as actionsController from "./controllers/actions";
@@ -25,7 +24,6 @@ mongoose
   })
   .then(() => {
     console.log("MongoDB connected");
-    createTestGame();
   })
   .catch((err) => {
     console.log(
@@ -43,5 +41,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
  * Primary app routes.
  */
 app.get("/api/hello", actionsController.getLogin);
+app.get("/api/initTestGame", actionsController.initTestGame);
 
 export default app;
