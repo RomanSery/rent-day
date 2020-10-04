@@ -42,5 +42,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
  */
 app.get("/api/hello", actionsController.getLogin);
 app.get("/api/initTestGame", actionsController.initTestGame);
+app.post("/api/getGame", actionsController.getGame);
 
 export default app;

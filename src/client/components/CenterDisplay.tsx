@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import API from '../api';
 import { Button } from "@material-ui/core";
 
 interface Props {
@@ -13,7 +13,7 @@ export const CenterDisplay: React.FC<Props> = () => {
 
   const onRollDice = async () => {
 
-    axios.get("api/hello")
+    API.get("hello")
       .then(function (response) {
         // handle success
         console.log(response);
