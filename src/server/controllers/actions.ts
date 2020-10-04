@@ -8,6 +8,6 @@ export const getLogin = (req: Request, res: Response) => {
 
 export const initTestGame = async (req: Request, res: Response) => {
   const newGameId = await createTestGame();
-  console.log("new game created: " + newGameId);
+  //console.log("new game created: " + newGameId);
   res.json({ gameId: newGameId });
 };
