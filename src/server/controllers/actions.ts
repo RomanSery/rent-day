@@ -3,15 +3,15 @@ import { NextFunction, Request, Response } from "express";
 import { createTestGame } from "../TestGameSetup";
 import { check, sanitize, validationResult } from "express-validator";
 import { GameInstance } from "../../core/schema/GameInstanceSchema";
+import { GameContext } from "../../core/types/GameContext";
 
 export const getLogin = (req: Request, res: Response) => {
   res.send("Hello World!");
 };
 
 export const initTestGame = async (req: Request, res: Response) => {
-  const newGameId = await createTestGame();
-  //console.log("new game created: " + newGameId);
-  res.json({ gameId: newGameId });
+  const testGame: GameContext = await createTestGame();
+  res.json(testGame);
 };
 
 export const getGame = async (req: Request, res: Response) => {

@@ -3,12 +3,14 @@ import { BoardSection } from "../../core/enums/BoardSection";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
+import { GameState } from "../../core/types/GameState";
 
 interface Props {
   id: number;
+  gameInfo: GameState | undefined;
 }
 
-export const GameSquare: React.FC<Props> = ({ id }) => {
+export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
 
   const section: BoardSection = SquareConfigDataMap.get(id)?.section!;
   const squareType: SquareType = SquareConfigDataMap.get(id)?.type!;
@@ -39,7 +41,7 @@ export const GameSquare: React.FC<Props> = ({ id }) => {
   return (
     <div className={getSquareClassName()} id={getSquareId()}>
       <div className={getContainerClassName()}>
-        <SquareInfo id={id} />
+        <SquareInfo id={id} gameInfo={gameInfo} />
       </div>
     </div>
   );

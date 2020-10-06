@@ -1,14 +1,17 @@
+import _ from "lodash";
 import React from "react";
-import { NyThemeData } from "../../core/config/NyTheme";
+import { GameState } from "../../core/types/GameState";
 import { ColorBar } from "./ColorBar";
 
 interface Props {
     id: number;
+    gameInfo: GameState | undefined;
 }
 
-export const PropertyDisplay: React.FC<Props> = ({ id }) => {
+export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const txt: string | undefined = NyThemeData.get(id)?.name;
+    const txt: string | undefined = gameInfo?.theme[id].name;
+
 
     return (
         <React.Fragment>

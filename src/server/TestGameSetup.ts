@@ -2,8 +2,9 @@ import { GameInstance } from "../core/schema/GameInstanceSchema";
 import { NyThemeData } from "../core/config/NyTheme";
 import _ from "lodash";
 import { SquareThemeData } from "../core/types/SquareThemeData";
+import { GameContext } from "../core/types/GameContext";
 
-export const createTestGame = async () => {
+export const createTestGame = async (): Promise<GameContext> => {
   const player1 = { name: "roman", position: 0, money: 2000 };
   const player2 = { name: "igor", position: 0, money: 2000 };
 
@@ -23,5 +24,5 @@ export const createTestGame = async () => {
 
   await testGame.save();
 
-  return testGame.id;
+  return { gameId: testGame.id, playerId: testGame.players[0].id };
 };

@@ -3,6 +3,6 @@ import { SquareThemeData } from "./SquareThemeData";
 
 export interface GameState {
   readonly id: String;
-  readonly theme: Map<string, SquareThemeData>;
+  readonly theme: Array<SquareThemeData>;
   readonly players: [Player];
 }

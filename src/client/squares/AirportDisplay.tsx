@@ -1,15 +1,16 @@
 import React from "react";
-import { NyThemeData } from "../../core/config/NyTheme";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlane } from '@fortawesome/free-solid-svg-icons'
+import { GameState } from "../../core/types/GameState";
 
 interface Props {
     id: number;
+    gameInfo: GameState | undefined;
 }
 
-export const AirportDisplay: React.FC<Props> = ({ id }) => {
+export const AirportDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const txt: string | undefined = NyThemeData.get(id)?.name;
+    const txt: string | undefined = gameInfo?.theme[id].name;
 
     return (
         <React.Fragment>

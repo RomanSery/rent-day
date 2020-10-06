@@ -7,13 +7,15 @@ import { PropertyDisplay } from "../squares/PropertyDisplay";
 import { CentralParkDisplay } from "../squares/CentralParkDisplay";
 import { GoDisplay } from "../squares/GoDisplay";
 import { UtilityDisplay } from "../squares/UtilityDisplay";
+import { GameState } from "../../core/types/GameState";
 
 
 interface Props {
     id: number;
+    gameInfo: GameState | undefined;
 }
 
-export const SquareInfo: React.FC<Props> = ({ id }) => {
+export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
 
     const type: SquareType | undefined = SquareConfigDataMap.get(id)?.type;
 
@@ -38,7 +40,7 @@ export const SquareInfo: React.FC<Props> = ({ id }) => {
             return null;
         }
 
-        return <PropertyDisplay id={id} />
+        return <PropertyDisplay id={id} gameInfo={gameInfo} />
     };
 
 

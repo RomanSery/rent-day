@@ -1,36 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
 
-import queryString from "query-string";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { GameState } from "../core/types/GameState";
 import API from './api';
 import {
-  Switch, Route, withRouter, useHistory, useLocation
+  Switch, Route, withRouter, useHistory
 } from "react-router-dom";
+import { CenterDisplay } from "./components/CenterDisplay";
 
 
 export const App: React.FC = () => {
 
-  const [gameState, setGameState] = useState<GameState | null>(null);
   const history = useHistory();
-  const location = useLocation();
 
   const GameDisplay = () => {
-
-    const parsed = queryString.parse(location.search);
-    const gameId = parsed.gid;
-
-    getGameState(gameId);
-
     return (
       <React.Fragment>
         <CssBaseline />
-        <GameBoard />
+        <GameBoard>
+          <CenterDisplay />
+        </GameBoard>
       </React.Fragment>
     );
   };
 
+  /*
   const getGameState = (gameId) => {
 
     API.post("getGame", { gameId: gameId })
@@ -41,7 +35,7 @@ export const App: React.FC = () => {
         console.log(error);
       });
   };
-
+*/
 
   const Home = () => {
     return (
@@ -60,7 +54,7 @@ export const App: React.FC = () => {
 
     API.get("initTestGame")
       .then(function (response) {
-        history.push("/gameinstance?gid=" + response.data.gameId);
+        history.push("/gameinstance?gid=" + response.data.gameId + "&pid=" + response.data.playerId);
       })
       .catch(function (error) {
         console.log(error);

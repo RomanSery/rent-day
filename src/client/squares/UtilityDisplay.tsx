@@ -2,17 +2,17 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 import { faSubway } from '@fortawesome/free-solid-svg-icons'
-import { NyThemeData } from "../../core/config/NyTheme";
+import { GameState } from "../../core/types/GameState";
 
 interface Props {
     id: number;
+    gameInfo: GameState | undefined;
 }
 
-export const UtilityDisplay: React.FC<Props> = ({ id }) => {
+export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const txt: string | undefined = NyThemeData.get(id)?.name;
-    const icon: string | undefined = NyThemeData.get(id)?.icon;
-
+    const txt: string | undefined = gameInfo?.theme[id].name;
+    const icon: string | undefined = gameInfo?.theme[id].icon;
 
     const getSubwayCompany = () => {
         return (<React.Fragment>
