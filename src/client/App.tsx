@@ -6,7 +6,6 @@ import API from './api';
 import {
   Switch, Route, withRouter, useHistory
 } from "react-router-dom";
-import { CenterDisplay } from "./components/CenterDisplay";
 
 
 export const App: React.FC = () => {
@@ -17,25 +16,11 @@ export const App: React.FC = () => {
     return (
       <React.Fragment>
         <CssBaseline />
-        <GameBoard>
-          <CenterDisplay />
-        </GameBoard>
+        <GameBoard />
       </React.Fragment>
     );
   };
 
-  /*
-  const getGameState = (gameId) => {
-
-    API.post("getGame", { gameId: gameId })
-      .then(function (response) {
-        setGameState(response.data.game);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  };
-*/
 
   const Home = () => {
     return (

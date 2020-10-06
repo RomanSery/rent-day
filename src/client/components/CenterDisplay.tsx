@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import API from '../api';
 import { Button } from "@material-ui/core";
+import { PlayersDisplay } from "./PlayersDisplay";
+import { GameState } from "../../core/types/GameState";
 
 interface Props {
-
+  gameInfo: GameState | undefined;
 }
 
-export const CenterDisplay: React.FC<Props> = () => {
+export const CenterDisplay: React.FC<Props> = ({ gameInfo }) => {
 
   const [serverResult, setServerResult] = useState<string | null>(null);
 
@@ -22,21 +24,22 @@ export const CenterDisplay: React.FC<Props> = () => {
       .catch(function (error) {
         // handle error
         console.log(error);
-      })
-      .then(function () {
-        // always executed
       });
-
   };
 
   return (
     <React.Fragment>
       <div className="center-square square">
-        <Button variant="contained" color="primary" onClick={onRollDice}>
-          Roll dice
+        <PlayersDisplay gameInfo={gameInfo} />
+
+        <div className="player-actions">
+          <Button variant="contained" color="primary" onClick={onRollDice}>
+            Roll dice
         </Button>
 
-        <p>Server result {serverResult}</p>
+          <p>Server result {serverResult}</p>
+        </div>
+
 
       </div>
     </React.Fragment>

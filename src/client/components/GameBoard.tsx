@@ -5,6 +5,7 @@ import { GameState } from "../../core/types/GameState";
 import { getGameContextFromUrl } from "../api";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
+import { CenterDisplay } from "./CenterDisplay";
 
 interface Props {
 
@@ -46,7 +47,7 @@ export const GameBoard: React.FC<Props> = ({ children }) => {
           />)
         })}
 
-        {children}
+        <CenterDisplay gameInfo={gameState} />
       </div>
     </React.Fragment>
   );

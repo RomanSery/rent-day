@@ -433,4 +433,15 @@ body {
   grid-row-end: 11;
   grid-column-start: 2;
   grid-column-end: 11;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.center-square .players-display {
+  flex-basis: 50%;
+}
+
+.center-square .player-actions {
+  flex-basis: 50%;
 }

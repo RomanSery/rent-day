@@ -3,4 +3,5 @@ export interface Player {
     readonly name: string;
     readonly money: number;
     readonly position: number;
+    readonly color: string;
 }
