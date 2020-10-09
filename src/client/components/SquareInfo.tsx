@@ -21,7 +21,7 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
 
     const getInfo = () => {
         if (type === SquareType.Airport) {
-            return <AirportDisplay id={id} />
+            return <AirportDisplay id={id} gameInfo={gameInfo} />
         }
         if (type === SquareType.Chance) {
             return <ChanceDisplay id={id} />
@@ -33,7 +33,7 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
             return <GoDisplay id={id} />
         }
         if (type === SquareType.Utility) {
-            return <UtilityDisplay id={id} />
+            return <UtilityDisplay id={id} gameInfo={gameInfo} />
         }
 
         if (type === SquareType.Jail || type === SquareType.GoToJail) {
