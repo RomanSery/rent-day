@@ -4,10 +4,23 @@ import { NyThemeData } from "../core/config/NyTheme";
 import _ from "lodash";
 import { SquareThemeData } from "../core/types/SquareThemeData";
 import { GameContext } from "../core/types/GameContext";
+import { PieceType } from "../core/enums/PieceType";
 
 export const createTestGame = async (): Promise<GameContext> => {
-  const player1 = { name: "roman", position: 0, money: 2000, color: "#3d4feb" };
-  const player2 = { name: "igor", position: 0, money: 2000, color: "#0ea706" };
+  const player1 = {
+    name: "roman",
+    position: 0,
+    money: 2000,
+    color: "#3d4feb",
+    type: PieceType.Bicycle,
+  };
+  const player2 = {
+    name: "igor",
+    position: 0,
+    money: 2000,
+    color: "#0ea706",
+    type: PieceType.Pawn,
+  };
 
   const themeData = new Map<string, SquareThemeData>();
 

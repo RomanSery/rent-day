@@ -1,5 +1,4 @@
-import { BoardSection } from "../enums/BoardSection";
-import { SquareType } from "../enums/SquareType";
+import { PieceType } from "../enums/PieceType";
 
 export interface Player {
   readonly id: string;
@@ -7,4 +6,5 @@ export interface Player {
   readonly money: number;
   readonly position: number;
   readonly color: string;
+  readonly type: PieceType;
 }

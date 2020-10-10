@@ -5,4 +5,5 @@ export const PlayerSchema = new mongoose.Schema({
   money: { type: Number, required: true },
   position: { type: Number, required: true },
   color: { type: String, required: true },
+  type: { type: Number, required: true },
 });
