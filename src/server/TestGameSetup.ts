@@ -9,17 +9,45 @@ import { PieceType } from "../core/enums/PieceType";
 export const createTestGame = async (): Promise<GameContext> => {
   const player1 = {
     name: "roman",
-    position: 0,
+    position: 4,
     money: 2000,
     color: "#3d4feb",
-    type: PieceType.Bicycle,
+    type: PieceType.Pawn,
   };
   const player2 = {
     name: "igor",
-    position: 0,
+    position: 4,
     money: 2000,
     color: "#0ea706",
-    type: PieceType.Pawn,
+    type: PieceType.Hat,
+  };
+  const player3 = {
+    name: "steve",
+    position: 4,
+    money: 2000,
+    color: "#42f5e3",
+    type: PieceType.Car,
+  };
+  const player4 = {
+    name: "alex",
+    position: 4,
+    money: 2000,
+    color: "#f542b3",
+    type: PieceType.Bicycle,
+  };
+  const player5 = {
+    name: "vlad",
+    position: 4,
+    money: 2000,
+    color: "#c8f542",
+    type: PieceType.Cat,
+  };
+  const player6 = {
+    name: "zak",
+    position: 4,
+    money: 2000,
+    color: "#f58a42",
+    type: PieceType.Dog,
   };
 
   const themeData = new Map<string, SquareThemeData>();
@@ -32,7 +60,7 @@ export const createTestGame = async (): Promise<GameContext> => {
 
   const testGame = new GameInstance({
     name: "test game",
-    players: [player1, player2],
+    players: [player1, player2, player3, player4, player5, player6],
     theme: themeData,
   });
 

@@ -3,6 +3,8 @@ import { faBicycle } from '@fortawesome/free-solid-svg-icons'
 import { faCar } from '@fortawesome/free-solid-svg-icons'
 import { faChessPawn } from '@fortawesome/free-solid-svg-icons'
 import { faHatWizard } from '@fortawesome/free-solid-svg-icons'
+import { faCat } from '@fortawesome/free-solid-svg-icons'
+import { faDog } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PieceType } from "../../core/enums/PieceType";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -23,12 +25,18 @@ export const GamePiece: React.FC<Props> = ({ color, type }) => {
       return faHatWizard;
     } else if (type == PieceType.Pawn) {
       return faChessPawn;
+    } else if (type == PieceType.Cat) {
+      return faCat;
+    } else if (type == PieceType.Dog) {
+      return faDog;
     }
     return faChessPawn;
   }
 
   const getPiece = () => {
-    return (<FontAwesomeIcon icon={getIconProp()} color={color} size="3x" />)
+    return (<div className="piece">
+      <FontAwesomeIcon icon={getIconProp()} color={color} size="3x" />
+    </div>)
   };
 
   return (

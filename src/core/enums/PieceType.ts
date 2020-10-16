@@ -3,4 +3,6 @@ export enum PieceType {
   Hat = 2,
   Car = 3,
   Bicycle = 4,
+  Cat = 5,
+  Dog = 6,
 }

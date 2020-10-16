@@ -4,6 +4,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
+import { SquarePieces } from "./SquarePieces";
 
 interface Props {
   id: number;
@@ -39,11 +40,17 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
 
 
   return (
-    <div className={getSquareClassName()} id={getSquareId()}>
-      <div className={getContainerClassName()}>
-        <SquareInfo id={id} gameInfo={gameInfo} />
+    <React.Fragment>
+      <div className={getSquareClassName()} id={getSquareId()}>
+        <SquarePieces gameInfo={gameInfo} id={id} />
+        <div className={getContainerClassName()}>
+          <SquareInfo id={id} gameInfo={gameInfo} />
+
+        </div>
       </div>
-    </div>
+
+    </React.Fragment>
+
   );
 
 };
