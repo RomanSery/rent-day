@@ -30,6 +30,10 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
     return "container container-" + sectionMap.get(section);
   };
 
+  const getPiecesClassName = () => {
+    return "pieces " + sectionMap.get(section);
+  };
+
   const getSquareClassName = () => {
     return "square " + squareTypeClass.get(squareType);
   };
@@ -42,7 +46,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
   return (
     <React.Fragment>
       <div className={getSquareClassName()} id={getSquareId()}>
-        <SquarePieces gameInfo={gameInfo} id={id} />
+        <SquarePieces gameInfo={gameInfo} cssName={getPiecesClassName()} id={id} />
         <div className={getContainerClassName()}>
           <SquareInfo id={id} gameInfo={gameInfo} />
 

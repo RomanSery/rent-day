@@ -12,8 +12,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo }) => {
   return (
     <React.Fragment>
       <div className="center-square square">
-        <DisplayPlayers gameInfo={gameInfo} />
         <DisplayActions gameInfo={gameInfo} />
+        <DisplayPlayers gameInfo={gameInfo} />
+
       </div>
     </React.Fragment>
   );

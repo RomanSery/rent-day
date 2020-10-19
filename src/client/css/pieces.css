@@ -1,0 +1,30 @@
+.pieces {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.pieces.bottom {
+  bottom: 10%;
+}
+
+.pieces.left {
+  bottom: 10%;
+  left: 5%;
+}
+
+.pieces.top {
+  top: 20%;
+}
+
+.pieces.right {
+  bottom: 10%;
+  right: 5%;
+}
+
+.pieces .piece {
+  font-size: calc(0.1rem + 0.4vw + 0.4vh);
+}

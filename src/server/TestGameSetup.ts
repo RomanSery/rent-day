@@ -7,44 +7,46 @@ import { GameContext } from "../core/types/GameContext";
 import { PieceType } from "../core/enums/PieceType";
 
 export const createTestGame = async (): Promise<GameContext> => {
+  const pos: number = 21;
+
   const player1 = {
     name: "roman",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#3d4feb",
     type: PieceType.Pawn,
   };
   const player2 = {
     name: "igor",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#0ea706",
     type: PieceType.Hat,
   };
   const player3 = {
     name: "steve",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#42f5e3",
     type: PieceType.Car,
   };
   const player4 = {
     name: "alex",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#f542b3",
     type: PieceType.Bicycle,
   };
   const player5 = {
     name: "vlad",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#c8f542",
     type: PieceType.Cat,
   };
   const player6 = {
     name: "zak",
-    position: 4,
+    position: pos,
     money: 2000,
     color: "#f58a42",
     type: PieceType.Dog,

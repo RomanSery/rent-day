@@ -35,7 +35,7 @@ export const GamePiece: React.FC<Props> = ({ color, type }) => {
 
   const getPiece = () => {
     return (<div className="piece">
-      <FontAwesomeIcon icon={getIconProp()} color={color} size="3x" />
+      <FontAwesomeIcon icon={getIconProp()} color={color} size="2x" />
     </div>)
   };
 

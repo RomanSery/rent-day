@@ -6,13 +6,15 @@ import { PieceType } from "../../core/enums/PieceType";
 interface Props {
   id: number;
   gameInfo: GameState | undefined;
+  cssName: string
 }
 
-export const SquarePieces: React.FC<Props> = ({ id, gameInfo }) => {
+export const SquarePieces: React.FC<Props> = ({ id, gameInfo, cssName }) => {
+
 
   return (
     <React.Fragment>
-      <div className="pieces">
+      <div className={cssName}>
         {gameInfo?.players.map((p, index) => {
           const pos: number = p.position;
           if (pos == id) {
