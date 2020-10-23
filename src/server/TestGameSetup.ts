@@ -7,7 +7,7 @@ import { GameContext } from "../core/types/GameContext";
 import { PieceType } from "../core/enums/PieceType";
 
 export const createTestGame = async (): Promise<GameContext> => {
-  const pos: number = 21;
+  const pos: number = 1;
 
   const player1 = {
     name: "roman",
@@ -62,7 +62,7 @@ export const createTestGame = async (): Promise<GameContext> => {
 
   const testGame = new GameInstance({
     name: "test game",
-    players: [player1, player2, player3, player4, player5, player6],
+    players: [player1, player2],
     theme: themeData,
   });
 

@@ -40,7 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 /**
  * Primary app routes.
  */
-app.get("/api/hello", actionsController.getLogin);
+app.post("/api/actions/roll", actionsController.roll);
 app.get("/api/initTestGame", actionsController.initTestGame);
 app.post("/api/getGame", actionsController.getGame);
 

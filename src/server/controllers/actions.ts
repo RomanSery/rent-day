@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { NextFunction, Request, Response } from "express";
 import { createTestGame } from "../TestGameSetup";
-import { check, sanitize, validationResult } from "express-validator";
+import { check, validationResult } from "express-validator";
 import { GameInstance } from "../../core/schema/GameInstanceSchema";
 import { GameContext } from "../../core/types/GameContext";
+import { processRoll } from "./gameplay";
 
-export const getLogin = (req: Request, res: Response) => {
-  res.send("Hello World!");
+export const roll = async (req: Request, res: Response) => {
+  res.json({ game: await processRoll(getGameContextFromUrl(req)) });
 };
 
 export const initTestGame = async (req: Request, res: Response) => {
@@ -32,4 +33,11 @@ export const getGame = async (req: Request, res: Response) => {
   });
 
   res.json({ game: found });
+};
+
+const getGameContextFromUrl = (req: Request): GameContext => {
+  const gid: any = req.body.context.gameId;
+  const pid: any = req.body.context.playerId;
+
+  return { gameId: gid, playerId: pid };
 };

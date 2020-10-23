@@ -22,12 +22,13 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player }) => {
     <React.Fragment>
       <div className="player-info" style={getColorStyle()}>
         <div className="container">
-          <div className="icon">
-            <GamePiece type={player.type} color={player.color} />
-          </div>
           <div className="name">
             {player.name}
           </div>
+          <div className="icon">
+            <GamePiece type={player.type} color={player.color} />
+          </div>
+
           <div className="money">
             ${player.money}
           </div>
