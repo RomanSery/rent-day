@@ -13,9 +13,6 @@ export const processRoll = async (context: GameContext) => {
       return console.log(err);
     }
 
-    console.log(existingGame.nextPlayerToAct);
-    console.log(playerId + " is trying to roll");
-
     const playerObjId = new mongoose.Types.ObjectId(context.playerId);
     if (!playerObjId.equals(existingGame.nextPlayerToAct)) {
       return console.log("not your turn!");
@@ -28,7 +25,7 @@ export const processRoll = async (context: GameContext) => {
       return console.log("player not found!");
     }
 
-    console.log(playerToAct.name + "is rolling");
+    console.log(playerToAct.name + "is rolling: " + newRoll.prettyPrint());
 
     const newPosition = playerToAct.position + newRoll.sum();
     playerToAct.position = newPosition;

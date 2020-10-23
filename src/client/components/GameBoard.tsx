@@ -11,7 +11,7 @@ interface Props {
 
 }
 
-export const GameBoard: React.FC<Props> = ({ children }) => {
+export const GameBoard: React.FC<Props> = () => {
 
   const num_squares: Array<number> = Array.from(Array(40));
   const location = useLocation();
@@ -34,6 +34,11 @@ export const GameBoard: React.FC<Props> = ({ children }) => {
       });
   };
 
+  const onGameStateChanged = (newGameState: GameState) => {
+    console.log("called here");
+    setGameState(newGameState);
+  }
+
   return (
     <React.Fragment>
       <div className="board">
@@ -47,7 +52,7 @@ export const GameBoard: React.FC<Props> = ({ children }) => {
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} />
+        <CenterDisplay gameInfo={gameState} onChangeGameState={onGameStateChanged} />
       </div>
     </React.Fragment>
   );

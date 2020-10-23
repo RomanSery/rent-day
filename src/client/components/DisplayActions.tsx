@@ -7,20 +7,19 @@ import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
   gameInfo: GameState | undefined;
+  onChangeGameState: (newGameState: GameState) => void;
 }
 
-export const DisplayActions: React.FC<Props> = ({ gameInfo }) => {
+export const DisplayActions: React.FC<Props> = ({ gameInfo, onChangeGameState }) => {
 
-  //const [serverResult, setServerResult] = useState<string | null>(null);
   const context: GameContext = getGameContextFromUrl(location.search);
 
 
   const onRollDice = async () => {
     API.post("actions/roll", { context })
       .then(function (response) {
-        // handle success
-        console.log(response);
-        //setServerResult(response.data);
+        // handle success        
+        onChangeGameState(response.data.game);
       })
       .catch(function (error) {
         // handle error
