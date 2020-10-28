@@ -11,8 +11,19 @@ interface Props {
 
 export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const txt: string | undefined = gameInfo?.theme[id].name;
-    const icon: string | undefined = gameInfo?.theme[id].icon;
+    const getIcon = () => {
+        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+            return gameInfo.theme[id].icon;
+        }
+        return "";
+    }
+
+    const getTxt = () => {
+        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+            return gameInfo.theme[id].name;
+        }
+        return "";
+    }
 
     const getSubwayCompany = () => {
         return (<React.Fragment>
@@ -20,7 +31,7 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faSubway} size="3x" color="blue" />
             </div>
-            <div className="square-name"> {txt}</div>
+            <div className="square-name"> {getTxt()}</div>
         </React.Fragment>);
     };
 
@@ -30,13 +41,13 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faLightbulb} size="3x" color="blue" />
             </div>
-            <div className="square-name"> {txt}</div>
+            <div className="square-name"> {getTxt()}</div>
         </React.Fragment>);
     };
 
 
     return (
-        icon === "subway" ? getSubwayCompany() : getElectricCompany()
+        getIcon() === "subway" ? getSubwayCompany() : getElectricCompany()
     );
 
 };

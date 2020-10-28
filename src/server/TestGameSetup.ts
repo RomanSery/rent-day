@@ -62,15 +62,18 @@ export const createTestGame = async (): Promise<GameContext> => {
 
   const testGame = new GameInstance({
     name: "test game",
-    players: [player1, player2],
     theme: themeData,
+    players: [player1, player2, player3, player4, player5, player6],
+    numPlayers: 2,
   });
+  /*players: [player1, player2, player3, player4, player5, player6],*/
 
   await testGame.save();
 
-  testGame.nextPlayerToAct = mongoose.Types.ObjectId(testGame.players[0].id);
+  testGame.nextPlayerToAct = mongoose.Types.ObjectId(testGame.players[0]._id);
 
   await testGame.save();
 
-  return { gameId: testGame.id, playerId: testGame.players[0].id };
+  return { gameId: testGame.id, playerId: testGame.players[0]._id };
+  //return { gameId: testGame.id, playerId: "12321" };
 };

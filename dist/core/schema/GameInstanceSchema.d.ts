@@ -6,5 +6,6 @@ export declare type GameInstanceDocument = mongoose.Document & {
     players: Player[];
     theme: Map<number, SquareThemeData>;
     nextPlayerToAct: mongoose.Types.ObjectId;
+    numPlayers: number;
 };
 export declare const GameInstance: mongoose.Model<GameInstanceDocument, {}>;

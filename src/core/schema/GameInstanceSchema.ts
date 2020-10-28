@@ -8,6 +8,7 @@ export type GameInstanceDocument = mongoose.Document & {
   players: Player[];
   theme: Map<number, SquareThemeData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
+  numPlayers: number;
 };
 
 const gameInstanceSchema = new mongoose.Schema(
@@ -16,6 +17,7 @@ const gameInstanceSchema = new mongoose.Schema(
     players: [PlayerSchema],
     theme: Map,
     nextPlayerToAct: mongoose.Types.ObjectId,
+    numPlayers: Number,
   },
   { timestamps: true }
 );

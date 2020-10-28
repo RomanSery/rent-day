@@ -4,8 +4,10 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import API from './api';
 import {
-  Switch, Route, withRouter, useHistory
+  Switch, Route, withRouter, useHistory, Link
 } from "react-router-dom";
+import { JoinGame } from "./join/JoinGame";
+import { StaticBoard } from "./join/StaticBoard";
 
 
 export const App: React.FC = () => {
@@ -24,12 +26,29 @@ export const App: React.FC = () => {
 
   const Home = () => {
     return (
-      <div>
-        <h2>Home</h2>
-        <p>
-          <button onClick={CreateGame}>Create test game</button>
-        </p>
-      </div>
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <div>
+            <h2>Welcome</h2>
+            <p>
+              <button onClick={CreateGame}>Create test game</button>
+              <Link to="/join">Join game</Link>
+            </p>
+          </div>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
+  const DisplayJoinGame = () => {
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <JoinGame />
+        </StaticBoard>
+      </React.Fragment>
     );
   };
 
@@ -40,6 +59,7 @@ export const App: React.FC = () => {
     API.get("initTestGame")
       .then(function (response) {
         history.push("/gameinstance?gid=" + response.data.gameId + "&pid=" + response.data.playerId);
+        //history.push("/join?gid=" + response.data.gameId);
       })
       .catch(function (error) {
         console.log(error);
@@ -51,6 +71,7 @@ export const App: React.FC = () => {
     <Switch>
       <Route exact path="/" component={withRouter(Home)} />
       <Route path="/gameinstance" component={GameDisplay} />
+      <Route path="/join" component={DisplayJoinGame} />
     </Switch>
   );
 }

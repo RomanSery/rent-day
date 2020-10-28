@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 export const PlayerSchema = new mongoose.Schema({
   name: { type: String, required: true },

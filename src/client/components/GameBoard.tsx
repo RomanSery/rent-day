@@ -35,7 +35,7 @@ export const GameBoard: React.FC<Props> = () => {
   };
 
   const onGameStateChanged = (newGameState: GameState) => {
-    console.log("called here");
+    console.log(newGameState);
     setGameState(newGameState);
   }
 

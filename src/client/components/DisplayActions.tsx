@@ -18,7 +18,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, onChangeGameState })
   const onRollDice = async () => {
     API.post("actions/roll", { context })
       .then(function (response) {
-        // handle success        
         onChangeGameState(response.data.game);
       })
       .catch(function (error) {

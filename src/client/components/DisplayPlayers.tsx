@@ -13,7 +13,7 @@ export const DisplayPlayers: React.FC<Props> = ({ gameInfo }) => {
     <React.Fragment>
       <div className="players-display">
         {gameInfo?.players.map((p: Player, index) => {
-          return (<DisplayPlayer gameInfo={gameInfo} player={p} key={p.id} />)
+          return (<DisplayPlayer gameInfo={gameInfo} player={p} key={p._id} />)
         })}
       </div>
     </React.Fragment>

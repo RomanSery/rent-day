@@ -10,6 +10,8 @@ interface Props {
 
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, onChangeGameState }) => {
 
+  console.log(gameInfo?.theme);
+
   return (
     <React.Fragment>
       <div className="center-square square">

@@ -10,13 +10,18 @@ interface Props {
 
 export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const txt: string | undefined = gameInfo?.theme[id].name;
+    const getTxt = () => {
+        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+            return gameInfo.theme[id].name;
+        }
+        return "";
+    }
 
 
     return (
         <React.Fragment>
             <ColorBar id={id} />
-            <div className="square-name">{txt}</div>
+            <div className="square-name">{getTxt()}</div>
         </React.Fragment>
     );
 

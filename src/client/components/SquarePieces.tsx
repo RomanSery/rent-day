@@ -2,6 +2,7 @@ import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { GamePiece } from "./GamePiece";
 import { PieceType } from "../../core/enums/PieceType";
+import { Player } from "../../core/types/Player";
 
 interface Props {
   id: number;
@@ -15,10 +16,10 @@ export const SquarePieces: React.FC<Props> = ({ id, gameInfo, cssName }) => {
   return (
     <React.Fragment>
       <div className={cssName}>
-        {gameInfo?.players.map((p, index) => {
+        {gameInfo?.players.map((p: Player, index) => {
           const pos: number = p.position;
           if (pos == id) {
-            return (<GamePiece type={p.type} color={p.color} />)
+            return (<GamePiece type={p.type} color={p.color} key={p._id} />)
           }
         })}
       </div>
