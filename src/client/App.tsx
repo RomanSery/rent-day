@@ -58,8 +58,8 @@ export const App: React.FC = () => {
 
     API.get("initTestGame")
       .then(function (response) {
-        history.push("/gameinstance?gid=" + response.data.gameId + "&pid=" + response.data.playerId);
-        //history.push("/join?gid=" + response.data.gameId);
+        //history.push("/gameinstance?gid=" + response.data.gameId + "&pid=" + response.data.playerId);
+        history.push("/join?gid=" + response.data.gameId);
       })
       .catch(function (error) {
         console.log(error);

@@ -9,6 +9,7 @@ export type GameInstanceDocument = mongoose.Document & {
   theme: Map<number, SquareThemeData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
   numPlayers: number;
+  allJoined: boolean;
 };
 
 const gameInstanceSchema = new mongoose.Schema(
@@ -18,6 +19,7 @@ const gameInstanceSchema = new mongoose.Schema(
     theme: Map,
     nextPlayerToAct: mongoose.Types.ObjectId,
     numPlayers: Number,
+    allJoined: Boolean,
   },
   { timestamps: true }
 );

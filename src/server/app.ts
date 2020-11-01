@@ -5,7 +5,8 @@ import mongoose from "mongoose";
 import { MONGODB_URI } from "./util/secrets";
 
 // Controllers (route handlers)
-import * as actionsController from "./controllers/actions";
+import * as actions from "./controllers/actions";
+import * as gameplay from "./controllers/gameplay";
 
 // Create Express server
 const app = express();
@@ -40,8 +41,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 /**
  * Primary app routes.
  */
-app.post("/api/actions/roll", actionsController.roll);
-app.get("/api/initTestGame", actionsController.initTestGame);
-app.post("/api/getGame", actionsController.getGame);
+
+app.get("/api/initTestGame", actions.initTestGame);
+app.post("/api/getGame", actions.getGame);
+app.post("/api/joinGame", actions.joinGame);
+
+app.post("/api/actions/roll", gameplay.roll);
 
 export default app;

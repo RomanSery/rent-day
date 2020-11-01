@@ -4,11 +4,9 @@ import { createTestGame } from "../TestGameSetup";
 import { check, validationResult } from "express-validator";
 import { GameInstance } from "../../core/schema/GameInstanceSchema";
 import { GameContext } from "../../core/types/GameContext";
-import { processRoll } from "./gameplay";
-
-export const roll = async (req: Request, res: Response) => {
-  res.json({ game: await processRoll(getGameContextFromUrl(req)) });
-};
+import { PieceType } from "../../core/enums/PieceType";
+import _ from "lodash";
+import { Player } from "../../core/types/Player";
 
 export const initTestGame = async (req: Request, res: Response) => {
   const testGame: GameContext = await createTestGame();
@@ -35,9 +33,58 @@ export const getGame = async (req: Request, res: Response) => {
   res.json({ game: found });
 };
 
-const getGameContextFromUrl = (req: Request): GameContext => {
-  const gid: any = req.body.context.gameId;
-  const pid: any = req.body.context.playerId;
+export const joinGame = async (req: Request, res: Response) => {
+  await check("gameId", "GameId missing").notEmpty().run(req);
+  await check("name", "Name is not valid")
+    .notEmpty()
+    .isLength({ min: 4 })
+    .isAlphanumeric()
+    .run(req);
 
-  return { gameId: gid, playerId: pid };
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.json({ errors: errors, status: "err" });
+  }
+
+  const gameId = req.body.gameId;
+  let existingGame = await GameInstance.findById(gameId);
+
+  if (existingGame == null) {
+    return res.json({ errors: "game not found", status: "err" });
+  }
+
+  if (existingGame.allJoined) {
+    return res.json({ errors: "allJoined already", status: "err" });
+  }
+
+  const playerName = _.trim(req.body.name);
+  if (_.some(existingGame.players, { name: playerName })) {
+    return res.json({ errors: "That name is already taken", status: "err" });
+  }
+
+  const newPlayer = {
+    name: playerName,
+    position: 1,
+    money: 2000,
+    color: "#f58a42",
+    type: req.body.piece,
+  };
+
+  existingGame.players.push(newPlayer);
+
+  if (existingGame.players.length === existingGame.numPlayers) {
+    existingGame.allJoined = true;
+  }
+  existingGame.save();
+
+  const playerAdded: Player | undefined = existingGame.players.find(
+    (p) => p.name === playerName
+  );
+  const playerAddedId = playerAdded != null ? playerAdded._id : "";
+
+  res.json({
+    status: "success",
+    playerId: playerAddedId,
+    allJoined: existingGame.allJoined,
+  });
 };
