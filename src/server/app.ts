@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import bluebird from "bluebird";
 import mongoose from "mongoose";
+import ioserver, { Socket } from "socket.io";
+import ioclient from "socket.io-client";
 import { MONGODB_URI } from "./util/secrets";
 
 // Controllers (route handlers)
@@ -38,14 +40,28 @@ app.set("port", process.env.PORT || 4000);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-/**
- * Primary app routes.
- */
-
 app.get("/api/initTestGame", actions.initTestGame);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/joinGame", actions.joinGame);
-
 app.post("/api/actions/roll", gameplay.roll);
+
+const options = {
+  pingTimeout: 5000,
+};
+//const io = require("socket.io")(3000, options);
+const io = ioserver(3000, options);
+
+io.on("connection", (client) => {
+  client.on("subscribeToTimer", (interval) => {
+    console.log("client is subscribing to timer with interval ", interval);
+    setInterval(() => {
+      client.emit("timer", new Date());
+    }, interval);
+  });
+});
+
+//const port = 7777;
+//io.listen(port);
+//console.log("listening on port ", port);
 
 export default app;

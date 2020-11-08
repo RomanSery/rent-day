@@ -8,6 +8,7 @@ import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 
+
 interface Props {
 
 }
@@ -26,7 +27,8 @@ export const JoinGame: React.FC<Props> = () => {
 
   useEffect(() => {
     getGameState();
-  }, [context.gameId, context.playerId])
+  }, [context.gameId, context.playerId]);
+
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
@@ -40,11 +42,13 @@ export const JoinGame: React.FC<Props> = () => {
       });
   };
 
+
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
     API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece })
       .then(function (response) {
         console.log(response.data);
+        getGameState();
       })
       .catch(function (error) {
         console.log(error);
