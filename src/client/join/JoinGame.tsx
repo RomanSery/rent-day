@@ -26,15 +26,15 @@ export const JoinGame: React.FC<Props> = () => {
 
   const [gameState, setGameState] = useState<GameState>();
 
+  let socket: SocketService;
+
   useEffect(() => {
     getGameState();
   }, [context.gameId, context.playerId]);
 
   useEffect(() => {
-    const socket = new SocketService();
+    socket = new SocketService();
     socket.init();
-
-    socket.send({ author: "roman", message: "im connected" });
 
     return () => socket.disconnect();
   }, []);
@@ -57,8 +57,12 @@ export const JoinGame: React.FC<Props> = () => {
 
     API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece })
       .then(function (response) {
-        console.log(response.data);
         getGameState();
+        socket.sendJoinedGame({
+          playerName: response.data.playerName,
+          playerId: response.data.playerId,
+          allJoined: response.data.allJoined
+        });
       })
       .catch(function (error) {
         console.log(error);

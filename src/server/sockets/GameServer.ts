@@ -1,6 +1,6 @@
-import ioserver from "socket.io";
-import { GameEvent } from "./constants";
-import { ChatMessage } from "./types";
+import ioserver, { Socket } from "socket.io";
+import { GameEvent } from "../../core/types/GameEvent";
+import { JoinedGameMsg } from "../../core/types/messages";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -18,11 +18,11 @@ export class GameServer {
   }
 
   public listen(): void {
-    this.io.on(GameEvent.CONNECT, (socket: any) => {
+    this.io.on(GameEvent.CONNECT, (socket: Socket) => {
       console.log("Connected client on port %s.", this.port);
 
-      socket.on(GameEvent.MESSAGE, (m: ChatMessage) => {
-        console.log("[server](message): %s", JSON.stringify(m));
+      socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
+        console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
         this.io.emit("message", m);
       });
 

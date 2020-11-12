@@ -86,5 +86,6 @@ export const joinGame = async (req: Request, res: Response) => {
     status: "success",
     playerId: playerAddedId,
     allJoined: existingGame.allJoined,
+    playerName: playerName,
   });
 };
