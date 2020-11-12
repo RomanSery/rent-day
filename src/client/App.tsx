@@ -42,6 +42,7 @@ export const App: React.FC = () => {
   };
 
   const DisplayJoinGame = () => {
+
     return (
       <React.Fragment>
         <CssBaseline />

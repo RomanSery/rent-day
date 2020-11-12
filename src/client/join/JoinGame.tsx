@@ -7,6 +7,7 @@ import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
+import { SocketService } from "../sockets/SocketService";
 
 
 interface Props {
@@ -28,6 +29,15 @@ export const JoinGame: React.FC<Props> = () => {
   useEffect(() => {
     getGameState();
   }, [context.gameId, context.playerId]);
+
+  useEffect(() => {
+    const socket = new SocketService();
+    socket.init();
+
+    socket.send({ author: "roman", message: "im connected" });
+
+    return () => socket.disconnect();
+  }, []);
 
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
