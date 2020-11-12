@@ -8,6 +8,7 @@ import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
+import { GameEvent } from "../../core/types/GameEvent";
 
 
 interface Props {
@@ -26,19 +27,24 @@ export const JoinGame: React.FC<Props> = () => {
 
   const [gameState, setGameState] = useState<GameState>();
 
-  let socket: SocketService;
+  console.log("creating SocketService");
+  const socket: SocketService = new SocketService();
 
   useEffect(() => {
     getGameState();
-  }, [context.gameId, context.playerId]);
+  }, [context.gameId]);
 
+  /*
   useEffect(() => {
-    socket = new SocketService();
-    socket.init();
+    console.log("init listen userEffect");
+    socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
+      console.log(data);
+      getGameState();
+    });
 
     return () => socket.disconnect();
-  }, []);
-
+  }, [context.gameId]);
+*/
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
@@ -58,11 +64,12 @@ export const JoinGame: React.FC<Props> = () => {
     API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece })
       .then(function (response) {
         getGameState();
-        socket.sendJoinedGame({
-          playerName: response.data.playerName,
-          playerId: response.data.playerId,
-          allJoined: response.data.allJoined
-        });
+
+        //socket.sendJoinedGame({
+        //playerName: response.data.playerName,
+        //playerId: response.data.playerId,
+        //allJoined: response.data.allJoined
+        //});
       })
       .catch(function (error) {
         console.log(error);

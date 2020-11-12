@@ -18,6 +18,8 @@ export class GameServer {
   }
 
   public listen(): void {
+    console.log("listen called");
+
     this.io.on(GameEvent.CONNECT, (socket: Socket) => {
       console.log("Connected client on port %s.", this.port);
 
