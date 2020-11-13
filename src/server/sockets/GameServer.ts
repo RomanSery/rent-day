@@ -25,7 +25,7 @@ export class GameServer {
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
         console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
-        this.io.emit("message", m);
+        this.io.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(GameEvent.DISCONNECT, () => {

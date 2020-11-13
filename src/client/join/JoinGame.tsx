@@ -12,7 +12,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 
 
 interface Props {
-
+  socket: SocketService;
 }
 
 type Inputs = {
@@ -20,33 +20,34 @@ type Inputs = {
   piece: PieceType;
 };
 
-export const JoinGame: React.FC<Props> = () => {
+export const JoinGame: React.FC<Props> = ({ socket }) => {
 
   const location = useLocation();
   const context: GameContext = getGameContextFromUrl(location.search);
 
   const [gameState, setGameState] = useState<GameState>();
+  //const [socket, setSocket] = useState<SocketService>(getMySocket);
+  const { register, handleSubmit, errors } = useForm<Inputs>();
 
-  console.log("creating SocketService");
-  const socket: SocketService = new SocketService();
 
   useEffect(() => {
     getGameState();
-  }, [context.gameId]);
 
-  /*
-  useEffect(() => {
-    console.log("init listen userEffect");
     socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
       console.log(data);
       getGameState();
     });
 
-    return () => socket.disconnect();
-  }, [context.gameId]);
-*/
 
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+    return function cleanup() {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [context.gameId]);
+
+
+
 
   const getGameState = () => {
     API.post("getGame", { gameId: context.gameId })
@@ -65,11 +66,13 @@ export const JoinGame: React.FC<Props> = () => {
       .then(function (response) {
         getGameState();
 
-        //socket.sendJoinedGame({
-        //playerName: response.data.playerName,
-        //playerId: response.data.playerId,
-        //allJoined: response.data.allJoined
-        //});
+        if (socket) {
+          socket.sendJoinedGame({
+            playerName: response.data.playerName,
+            playerId: response.data.playerId,
+            allJoined: response.data.allJoined
+          });
+        }
       })
       .catch(function (error) {
         console.log(error);

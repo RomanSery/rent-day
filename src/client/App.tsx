@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
+import { SocketService } from "./sockets/SocketService";
 
 
 export const App: React.FC = () => {
@@ -43,11 +44,13 @@ export const App: React.FC = () => {
 
   const DisplayJoinGame = () => {
 
+    const socket = new SocketService();
+
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <JoinGame />
+          <JoinGame socket={socket} />
         </StaticBoard>
       </React.Fragment>
     );
