@@ -14,3 +14,22 @@ export const getGameContextFromUrl = (search: string): GameContext => {
 
   return { gameId: gid, playerId: pid };
 };
+
+export enum StorageConstants {
+  GAME_ID = "myGameId",
+  PLAYER_ID = "myPlayerId",
+}
+
+export const hasJoinedGame = (): boolean => {
+  const myGameId = localStorage.getItem(StorageConstants.GAME_ID);
+  const myPlayerId = localStorage.getItem(StorageConstants.PLAYER_ID);
+  return myGameId != null && myPlayerId != null;
+};
+
+export const setJoinedGameStorage = (
+  gameId: string,
+  playerId: string
+): void => {
+  localStorage.setItem(StorageConstants.GAME_ID, gameId);
+  localStorage.setItem(StorageConstants.PLAYER_ID, playerId);
+};

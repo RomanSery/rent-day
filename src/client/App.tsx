@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import API from './api';
+import API, { hasJoinedGame, StorageConstants } from './api';
 import {
   Switch, Route, withRouter, useHistory, Link
 } from "react-router-dom";
@@ -26,6 +26,13 @@ export const App: React.FC = () => {
 
 
   const Home = () => {
+
+    if (hasJoinedGame()) {
+      const myGameId = localStorage.getItem(StorageConstants.GAME_ID);
+      const myPlayerId = localStorage.getItem(StorageConstants.PLAYER_ID);
+      history.push("/join?gid=" + myGameId + "&pid=" + myPlayerId);
+    }
+
     return (
       <React.Fragment>
         <CssBaseline />

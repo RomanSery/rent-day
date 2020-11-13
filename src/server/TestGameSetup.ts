@@ -63,8 +63,9 @@ export const createTestGame = async (): Promise<GameContext> => {
   const testGame = new GameInstance({
     name: "test game",
     theme: themeData,
-    numPlayers: 2,
+    numPlayers: 5,
     allJoined: false,
+    players: [player3, player4, player5],
   });
   /*players: [player1, player2, player3, player4, player5, player6],*/
 
