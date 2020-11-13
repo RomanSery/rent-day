@@ -2,13 +2,14 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import API, { hasJoinedGame, StorageConstants } from './api';
+import API, { getGameContextFromUrl, getMyGameId, getMyPlayerId, hasJoinedGame, StorageConstants } from './api';
 import {
-  Switch, Route, withRouter, useHistory, Link
+  Switch, Route, withRouter, useHistory, Link, useLocation
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
+import { GameContext } from "../core/types/GameContext";
 
 
 export const App: React.FC = () => {
@@ -28,9 +29,7 @@ export const App: React.FC = () => {
   const Home = () => {
 
     if (hasJoinedGame()) {
-      const myGameId = localStorage.getItem(StorageConstants.GAME_ID);
-      const myPlayerId = localStorage.getItem(StorageConstants.PLAYER_ID);
-      history.push("/join?gid=" + myGameId + "&pid=" + myPlayerId);
+      history.push("/join?gid=" + getMyGameId() + "&pid=" + getMyPlayerId());
     }
 
     return (
@@ -52,6 +51,16 @@ export const App: React.FC = () => {
   const DisplayJoinGame = () => {
 
     const socket = new SocketService();
+    const location = useLocation();
+
+    if (hasJoinedGame()) {
+      const context: GameContext = getGameContextFromUrl(location.search);
+      const myGameId = getMyGameId();
+      const myPlayerId = getMyPlayerId();
+      if (context.gameId !== myGameId || context.playerId !== myPlayerId) {
+        history.push("/join?gid=" + myGameId + "&pid=" + myPlayerId);
+      }
+    }
 
     return (
       <React.Fragment>

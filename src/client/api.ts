@@ -20,10 +20,21 @@ export enum StorageConstants {
   PLAYER_ID = "myPlayerId",
 }
 
+export const getMyGameId = (): string | null => {
+  return localStorage.getItem(StorageConstants.GAME_ID);
+};
+export const getMyPlayerId = (): string | null => {
+  return localStorage.getItem(StorageConstants.PLAYER_ID);
+};
+
 export const hasJoinedGame = (): boolean => {
-  const myGameId = localStorage.getItem(StorageConstants.GAME_ID);
-  const myPlayerId = localStorage.getItem(StorageConstants.PLAYER_ID);
+  const myGameId = getMyGameId();
+  const myPlayerId = getMyPlayerId();
   return myGameId != null && myPlayerId != null;
+};
+
+export const clearMyGameInfo = (): void => {
+  localStorage.clear();
 };
 
 export const setJoinedGameStorage = (

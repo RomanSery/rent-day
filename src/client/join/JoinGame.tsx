@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromUrl, hasJoinedGame, setJoinedGameStorage } from "../api";
+import { clearMyGameInfo, getGameContextFromUrl, hasJoinedGame, setJoinedGameStorage } from "../api";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -10,7 +10,7 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GamePiece } from "../components/GamePiece";
-
+import { Button } from "@material-ui/core";
 
 interface Props {
   socket: SocketService;
@@ -84,6 +84,12 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
     return { borderColor: "#000000" };
   };
 
+  const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    clearMyGameInfo();
+    history.push("/");
+  };
+
 
   return (
     <React.Fragment>
@@ -124,6 +130,12 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
 
             <input type="submit" value="Join" />
           </form>
+        }
+
+        {hasJoinedGame() &&
+          <Button variant="contained" color="secondary" onClick={onLeaveGame}>
+            Leave Game
+         </Button>
         }
 
       </div>
