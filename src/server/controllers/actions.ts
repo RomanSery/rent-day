@@ -2,11 +2,15 @@
 import { NextFunction, Request, Response } from "express";
 import { createTestGame } from "../TestGameSetup";
 import { check, validationResult } from "express-validator";
-import { GameInstance } from "../../core/schema/GameInstanceSchema";
+import {
+  GameInstance,
+  GameInstanceDocument,
+} from "../../core/schema/GameInstanceSchema";
 import { GameContext } from "../../core/types/GameContext";
-import { PieceType } from "../../core/enums/PieceType";
 import _ from "lodash";
 import { Player } from "../../core/types/Player";
+import mongoose from "mongoose";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 export const initTestGame = async (req: Request, res: Response) => {
   const testGame: GameContext = await createTestGame();
@@ -74,6 +78,7 @@ export const joinGame = async (req: Request, res: Response) => {
 
   if (existingGame.players.length === existingGame.numPlayers) {
     existingGame.allJoined = true;
+    initGame(existingGame);
   }
   existingGame.save();
 
@@ -88,4 +93,26 @@ export const joinGame = async (req: Request, res: Response) => {
     allJoined: existingGame.allJoined,
     playerName: playerName,
   });
+};
+
+const initGame = (game: GameInstanceDocument) => {
+  game.players = _.shuffle(game.players);
+
+  const colors = [
+    "#3d4feb",
+    "#0ea706",
+    "#42f5e3",
+    "#f542b3",
+    "#c8f542",
+    "#f58a42",
+  ];
+
+  _.forEach(game.players, function (p) {
+    p.money = game.settings.initialMoney;
+    p.position = 1;
+    p.color = colors[_.random(0, colors.length)];
+  });
+
+  game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
+  game.status = GameStatus.ACTIVE;
 };

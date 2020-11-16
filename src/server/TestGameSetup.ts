@@ -1,55 +1,32 @@
-import mongoose from "mongoose";
 import { GameInstance } from "../core/schema/GameInstanceSchema";
 import { NyThemeData } from "../core/config/NyTheme";
 import _ from "lodash";
 import { SquareThemeData } from "../core/types/SquareThemeData";
 import { GameContext } from "../core/types/GameContext";
 import { PieceType } from "../core/enums/PieceType";
+import { GameStatus } from "../core/enums/GameStatus";
 
 export const createTestGame = async (): Promise<GameContext> => {
-  const pos: number = 1;
-
-  const player1 = {
-    name: "roman",
-    position: pos,
-    money: 2000,
-    color: "#3d4feb",
-    type: PieceType.Pawn,
-  };
-  const player2 = {
-    name: "igor",
-    position: pos,
-    money: 2000,
-    color: "#0ea706",
-    type: PieceType.Hat,
-  };
   const player3 = {
     name: "steve",
-    position: pos,
-    money: 2000,
-    color: "#42f5e3",
     type: PieceType.Car,
+    color: "#000000",
+    position: 1,
+    money: 0,
   };
   const player4 = {
     name: "alex",
-    position: pos,
-    money: 2000,
-    color: "#f542b3",
     type: PieceType.Bicycle,
+    color: "#000000",
+    position: 1,
+    money: 0,
   };
   const player5 = {
     name: "vlad",
-    position: pos,
-    money: 2000,
-    color: "#c8f542",
     type: PieceType.Cat,
-  };
-  const player6 = {
-    name: "zak",
-    position: pos,
-    money: 2000,
-    color: "#f58a42",
-    type: PieceType.Dog,
+    color: "#000000",
+    position: 1,
+    money: 0,
   };
 
   const themeData = new Map<string, SquareThemeData>();
@@ -65,16 +42,12 @@ export const createTestGame = async (): Promise<GameContext> => {
     theme: themeData,
     numPlayers: 5,
     allJoined: false,
+    settings: { initialMoney: 2000, numPlayers: 5 },
     players: [player3, player4, player5],
+    status: GameStatus.JOINING,
   });
-  /*players: [player1, player2, player3, player4, player5, player6],*/
 
   await testGame.save();
 
-  //testGame.nextPlayerToAct = mongoose.Types.ObjectId(testGame.players[0]._id);
-
-  await testGame.save();
-
-  //return { gameId: testGame.id, playerId: testGame.players[0]._id };
   return { gameId: testGame.id, playerId: "" };
 };

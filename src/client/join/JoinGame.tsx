@@ -35,6 +35,9 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
     getGameState();
 
     socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
+      if (data.allJoined) {
+        history.push("/gameinstance?gid=" + context.gameId + "&pid=" + data.playerId);
+      }
       getGameState();
     });
 
@@ -150,7 +153,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
                     {p.name}
                   </div>
                   <div className="icon">
-                    <GamePiece type={p.type} color={p.color} />
+                    <GamePiece type={p.type} color="#000000" />
                   </div>
                 </div>
               </div>

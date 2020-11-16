@@ -5,6 +5,6 @@ export interface Player {
   readonly name: string;
   money: number;
   position: number;
-  readonly color: string;
+  color: string;
   readonly type: PieceType;
 }
