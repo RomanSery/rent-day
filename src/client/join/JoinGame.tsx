@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { clearMyGameInfo, getGameContextFromUrl, hasJoinedGame, setJoinedGameStorage } from "../api";
+import { clearMyGameInfo, getGameContextFromUrl, hasJoinedGame, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -37,8 +37,9 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
     socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
       if (data.allJoined) {
         history.push("/gameinstance?gid=" + context.gameId + "&pid=" + data.playerId);
+      } else {
+        getGameState();
       }
-      getGameState();
     });
 
     return function cleanup() {
@@ -146,7 +147,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
       <div className="players-display">
         {gameState?.players.map((p: Player, index) => {
           return (
-            <React.Fragment>
+            <React.Fragment key={p._id}>
               <div className="player-info" style={getColorStyle()}>
                 <div className="container">
                   <div className="name">

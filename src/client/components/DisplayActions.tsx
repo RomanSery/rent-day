@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from '../api';
 import { Button } from "@material-ui/core";
-import { getGameContextFromUrl } from "../api";
+import { getGameContextFromUrl } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { GameContext } from "../../core/types/GameContext";
 

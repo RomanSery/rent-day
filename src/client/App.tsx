@@ -2,7 +2,8 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import API, { getGameContextFromUrl, getMyGameId, getMyPlayerId, hasJoinedGame, StorageConstants } from './api';
+import API from './api';
+import { getGameContextFromUrl, tryToRedirectToExistingGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory, Link, useLocation
 } from "react-router-dom";
@@ -28,8 +29,10 @@ export const App: React.FC = () => {
 
   const Home = () => {
 
-    if (hasJoinedGame()) {
-      history.push("/join?gid=" + getMyGameId() + "&pid=" + getMyPlayerId());
+    const context: GameContext = getGameContextFromUrl(location.search);
+    const url: string | null = tryToRedirectToExistingGame(context, false);
+    if (url) {
+      history.push(url);
     }
 
     return (
@@ -52,14 +55,10 @@ export const App: React.FC = () => {
 
     const socket = new SocketService();
     const location = useLocation();
-
-    if (hasJoinedGame()) {
-      const context: GameContext = getGameContextFromUrl(location.search);
-      const myGameId = getMyGameId();
-      const myPlayerId = getMyPlayerId();
-      if (context.gameId !== myGameId || context.playerId !== myPlayerId) {
-        history.push("/join?gid=" + myGameId + "&pid=" + myPlayerId);
-      }
+    const context: GameContext = getGameContextFromUrl(location.search);
+    const url: string | null = tryToRedirectToExistingGame(context, true);
+    if (url) {
+      history.push(url);
     }
 
     return (

@@ -40,7 +40,7 @@ export const createTestGame = async (): Promise<GameContext> => {
   const testGame = new GameInstance({
     name: "test game",
     theme: themeData,
-    numPlayers: 5,
+    numPlayers: 4,
     allJoined: false,
     settings: { initialMoney: 2000, numPlayers: 5 },
     players: [player3, player4, player5],
