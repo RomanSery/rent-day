@@ -13,6 +13,7 @@ export class GameServer {
 
     const options = {
       pingTimeout: 5000,
+      pingInterval: 10000,
     };
     this.io = ioserver(this.port, options);
   }
@@ -28,8 +29,8 @@ export class GameServer {
         this.io.emit(GameEvent.JOINED_GAME, m);
       });
 
-      socket.on(GameEvent.DISCONNECT, () => {
-        console.log("Client disconnected");
+      socket.on(GameEvent.DISCONNECT, (reason) => {
+        console.log("Client disconnected: " + reason);
       });
     });
   }

@@ -42,6 +42,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
       }
     });
 
+
     return function cleanup() {
       if (socket) {
         socket.disconnect();

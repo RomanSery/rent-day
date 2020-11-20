@@ -40,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/api/initTestGame", actions.initTestGame);
 app.post("/api/getGame", actions.getGame);
+app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
 app.post("/api/actions/roll", gameplay.roll);
 

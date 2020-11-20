@@ -3,7 +3,7 @@ import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import API from './api';
-import { getGameContextFromUrl, tryToRedirectToExistingGame } from './helpers';
+import { getGameContextFromUrl, tryToRedirectFromHomePage, tryToRedirectFromJoinPage } from './helpers';
 import {
   Switch, Route, withRouter, useHistory, Link, useLocation
 } from "react-router-dom";
@@ -29,11 +29,13 @@ export const App: React.FC = () => {
 
   const Home = () => {
 
-    const context: GameContext = getGameContextFromUrl(location.search);
-    const url: string | null = tryToRedirectToExistingGame(context, false);
-    if (url) {
-      history.push(url);
-    }
+    localStorage.setItem("debug", '*');
+
+    tryToRedirectFromHomePage((redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
 
     return (
       <React.Fragment>
@@ -56,10 +58,12 @@ export const App: React.FC = () => {
     const socket = new SocketService();
     const location = useLocation();
     const context: GameContext = getGameContextFromUrl(location.search);
-    const url: string | null = tryToRedirectToExistingGame(context, true);
-    if (url) {
-      history.push(url);
-    }
+    tryToRedirectFromJoinPage(context, (redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
+
 
     return (
       <React.Fragment>

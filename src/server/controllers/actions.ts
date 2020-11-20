@@ -37,6 +37,27 @@ export const getGame = async (req: Request, res: Response) => {
   res.json({ game: found });
 };
 
+export const getGameStatus = async (req: Request, res: Response) => {
+  await check("gameId", "Please enter a valid gameId.").notEmpty().run(req);
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.json({ err: "missing gameId" });
+  }
+
+  const gameId = req.body.gameId;
+
+  const found = await GameInstance.findById(gameId, (err, existingGame) => {
+    if (err) {
+      return console.log(err);
+    }
+    return existingGame;
+  });
+
+  const status: GameStatus | null = found != null ? found.status : null;
+  res.json({ status: status });
+};
+
 export const joinGame = async (req: Request, res: Response) => {
   await check("gameId", "GameId missing").notEmpty().run(req);
   await check("name", "Name is not valid")

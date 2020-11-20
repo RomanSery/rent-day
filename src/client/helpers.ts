@@ -1,3 +1,4 @@
+import { NextFunction } from "express";
 import queryString from "query-string";
 import { GameStatus } from "../core/enums/GameStatus";
 import { GameContext } from "../core/types/GameContext";
@@ -41,41 +42,65 @@ export const setJoinedGameStorage = (
   localStorage.setItem(StorageConstants.PLAYER_ID, playerId);
 };
 
-export const tryToRedirectToExistingGame = (
+export const tryToRedirectFromHomePage = async (
+  callback: (redirectUrl: string) => void
+) => {
+  if (!hasJoinedGame()) {
+    return;
+  }
+
+  const gameStatus: GameStatus = await getGameStatus(getMyGameId()!);
+  if (gameStatus == null) {
+    clearMyGameInfo();
+    return callback("/");
+  }
+
+  if (gameStatus == GameStatus.JOINING) {
+    return callback("/join?gid=" + getMyGameId() + "&pid=" + getMyPlayerId());
+  } else if (gameStatus == GameStatus.ACTIVE) {
+    return callback(
+      "/gameinstance?gid=" + getMyGameId() + "&pid=" + getMyPlayerId()
+    );
+  }
+};
+
+export const tryToRedirectFromJoinPage = async (
   context: GameContext,
-  onJoinScreen: boolean
-): string | null => {
-  const joinedGame = hasJoinedGame();
-  let gameStatus: GameStatus = GameStatus.JOINING;
-  console.log("here");
+  callback: (redirectUrl: string) => void
+) => {
+  if (!hasJoinedGame()) {
+    return;
+  }
 
-  API.post("getGame", { gameId: context.gameId })
+  const currGameId = context.gameId;
+  const currPlayerId = context.playerId;
+  const myGameId = getMyGameId();
+  const myPlayerId = getMyPlayerId();
+  const gameStatus: GameStatus = await getGameStatus(currGameId);
+
+  if (currGameId === null) {
+    return callback("/");
+  }
+
+  if (currGameId !== myGameId || context.playerId !== myPlayerId) {
+    if (gameStatus == GameStatus.JOINING) {
+      return callback("/join?gid=" + myGameId + "&pid=" + myPlayerId);
+    } else if (gameStatus == GameStatus.ACTIVE) {
+      return callback("/gameinstance?gid=" + myGameId + "&pid=" + myPlayerId);
+    }
+  }
+};
+
+const getGameStatus = async (gameId: string) => {
+  const status = await API.post("getGameStatus", {
+    gameId: gameId,
+  })
     .then(function (response) {
-      gameStatus = response.data.game.status;
-      console.log(gameStatus);
-
-      if (joinedGame) {
-        if (gameStatus == GameStatus.JOINING) {
-          return "/join?gid=" + getMyGameId() + "&pid=" + getMyPlayerId();
-        } else if (gameStatus == GameStatus.ACTIVE) {
-          return (
-            "/gameinstance?gid=" + getMyGameId() + "&pid=" + getMyPlayerId()
-          );
-        }
-      }
-
-      if (joinedGame) {
-        const myGameId = getMyGameId();
-        const myPlayerId = getMyPlayerId();
-        if (context.gameId !== myGameId || context.playerId !== myPlayerId) {
-          return "/join?gid=" + myGameId + "&pid=" + myPlayerId;
-        }
-      }
+      return response.data.status;
     })
     .catch(function (error) {
       console.log(error);
     });
 
-  console.log("return null");
-  return null;
+  return status;
 };
