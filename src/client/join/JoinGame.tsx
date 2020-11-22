@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useHistory, useLocation } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { clearMyGameInfo, getGameContextFromUrl, hasJoinedGame, setJoinedGameStorage } from "../helpers";
+import { clearMyGameInfo, getGameContextFromLocalStorage, hasJoinedGame, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -24,8 +24,7 @@ type Inputs = {
 export const JoinGame: React.FC<Props> = ({ socket }) => {
 
   const history = useHistory();
-  const location = useLocation();
-  const context: GameContext = getGameContextFromUrl(location.search);
+  const context: GameContext = getGameContextFromLocalStorage();
 
   const [gameState, setGameState] = useState<GameState>();
   const { register, handleSubmit, errors } = useForm<Inputs>();
@@ -36,7 +35,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
 
     socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
       if (data.allJoined) {
-        history.push("/gameinstance?gid=" + context.gameId + "&pid=" + data.playerId);
+        history.push("/gameinstance");
       } else {
         getGameState();
       }
@@ -77,7 +76,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
         }
 
         setJoinedGameStorage(context.gameId, response.data.playerId);
-        history.push("/join?gid=" + context.gameId + "&pid=" + response.data.playerId);
+        getGameState();
       })
       .catch(function (error) {
         console.log(error);

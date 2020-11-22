@@ -1,13 +1,10 @@
-import { NextFunction } from "express";
-import queryString from "query-string";
 import { GameStatus } from "../core/enums/GameStatus";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
 
-export const getGameContextFromUrl = (search: string): GameContext => {
-  const parsed = queryString.parse(search);
-  const gid: any = parsed.gid;
-  const pid: any = parsed.pid;
+export const getGameContextFromLocalStorage = (): GameContext => {
+  const gid: any = getMyGameId();
+  const pid: any = getMyPlayerId();
 
   return { gameId: gid, playerId: pid };
 };
@@ -42,7 +39,7 @@ export const setJoinedGameStorage = (
   localStorage.setItem(StorageConstants.PLAYER_ID, playerId);
 };
 
-export const tryToRedirectFromHomePage = async (
+export const tryToRedirectToGame = async (
   callback: (redirectUrl: string) => void
 ) => {
   if (!hasJoinedGame()) {
@@ -56,38 +53,9 @@ export const tryToRedirectFromHomePage = async (
   }
 
   if (gameStatus == GameStatus.JOINING) {
-    return callback("/join?gid=" + getMyGameId() + "&pid=" + getMyPlayerId());
+    return callback("/join");
   } else if (gameStatus == GameStatus.ACTIVE) {
-    return callback(
-      "/gameinstance?gid=" + getMyGameId() + "&pid=" + getMyPlayerId()
-    );
-  }
-};
-
-export const tryToRedirectFromJoinPage = async (
-  context: GameContext,
-  callback: (redirectUrl: string) => void
-) => {
-  if (!hasJoinedGame()) {
-    return;
-  }
-
-  const currGameId = context.gameId;
-  const currPlayerId = context.playerId;
-  const myGameId = getMyGameId();
-  const myPlayerId = getMyPlayerId();
-  const gameStatus: GameStatus = await getGameStatus(currGameId);
-
-  if (currGameId === null) {
-    return callback("/");
-  }
-
-  if (currGameId !== myGameId || context.playerId !== myPlayerId) {
-    if (gameStatus == GameStatus.JOINING) {
-      return callback("/join?gid=" + myGameId + "&pid=" + myPlayerId);
-    } else if (gameStatus == GameStatus.ACTIVE) {
-      return callback("/gameinstance?gid=" + myGameId + "&pid=" + myPlayerId);
-    }
+    return callback("/gameinstance");
   }
 };
 

@@ -3,14 +3,13 @@ import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import API from './api';
-import { getGameContextFromUrl, tryToRedirectFromHomePage, tryToRedirectFromJoinPage } from './helpers';
+import { StorageConstants, tryToRedirectToGame } from './helpers';
 import {
-  Switch, Route, withRouter, useHistory, Link, useLocation
+  Switch, Route, withRouter, useHistory, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
-import { GameContext } from "../core/types/GameContext";
 
 
 export const App: React.FC = () => {
@@ -31,7 +30,7 @@ export const App: React.FC = () => {
 
     localStorage.setItem("debug", '*');
 
-    tryToRedirectFromHomePage((redirectUrl: string) => {
+    tryToRedirectToGame((redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }
@@ -45,7 +44,7 @@ export const App: React.FC = () => {
             <h2>Welcome</h2>
             <p>
               <button onClick={CreateGame}>Create test game</button>
-              <Link to="/join">Join game</Link>
+              <Link to="/find">Join game</Link>
             </p>
           </div>
         </StaticBoard>
@@ -56,9 +55,7 @@ export const App: React.FC = () => {
   const DisplayJoinGame = () => {
 
     const socket = new SocketService();
-    const location = useLocation();
-    const context: GameContext = getGameContextFromUrl(location.search);
-    tryToRedirectFromJoinPage(context, (redirectUrl: string) => {
+    tryToRedirectToGame((redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }
@@ -81,8 +78,8 @@ export const App: React.FC = () => {
 
     API.get("initTestGame")
       .then(function (response) {
-        //history.push("/gameinstance?gid=" + response.data.gameId + "&pid=" + response.data.playerId);
-        history.push("/join?gid=" + response.data.gameId);
+        localStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
+        history.push("/join");
       })
       .catch(function (error) {
         console.log(error);

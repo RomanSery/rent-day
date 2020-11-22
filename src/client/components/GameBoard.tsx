@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromUrl } from "../helpers";
+import { getGameContextFromLocalStorage } from "../helpers";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
@@ -14,8 +13,7 @@ interface Props {
 export const GameBoard: React.FC<Props> = () => {
 
   const num_squares: Array<number> = Array.from(Array(40));
-  const location = useLocation();
-  const context: GameContext = getGameContextFromUrl(location.search);
+  const context: GameContext = getGameContextFromLocalStorage();
 
   const [gameState, setGameState] = useState<GameState>();
 
