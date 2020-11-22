@@ -7,6 +7,7 @@ import {
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
 import { GameContext } from "../../core/types/GameContext";
+import { GameToJoin } from "../../core/types/GameToJoin";
 import _ from "lodash";
 import { Player } from "../../core/types/Player";
 import mongoose from "mongoose";
@@ -35,6 +36,26 @@ export const getGame = async (req: Request, res: Response) => {
   });
 
   res.json({ game: found });
+};
+
+export const getGamesToJoin = async (req: Request, res: Response) => {
+  GameInstance.find({ status: GameStatus.JOINING }, function (err, docs) {
+    if (err) {
+      return console.log(err);
+    }
+
+    const gamesToJoin: GameToJoin[] = [];
+
+    for (let game of docs) {
+      gamesToJoin.push({
+        gameId: game._id,
+        name: game.name,
+        numPlayers: game.numPlayers,
+      });
+    }
+
+    res.json({ games: gamesToJoin });
+  });
 };
 
 export const getGameStatus = async (req: Request, res: Response) => {

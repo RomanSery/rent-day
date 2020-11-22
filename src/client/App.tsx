@@ -10,6 +10,7 @@ import {
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
+import { DisplayAllGames } from "./join/DisplayAllGames";
 
 
 export const App: React.FC = () => {
@@ -73,6 +74,25 @@ export const App: React.FC = () => {
   };
 
 
+  const FindGames = () => {
+
+    tryToRedirectToGame((redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <DisplayAllGames />
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
+
   const CreateGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
@@ -92,6 +112,7 @@ export const App: React.FC = () => {
       <Route exact path="/" component={withRouter(Home)} />
       <Route path="/gameinstance" component={GameDisplay} />
       <Route path="/join" component={DisplayJoinGame} />
+      <Route path="/find" component={FindGames} />
     </Switch>
   );
 }

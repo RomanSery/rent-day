@@ -39,6 +39,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/api/initTestGame", actions.initTestGame);
+
+app.get("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
