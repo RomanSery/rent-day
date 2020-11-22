@@ -1,4 +1,5 @@
 import { GameStatus } from "../core/enums/GameStatus";
+import { PageType } from "../core/enums/PageType";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
 
@@ -40,22 +41,28 @@ export const setJoinedGameStorage = (
 };
 
 export const tryToRedirectToGame = async (
+  pageType: PageType,
   callback: (redirectUrl: string) => void
 ) => {
-  if (!hasJoinedGame()) {
+  const myGameId = getMyGameId();
+  if (myGameId === null) {
     return;
   }
 
-  const gameStatus: GameStatus = await getGameStatus(getMyGameId()!);
+  const gameStatus: GameStatus = await getGameStatus(myGameId);
   if (gameStatus == null) {
     clearMyGameInfo();
     return callback("/");
   }
 
-  if (gameStatus == GameStatus.JOINING) {
-    return callback("/join");
-  } else if (gameStatus == GameStatus.ACTIVE) {
-    return callback("/gameinstance");
+  if (hasJoinedGame()) {
+    if (pageType == PageType.Home || pageType == PageType.Find) {
+      return callback(
+        gameStatus == GameStatus.JOINING ? "/join" : "/gameinstance"
+      );
+    } else if (pageType == PageType.Join && gameStatus == GameStatus.ACTIVE) {
+      return callback("/gameinstance");
+    }
   }
 };
 

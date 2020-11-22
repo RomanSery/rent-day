@@ -25,19 +25,30 @@ export class GameServer {
   }
 
   public listen(): void {
-    console.log("listen called");
-
     this.io.on(GameEvent.CONNECT, (socket: Socket) => {
       console.log("Connected client on port %s.", this.port);
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
         console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
-        this.io.emit(GameEvent.JOINED_GAME, m);
+
+        // @ts-ignore: dont know what to do here
+        socket.playerName = m.playerName;
+        // @ts-ignore: dont know what to do here
+        socket.playerId = m.playerName;
+
+        socket.broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
-        console.log("Client disconnected: " + reason);
+        console.log(
+          // @ts-ignore: dont know what to do here
+          "Player disconnected: " + socket.playerName + " reason: " + reason
+        );
       });
+    });
+
+    this.io.on("ping", (socket: Socket) => {
+      console.log("server recieved ping");
     });
   }
 }
