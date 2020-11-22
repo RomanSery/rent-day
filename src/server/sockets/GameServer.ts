@@ -1,21 +1,27 @@
-import ioserver, { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg } from "../../core/types/messages";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
 
-  private io: SocketIO.Server;
-  private port: string | number;
+  private io: Server;
+  private port: number;
 
   constructor() {
-    this.port = process.env.PORT || GameServer.PORT;
+    //this.port = process.env.PORT || GameServer.PORT;
+    this.port = GameServer.PORT;
 
     const options = {
       pingTimeout: 5000,
       pingInterval: 10000,
+      cors: {
+        origin: ["http://localhost:3000", "http://localhost:8000"],
+        methods: ["GET", "POST"],
+        credentials: true,
+      },
     };
-    this.io = ioserver(this.port, options);
+    this.io = new Server(this.port, options);
   }
 
   public listen(): void {
