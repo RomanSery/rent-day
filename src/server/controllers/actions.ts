@@ -1,21 +1,49 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-import { NextFunction, Request, Response } from "express";
-import { createTestGame } from "../TestGameSetup";
+import { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
-import { GameContext } from "../../core/types/GameContext";
 import { GameToJoin } from "../../core/types/GameToJoin";
 import _ from "lodash";
 import { Player } from "../../core/types/Player";
 import mongoose from "mongoose";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { SquareThemeData } from "../../core/types/SquareThemeData";
+import { NyThemeData } from "../../core/config/NyTheme";
 
-export const initTestGame = async (req: Request, res: Response) => {
-  const testGame: GameContext = await createTestGame();
-  res.json(testGame);
+export const createGame = async (req: Request, res: Response) => {
+  await check("data.gameName", "GameId missing").notEmpty().run(req);
+  await check("data.numPlayers", "GameId missing").notEmpty().run(req);
+  await check("data.initialMoney", "Name is not valid")
+    .notEmpty()
+    .isLength({ min: 4 })
+    .isAlphanumeric()
+    .run(req);
+
+  const themeData = new Map<string, SquareThemeData>();
+  NyThemeData.forEach((value: SquareThemeData, key: number) => {
+    themeData.set(_.toString(key), value);
+  });
+
+  const gameName = req.body.data.gameName;
+  const numPlayers = req.body.data.numPlayers;
+  const initialMoney = req.body.data.initialMoney;
+
+  const newGame = new GameInstance({
+    name: gameName,
+    theme: themeData,
+    numPlayers: 0,
+    allJoined: false,
+    settings: { initialMoney: initialMoney, numPlayers: numPlayers },
+    players: [],
+    status: GameStatus.JOINING,
+  });
+
+  await newGame.save();
+
+  return res.json({ gameId: newGame.id });
 };
 
 export const getGame = async (req: Request, res: Response) => {

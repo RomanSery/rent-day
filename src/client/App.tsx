@@ -12,6 +12,7 @@ import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
 import { PageType } from "../core/enums/PageType";
+import { CreateGame } from "./join/CreateGame";
 
 
 export const App: React.FC = () => {
@@ -45,7 +46,7 @@ export const App: React.FC = () => {
           <div>
             <h2>Welcome</h2>
             <p>
-              <button onClick={CreateGame}>Create test game</button>
+              <Link to="/create">Create new game</Link>
               <Link to="/find">Join game</Link>
             </p>
           </div>
@@ -54,7 +55,7 @@ export const App: React.FC = () => {
     );
   };
 
-  const DisplayJoinGame = () => {
+  const DisplayJoinGamePage = () => {
 
     const socket = new SocketService();
     tryToRedirectToGame(PageType.Join, (redirectUrl: string) => {
@@ -75,7 +76,7 @@ export const App: React.FC = () => {
   };
 
 
-  const FindGames = () => {
+  const FindGamesPage = () => {
 
     tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
@@ -93,18 +94,22 @@ export const App: React.FC = () => {
     );
   };
 
+  const CreateGamePage = () => {
 
-  const CreateGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.preventDefault();
+    tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
 
-    API.get("initTestGame")
-      .then(function (response) {
-        localStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
-        history.push("/join");
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <CreateGame />
+        </StaticBoard>
+      </React.Fragment>
+    );
   };
 
 
@@ -112,8 +117,9 @@ export const App: React.FC = () => {
     <Switch>
       <Route exact path="/" component={withRouter(Home)} />
       <Route path="/gameinstance" component={GameDisplay} />
-      <Route path="/join" component={DisplayJoinGame} />
-      <Route path="/find" component={FindGames} />
+      <Route path="/join" component={DisplayJoinGamePage} />
+      <Route path="/find" component={FindGamesPage} />
+      <Route path="/create" component={CreateGamePage} />
     </Switch>
   );
 }

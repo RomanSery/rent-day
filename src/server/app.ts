@@ -38,13 +38,12 @@ app.set("port", process.env.PORT || 4000);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/api/initTestGame", actions.initTestGame);
-
 app.get("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
 app.post("/api/leaveGame", actions.leaveGame);
+app.post("/api/createGame", actions.createGame);
 app.post("/api/actions/roll", gameplay.roll);
 
 const gameServer = new GameServer();
