@@ -1,4 +1,4 @@
 export interface Settings {
   initialMoney: number;
-  numPlayers: number;
+  maxPlayers: number;
 }

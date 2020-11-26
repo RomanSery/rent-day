@@ -12,7 +12,6 @@ export type GameInstanceDocument = mongoose.Document & {
   settings: Settings;
   theme: Map<number, SquareThemeData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
-  numPlayers: number;
   allJoined: boolean;
   status: GameStatus;
 };
@@ -24,7 +23,6 @@ const gameInstanceSchema = new mongoose.Schema(
     settings: SettingsSchema,
     theme: Map,
     nextPlayerToAct: mongoose.Types.ObjectId,
-    numPlayers: Number,
     allJoined: Boolean,
     status: String,
   },

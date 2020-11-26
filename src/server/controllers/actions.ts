@@ -15,7 +15,7 @@ import { NyThemeData } from "../../core/config/NyTheme";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "GameId missing").notEmpty().run(req);
-  await check("data.numPlayers", "GameId missing").notEmpty().run(req);
+  await check("data.maxPlayers", "GameId missing").notEmpty().run(req);
   await check("data.initialMoney", "Name is not valid")
     .notEmpty()
     .isLength({ min: 4 })
@@ -28,15 +28,15 @@ export const createGame = async (req: Request, res: Response) => {
   });
 
   const gameName = req.body.data.gameName;
-  const numPlayers = req.body.data.numPlayers;
+  const maxPlayers = req.body.data.maxPlayers;
   const initialMoney = req.body.data.initialMoney;
 
   const newGame = new GameInstance({
     name: gameName,
     theme: themeData,
-    numPlayers: 0,
     allJoined: false,
-    settings: { initialMoney: initialMoney, numPlayers: numPlayers },
+    maxPlayers: maxPlayers,
+    settings: { initialMoney: initialMoney, maxPlayers: maxPlayers },
     players: [],
     status: GameStatus.JOINING,
   });
@@ -78,7 +78,8 @@ export const getGamesToJoin = async (req: Request, res: Response) => {
       gamesToJoin.push({
         gameId: game._id,
         name: game.name,
-        numPlayers: game.numPlayers,
+        maxPlayers: game.settings.maxPlayers,
+        playersJoined: game.players.length,
       });
     }
 
@@ -146,7 +147,7 @@ export const joinGame = async (req: Request, res: Response) => {
 
   existingGame.players.push(newPlayer);
 
-  if (existingGame.players.length === existingGame.numPlayers) {
+  if (existingGame.players.length === existingGame.settings.maxPlayers) {
     existingGame.allJoined = true;
     initGame(existingGame);
   }

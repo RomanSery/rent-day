@@ -119,7 +119,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
           name: {gameState?.name}
         </p>
         <p>
-          max players: {gameState?.numPlayers}
+          max players: {gameState?.settings.maxPlayers}
         </p>
         <p>
           num joined: {gameState?.players.length}

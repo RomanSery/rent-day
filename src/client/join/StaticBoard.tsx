@@ -25,7 +25,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
         themeArray.push({ name: "" });
       }
     }
-    return { id: '', theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', numPlayers: 0 };
+    return { id: '', theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: { maxPlayers: 0, initialMoney: 0 } };
   }
 
 

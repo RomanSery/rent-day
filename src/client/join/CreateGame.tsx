@@ -11,7 +11,7 @@ interface Props {
 
 type Inputs = {
   gameName: string;
-  numPlayers: number;
+  maxPlayers: number;
   initialMoney: number;
 };
 
@@ -24,7 +24,6 @@ export const CreateGame: React.FC<Props> = () => {
   const onCreateGame: SubmitHandler<Inputs> = (data) => {
     API.post("createGame", { data })
       .then(function (response) {
-        console.log(response.data.gameId);
         localStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
         history.push("/join");
       })
@@ -42,7 +41,7 @@ export const CreateGame: React.FC<Props> = () => {
           <TextField label="Name" fullWidth={true} name="gameName" required={true}
             inputRef={register({ required: true, maxLength: 30, minLength: 4 })} />
 
-          <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={2} required={true} name="numPlayers"
+          <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={2} required={true} name="maxPlayers"
             inputRef={register({ required: true, min: 2, max: 6 })} />
 
           <TextField label="Starting amount" fullWidth={true} name="initialMoney" defaultValue={1500} required={true}
