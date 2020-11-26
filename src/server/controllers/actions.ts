@@ -158,3 +158,38 @@ const initGame = (game: GameInstanceDocument) => {
   game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
   game.status = GameStatus.ACTIVE;
 };
+
+export const leaveGame = async (req: Request, res: Response) => {
+  await check("gameId", "GameId missing").notEmpty().run(req);
+  await check("playerId", "playerId missing").notEmpty().run(req);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.json({ errors: errors, status: "err" });
+  }
+
+  const gameId = req.body.gameId;
+  const playerId = req.body.playerId;
+  let existingGame = await GameInstance.findById(gameId);
+
+  if (existingGame == null) {
+    return res.json({ errors: "game not found", status: "err" });
+  }
+
+  const status: GameStatus = existingGame.status;
+
+  if (status === GameStatus.JOINING) {
+    existingGame.players = _.remove(existingGame.players, function (p) {
+      return p._id === playerId;
+    });
+  } else if (status === GameStatus.ACTIVE) {
+    //TODO do something else i think, not sure
+    existingGame.players = _.remove(existingGame.players, function (p) {
+      return p._id === playerId;
+    });
+  }
+
+  existingGame.save();
+
+  res.json({ status: "success" });
+};

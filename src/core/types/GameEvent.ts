@@ -1,6 +1,6 @@
 export enum GameEvent {
   CONNECT = "connect",
   DISCONNECT = "disconnect",
-  MESSAGE = "message",
+  GET_LATENCY = "getLatency",
   JOINED_GAME = "joinedGame",
 }

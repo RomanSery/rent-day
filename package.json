@@ -16,7 +16,6 @@
     "@types/jest": "^24.9.1",
     "@types/react": "^16.14.1",
     "@types/react-dom": "^16.9.10",
-    "@types/socket.io-client": "^1.4.34",
     "axios": "^0.20.0",
     "bluebird": "^3.7.2",
     "body-parser": "^1.19.0",

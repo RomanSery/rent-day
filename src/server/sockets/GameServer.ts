@@ -1,6 +1,7 @@
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { GameEvent } from "../../core/types/GameEvent";
-import { JoinedGameMsg } from "../../core/types/messages";
+import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
+import { GameSocket } from "../../core/types/GameSocket";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -25,30 +26,41 @@ export class GameServer {
   }
 
   public listen(): void {
-    this.io.on(GameEvent.CONNECT, (socket: Socket) => {
+    this.io.on(GameEvent.CONNECT, (socket: GameSocket) => {
       console.log("Connected client on port %s.", this.port);
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
         console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
 
-        // @ts-ignore: dont know what to do here
         socket.playerName = m.playerName;
-        // @ts-ignore: dont know what to do here
-        socket.playerId = m.playerName;
+        socket.playerId = m.playerId;
+        socket.latency = 0;
 
         socket.broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
         console.log(
-          // @ts-ignore: dont know what to do here
           "Player disconnected: " + socket.playerName + " reason: " + reason
         );
       });
-    });
 
-    this.io.on("ping", (socket: Socket) => {
-      console.log("server recieved ping");
+      socket.on(GameEvent.GET_LATENCY, (start) => {
+        const latency = Date.now() - start;
+        socket.latency = latency;
+
+        const info: LatencyInfoMsg[] = [];
+        this.io.of("/").sockets.forEach((s) => {
+          const gameSocket = <GameSocket>s;
+          info.push({
+            playerId: gameSocket.playerId,
+            latency: gameSocket.latency,
+          });
+        });
+
+        console.log(info);
+        socket.broadcast.emit(GameEvent.GET_LATENCY, info);
+      });
     });
   }
 }

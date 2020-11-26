@@ -11,7 +11,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
-import { clearMyGameInfo, StorageConstants } from "../helpers";
+import { leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
 
 interface Props {
 
@@ -34,9 +34,11 @@ export const DisplayAllGames: React.FC<Props> = () => {
   });
 
   const onJoinGame = (gameId: string) => {
-    clearMyGameInfo();
-    localStorage.setItem(StorageConstants.GAME_ID, gameId);
-    history.push("/join");
+
+    leaveCurrentGameIfJoined(() => {
+      localStorage.setItem(StorageConstants.GAME_ID, gameId);
+      history.push("/join");
+    });
   };
 
 

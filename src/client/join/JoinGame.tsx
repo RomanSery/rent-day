@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { clearMyGameInfo, getGameContextFromLocalStorage, hasJoinedGame, setJoinedGameStorage } from "../helpers";
+import { getGameContextFromLocalStorage, getMyPlayerId, getMyPlayerName, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -33,6 +33,15 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
   useEffect(() => {
     getGameState();
 
+    /*
+    if (hasJoinedGame() && socket && getMyPlayerName() !== null && getMyPlayerId() !== null) {
+      socket.sendJoinedGame({
+        playerName: getMyPlayerName()!,
+        playerId: getMyPlayerId()!,
+        allJoined: false
+      });
+    }*/
+
     socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
       if (data.allJoined) {
         history.push("/gameinstance");
@@ -41,13 +50,19 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
       }
     });
 
+    socket.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
+      //console.log(data);
+    });
+
+    socket.sendPingToServer();
+
 
     return function cleanup() {
       if (socket) {
         socket.disconnect();
       }
     };
-  }, [context.gameId]);
+  }, [context.gameId, context.playerId]);
 
 
 
@@ -75,7 +90,7 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
           });
         }
 
-        setJoinedGameStorage(context.gameId, response.data.playerId);
+        setJoinedGameStorage(context.gameId, response.data.playerId, response.data.playerName);
         getGameState();
       })
       .catch(function (error) {
@@ -90,8 +105,10 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
 
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
-    clearMyGameInfo();
-    history.push("/");
+
+    leaveCurrentGameIfJoined(() => {
+      history.push("/");
+    });
   };
 
 

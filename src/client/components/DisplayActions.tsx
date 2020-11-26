@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import API from '../api';
 import { Button } from "@material-ui/core";
-import { clearMyGameInfo, getGameContextFromLocalStorage } from "../helpers";
+import { getGameContextFromLocalStorage, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { GameContext } from "../../core/types/GameContext";
 import { useHistory } from "react-router-dom";
@@ -28,8 +28,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, onChangeGameState })
   };
 
   const onLeaveGame = async () => {
-    clearMyGameInfo();
-    history.push("/");
+    leaveCurrentGameIfJoined(() => {
+      history.push("/");
+    });
   };
 
   return (

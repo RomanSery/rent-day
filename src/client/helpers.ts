@@ -13,6 +13,7 @@ export const getGameContextFromLocalStorage = (): GameContext => {
 export enum StorageConstants {
   GAME_ID = "myGameId",
   PLAYER_ID = "myPlayerId",
+  PLAYER_NAME = "myPlayerName",
 }
 
 export const getMyGameId = (): string | null => {
@@ -21,11 +22,29 @@ export const getMyGameId = (): string | null => {
 export const getMyPlayerId = (): string | null => {
   return localStorage.getItem(StorageConstants.PLAYER_ID);
 };
+export const getMyPlayerName = (): string | null => {
+  return localStorage.getItem(StorageConstants.PLAYER_NAME);
+};
 
 export const hasJoinedGame = (): boolean => {
   const myGameId = getMyGameId();
   const myPlayerId = getMyPlayerId();
   return myGameId != null && myPlayerId != null;
+};
+
+export const leaveCurrentGameIfJoined = async (callback: () => void) => {
+  if (!hasJoinedGame()) {
+    clearMyGameInfo();
+    return callback();
+  }
+
+  await API.post("leaveGame", {
+    gameId: getMyGameId(),
+    playerId: getMyPlayerId(),
+  }).then(function (response) {
+    clearMyGameInfo();
+    return callback();
+  });
 };
 
 export const clearMyGameInfo = (): void => {
@@ -34,10 +53,12 @@ export const clearMyGameInfo = (): void => {
 
 export const setJoinedGameStorage = (
   gameId: string,
-  playerId: string
+  playerId: string,
+  playerName: string
 ): void => {
   localStorage.setItem(StorageConstants.GAME_ID, gameId);
   localStorage.setItem(StorageConstants.PLAYER_ID, playerId);
+  localStorage.setItem(StorageConstants.PLAYER_NAME, playerName);
 };
 
 export const tryToRedirectToGame = async (

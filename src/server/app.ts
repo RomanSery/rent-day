@@ -44,6 +44,7 @@ app.get("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
+app.post("/api/leaveGame", actions.leaveGame);
 app.post("/api/actions/roll", gameplay.roll);
 
 const gameServer = new GameServer();
