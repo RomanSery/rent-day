@@ -36,6 +36,8 @@ export class SocketService {
         gameId: getMyGameId()!,
         allJoined: false,
       });
+    } else if (getMyGameId() !== null) {
+      this.socket.emit(GameEvent.JOIN_GAME_ROOM, getMyGameId());
     }
   }
 

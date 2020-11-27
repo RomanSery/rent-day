@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { getGameContextFromLocalStorage, getMyGameId, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -10,7 +10,8 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GamePiece } from "../components/GamePiece";
-import { Button } from "@material-ui/core";
+import { Button, Snackbar } from "@material-ui/core";
+import { JoinedGameMsg } from "../../core/types/messages";
 
 interface Props {
   socketService: SocketService;
@@ -27,6 +28,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const context: GameContext = getGameContextFromLocalStorage();
 
   const [gameState, setGameState] = useState<GameState>();
+  const [snackOpen, setSnackOpen] = useState<boolean>(false);
+  const [snackMsg, setSnackMsg] = useState<string>("");
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
 
@@ -37,12 +40,19 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
 
-    socketService.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
+    socketService.listenForEvent(GameEvent.JOINED_GAME, (data: JoinedGameMsg) => {
       if (data.allJoined) {
         history.push("/gameinstance");
       } else {
         getGameState();
+        setSnackMsg(data.playerName + " has joined");
+        setSnackOpen(true);
       }
+    });
+
+    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any) => {
+      setSnackMsg(data);
+      setSnackOpen(true);
     });
 
     //socket.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
@@ -102,9 +112,19 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
-    leaveCurrentGameIfJoined(() => {
-      history.push("/");
-    });
+    socketService.socket.emit(GameEvent.LEAVE_GAME, getMyGameId());
+
+    //leaveCurrentGameIfJoined(() => {      
+    //history.push("/");
+    //});
+  };
+
+  const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackOpen(false);
   };
 
 
@@ -175,6 +195,16 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           )
         })}
       </div>
+
+
+      <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        onClose={closeSnack}
+        open={snackOpen} autoHideDuration={5000} message={snackMsg}
+      />
 
     </React.Fragment>
   );

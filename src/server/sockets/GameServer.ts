@@ -30,18 +30,29 @@ export class GameServer {
       console.log("Connected client on port %s", this.port);
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
-        //console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
-
-        console.log("%s joined gameid=%s", m.playerName, m.gameId);
-
         socket.playerName = m.playerName;
         socket.playerId = m.playerId;
         socket.gameId = m.gameId;
         socket.latency = 0;
 
         socket.join(m.gameId);
-
         socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
+      });
+
+      socket.on(GameEvent.JOIN_GAME_ROOM, (gameId: string) => {
+        socket.gameId = gameId;
+        socket.latency = 0;
+        socket.join(gameId);
+      });
+
+      socket.on(GameEvent.LEAVE_GAME, (gameId: string) => {
+        socket.leave(gameId);
+        socket
+          .to(gameId)
+          .broadcast.emit(
+            GameEvent.LEAVE_GAME,
+            socket.playerName + " has left"
+          );
       });
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
