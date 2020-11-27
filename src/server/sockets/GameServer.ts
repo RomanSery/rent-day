@@ -27,40 +27,48 @@ export class GameServer {
 
   public listen(): void {
     this.io.on(GameEvent.CONNECT, (socket: GameSocket) => {
-      console.log("Connected client on port %s.", this.port);
+      console.log("Connected client on port %s", this.port);
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
-        console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
+        //console.log("[server](JoinedGameMsg recieved): %s", JSON.stringify(m));
+
+        console.log("%s joined gameid=%s", m.playerName, m.gameId);
 
         socket.playerName = m.playerName;
         socket.playerId = m.playerId;
+        socket.gameId = m.gameId;
         socket.latency = 0;
 
-        socket.broadcast.emit(GameEvent.JOINED_GAME, m);
+        socket.join(m.gameId);
+
+        socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
         console.log(
-          "Player disconnected: " + socket.playerName + " reason: " + reason
+          "Player disconnected: %s reason: %s",
+          socket.playerName,
+          reason
         );
       });
-
-      socket.on(GameEvent.GET_LATENCY, (start) => {
-        const latency = Date.now() - start;
-        socket.latency = latency;
-
-        const info: LatencyInfoMsg[] = [];
-        this.io.of("/").sockets.forEach((s) => {
-          const gameSocket = <GameSocket>s;
-          info.push({
-            playerId: gameSocket.playerId,
-            latency: gameSocket.latency,
-          });
-        });
-
-        console.log(info);
-        socket.broadcast.emit(GameEvent.GET_LATENCY, info);
-      });
     });
+
+    /*
+    socket.on(GameEvent.GET_LATENCY, (start) => {
+      const latency = Date.now() - start;
+      socket.latency = latency;
+
+      const info: LatencyInfoMsg[] = [];
+      this.io.of("/").sockets.forEach((s) => {
+        const gameSocket = <GameSocket>s;
+        info.push({
+          playerId: gameSocket.playerId,
+          latency: gameSocket.latency,
+        });
+      });
+
+      console.log(info);
+      socket.broadcast.emit(GameEvent.GET_LATENCY, info);
+    });*/
   }
 }

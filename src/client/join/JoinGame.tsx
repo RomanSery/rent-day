@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getMyPlayerId, getMyPlayerName, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { getGameContextFromLocalStorage, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -13,7 +13,7 @@ import { GamePiece } from "../components/GamePiece";
 import { Button } from "@material-ui/core";
 
 interface Props {
-  socket: SocketService;
+  socketService: SocketService;
 }
 
 type Inputs = {
@@ -21,7 +21,7 @@ type Inputs = {
   piece: PieceType;
 };
 
-export const JoinGame: React.FC<Props> = ({ socket }) => {
+export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const history = useHistory();
   const context: GameContext = getGameContextFromLocalStorage();
@@ -32,17 +32,12 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
 
   useEffect(() => {
     getGameState();
+  }, [context.gameId, context.playerId]);
 
-    /*
-    if (hasJoinedGame() && socket && getMyPlayerName() !== null && getMyPlayerId() !== null) {
-      socket.sendJoinedGame({
-        playerName: getMyPlayerName()!,
-        playerId: getMyPlayerId()!,
-        allJoined: false
-      });
-    }*/
 
-    socket.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
+  useEffect(() => {
+
+    socketService.listenForEvent(GameEvent.JOINED_GAME, (data: any) => {
       if (data.allJoined) {
         history.push("/gameinstance");
       } else {
@@ -50,19 +45,19 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
       }
     });
 
-    socket.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
-      //console.log(data);
-    });
+    //socket.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
+    //console.log(data);
+    //});
 
-    socket.sendPingToServer();
+    //socket.sendPingToServer();
 
 
     return function cleanup() {
-      if (socket) {
-        socket.disconnect();
+      if (socketService) {
+        socketService.disconnect();
       }
     };
-  }, [context.gameId, context.playerId]);
+  }, [context.gameId]);
 
 
 
@@ -82,11 +77,12 @@ export const JoinGame: React.FC<Props> = ({ socket }) => {
 
     API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece })
       .then(function (response) {
-        if (socket) {
-          socket.sendJoinedGame({
+        if (socketService) {
+          socketService.socket.emit(GameEvent.JOINED_GAME, {
             playerName: response.data.playerName,
             playerId: response.data.playerId,
-            allJoined: response.data.allJoined
+            allJoined: response.data.allJoined,
+            gameId: context.gameId
           });
         }
 

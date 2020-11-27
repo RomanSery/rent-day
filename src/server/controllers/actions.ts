@@ -220,5 +220,15 @@ export const leaveGame = async (req: Request, res: Response) => {
 
   existingGame.save();
 
+  if (existingGame.players.length == 0) {
+    GameInstance.findByIdAndDelete(existingGame.id, function (err) {
+      if (err) console.log(err);
+      //console.log(
+      //"game deleted, no players left after leaving game: " +
+      //existingGame?.name
+      //);
+    });
+  }
+
   res.json({ status: "success" });
 };

@@ -31,7 +31,7 @@ export const App: React.FC = () => {
 
   const Home = () => {
 
-    localStorage.setItem("debug", '*');
+    //localStorage.setItem("debug", '*');
 
     tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
@@ -69,7 +69,7 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <JoinGame socket={socket} />
+          <JoinGame socketService={socket} />
         </StaticBoard>
       </React.Fragment>
     );

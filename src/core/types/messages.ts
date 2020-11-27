@@ -1,6 +1,7 @@
 export interface JoinedGameMsg {
   playerName: string;
   playerId: string;
+  gameId: string;
   allJoined: boolean;
 }
 
