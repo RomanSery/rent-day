@@ -10,8 +10,10 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GamePiece } from "../components/GamePiece";
-import { Button, FormControl, InputLabel, MenuItem, NativeSelect, Select, Snackbar, TextField } from "@material-ui/core";
+import { Button, Container, Divider, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, TextField, Typography } from "@material-ui/core";
 import { JoinedGameMsg } from "../../core/types/messages";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 
 interface Props {
   socketService: SocketService;
@@ -127,19 +129,26 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     setSnackOpen(false);
   };
 
+  const getNumPlayers = () => {
+    return "Players: " + gameState?.players.length + " / " + gameState?.settings.maxPlayers;
+  }
 
   return (
     <React.Fragment>
-      <div className="player-actions">
-        <p>
-          name: {gameState?.name}
-        </p>
-        <p>
-          max players: {gameState?.settings.maxPlayers}
-        </p>
-        <p>
-          num joined: {gameState?.players.length}
-        </p>
+      <Container maxWidth="xs" className="player-actions">
+        <Typography component="h2" variant="h5">{gameState?.name}</Typography>
+
+        <List dense={true} className="game-settings">
+          <ListItem>
+            <ListItemIcon> <FontAwesomeIcon icon={faUsers} size="2x" /> </ListItemIcon>
+            <ListItemText primary={getNumPlayers()} />
+          </ListItem>
+          <ListItem>
+            <ListItemIcon> <FontAwesomeIcon icon={faDollarSign} size="2x" /> </ListItemIcon>
+            <ListItemText primary={gameState?.settings.initialMoney} />
+          </ListItem>
+        </List>
+
 
         {!hasJoinedGame() &&
           <form onSubmit={handleSubmit(onJoinGame)}>
@@ -147,7 +156,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             <TextField label="Name" fullWidth={true} name="playerName" required={true}
               inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
 
-            <FormControl >
+            <FormControl fullWidth >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
               <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true} inputRef={register({ required: true })} >
                 <option value="1">Pawn</option>
@@ -172,7 +181,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
          </Button>
         }
 
-      </div>
+      </Container>
 
       <div className="players-display">
         {gameState?.players.map((p: Player, index) => {

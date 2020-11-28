@@ -117,7 +117,9 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <CreateGame />
+          <Container maxWidth="xs" className="player-actions">
+            <CreateGame />
+          </Container>
         </StaticBoard>
       </React.Fragment>
     );

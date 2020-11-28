@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button, TextField } from "@material-ui/core";
+import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import API from '../api';
 import { StorageConstants } from "../helpers";
 
@@ -32,28 +32,33 @@ export const CreateGame: React.FC<Props> = () => {
       });
   };
 
+  const createStyles = makeStyles({
+    opt: {
+      marginTop: 15,
+      marginBottom: 15
+    },
+  });
+
+  const classes = createStyles();
+
   return (
     <React.Fragment>
-      <div className="player-actions">
 
-        <form onSubmit={handleSubmit(onCreateGame)}>
+      <Typography component="h2" variant="h5">Create Game</Typography>
 
-          <TextField label="Name" fullWidth={true} name="gameName" required={true}
-            inputRef={register({ required: true, maxLength: 30, minLength: 4 })} />
+      <form onSubmit={handleSubmit(onCreateGame)}>
 
-          <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={3} required={true} name="maxPlayers"
-            inputRef={register({ required: true, min: 2, max: 6 })} />
+        <TextField label="Name" fullWidth={true} name="gameName" required={true}
+          inputRef={register({ required: true, maxLength: 30, minLength: 4 })} />
 
-          <TextField label="Starting amount" fullWidth={true} name="initialMoney" defaultValue={1500} required={true}
-            inputRef={register({ required: true })} />
+        <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={3} required={true} name="maxPlayers"
+          inputRef={register({ required: true, min: 2, max: 6 })} />
 
-          <Button variant="contained" color="primary" type="submit">
-            Create
-          </Button>
-        </form>
+        <TextField label="Starting amount" fullWidth={true} name="initialMoney" defaultValue={1500} required={true}
+          inputRef={register({ required: true })} />
 
-
-      </div>
+        <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
+      </form>
 
     </React.Fragment>
   );
