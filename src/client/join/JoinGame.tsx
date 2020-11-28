@@ -10,7 +10,7 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GamePiece } from "../components/GamePiece";
-import { Button, Snackbar } from "@material-ui/core";
+import { Button, FormControl, InputLabel, MenuItem, NativeSelect, Select, Snackbar, TextField } from "@material-ui/core";
 import { JoinedGameMsg } from "../../core/types/messages";
 
 interface Props {
@@ -114,9 +114,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
     socketService.socket.emit(GameEvent.LEAVE_GAME, getMyGameId());
 
-    //leaveCurrentGameIfJoined(() => {      
-    //history.push("/");
-    //});
+    leaveCurrentGameIfJoined(() => {
+      history.push("/");
+    });
   };
 
   const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
@@ -143,25 +143,26 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
         {!hasJoinedGame() &&
           <form onSubmit={handleSubmit(onJoinGame)}>
-            <label>Name</label>
-            <input
-              name="playerName"
-              ref={register({ required: true, maxLength: 10, minLength: 4 })}
-            />
-            {errors.playerName && <p>This field is required</p>}
 
-            <br />
 
-            <label>Piece Type</label>
-            <select name="piece" ref={register({ required: true })}>
-              <option value="1">Pawn</option>
-              <option value="2">Hat</option>
-              <option value="3">Car</option>
-              <option value="4">Bicycle</option>
-              <option value="5">Cat</option>
-              <option value="6">Dog</option>
-            </select>
-            {errors.piece && <p>This field is required</p>}
+            <TextField label="Name" fullWidth={true} name="playerName" required={true}
+              inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
+
+
+
+
+            <FormControl >
+              <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
+              <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true} inputRef={register({ required: true })} >
+                <option value="1">Pawn</option>
+                <option value="2">Hat</option>
+                <option value="3">Car</option>
+                <option value="4">Bicycle</option>
+                <option value="5">Cat</option>
+                <option value="6">Dog</option>
+              </NativeSelect>
+
+            </FormControl>
 
             <br />
 

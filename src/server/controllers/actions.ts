@@ -207,27 +207,23 @@ export const leaveGame = async (req: Request, res: Response) => {
 
   const status: GameStatus = existingGame.status;
 
-  if (status === GameStatus.JOINING) {
+  if (status == GameStatus.JOINING) {
     existingGame.players = _.remove(existingGame.players, function (p) {
       return p._id === playerId;
     });
-  } else if (status === GameStatus.ACTIVE) {
+  } else if (status == GameStatus.ACTIVE) {
     //TODO do something else i think, not sure
     existingGame.players = _.remove(existingGame.players, function (p) {
       return p._id === playerId;
     });
   }
 
-  existingGame.save();
-
   if (existingGame.players.length == 0) {
     GameInstance.findByIdAndDelete(existingGame.id, function (err) {
       if (err) console.log(err);
-      //console.log(
-      //"game deleted, no players left after leaving game: " +
-      //existingGame?.name
-      //);
     });
+  } else {
+    existingGame.save();
   }
 
   res.json({ status: "success" });

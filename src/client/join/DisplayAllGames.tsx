@@ -59,7 +59,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
                 <TableCell component="th" scope="row">
                   {g.name}
                 </TableCell>
-                <TableCell align="right">{g.maxPlayers}</TableCell>
+                <TableCell align="right">{g.playersJoined} / {g.maxPlayers}</TableCell>
                 <TableCell align="right">
                   <Button variant="contained" color="secondary" onClick={() => onJoinGame(g.gameId)}>Join</Button>
                 </TableCell>
