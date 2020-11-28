@@ -55,11 +55,11 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       setSnackOpen(true);
     });
 
-    //socket.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
-    //console.log(data);
-    //});
+    socketService.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
+      console.log(data);
+    });
 
-    //socket.sendPingToServer();
+    socketService.sendPingToServer();
 
 
     return function cleanup() {
@@ -144,12 +144,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         {!hasJoinedGame() &&
           <form onSubmit={handleSubmit(onJoinGame)}>
 
-
             <TextField label="Name" fullWidth={true} name="playerName" required={true}
               inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
-
-
-
 
             <FormControl >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>

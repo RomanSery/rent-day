@@ -46,9 +46,13 @@ export class SocketService {
   }
 
   public sendPingToServer(): void {
-    //setInterval(() => {
-    //this.socket.volatile.emit(GameEvent.GET_LATENCY, Date.now());
-    //}, 10000);
+    setInterval(() => {
+      this.socket.volatile.emit(
+        GameEvent.GET_LATENCY,
+        Date.now(),
+        getMyGameId()
+      );
+    }, 10000);
   }
 
   // disconnect - used when unmounting

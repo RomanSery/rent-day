@@ -62,24 +62,25 @@ export class GameServer {
           reason
         );
       });
-    });
 
-    /*
-    socket.on(GameEvent.GET_LATENCY, (start) => {
-      const latency = Date.now() - start;
-      socket.latency = latency;
+      socket.on(GameEvent.GET_LATENCY, (start, gameId: string) => {
+        const latency = Date.now() - start;
+        socket.latency = latency;
 
-      const info: LatencyInfoMsg[] = [];
-      this.io.of("/").sockets.forEach((s) => {
-        const gameSocket = <GameSocket>s;
-        info.push({
-          playerId: gameSocket.playerId,
-          latency: gameSocket.latency,
-        });
+        const info: LatencyInfoMsg[] = [];
+        this.io
+          .of("/")
+          .in(gameId)
+          .sockets.forEach((s) => {
+            const gameSocket = <GameSocket>s;
+            info.push({
+              playerId: gameSocket.playerId,
+              latency: gameSocket.latency,
+            });
+          });
+
+        socket.to(gameId).broadcast.emit(GameEvent.GET_LATENCY, info);
       });
-
-      console.log(info);
-      socket.broadcast.emit(GameEvent.GET_LATENCY, info);
-    });*/
+    });
   }
 }

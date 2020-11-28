@@ -13,6 +13,8 @@ import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
+import { Button, Container, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/styles";
 
 
 export const App: React.FC = () => {
@@ -39,17 +41,26 @@ export const App: React.FC = () => {
       }
     });
 
+    const homeStyles = makeStyles({
+      opt: {
+        marginTop: 10,
+        marginBottom: 10
+      },
+    });
+
+    const classes = homeStyles();
+
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <div>
-            <h2>Welcome</h2>
-            <p>
-              <Link to="/create">Create new game</Link>
-              <Link to="/find">Join game</Link>
-            </p>
-          </div>
+          <Container maxWidth="xs" className="home-page-options">
+            <Typography component="h2" variant="h5">Rent Day</Typography>
+
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
+
+          </Container>
         </StaticBoard>
       </React.Fragment>
     );
