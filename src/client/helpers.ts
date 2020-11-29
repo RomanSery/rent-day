@@ -1,5 +1,15 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import {
+  faBicycle,
+  faCar,
+  faHatWizard,
+  faChessPawn,
+  faCat,
+  faDog,
+} from "@fortawesome/free-solid-svg-icons";
 import { GameStatus } from "../core/enums/GameStatus";
 import { PageType } from "../core/enums/PageType";
+import { PieceType } from "../core/enums/PieceType";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
 
@@ -99,4 +109,21 @@ const getGameStatus = async (gameId: string) => {
     });
 
   return status;
+};
+
+export const getIconProp = (type: PieceType): IconDefinition => {
+  if (type == PieceType.Bicycle) {
+    return faBicycle;
+  } else if (type == PieceType.Car) {
+    return faCar;
+  } else if (type == PieceType.Hat) {
+    return faHatWizard;
+  } else if (type == PieceType.Pawn) {
+    return faChessPawn;
+  } else if (type == PieceType.Cat) {
+    return faCat;
+  } else if (type == PieceType.Dog) {
+    return faDog;
+  }
+  return faChessPawn;
 };

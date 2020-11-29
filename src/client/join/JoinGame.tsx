@@ -2,18 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getMyGameId, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { getGameContextFromLocalStorage, getIconProp, getMyGameId, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { GamePiece } from "../components/GamePiece";
-import { Button, Container, Divider, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, TextField, Typography } from "@material-ui/core";
+import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, TextField, Typography } from "@material-ui/core";
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
+import { getPackedSettings } from "http2";
+import _ from "lodash";
+
 
 interface Props {
   socketService: SocketService;
@@ -32,6 +34,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
+  const [pings, setPings] = useState();
+
+
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
 
@@ -58,7 +63,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     });
 
     socketService.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
-      console.log(data);
+      setPings(data);
     });
 
     socketService.sendPingToServer();
@@ -133,6 +138,16 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     return "Players: " + gameState?.players.length + " / " + gameState?.settings.maxPlayers;
   }
 
+  const getPing = (playerId: string | undefined) => {
+    if (playerId) {
+      const pingInfo = _.filter(pings, { 'playerId': playerId });
+      if (pingInfo && pingInfo.length > 0) {
+        return "Ping: " + pingInfo[0].latency + "ms";
+      }
+    }
+    return "";
+  }
+
   return (
     <React.Fragment>
       <Container maxWidth="xs" className="player-actions">
@@ -189,12 +204,10 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             <React.Fragment key={p._id}>
               <div className="player-info" style={getColorStyle()}>
                 <div className="container">
-                  <div className="name">
-                    {p.name}
-                  </div>
-                  <div className="icon">
-                    <GamePiece type={p.type} color="#000000" />
-                  </div>
+                  <Chip clickable={false} color="primary" size="medium" variant="outlined"
+                    icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
+                    label={p.name} />
+                  <div className="ping">{getPing(p._id)}</div>
                 </div>
               </div>
             </React.Fragment>
