@@ -51,7 +51,7 @@ export const CreateGame: React.FC<Props> = () => {
         <TextField label="Name" fullWidth={true} name="gameName" required={true}
           inputRef={register({ required: true, maxLength: 30, minLength: 4 })} />
 
-        <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={3} required={true} name="maxPlayers"
+        <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={2} required={true} name="maxPlayers"
           inputRef={register({ required: true, min: 2, max: 6 })} />
 
         <TextField label="Starting amount" fullWidth={true} name="initialMoney" defaultValue={1500} required={true}

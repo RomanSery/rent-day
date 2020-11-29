@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import API from '../api';
-import { Button } from "@material-ui/core";
+import React from "react";
+import { Button, Chip } from "@material-ui/core";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
-import { faPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { GamePiece } from "./GamePiece";
+import { getIconProp } from "../helpers";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -22,12 +20,9 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player }) => {
     <React.Fragment>
       <div className="player-info" style={getColorStyle()}>
         <div className="container">
-          <div className="name">
-            {player.name}
-          </div>
-          <div className="icon">
-            <GamePiece type={player.type} color={player.color} />
-          </div>
+          <Chip clickable={false} color="primary" size="medium" variant="outlined"
+            icon={<FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />}
+            label={player.name} />
 
           <div className="money">
             ${player.money}

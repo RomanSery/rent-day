@@ -11,7 +11,7 @@ interface Props {
 export const AirportDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
     const getTxt = () => {
-        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+        if (gameInfo && gameInfo.theme) {
             return gameInfo.theme[id].name;
         }
         return "";

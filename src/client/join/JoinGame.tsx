@@ -13,7 +13,6 @@ import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListI
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
-import { getPackedSettings } from "http2";
 import _ from "lodash";
 
 

@@ -12,14 +12,14 @@ interface Props {
 export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
     const getIcon = () => {
-        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+        if (gameInfo && gameInfo.theme) {
             return gameInfo.theme[id].icon;
         }
         return "";
     }
 
     const getTxt = () => {
-        if (gameInfo && gameInfo.theme && gameInfo.theme.length > 0) {
+        if (gameInfo && gameInfo.theme) {
             return gameInfo.theme[id].name;
         }
         return "";
