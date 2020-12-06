@@ -51,7 +51,7 @@ export const getGame = async (req: Request, res: Response) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.json({ err: "missing gameId" });
+    return res.status(400).send("missing gameId");
   }
 
   const gameId = req.body.gameId;
@@ -92,7 +92,7 @@ export const getGameStatus = async (req: Request, res: Response) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.json({ err: "missing gameId" });
+    return res.status(400).send("missing gameId");
   }
 
   const gameId = req.body.gameId;
@@ -118,23 +118,29 @@ export const joinGame = async (req: Request, res: Response) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.json({ errors: errors, status: "err" });
+    return res.status(400).send(errors);
   }
 
   const gameId = req.body.gameId;
   let existingGame = await GameInstance.findById(gameId);
 
   if (existingGame == null) {
-    return res.json({ errors: "game not found", status: "err" });
+    return res.status(400).send("game not found");
   }
 
   if (existingGame.allJoined) {
-    return res.json({ errors: "allJoined already", status: "err" });
+    return res.status(400).send("all Joined already");
   }
 
   const playerName = _.trim(req.body.name);
+  const selectedPiece: number = parseInt(_.trim(req.body.piece));
+
   if (_.some(existingGame.players, { name: playerName })) {
-    return res.json({ errors: "That name is already taken", status: "err" });
+    return res.status(400).send("That name is already taken");
+  }
+
+  if (_.some(existingGame.players, { piece: selectedPiece })) {
+    return res.status(400).send("That piece is already taken");
   }
 
   const newPlayer = {
@@ -142,7 +148,7 @@ export const joinGame = async (req: Request, res: Response) => {
     position: 1,
     money: 2000,
     color: "#f58a42",
-    type: req.body.piece,
+    type: selectedPiece,
   };
 
   existingGame.players.push(newPlayer);
@@ -194,7 +200,7 @@ export const leaveGame = async (req: Request, res: Response) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.json({ errors: errors, status: "err" });
+    return res.status(400).send(errors);
   }
 
   const gameId = req.body.gameId;
@@ -202,7 +208,7 @@ export const leaveGame = async (req: Request, res: Response) => {
   let existingGame = await GameInstance.findById(gameId);
 
   if (existingGame == null) {
-    return res.json({ errors: "game not found", status: "err" });
+    return res.status(400).send("game not found");
   }
 
   const status: GameStatus = existingGame.status;

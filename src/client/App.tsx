@@ -21,11 +21,15 @@ export const App: React.FC = () => {
 
   const history = useHistory();
 
+
   const GameDisplay = () => {
+
+    const socket = new SocketService(PageType.Game);
+
     return (
       <React.Fragment>
         <CssBaseline />
-        <GameBoard />
+        <GameBoard socketService={socket} />
       </React.Fragment>
     );
   };
@@ -68,7 +72,7 @@ export const App: React.FC = () => {
 
   const DisplayJoinGamePage = () => {
 
-    const socket = new SocketService();
+    const socket = new SocketService(PageType.Join);
     tryToRedirectToGame(PageType.Join, (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);

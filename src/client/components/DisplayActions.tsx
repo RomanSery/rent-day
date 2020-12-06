@@ -40,7 +40,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, onChangeGameState })
           Roll dice
         </Button>
 
-        <Button variant="contained" color="primary" onClick={onLeaveGame}>
+        <Button variant="contained" color="secondary" onClick={onLeaveGame}>
           Leave Game
         </Button>
 

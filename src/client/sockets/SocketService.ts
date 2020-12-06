@@ -1,4 +1,5 @@
 import { Manager, Socket } from "socket.io-client";
+import { PageType } from "../../core/enums/PageType";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg } from "../../core/types/messages";
 import {
@@ -16,28 +17,32 @@ interface GameClientSocket extends Socket {
 }
 
 export class SocketService {
+  private pageType: PageType;
   private manager;
   public socket: GameClientSocket;
 
-  constructor() {
+  constructor(type: PageType) {
     console.log("initiating socket service");
 
     this.manager = new Manager("ws://localhost:8080");
     this.socket = this.manager.socket("/");
+    this.pageType = type;
 
-    if (
-      hasJoinedGame() &&
-      getMyPlayerName() !== null &&
-      getMyPlayerId() !== null
-    ) {
-      this.socket.emit(GameEvent.JOINED_GAME, {
-        playerName: getMyPlayerName()!,
-        playerId: getMyPlayerId()!,
-        gameId: getMyGameId()!,
-        allJoined: false,
-      });
-    } else if (getMyGameId() !== null) {
-      this.socket.emit(GameEvent.JOIN_GAME_ROOM, getMyGameId());
+    if (this.pageType == PageType.Join) {
+      if (
+        hasJoinedGame() &&
+        getMyPlayerName() !== null &&
+        getMyPlayerId() !== null
+      ) {
+        this.socket.emit(GameEvent.JOINED_GAME, {
+          playerName: getMyPlayerName()!,
+          playerId: getMyPlayerId()!,
+          gameId: getMyGameId()!,
+          allJoined: false,
+        });
+      } else if (getMyGameId() !== null) {
+        this.socket.emit(GameEvent.JOIN_GAME_ROOM, getMyGameId());
+      }
     }
   }
 
