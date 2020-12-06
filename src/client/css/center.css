@@ -34,13 +34,34 @@
 }
 
 .player-info .container {
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
 .player-info .name {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.player-info .player-chip .MuiChip-label {
+  font-size: calc(0.4rem + 0.4vw + 0.5vh);
+}
+
+.player-info .ping {
 }
 
 .player-info .icon {
 }
 
 .player-info .money {
+  font-weight: bold;
+  font-size: calc(0.7rem + 0.4vw + 0.5vh);
+  align-self: flex-start;
+}
+
+.player-info .actions {
+  align-self: flex-start;
 }

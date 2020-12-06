@@ -5,4 +5,5 @@ export enum GameEvent {
   JOINED_GAME = "joinedGame",
   JOIN_GAME_ROOM = "joinGameRoom",
   LEAVE_GAME = "leaveGame",
+  UPDATE_GAME_STATE = "updateGameState",
 }

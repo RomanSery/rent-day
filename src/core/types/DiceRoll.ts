@@ -8,7 +8,7 @@ export class DiceRoll {
   }
 
   prettyPrint() {
-    return "Rolle: " + this.die1 + ", " + this.die2;
+    return "Roll: " + this.die1 + ", " + this.die2;
   }
 
   sum(): number {

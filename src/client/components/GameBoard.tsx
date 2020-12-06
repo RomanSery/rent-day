@@ -8,6 +8,7 @@ import { CenterDisplay } from "./CenterDisplay";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
+import _ from "lodash";
 
 interface Props {
   socketService: SocketService;
@@ -42,6 +43,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     socketService.sendPingToServer();
 
 
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
+      console.log("UPDATE_GAME_STATE");
+      getGameState();
+    });
+
     return function cleanup() {
       if (socketService) {
         socketService.disconnect();
@@ -60,9 +66,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       });
   };
 
-  const onGameStateChanged = (newGameState: GameState) => {
-    setGameState(newGameState);
-  }
 
   const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
     if (reason === 'clickaway') {
@@ -71,6 +74,16 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
     setSnackOpen(false);
   };
+
+  const getPing = (playerId: string | undefined) => {
+    if (playerId) {
+      const pingInfo = _.filter(pings, { 'playerId': playerId });
+      if (pingInfo && pingInfo.length > 0) {
+        return "Ping: " + pingInfo[0].latency + "ms";
+      }
+    }
+    return "Ping: 0ms";
+  }
 
   return (
     <React.Fragment>
@@ -85,7 +98,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} onChangeGameState={onGameStateChanged} />
+        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} />
       </div>
 
 

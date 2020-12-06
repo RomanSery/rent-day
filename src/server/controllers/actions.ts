@@ -184,10 +184,10 @@ const initGame = (game: GameInstanceDocument) => {
     "#f58a42",
   ];
 
-  _.forEach(game.players, function (p) {
+  _.forEach(game.players, function (p, index) {
     p.money = game.settings.initialMoney;
     p.position = 1;
-    p.color = colors[_.random(0, colors.length)];
+    p.color = colors[index];
   });
 
   game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);

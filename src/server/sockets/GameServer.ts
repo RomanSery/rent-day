@@ -39,11 +39,17 @@ export class GameServer {
         socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
-      socket.on(GameEvent.JOIN_GAME_ROOM, (gameId: string) => {
-        socket.gameId = gameId;
-        socket.latency = 0;
-        socket.join(gameId);
-      });
+      socket.on(
+        GameEvent.JOIN_GAME_ROOM,
+        (gameId: string, playerId: string, playerName: string) => {
+          console.log("joined game room %s", gameId);
+          socket.playerName = playerName;
+          socket.playerId = playerId;
+          socket.gameId = gameId;
+          socket.latency = 0;
+          socket.join(gameId);
+        }
+      );
 
       socket.on(GameEvent.LEAVE_GAME, (gameId: string) => {
         socket.leave(gameId);
@@ -80,6 +86,10 @@ export class GameServer {
           });
 
         socket.to(gameId).broadcast.emit(GameEvent.GET_LATENCY, info);
+      });
+
+      socket.on(GameEvent.UPDATE_GAME_STATE, (gameId: string) => {
+        this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE);
       });
     });
   }
