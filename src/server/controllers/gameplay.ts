@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 import { GameInstance } from "../../core/schema/GameInstanceSchema";
 import { DiceRoll } from "../../core/types/DiceRoll";
 import { GameContext } from "../../core/types/GameContext";
+import { Player } from "../../core/types/Player";
 
 export const roll = async (req: Request, res: Response) => {
   const context: GameContext = getGameContextFromUrl(req);
@@ -36,8 +37,9 @@ export const roll = async (req: Request, res: Response) => {
   console.log(playerToAct.name + " is rolling: " + newRoll.prettyPrint());
 
   let newPosition = playerToAct.position + newRoll.sum();
-  if (newPosition > 39) {
+  if (newPosition >= 39) {
     newPosition = newPosition - 39;
+    playerPassedGo(playerToAct);
   }
   playerToAct.position = newPosition;
 
@@ -55,6 +57,10 @@ export const roll = async (req: Request, res: Response) => {
   res.json({
     status: "success",
   });
+};
+
+const playerPassedGo = (player: Player) => {
+  player.money = player.money + 200;
 };
 
 const getGameContextFromUrl = (req: Request): GameContext => {
