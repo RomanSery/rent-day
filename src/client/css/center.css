@@ -13,8 +13,28 @@
   flex-basis: 15%;
 }
 
-.center-square .player-actions {
+.center-square .center-left-side {
   flex-basis: 85%;
+  flex-direction: column;
+  display: flex;
+}
+
+.game-results {
+  flex-basis: 60%;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-results .dice-roll {
+  display: flex;
+}
+
+.my-info {
+  flex-basis: 30%;
+}
+
+.player-actions {
+  flex-basis: 10%;
 }
 
 /* players */

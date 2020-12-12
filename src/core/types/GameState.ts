@@ -1,3 +1,4 @@
+import { LastResult } from "./LastResult";
 import { Player } from "./Player";
 import { Settings } from "./Settings";
 import { SquareThemeData } from "./SquareThemeData";
@@ -9,4 +10,5 @@ export interface GameState {
   readonly theme: Array<SquareThemeData>;
   readonly players: Array<Player>;
   readonly nextPlayerToAct: string;
+  readonly results: LastResult;
 }

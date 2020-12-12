@@ -9,6 +9,7 @@ import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
 import _ from "lodash";
+import { useSpring, animated } from 'react-spring'
 
 interface Props {
   socketService: SocketService;
@@ -23,6 +24,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [pings, setPings] = useState();
+
 
   useEffect(() => {
     getGameState();
@@ -60,6 +62,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     API.post("getGame", { gameId: context.gameId })
       .then(function (response) {
         setGameState(response.data.game);
+        console.log(response.data.game.results);
       })
       .catch(function (error) {
         console.log(error);

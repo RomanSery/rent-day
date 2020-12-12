@@ -121,7 +121,7 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <Container maxWidth="xs" className="player-actions">
+          <Container maxWidth="xs">
             <CreateGame />
           </Container>
         </StaticBoard>

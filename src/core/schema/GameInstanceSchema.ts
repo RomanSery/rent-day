@@ -1,5 +1,6 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { GameStatus } from "../enums/GameStatus";
+import { LastResult } from "../types/LastResult";
 import { Player } from "../types/Player";
 import { Settings } from "../types/Settings";
 import { SquareThemeData } from "../types/SquareThemeData";
@@ -14,6 +15,7 @@ export type GameInstanceDocument = mongoose.Document & {
   nextPlayerToAct: mongoose.Types.ObjectId;
   allJoined: boolean;
   status: GameStatus;
+  results: LastResult;
 };
 
 const gameInstanceSchema = new mongoose.Schema(
@@ -25,6 +27,7 @@ const gameInstanceSchema = new mongoose.Schema(
     nextPlayerToAct: mongoose.Types.ObjectId,
     allJoined: Boolean,
     status: String,
+    results: Schema.Types.Mixed,
   },
   { timestamps: true }
 );

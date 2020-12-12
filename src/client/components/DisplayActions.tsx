@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import API from '../api';
-import { Button } from "@material-ui/core";
+import { Button, ButtonGroup } from "@material-ui/core";
 import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { GameContext } from "../../core/types/GameContext";
@@ -55,13 +55,16 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService }) => 
   const getMyActions = () => {
     return (
       <React.Fragment>
-        <Button variant="contained" color="primary" onClick={onRollDice}>
-          Roll dice
-        </Button>
 
-        <Button variant="contained" color="secondary" onClick={onLeaveGame}>
-          Leave Game
-        </Button>
+        <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+          <Button color="primary" onClick={onRollDice}>Roll dice</Button>
+          <Button color="primary">Build</Button>
+          <Button color="primary">Mortgage</Button>
+          <Button color="primary">Redeem</Button>
+          <Button color="primary">Sell</Button>
+          <Button color="secondary" onClick={onLeaveGame}> Leave Game</Button>
+        </ButtonGroup>
+
       </React.Fragment>
     );
   }
@@ -72,7 +75,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService }) => 
     <React.Fragment>
       <div className="player-actions">
         {isMyTurn() && getMyActions()}
-
       </div>
     </React.Fragment>
   );

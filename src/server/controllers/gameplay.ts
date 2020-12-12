@@ -52,6 +52,11 @@ export const roll = async (req: Request, res: Response) => {
   existingGame.nextPlayerToAct = new mongoose.Types.ObjectId(nextPlayer._id);
   console.log("next player to act: %s", nextPlayer.name);
 
+  existingGame.results = {
+    roll: newRoll,
+    description: playerToAct.name + " rolled a: " + newRoll.prettyPrint(),
+  };
+
   existingGame.save();
 
   res.json({

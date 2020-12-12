@@ -165,7 +165,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   return (
     <React.Fragment>
-      <Container maxWidth="xs" className="player-actions">
+      <Container maxWidth="xs">
         <Typography component="h2" variant="h5">{gameState?.name}</Typography>
 
         <List dense={true} className="game-settings">

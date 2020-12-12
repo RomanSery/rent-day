@@ -1,4 +1,5 @@
 import { PieceType } from "../enums/PieceType";
+import { PlayerState } from "../enums/PlayerState";
 
 export interface Player {
   readonly _id?: string;
@@ -7,4 +8,5 @@ export interface Player {
   position: number;
   color: string;
   readonly type: PieceType;
+  state: PlayerState;
 }

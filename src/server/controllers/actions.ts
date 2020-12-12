@@ -12,6 +12,7 @@ import mongoose from "mongoose";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "GameId missing").notEmpty().run(req);
@@ -149,6 +150,7 @@ export const joinGame = async (req: Request, res: Response) => {
     money: 2000,
     color: "#f58a42",
     type: selectedPiece,
+    state: PlayerState.ACTIVE,
   };
 
   existingGame.players.push(newPlayer);
@@ -188,6 +190,7 @@ const initGame = (game: GameInstanceDocument) => {
     p.money = game.settings.initialMoney;
     p.position = 1;
     p.color = colors[index];
+    p.state = PlayerState.ACTIVE;
   });
 
   game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
