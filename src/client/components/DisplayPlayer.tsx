@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Chip } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +14,10 @@ interface Props {
 export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing }) => {
 
   const getColorStyle = (): React.CSSProperties => {
-    return { borderColor: player.color };
+    if (isPlayersTurn()) {
+      return { borderColor: player.color };
+    }
+    return { borderWidth: 0 };
   };
 
   const isMe = () => {
@@ -30,11 +33,11 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing }) =>
       <div className="player-info" style={getColorStyle()}>
         <div className="container">
           <div className="name">
-            <Chip clickable={false} className="player-chip" color="primary" size="medium" variant={isPlayersTurn() ? "default" : "outlined"}
-              icon={<FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />}
-              label={player.name} />
-
+            <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
             <div className="ping">{getPing(player._id)}</div>
+          </div>
+          <div className="name">
+            {player.name}
           </div>
 
           <div className="money">

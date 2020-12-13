@@ -46,7 +46,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
-      console.log("UPDATE_GAME_STATE");
       getGameState();
     });
 
@@ -62,7 +61,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     API.post("getGame", { gameId: context.gameId })
       .then(function (response) {
         setGameState(response.data.game);
-        console.log(response.data.game.results);
       })
       .catch(function (error) {
         console.log(error);

@@ -11,7 +11,7 @@ export const Die: React.FC<Props> = ({ value }) => {
   }
 
   const Face = ({ children }) => {
-    return <div className="face">{children}</div>;
+    return <div className="die-face">{children}</div>;
   }
 
 

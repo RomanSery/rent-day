@@ -91,6 +91,10 @@ export class GameServer {
       socket.on(GameEvent.UPDATE_GAME_STATE, (gameId: string) => {
         this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE);
       });
+
+      socket.on(GameEvent.ROLL_DICE, (gameId: string) => {
+        this.io.in(gameId).emit(GameEvent.ANIMATE_DICE);
+      });
     });
   }
 }

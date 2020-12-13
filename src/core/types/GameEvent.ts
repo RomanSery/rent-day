@@ -6,4 +6,6 @@ export enum GameEvent {
   JOIN_GAME_ROOM = "joinGameRoom",
   LEAVE_GAME = "leaveGame",
   UPDATE_GAME_STATE = "updateGameState",
+  ROLL_DICE = "rollDiceEvent",
+  ANIMATE_DICE = "animateDice",
 }

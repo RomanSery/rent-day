@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { GameContext } from "../../core/types/GameContext";
+import { GameEvent } from "../../core/types/GameEvent";
 import { GameState } from "../../core/types/GameState";
+import { getGameContextFromLocalStorage } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
+import { AnimatedDice } from "./AnimatedDice";
 import { Die } from "./Die";
 
 interface Props {
@@ -9,6 +13,21 @@ interface Props {
 }
 
 export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => {
+
+  const context: GameContext = getGameContextFromLocalStorage();
+  const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
+
+
+  useEffect(() => {
+    socketService.listenForEvent(GameEvent.ANIMATE_DICE, () => {
+      setShowDiceAnimation(true);
+    });
+
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
+      setShowDiceAnimation(false);
+    });
+  }, [context.gameId]);
+
 
   const getResults = () => {
     return (
@@ -23,7 +42,6 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
           what happend: {gameInfo?.results.description}
         </div>
 
-
       </React.Fragment>
     );
   }
@@ -32,7 +50,11 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
   return (
     <React.Fragment>
       <div className="game-results">
-        {gameInfo && gameInfo.results && getResults()}
+
+        {showDiceAnimation ? <AnimatedDice key={5} /> : null}
+
+
+        {gameInfo && !showDiceAnimation && gameInfo.results && getResults()}
       </div>
     </React.Fragment>
   );
