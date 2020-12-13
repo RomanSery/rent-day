@@ -46,6 +46,19 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
     );
   }
 
+  const getEmptyResults = () => {
+    return (
+      <React.Fragment>
+        <div className="dice-roll">
+
+        </div>
+        <div className="description">
+
+        </div>
+      </React.Fragment>
+    );
+  }
+
 
   return (
     <React.Fragment>
@@ -54,7 +67,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
         {showDiceAnimation ? <AnimatedDice key={5} /> : null}
 
 
-        {gameInfo && !showDiceAnimation && gameInfo.results && getResults()}
+        {gameInfo && !showDiceAnimation && gameInfo.results ? getResults() : getEmptyResults()}
       </div>
     </React.Fragment>
   );

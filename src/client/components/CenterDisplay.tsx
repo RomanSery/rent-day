@@ -41,7 +41,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
             console.log('Error', error.message);
           }
         });
-    }, 1500);
+    }, 1200);
 
   };
 

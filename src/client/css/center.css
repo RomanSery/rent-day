@@ -29,6 +29,10 @@
   display: flex;
 }
 
+.game-results .description {
+  text-align: left;
+}
+
 .my-info {
   flex-basis: 30%;
 }
