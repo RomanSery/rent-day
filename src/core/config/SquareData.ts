@@ -23,6 +23,17 @@ SquareConfigDataMap.set(2, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 1,
+
+  mortgageValue: 25,
+  houseCost: 50,
+  rent: new Map<number, number>([
+    [0, 5],
+    [1, 18],
+    [2, 30],
+    [3, 90],
+    [4, 160],
+    [5, 250],
+  ]),
 });
 SquareConfigDataMap.set(3, {
   type: SquareType.Chance,
@@ -32,6 +43,17 @@ SquareConfigDataMap.set(4, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 1,
+
+  mortgageValue: 30,
+  houseCost: 50,
+  rent: new Map<number, number>([
+    [0, 10],
+    [1, 30],
+    [2, 60],
+    [3, 180],
+    [4, 320],
+    [5, 450],
+  ]),
 });
 SquareConfigDataMap.set(5, {
   type: SquareType.Property,

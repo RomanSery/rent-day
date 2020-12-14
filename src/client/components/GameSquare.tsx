@@ -52,9 +52,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
 
         </div>
       </div>
-
     </React.Fragment>
 
   );
+
 
 };

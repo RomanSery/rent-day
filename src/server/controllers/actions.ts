@@ -13,6 +13,7 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "GameId missing").notEmpty().run(req);
@@ -195,6 +196,16 @@ const initGame = (game: GameInstanceDocument) => {
 
   game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
   game.status = GameStatus.ACTIVE;
+
+  //TEMP just for testing
+  const squareState = new Map<string, SquareGameData>();
+  squareState.set("7", {
+    owner: game.players[0]._id!,
+    numHouses: 0,
+    isMortgaged: false,
+    color: game.players[0].color,
+  });
+  game.squareState = squareState;
 };
 
 export const leaveGame = async (req: Request, res: Response) => {

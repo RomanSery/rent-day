@@ -3,6 +3,7 @@ import { GameStatus } from "../enums/GameStatus";
 import { LastResult } from "../types/LastResult";
 import { Player } from "../types/Player";
 import { Settings } from "../types/Settings";
+import { SquareGameData } from "../types/SquareGameData";
 import { SquareThemeData } from "../types/SquareThemeData";
 import { PlayerSchema } from "./PlayerSchema";
 import { SettingsSchema } from "./SettingsSchema";
@@ -12,6 +13,7 @@ export type GameInstanceDocument = mongoose.Document & {
   players: Player[];
   settings: Settings;
   theme: Map<number, SquareThemeData>;
+  squareState: Map<string, SquareGameData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
   allJoined: boolean;
   status: GameStatus;
@@ -24,6 +26,7 @@ const gameInstanceSchema = new mongoose.Schema(
     players: [PlayerSchema],
     settings: SettingsSchema,
     theme: Map,
+    squareState: Map,
     nextPlayerToAct: mongoose.Types.ObjectId,
     allJoined: Boolean,
     status: String,
