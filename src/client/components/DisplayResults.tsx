@@ -62,13 +62,13 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   return (
     <React.Fragment>
-      <div className="game-results">
-
-        {showDiceAnimation ? <AnimatedDice key={5} /> : null}
 
 
-        {gameInfo && !showDiceAnimation && gameInfo.results ? getResults() : getEmptyResults()}
-      </div>
+      {showDiceAnimation ? <AnimatedDice key={5} /> : null}
+
+
+      {gameInfo && !showDiceAnimation && gameInfo.results ? getResults() : getEmptyResults()}
+
     </React.Fragment>
   );
 

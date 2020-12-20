@@ -4,19 +4,21 @@ import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
 import { SocketService } from "../sockets/SocketService";
 import { DisplayResults } from "./DisplayResults";
-import { DisplayMyInfo } from "./DisplayMyInfo";
+import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getGameContextFromLocalStorage, getMyGameId } from "../helpers";
+import { SquareViewer } from "./SquareViewer";
 
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
   getPing: (playerId: string | undefined) => string;
+  getSquareId: () => number | undefined;
 }
 
-export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing }) => {
+export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
 
@@ -50,9 +52,24 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     <React.Fragment>
       <div className="center-square square">
         <div className="center-left-side">
-          <DisplayResults gameInfo={gameInfo} socketService={socketService} />
-          <DisplayMyInfo gameInfo={gameInfo} socketService={socketService} />
-          <DisplayActions gameInfo={gameInfo} socketService={socketService} onRollAction={onRollDice} />
+          <div className="game-results">
+            <DisplayResults gameInfo={gameInfo} socketService={socketService} />
+          </div>
+
+          <div className="second-row">
+            <div className="player-viewer">
+              <PlayerViewer gameInfo={gameInfo} />
+            </div>
+            <div className="property-viewer">
+              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
+            </div>
+
+          </div>
+
+          <div className="player-actions">
+            <DisplayActions gameInfo={gameInfo} socketService={socketService} onRollAction={onRollDice} />
+          </div>
+
         </div>
 
         <DisplayPlayers gameInfo={gameInfo} getPing={getPing} />

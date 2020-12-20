@@ -26,6 +26,7 @@ SquareConfigDataMap.set(2, {
 
   mortgageValue: 25,
   houseCost: 50,
+  tax: 1.2,
   rent: new Map<number, number>([
     [0, 5],
     [1, 18],
@@ -46,6 +47,7 @@ SquareConfigDataMap.set(4, {
 
   mortgageValue: 30,
   houseCost: 50,
+  tax: 1.3,
   rent: new Map<number, number>([
     [0, 10],
     [1, 30],

@@ -2,6 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlane } from '@fortawesome/free-solid-svg-icons'
 import { GameState } from "../../core/types/GameState";
+import { motion } from "framer-motion";
 
 interface Props {
     id: number;
@@ -23,7 +24,11 @@ export const AirportDisplay: React.FC<Props> = ({ id, gameInfo }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faPlane} size="3x" />
             </div>
-            <div className="square-name"> {getTxt()}</div>
+
+            <motion.div whileHover={{ scale: 1.1 }} className="square-name">
+                {getTxt()}
+            </motion.div>
+
         </React.Fragment>
     );
 

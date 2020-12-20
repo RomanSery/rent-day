@@ -3,4 +3,5 @@ export interface SquareGameData {
   color: string;
   numHouses: number;
   isMortgaged: boolean;
+  purchasePrice: number;
 }

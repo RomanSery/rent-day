@@ -204,6 +204,7 @@ const initGame = (game: GameInstanceDocument) => {
     numHouses: 0,
     isMortgaged: false,
     color: game.players[0].color,
+    purchasePrice: 580,
   });
   game.squareState = squareState;
 };

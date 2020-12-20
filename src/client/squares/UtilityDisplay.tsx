@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
 import { faSubway } from '@fortawesome/free-solid-svg-icons'
 import { GameState } from "../../core/types/GameState";
+import { motion } from "framer-motion";
 
 interface Props {
     id: number;
@@ -31,7 +32,9 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faSubway} size="3x" color="blue" />
             </div>
-            <div className="square-name"> {getTxt()}</div>
+            <motion.div whileHover={{ scale: 1.1 }} className="square-name">
+                {getTxt()}
+            </motion.div>
         </React.Fragment>);
     };
 
@@ -41,7 +44,9 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faLightbulb} size="3x" color="blue" />
             </div>
-            <div className="square-name"> {getTxt()}</div>
+            <motion.div whileHover={{ scale: 1.1 }} className="square-name">
+                {getTxt()}
+            </motion.div>
         </React.Fragment>);
     };
 

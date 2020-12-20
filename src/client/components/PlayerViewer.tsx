@@ -4,17 +4,17 @@ import { SocketService } from "../sockets/SocketService";
 
 interface Props {
   gameInfo: GameState | undefined;
-  socketService: SocketService;
 }
 
-export const DisplayMyInfo: React.FC<Props> = ({ gameInfo, socketService }) => {
+export const PlayerViewer: React.FC<Props> = ({ gameInfo }) => {
 
 
   return (
     <React.Fragment>
-      <div className="my-info">
+      <div>
         My info:
-      </div>
+     </div>
+
     </React.Fragment>
   );
 

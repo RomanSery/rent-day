@@ -9,9 +9,11 @@ import { SquarePieces } from "./SquarePieces";
 interface Props {
   id: number;
   gameInfo: GameState | undefined;
+  viewSquare: (id: number) => void;
+  clearSquare: () => void;
 }
 
-export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
+export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSquare }) => {
 
   const section: BoardSection = SquareConfigDataMap.get(id)?.section!;
   const squareType: SquareType = SquareConfigDataMap.get(id)?.type!;
@@ -42,10 +44,17 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo }) => {
     return "game-square-" + id;
   };
 
+  const setSquareToView = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    viewSquare(id);
+  };
+  const leaveSquare = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    clearSquare();
+  };
+
 
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} id={getSquareId()}>
+      <div className={getSquareClassName()} id={getSquareId()} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
         <SquarePieces gameInfo={gameInfo} cssName={getPiecesClassName()} id={id} />
         <div className={getContainerClassName()}>
           <SquareInfo id={id} gameInfo={gameInfo} />

@@ -9,7 +9,6 @@ import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
 import _ from "lodash";
-import { useSpring, animated } from 'react-spring'
 
 interface Props {
   socketService: SocketService;
@@ -24,6 +23,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [pings, setPings] = useState();
+
+  const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
 
   useEffect(() => {
@@ -86,6 +87,13 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     return "Ping: 0ms";
   }
 
+  const viewSquare = (id: number) => {
+    setSquareToView(id);
+  };
+  const clearSquare = () => {
+    setSquareToView(undefined);
+  };
+
   return (
     <React.Fragment>
       <div className="board">
@@ -96,10 +104,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           return (<GameSquare gameInfo={gameState}
             id={id}
             key={id}
+            viewSquare={viewSquare} clearSquare={clearSquare}
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} />
+        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} />
       </div>
 
 
