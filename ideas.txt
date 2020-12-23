@@ -1,0 +1,22 @@
+ship:
+   good: Collect 400 when you pass go
+   bad:  any pay to bank is doubled
+
+cannon:
+   good: Rent is 1.5  the normal rent(the first set the player gets)   
+   bad:  house and hotel costs are doubled	
+
+horse:
+   good: Get 2 ability points when you pass go
+   bad:  you start with 0 ability points
+
+car:
+   good: start with random railroad and all railroad rent is doubled
+   bad:  get 100 when pass go
+
+Each player gets an attribute point when he/she passes go(the horse gets 2).
+Standard Monopoly rules also apply except there is no trading or auctioning.
+
+
+MTA doubles all railroad rent
+one class is focues on taking advantage of rail roads

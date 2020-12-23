@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
@@ -10,6 +10,7 @@ import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getGameContextFromLocalStorage, getMyGameId } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
+import { Player } from "../../core/types/Player";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -21,6 +22,8 @@ interface Props {
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
+
+  const [playerToView, setPlayerToView] = useState<Player | undefined>(undefined);
 
   const onRollDice = async () => {
     if (socketService) {
@@ -47,6 +50,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   };
 
+  const viewPlayer = (player: Player) => {
+    setPlayerToView(player);
+  };
+  const clearPlayer = () => {
+    setPlayerToView(undefined);
+  };
+
 
   return (
     <React.Fragment>
@@ -58,7 +68,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
           <div className="second-row">
             <div className="player-viewer">
-              <PlayerViewer gameInfo={gameInfo} />
+              <PlayerViewer gameInfo={gameInfo} getPlayer={() => playerToView} />
             </div>
             <div className="property-viewer">
               <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
@@ -72,7 +82,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
         </div>
 
-        <DisplayPlayers gameInfo={gameInfo} getPing={getPing} />
+        <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
 
       </div>
     </React.Fragment>

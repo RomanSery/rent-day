@@ -8,9 +8,11 @@ interface Props {
   gameInfo: GameState | undefined;
   player: Player;
   getPing: (playerId: string | undefined) => string;
+  viewPlayer: (player: Player) => void;
+  clearPlayer: () => void;
 }
 
-export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing }) => {
+export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer }) => {
 
   const getColorStyle = (): React.CSSProperties => {
     if (isPlayersTurn()) {
@@ -27,9 +29,20 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing }) =>
     return player._id == gameInfo?.nextPlayerToAct;
   }
 
+
+  const setPlayerToView = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (player && player._id) {
+      viewPlayer(player);
+    }
+  };
+  const leavePlayer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    clearPlayer();
+  };
+
+
   return (
     <React.Fragment>
-      <div className="player-info" style={getColorStyle()}>
+      <div className="player-info" style={getColorStyle()} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
         <div className="container">
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
