@@ -8,7 +8,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { getGameContextFromLocalStorage, getMyGameId } from "../helpers";
+import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 
@@ -54,9 +54,30 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     setPlayerToView(player);
   };
   const clearPlayer = () => {
-    setPlayerToView(undefined);
+    if (gameInfo && gameInfo.players) {
+      const myPlayerId = getMyPlayerId();
+      const myPlayer = gameInfo.players.find(
+        (p) => p._id && p._id.toString() === myPlayerId
+      );
+      setPlayerToView(myPlayer);
+    } else {
+      setPlayerToView(undefined);
+    }
   };
 
+  const getPlayerToView = (): Player | undefined => {
+    if (playerToView) {
+      return playerToView;
+    }
+    if (gameInfo && gameInfo.players) {
+      const myPlayerId = getMyPlayerId();
+      const myPlayer = gameInfo.players.find(
+        (p) => p._id && p._id.toString() === myPlayerId
+      );
+      return myPlayer;
+    }
+    return playerToView;
+  }
 
   return (
     <React.Fragment>
@@ -68,7 +89,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
           <div className="second-row">
             <div className="player-viewer">
-              <PlayerViewer gameInfo={gameInfo} getPlayer={() => playerToView} />
+              <PlayerViewer gameInfo={gameInfo} getPlayer={getPlayerToView} />
             </div>
             <div className="property-viewer">
               <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />

@@ -64,6 +64,25 @@
   flex-direction: row;
 }
 
+.property-viewer .rent-info {
+  border-right: 3px solid black;
+}
+
+.player-viewer .player-name {
+  border: 1px solid black;
+  color: white;
+  font-weight: bold;
+}
+
+.player-viewer .info-tables {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-viewer .other-info {
+  border-top: 3px solid black;
+}
+
 .player-actions {
   flex-basis: 10%;
 }
