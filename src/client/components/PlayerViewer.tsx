@@ -17,11 +17,20 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
     return "";
   }
 
+  const getPlayerMoney = () => {
+    const p = getPlayer();
+    if (p) {
+      return "$" + p.money;
+    }
+    return "";
+  }
+
 
   return (
     <React.Fragment>
       <div>
         Player name: {getPlayerName()}
+        player money: {getPlayerMoney()}
       </div>
 
     </React.Fragment>

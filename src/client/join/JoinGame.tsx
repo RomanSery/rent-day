@@ -14,6 +14,7 @@ import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import _ from "lodash";
+import { PlayerClass } from "../../core/enums/PlayerClass";
 
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 type Inputs = {
   playerName: string;
   piece: PieceType;
+  playerClass: PlayerClass;
 };
 
 export const JoinGame: React.FC<Props> = ({ socketService }) => {
@@ -59,6 +61,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any) => {
       setSnackMsg(data);
       setSnackOpen(true);
+      getGameState();
     });
 
     socketService.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
@@ -91,7 +94,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
-    API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece })
+    API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece, playerClass: data.playerClass })
       .then(function (response) {
         if (socketService) {
           socketService.socket.emit(GameEvent.JOINED_GAME, {
@@ -163,6 +166,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     return "";
   }
 
+
   return (
     <React.Fragment>
       <Container maxWidth="xs">
@@ -196,7 +200,15 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                 <option value="5">Cat</option>
                 <option value="6">Dog</option>
               </NativeSelect>
+            </FormControl>
 
+            <FormControl fullWidth >
+              <InputLabel htmlFor="class-type">Class Type</InputLabel>
+              <NativeSelect id="class-type" name="playerClass" required={true} fullWidth={true} inputRef={register({ required: true })} >
+                <option value="1">Broker</option>
+                <option value="2">Conductor</option>
+                <option value="3">Banker</option>
+              </NativeSelect>
             </FormControl>
 
             <br />
@@ -222,7 +234,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                   <Chip clickable={false} color="primary" size="medium" variant="outlined"
                     icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
                     label={p.name} />
+                  <div className="player-class">{PlayerClass[p.playerClass]}</div>
                   <div className="ping">{getPing(p._id)}</div>
+
                 </div>
               </div>
             </React.Fragment>

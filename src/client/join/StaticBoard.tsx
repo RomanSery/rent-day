@@ -25,8 +25,20 @@ export const StaticBoard: React.FC<Props> = (props) => {
         themeArray.push({ name: "" });
       }
     }
-    return { id: '', theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: { maxPlayers: 0, initialMoney: 0 } };
+    return {
+      id: '', theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: {
+        maxPlayers: 0, initialMoney: 0
+      }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []
+    };
   }
+
+  const viewSquare = (id: number) => {
+
+  };
+  const clearSquare = () => {
+
+  };
+
 
 
   return (
@@ -36,7 +48,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
           const id: number = index + 1;
           return (<GameSquare gameInfo={createEmptyState()}
             id={id}
-            key={id}
+            key={id} viewSquare={viewSquare} clearSquare={clearSquare}
           />)
         })}
 

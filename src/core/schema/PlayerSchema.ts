@@ -6,5 +6,10 @@ export const PlayerSchema = new mongoose.Schema({
   position: { type: Number, required: true },
   color: { type: String, required: true },
   type: { type: Number, required: true },
+  playerClass: { type: Number, required: true },
   state: { type: Number, required: true },
+
+  negotiation: { type: Number, required: true },
+  speed: { type: Number, required: true },
+  intelligence: { type: Number, required: true },
 });

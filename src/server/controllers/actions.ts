@@ -136,12 +136,13 @@ export const joinGame = async (req: Request, res: Response) => {
 
   const playerName = _.trim(req.body.name);
   const selectedPiece: number = parseInt(_.trim(req.body.piece));
+  const selectedPlayerClass: number = parseInt(_.trim(req.body.playerClass));
 
   if (_.some(existingGame.players, { name: playerName })) {
     return res.status(400).send("That name is already taken");
   }
 
-  if (_.some(existingGame.players, { piece: selectedPiece })) {
+  if (_.some(existingGame.players, { type: selectedPiece })) {
     return res.status(400).send("That piece is already taken");
   }
 
@@ -151,7 +152,11 @@ export const joinGame = async (req: Request, res: Response) => {
     money: 2000,
     color: "#f58a42",
     type: selectedPiece,
+    playerClass: selectedPlayerClass,
     state: PlayerState.ACTIVE,
+    negotiation: 2,
+    speed: 3,
+    intelligence: 4,
   };
 
   existingGame.players.push(newPlayer);
@@ -229,23 +234,29 @@ export const leaveGame = async (req: Request, res: Response) => {
   const status: GameStatus = existingGame.status;
 
   if (status == GameStatus.JOINING) {
-    existingGame.players = _.remove(existingGame.players, function (p) {
-      return p._id === playerId;
-    });
+    for (let i = 0; i < existingGame.players.length; i++) {
+      if (existingGame.players[i]._id == playerId) {
+        existingGame.players.splice(i, 1);
+      }
+    }
   } else if (status == GameStatus.ACTIVE) {
     //TODO do something else i think, not sure
-    existingGame.players = _.remove(existingGame.players, function (p) {
-      return p._id === playerId;
-    });
+    for (let i = 0; i < existingGame.players.length; i++) {
+      if (existingGame.players[i]._id == playerId) {
+        existingGame.players.splice(i, 1);
+      }
+    }
   }
 
+  /*
   if (existingGame.players.length == 0) {
     GameInstance.findByIdAndDelete(existingGame.id, function (err) {
       if (err) console.log(err);
     });
   } else {
     existingGame.save();
-  }
+  }*/
+  existingGame.save();
 
   res.json({ status: "success" });
 };
