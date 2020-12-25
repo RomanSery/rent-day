@@ -18,5 +18,11 @@ Each player gets an attribute point when he/she passes go(the horse gets 2).
 Standard Monopoly rules also apply except there is no trading or auctioning.
 
 
-MTA doubles all railroad rent
-one class is focues on taking advantage of rail roads
+player classes
+one class is focues on taking advantage of rail roads/airports
+
+
+utilities
+you cant mortgage utilities but maybe you can sell them?
+MTA doubles all railroad rent (should be renamed to FAA)
+con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)

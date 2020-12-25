@@ -67,6 +67,14 @@ SquareConfigDataMap.set(6, {
   type: SquareType.Airport,
   section: BoardSection.Bottom,
   groupId: 10,
+  mortgageValue: 100,
+  tax: 1.5,
+  rent: new Map<number, number>([
+    [0, 25],
+    [1, 50],
+    [2, 100],
+    [3, 200],
+  ]),
 });
 
 SquareConfigDataMap.set(7, {
@@ -128,6 +136,7 @@ SquareConfigDataMap.set(17, {
 SquareConfigDataMap.set(18, {
   type: SquareType.Utility,
   section: BoardSection.Left,
+  description: "Doubles all rent for all of your airports",
 });
 SquareConfigDataMap.set(19, {
   type: SquareType.Property,
@@ -225,6 +234,7 @@ SquareConfigDataMap.set(36, {
 SquareConfigDataMap.set(37, {
   type: SquareType.Utility,
   section: BoardSection.Right,
+  description: "Reduces electricity costs for building houses",
 });
 
 SquareConfigDataMap.set(38, {

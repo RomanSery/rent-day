@@ -11,6 +11,7 @@ import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { SkillType } from "../../core/enums/SkillType";
+import { PlayerClass } from "../../core/enums/PlayerClass";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -22,7 +23,7 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
   const getPlayerName = () => {
     const p = getPlayer();
     if (p) {
-      return p.name;
+      return p.name + " - " + PlayerClass[p.playerClass];
     }
     return "";
   }
@@ -69,15 +70,15 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
         <TableContainer component={Paper} className="rent-info">
           <Table size="small" aria-label="a dense table">
             <TableBody>
-              <TableRow key={0}>
+              <TableRow key="playerViewer1">
                 <TableCell component="th" scope="row">Money</TableCell>
                 <TableCell align="right">{getPlayerMoney()}</TableCell>
               </TableRow>
-              <TableRow key={1}>
+              <TableRow key="playerViewer2">
                 <TableCell component="th" scope="row">Tax</TableCell>
                 <TableCell align="right">$343</TableCell>
               </TableRow>
-              <TableRow key={2}>
+              <TableRow key="playerViewer3">
                 <TableCell component="th" scope="row">Maintenance</TableCell>
                 <TableCell align="right">$3454</TableCell>
               </TableRow>
@@ -88,15 +89,15 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
         <TableContainer component={Paper} className="other-info">
           <Table size="small" aria-label="a dense table">
             <TableBody>
-              <TableRow key={0}>
+              <TableRow key="playerViewer4">
                 <TableCell component="th" scope="row">Negotiation</TableCell>
                 <TableCell align="right">{getSkill(SkillType.Negotiation)}</TableCell>
               </TableRow>
-              <TableRow key={1}>
+              <TableRow key="playerViewer5">
                 <TableCell component="th" scope="row">Speed</TableCell>
                 <TableCell align="right">{getSkill(SkillType.Speed)}</TableCell>
               </TableRow>
-              <TableRow key={1}>
+              <TableRow key="playerViewer6">
                 <TableCell component="th" scope="row">Intelligence</TableCell>
                 <TableCell align="right">{getSkill(SkillType.Intelligence)}</TableCell>
               </TableRow>

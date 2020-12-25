@@ -5,6 +5,7 @@ export interface SquareConfigData {
   readonly type: SquareType;
   readonly section: BoardSection;
   readonly groupId?: number;
+  readonly description?: string;
 
   readonly mortgageValue?: number;
   readonly houseCost?: number;

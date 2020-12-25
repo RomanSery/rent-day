@@ -59,6 +59,13 @@
   font-weight: bold;
 }
 
+.property-viewer .airport-name {
+  border: 1px solid black;
+  color: white;
+  font-weight: bold;
+  background-color: black;
+}
+
 .property-viewer .info-tables {
   display: flex;
   flex-direction: row;

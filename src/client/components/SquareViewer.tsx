@@ -1,4 +1,4 @@
-import { faHome, faHotel } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faHotel, faPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -38,6 +38,10 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
     if (config.type === SquareType.Property) {
       return getPropertyView(config);
+    } else if (config.type === SquareType.Airport) {
+      return getAirportView(config);
+    } else if (config.type === SquareType.Utility) {
+      return getUtilityView(config);
     }
 
     return null;
@@ -51,6 +55,16 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     const groupId: number = SquareConfigDataMap.get(squareId)?.groupId!;
     return "property-name square-color-bar " + squareGroupColorMap.get(groupId);
   };
+
+  const getDescription = () => {
+    const squareId = getSquareId();
+    if (squareId == null) {
+      return "";
+    }
+    const description = SquareConfigDataMap.get(squareId)?.description;
+    return description;
+  };
+
 
   const getowner = (): string => {
     const squareId = getSquareId();
@@ -103,27 +117,27 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
           <TableContainer component={Paper} className="rent-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key={0}>
+                <TableRow key="propertyViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
                 </TableRow>
-                <TableRow key={1}>
+                <TableRow key="propertyViewer2">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /></TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
                 </TableRow>
-                <TableRow key={2}>
+                <TableRow key="propertyViewer3">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
                 </TableRow>
-                <TableRow key={3}>
+                <TableRow key="propertyViewer4">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
                 </TableRow>
-                <TableRow key={4}>
+                <TableRow key="propertyViewer5">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(4) : ""}</TableCell>
                 </TableRow>
-                <TableRow key={4}>
+                <TableRow key="propertyViewer6">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHotel} /></TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(5) : ""}</TableCell>
                 </TableRow>
@@ -134,23 +148,23 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
           <TableContainer component={Paper} className="other-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key={0}>
+                <TableRow key="propertyViewer10">
                   <TableCell component="th" scope="row">Mortgage Value</TableCell>
                   <TableCell align="right">{config.mortgageValue ? "$" + config.mortgageValue : ""}</TableCell>
                 </TableRow>
-                <TableRow key={1}>
+                <TableRow key="propertyViewer11">
                   <TableCell component="th" scope="row">House Cost</TableCell>
                   <TableCell align="right">{config.houseCost ? "$" + config.houseCost : ""}</TableCell>
                 </TableRow>
-                <TableRow key={1}>
+                <TableRow key="propertyViewer12">
                   <TableCell component="th" scope="row">Tax</TableCell>
                   <TableCell align="right">{config.tax ? config.tax + "%" : ""}</TableCell>
                 </TableRow>
-                <TableRow key={1}>
+                <TableRow key="propertyViewer13">
                   <TableCell component="th" scope="row">Owner</TableCell>
                   <TableCell align="right" style={getNameColorStyle()}>{getowner()}</TableCell>
                 </TableRow>
-                <TableRow key={1}>
+                <TableRow key="propertyViewer14">
                   <TableCell component="th" scope="row">Purchase Price</TableCell>
                   <TableCell align="right">{getPurchasePrice()}</TableCell>
                 </TableRow>
@@ -164,6 +178,75 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     );
   };
 
+
+  const getAirportView = (config: SquareConfigData) => {
+    return (
+      <React.Fragment>
+        <div className="airport-name square-color-bar">{getSquareTxt()}</div>
+        <div className="info-tables">
+          <TableContainer component={Paper} className="rent-info">
+            <Table size="small" aria-label="a dense table">
+              <TableBody>
+                <TableRow key="airportViewer1">
+                  <TableCell component="th" scope="row">Base</TableCell>
+                  <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer2">
+                  <TableCell component="th" scope="row">If you have 2 airports</TableCell>
+                  <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer3">
+                  <TableCell component="th" scope="row">If you have 3 airports</TableCell>
+                  <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer4">
+                  <TableCell component="th" scope="row">If you all airports</TableCell>
+                  <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <TableContainer component={Paper} className="other-info">
+            <Table size="small" aria-label="a dense table">
+              <TableBody>
+                <TableRow key="airportViewer5">
+                  <TableCell component="th" scope="row">Mortgage Value</TableCell>
+                  <TableCell align="right">{config.mortgageValue ? "$" + config.mortgageValue : ""}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer6">
+                  <TableCell component="th" scope="row">Tax</TableCell>
+                  <TableCell align="right">{config.tax ? config.tax + "%" : ""}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer7">
+                  <TableCell component="th" scope="row">Owner</TableCell>
+                  <TableCell align="right" style={getNameColorStyle()}>{getowner()}</TableCell>
+                </TableRow>
+                <TableRow key="airportViewer8">
+                  <TableCell component="th" scope="row">Purchase Price</TableCell>
+                  <TableCell align="right">{getPurchasePrice()}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
+
+      </React.Fragment>
+    );
+  };
+
+
+  const getUtilityView = (config: SquareConfigData) => {
+    return (
+      <React.Fragment>
+        <div className="airport-name square-color-bar">{getSquareTxt()}</div>
+        <div className="utility-description">
+          {getDescription()}
+        </div>
+      </React.Fragment>
+    );
+  };
 
   return (
     getInfo()

@@ -211,6 +211,14 @@ const initGame = (game: GameInstanceDocument) => {
     color: game.players[0].color,
     purchasePrice: 580,
   });
+
+  squareState.set("6", {
+    owner: game.players[0]._id!,
+    numHouses: 0,
+    isMortgaged: false,
+    color: game.players[0].color,
+    purchasePrice: 350,
+  });
   game.squareState = squareState;
 };
 
