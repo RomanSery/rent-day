@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlane } from '@fortawesome/free-solid-svg-icons'
+import { faSubway } from '@fortawesome/free-solid-svg-icons'
 import { GameState } from "../../core/types/GameState";
 import { motion } from "framer-motion";
 import { SquareGameData } from "../../core/types/SquareGameData";
@@ -11,7 +11,7 @@ interface Props {
     gameInfo: GameState | undefined;
 }
 
-export const AirportDisplay: React.FC<Props> = ({ id, gameInfo }) => {
+export const TrainStationDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
     const getTxt = () => {
         if (gameInfo && gameInfo.theme) {
@@ -50,7 +50,7 @@ export const AirportDisplay: React.FC<Props> = ({ id, gameInfo }) => {
         <React.Fragment>
             <div className="blank"></div>
             <div className="icon">
-                <FontAwesomeIcon icon={faPlane} size="3x" />
+                <FontAwesomeIcon icon={faSubway} size="3x" />
             </div>
 
             <motion.div whileHover={{ scale: 1.1 }} className="square-name" style={getColorStyle()}>

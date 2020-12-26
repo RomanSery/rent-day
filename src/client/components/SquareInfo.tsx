@@ -1,7 +1,7 @@
 import React from "react";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
-import { AirportDisplay } from "../squares/AirportDisplay";
+import { TrainStationDisplay } from "../squares/TrainStationDisplay";
 import { ChanceDisplay } from "../squares/ChanceDisplay";
 import { PropertyDisplay } from "../squares/PropertyDisplay";
 import { CentralParkDisplay } from "../squares/CentralParkDisplay";
@@ -20,8 +20,8 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
     const type: SquareType | undefined = SquareConfigDataMap.get(id)?.type;
 
     const getInfo = () => {
-        if (type === SquareType.Airport) {
-            return <AirportDisplay id={id} gameInfo={gameInfo} />
+        if (type === SquareType.TrainStation) {
+            return <TrainStationDisplay id={id} gameInfo={gameInfo} />
         }
         if (type === SquareType.Chance) {
             return <ChanceDisplay id={id} />

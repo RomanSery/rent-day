@@ -64,7 +64,7 @@ SquareConfigDataMap.set(5, {
 });
 
 SquareConfigDataMap.set(6, {
-  type: SquareType.Airport,
+  type: SquareType.TrainStation,
   section: BoardSection.Bottom,
   groupId: 10,
   mortgageValue: 100,
@@ -123,7 +123,7 @@ SquareConfigDataMap.set(15, {
 });
 
 SquareConfigDataMap.set(16, {
-  type: SquareType.Airport,
+  type: SquareType.TrainStation,
   section: BoardSection.Left,
   groupId: 10,
 });
@@ -136,7 +136,7 @@ SquareConfigDataMap.set(17, {
 SquareConfigDataMap.set(18, {
   type: SquareType.Utility,
   section: BoardSection.Left,
-  description: "Doubles all rent for all of your airports",
+  description: "Doubles all rent for all of your TrainStations",
 });
 SquareConfigDataMap.set(19, {
   type: SquareType.Property,
@@ -175,7 +175,7 @@ SquareConfigDataMap.set(25, {
 });
 
 SquareConfigDataMap.set(26, {
-  type: SquareType.Airport,
+  type: SquareType.TrainStation,
   section: BoardSection.Top,
   groupId: 10,
 });
@@ -226,7 +226,7 @@ SquareConfigDataMap.set(35, {
 });
 
 SquareConfigDataMap.set(36, {
-  type: SquareType.Airport,
+  type: SquareType.TrainStation,
   section: BoardSection.Right,
   groupId: 10,
 });

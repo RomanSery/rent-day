@@ -1,7 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLightbulb } from '@fortawesome/free-solid-svg-icons'
-import { faSubway } from '@fortawesome/free-solid-svg-icons'
+import { faLightbulb, faTrain } from '@fortawesome/free-solid-svg-icons'
 import { GameState } from "../../core/types/GameState";
 import { motion } from "framer-motion";
 import { SquareGameData } from "../../core/types/SquareGameData";
@@ -58,7 +57,7 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
         return (<React.Fragment>
             <div className="blank"></div>
             <div className="icon">
-                <FontAwesomeIcon icon={faSubway} size="3x" color="blue" />
+                <FontAwesomeIcon icon={faTrain} size="3x" color="blue" />
             </div>
             <motion.div whileHover={{ scale: 1.1 }} className="square-name" style={getColorStyle()}>
                 {getTxt()} {getOwnerIcon()}

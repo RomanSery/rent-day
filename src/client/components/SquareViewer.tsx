@@ -1,4 +1,4 @@
-import { faHome, faHotel, faPlane } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faHotel, faLightbulb, faPlane, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -38,8 +38,8 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
     if (config.type === SquareType.Property) {
       return getPropertyView(config);
-    } else if (config.type === SquareType.Airport) {
-      return getAirportView(config);
+    } else if (config.type === SquareType.TrainStation) {
+      return getTrainStationView(config);
     } else if (config.type === SquareType.Utility) {
       return getUtilityView(config);
     }
@@ -107,6 +107,14 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
     return "";
   };
+
+  const getIcon = () => {
+    const squareId = getSquareId();
+    if (squareId && gameInfo && gameInfo.theme) {
+      return gameInfo.theme[squareId].icon;
+    }
+    return "";
+  }
 
 
   const getPropertyView = (config: SquareConfigData) => {
@@ -179,28 +187,28 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   };
 
 
-  const getAirportView = (config: SquareConfigData) => {
+  const getTrainStationView = (config: SquareConfigData) => {
     return (
       <React.Fragment>
-        <div className="airport-name square-color-bar">{getSquareTxt()}</div>
+        <div className="train-station-name square-color-bar">{getSquareTxt()}</div>
         <div className="info-tables">
           <TableContainer component={Paper} className="rent-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key="airportViewer1">
+                <TableRow key="stationViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer2">
-                  <TableCell component="th" scope="row">If you have 2 airports</TableCell>
+                <TableRow key="stationViewer2">
+                  <TableCell component="th" scope="row">If you have 2 stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer3">
-                  <TableCell component="th" scope="row">If you have 3 airports</TableCell>
+                <TableRow key="stationViewer3">
+                  <TableCell component="th" scope="row">If you have 3 stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer4">
-                  <TableCell component="th" scope="row">If you all airports</TableCell>
+                <TableRow key="stationViewer4">
+                  <TableCell component="th" scope="row">If you all stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
                 </TableRow>
               </TableBody>
@@ -210,19 +218,19 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
           <TableContainer component={Paper} className="other-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key="airportViewer5">
+                <TableRow key="stationViewer5">
                   <TableCell component="th" scope="row">Mortgage Value</TableCell>
                   <TableCell align="right">{config.mortgageValue ? "$" + config.mortgageValue : ""}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer6">
+                <TableRow key="stationViewer6">
                   <TableCell component="th" scope="row">Tax</TableCell>
                   <TableCell align="right">{config.tax ? config.tax + "%" : ""}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer7">
+                <TableRow key="stationViewer7">
                   <TableCell component="th" scope="row">Owner</TableCell>
                   <TableCell align="right" style={getNameColorStyle()}>{getowner()}</TableCell>
                 </TableRow>
-                <TableRow key="airportViewer8">
+                <TableRow key="stationViewer8">
                   <TableCell component="th" scope="row">Purchase Price</TableCell>
                   <TableCell align="right">{getPurchasePrice()}</TableCell>
                 </TableRow>
@@ -240,7 +248,10 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   const getUtilityView = (config: SquareConfigData) => {
     return (
       <React.Fragment>
-        <div className="airport-name square-color-bar">{getSquareTxt()}</div>
+        <div className="utility-name square-color-bar">{getSquareTxt()}</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={getIcon() === "subway" ? faTrain : faLightbulb} size="3x" color="blue" />
+        </div>
         <div className="utility-description">
           {getDescription()}
         </div>

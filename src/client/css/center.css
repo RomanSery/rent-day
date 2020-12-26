@@ -59,11 +59,17 @@
   font-weight: bold;
 }
 
-.property-viewer .airport-name {
+.property-viewer .train-station-name,
+.utility-name {
   border: 1px solid black;
   color: white;
   font-weight: bold;
   background-color: black;
+}
+
+.property-viewer .utility-icon {
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .property-viewer .info-tables {

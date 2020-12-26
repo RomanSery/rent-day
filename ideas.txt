@@ -14,15 +14,14 @@ car:
    good: start with random railroad and all railroad rent is doubled
    bad:  get 100 when pass go
 
-Each player gets an attribute point when he/she passes go(the horse gets 2).
-Standard Monopoly rules also apply except there is no trading or auctioning.
 
+LUCK
 
 player classes
-one class is focues on taking advantage of rail roads/airports
+one class is focues on taking advantage of train stations
 
 
 utilities
 you cant mortgage utilities but maybe you can sell them?
-MTA doubles all railroad rent (should be renamed to FAA)
+MTA doubles all railroad rent
 con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)

@@ -134,50 +134,50 @@
   flex-basis: auto;
 }
 
-/* airport */
-.square.airport .container {
+/* train-station */
+.square.train-station .container {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
 }
-.square.airport .container-top {
+.square.train-station .container-top {
   flex-wrap: nowrap;
 }
-.square.airport .container-bottom {
+.square.train-station .container-bottom {
   flex-wrap: nowrap;
 }
-.square.airport .blank {
+.square.train-station .blank {
   flex-basis: 10%;
 }
-.square.airport .icon {
+.square.train-station .icon {
   flex-basis: 70%;
   font-size: calc(0.1rem + 0.5vw + 0.5vh);
 }
-.square.airport .square-name {
+.square.train-station .square-name {
   flex-basis: 20%;
   order: 2;
 }
-.square.airport .container-top .square-name {
+.square.train-station .container-top .square-name {
   order: -2;
 }
-.square.airport .container-left .square-name {
+.square.train-station .container-left .square-name {
   order: -2;
   font-size: 70%;
 }
-.square.airport .container-left .blank {
+.square.train-station .container-left .blank {
   order: 5;
 }
-.square.airport .container-left .icon {
+.square.train-station .container-left .icon {
   flex-basis: auto;
 }
-.square.airport .container-right .square-name {
+.square.train-station .container-right .square-name {
   order: 2;
   font-size: 70%;
 }
-.square.airport .container-right .blank {
+.square.train-station .container-right .blank {
   order: -5;
 }
-.square.airport .container-right .icon {
+.square.train-station .container-right .icon {
   flex-basis: auto;
 }
 
