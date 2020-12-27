@@ -2,9 +2,14 @@
 import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { GameInstance } from "../../core/schema/GameInstanceSchema";
+import { Auction } from "../../core/schema/AuctionSchema";
 import { DiceRoll } from "../../core/types/DiceRoll";
 import { GameContext } from "../../core/types/GameContext";
 import { Player } from "../../core/types/Player";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
+import { Bidder } from "../../core/types/Bidder";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export const roll = async (req: Request, res: Response) => {
   const context: GameContext = getGameContextFromUrl(req);
@@ -42,6 +47,54 @@ export const roll = async (req: Request, res: Response) => {
     playerPassedGo(playerToAct);
   }
   playerToAct.position = newPosition;
+
+  //set auction mode if applicable
+  const squareId: number = playerToAct.position;
+  const squareConfig = SquareConfigDataMap.get(squareId);
+  if (
+    squareConfig &&
+    (squareConfig.type == SquareType.Property ||
+      squareConfig.type == SquareType.TrainStation ||
+      squareConfig.type == SquareType.Utility)
+  ) {
+    const squareData = existingGame.squareState.get(squareId.toString());
+    if (squareData) {
+      console.log("owner: " + squareData.owner);
+    }
+
+    if ((squareData && squareData.owner == null) || squareData == null) {
+      console.log("start auction mode");
+
+      const bidders: Array<Bidder> = new Array();
+
+      existingGame.players.forEach((value: Player, key: number) => {
+        if (
+          value.state == PlayerState.ACTIVE ||
+          value.state == PlayerState.IN_JAIL
+        ) {
+          const newBidder = {
+            name: value.name,
+            type: value.type,
+            color: value.color,
+            _id: value._id,
+          };
+          bidders.push(newBidder);
+        }
+      });
+
+      const newAuction = new Auction({
+        gameId: existingGame.id,
+        squareId: squareId,
+        finished: false,
+        bidders: bidders,
+      });
+
+      console.log("saving new auction");
+      await newAuction.save();
+
+      existingGame.auctionId = new mongoose.Types.ObjectId(newAuction._id);
+    }
+  }
 
   //set next player to act
   const index = existingGame.players.indexOf(playerToAct);

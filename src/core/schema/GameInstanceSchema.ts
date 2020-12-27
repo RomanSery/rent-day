@@ -12,9 +12,10 @@ export type GameInstanceDocument = mongoose.Document & {
   name: string;
   players: Player[];
   settings: Settings;
-  theme: Map<number, SquareThemeData>;
+  theme: Map<string, SquareThemeData>;
   squareState: Map<string, SquareGameData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
+  auctionId: mongoose.Types.ObjectId;
   allJoined: boolean;
   status: GameStatus;
   results: LastResult;
@@ -28,6 +29,7 @@ const gameInstanceSchema = new mongoose.Schema(
     theme: Map,
     squareState: Map,
     nextPlayerToAct: mongoose.Types.ObjectId,
+    auctionId: mongoose.Types.ObjectId,
     allJoined: Boolean,
     status: String,
     results: Schema.Types.Mixed,
