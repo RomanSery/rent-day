@@ -13,15 +13,22 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { SquareGameData } from "../../core/types/SquareGameData";
+import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
+import { GameContext } from "../../core/types/GameContext";
+import { getGameContextFromUrl } from "util/helpers";
 
 export const createGame = async (req: Request, res: Response) => {
-  await check("data.gameName", "GameId missing").notEmpty().run(req);
-  await check("data.maxPlayers", "GameId missing").notEmpty().run(req);
-  await check("data.initialMoney", "Name is not valid")
+  await check("data.gameName", "GameId missing")
     .notEmpty()
-    .isLength({ min: 4 })
     .isAlphanumeric()
+    .run(req);
+  await check("data.maxPlayers", "GameId missing")
+    .notEmpty()
+    .isNumeric()
+    .run(req);
+  await check("data.initialMoney", "InitialMoney is not valid")
+    .notEmpty()
+    .isNumeric()
     .run(req);
 
   const themeData = new Map<string, SquareThemeData>();
@@ -66,6 +73,43 @@ export const getGame = async (req: Request, res: Response) => {
   });
 
   res.json({ game: found });
+};
+
+export const getAuction = async (req: Request, res: Response) => {
+  await check("auctionId", "Please enter a valid auctionId.")
+    .notEmpty()
+    .run(req);
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).send("missing auctionId");
+  }
+
+  const auctionId = req.body.auctionId;
+
+  let found: AuctionDocument = await Auction.findById(
+    auctionId,
+    (err, existingAuction) => {
+      if (err) {
+        return console.log(err);
+      }
+      return existingAuction;
+    }
+  );
+
+  if (!found.finished) {
+    //for security purposes if auction is not finished, dont return real bid amounts
+    const context: GameContext = getGameContextFromUrl(req);
+    const playerId: string = context.playerId;
+
+    found.bidders.forEach((b) => {
+      if (b._id != playerId) {
+        b.bid = 0;
+      }
+    });
+  }
+
+  res.json({ auction: found });
 };
 
 export const getGamesToJoin = async (req: Request, res: Response) => {
@@ -201,25 +245,6 @@ const initGame = (game: GameInstanceDocument) => {
 
   game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
   game.status = GameStatus.ACTIVE;
-
-  //TEMP just for testing
-  const squareState = new Map<string, SquareGameData>();
-  squareState.set("7", {
-    owner: game.players[0]._id!,
-    numHouses: 0,
-    isMortgaged: false,
-    color: game.players[0].color,
-    purchasePrice: 580,
-  });
-
-  squareState.set("6", {
-    owner: game.players[0]._id!,
-    numHouses: 0,
-    isMortgaged: false,
-    color: game.players[0].color,
-    purchasePrice: 350,
-  });
-  game.squareState = squareState;
 };
 
 export const leaveGame = async (req: Request, res: Response) => {

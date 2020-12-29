@@ -11,6 +11,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
+import { DisplayAuction } from "./DisplayAuction";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -79,12 +80,19 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     return playerToView;
   }
 
+  const getGameResultsDisplayComp = () => {
+    if (gameInfo?.auctionId) {
+      return (<DisplayAuction gameInfo={gameInfo} socketService={socketService} />);
+    }
+    return (<DisplayResults gameInfo={gameInfo} socketService={socketService} />);
+  }
+
   return (
     <React.Fragment>
       <div className="center-square square">
         <div className="center-left-side">
           <div className="game-results">
-            <DisplayResults gameInfo={gameInfo} socketService={socketService} />
+            {getGameResultsDisplayComp()}
           </div>
 
           <div className="second-row">

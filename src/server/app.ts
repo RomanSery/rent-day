@@ -40,11 +40,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
+app.post("/api/getAuction", actions.getAuction);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
 app.post("/api/leaveGame", actions.leaveGame);
 app.post("/api/createGame", actions.createGame);
+
 app.post("/api/actions/roll", gameplay.roll);
+app.post("/api/actions/bid", gameplay.bid);
 
 const gameServer = new GameServer();
 gameServer.listen();

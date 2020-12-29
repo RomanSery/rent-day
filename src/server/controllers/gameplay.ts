@@ -10,6 +10,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { Bidder } from "../../core/types/Bidder";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { check } from "express-validator";
 
 export const roll = async (req: Request, res: Response) => {
   const context: GameContext = getGameContextFromUrl(req);
@@ -32,7 +33,7 @@ export const roll = async (req: Request, res: Response) => {
   const newRoll = new DiceRoll();
 
   const playerToAct = existingGame.players.find(
-    (p) => p._id && p._id.toString() === playerId
+    (p: Player) => p._id && p._id.toString() === playerId
   );
   if (playerToAct == null) {
     console.log("player not found!");
@@ -111,6 +112,25 @@ export const roll = async (req: Request, res: Response) => {
   };
 
   existingGame.save();
+
+  res.json({
+    status: "success",
+  });
+};
+
+export const bid = async (req: Request, res: Response) => {
+  await check("bid", "Bid is not valid").notEmpty().isNumeric().run(req);
+
+  const context: GameContext = getGameContextFromUrl(req);
+  const bidAmount = parseInt(req.body.bid);
+  //const auction = new AuctionProcessor(bidAmount, context);
+
+  //const errMsg = auction.getErrMsg();
+  //if (errMsg) {
+  //return res.status(400).send(errMsg);
+  //}
+
+  //auction.placeBid();
 
   res.json({
     status: "success",

@@ -15,7 +15,7 @@ export type GameInstanceDocument = mongoose.Document & {
   theme: Map<string, SquareThemeData>;
   squareState: Map<string, SquareGameData>;
   nextPlayerToAct: mongoose.Types.ObjectId;
-  auctionId: mongoose.Types.ObjectId;
+  auctionId: mongoose.Types.ObjectId | null;
   allJoined: boolean;
   status: GameStatus;
   results: LastResult;

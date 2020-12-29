@@ -8,6 +8,7 @@ export type AuctionDocument = mongoose.Document & {
   bidders: Bidder[];
   finished: boolean;
   squareId: number;
+  isTie: boolean;
 };
 
 const auctionSchema = new mongoose.Schema(
@@ -16,6 +17,7 @@ const auctionSchema = new mongoose.Schema(
     winnerId: mongoose.Types.ObjectId,
     bidders: [BidderSchema],
     finished: Boolean,
+    isTie: Boolean,
     squareId: Number,
   },
   { timestamps: true }

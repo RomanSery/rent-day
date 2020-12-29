@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, ButtonGroup } from "@material-ui/core";
+import { Button, ButtonGroup, Container } from "@material-ui/core";
 import { getMyPlayerId, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
@@ -32,28 +32,25 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const isMyTurn = () => {
-    return getMyPlayerId() == gameInfo?.nextPlayerToAct;
+    return getMyPlayerId() == gameInfo?.nextPlayerToAct && gameInfo?.auctionId == null;
   }
 
   const getMyActions = () => {
     return (
-      <React.Fragment>
-
+      <Container maxWidth="sm">
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
           {showRollBtn ? <Button color="primary" onClick={onClickRoll}>Roll dice</Button> : null}
           <Button color="primary">Build</Button>
           <Button color="primary">Sell</Button>
         </ButtonGroup>
 
-        <br></br>
 
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
           <Button color="primary">Mortgage</Button>
           <Button color="primary">Redeem</Button>
           <Button color="secondary" onClick={onLeaveGame}> Leave Game</Button>
         </ButtonGroup>
-
-      </React.Fragment>
+      </Container>
     );
   }
 

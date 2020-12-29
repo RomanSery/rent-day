@@ -95,6 +95,10 @@ export class GameServer {
       socket.on(GameEvent.ROLL_DICE, (gameId: string) => {
         this.io.in(gameId).emit(GameEvent.ANIMATE_DICE);
       });
+
+      socket.on(GameEvent.AUCTION_BID, (gameId: string) => {
+        this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE);
+      });
     });
   }
 }
