@@ -16,7 +16,6 @@ export class AuctionProcessor {
   constructor(bid: number, context: GameContext) {
     this.bid = bid;
     this.context = context;
-    this.init();
   }
 
   public async init(): Promise<void> {
@@ -73,8 +72,11 @@ export class AuctionProcessor {
   }
 
   private purchaseSquare(winner: Bidder): void {
-    const squareId = this.auction!.squareId.toString();
-    this.game?.squareState.set(squareId, {
+    if (!this.game || !this.auction) {
+      return;
+    }
+    const squareId = this.auction.squareId.toString();
+    this.game.squareState.set(squareId, {
       owner: winner._id!,
       numHouses: 0,
       isMortgaged: false,
