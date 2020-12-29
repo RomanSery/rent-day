@@ -15,7 +15,7 @@ const app = express();
 const mongoUrl: string = "mongodb://localhost:27017/monopoly"; //MONGODB_URI;
 console.log(mongoUrl);
 
-mongoose.Promise = bluebird;
+//mongoose.Promise = bluebird;
 
 mongoose
   .connect(mongoUrl, {

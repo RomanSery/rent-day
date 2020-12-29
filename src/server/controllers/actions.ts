@@ -15,7 +15,7 @@ import { NyThemeData } from "../../core/config/NyTheme";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
 import { GameContext } from "../../core/types/GameContext";
-import { getGameContextFromUrl } from "util/helpers";
+import { getGameContextFromUrl } from "./helpers";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "GameId missing")
@@ -65,12 +65,15 @@ export const getGame = async (req: Request, res: Response) => {
 
   const gameId = req.body.gameId;
 
-  const found = await GameInstance.findById(gameId, (err, existingGame) => {
-    if (err) {
-      return console.log(err);
+  const found = await GameInstance.findById(
+    gameId,
+    (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
+      if (err) {
+        return console.log(err);
+      }
+      return existingGame;
     }
-    return existingGame;
-  });
+  );
 
   res.json({ game: found });
 };
@@ -89,7 +92,7 @@ export const getAuction = async (req: Request, res: Response) => {
 
   let found: AuctionDocument = await Auction.findById(
     auctionId,
-    (err, existingAuction) => {
+    (err: mongoose.CallbackError, existingAuction: AuctionDocument) => {
       if (err) {
         return console.log(err);
       }
@@ -143,12 +146,15 @@ export const getGameStatus = async (req: Request, res: Response) => {
 
   const gameId = req.body.gameId;
 
-  const found = await GameInstance.findById(gameId, (err, existingGame) => {
-    if (err) {
-      return console.log(err);
+  const found = await GameInstance.findById(
+    gameId,
+    (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
+      if (err) {
+        return console.log(err);
+      }
+      return existingGame;
     }
-    return existingGame;
-  });
+  );
 
   const status: GameStatus | null = found != null ? found.status : null;
   res.json({ status: status });
@@ -212,7 +218,7 @@ export const joinGame = async (req: Request, res: Response) => {
   existingGame.save();
 
   const playerAdded: Player | undefined = existingGame.players.find(
-    (p) => p.name === playerName
+    (p: Player) => p.name === playerName
   );
   const playerAddedId = playerAdded != null ? playerAdded._id : "";
 

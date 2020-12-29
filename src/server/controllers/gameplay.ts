@@ -11,6 +11,8 @@ import { SquareType } from "../../core/enums/SquareType";
 import { Bidder } from "../../core/types/Bidder";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { check } from "express-validator";
+import { getGameContextFromUrl } from "./helpers";
+import { AuctionProcessor } from "./AuctionProcessor";
 
 export const roll = async (req: Request, res: Response) => {
   const context: GameContext = getGameContextFromUrl(req);
@@ -123,14 +125,14 @@ export const bid = async (req: Request, res: Response) => {
 
   const context: GameContext = getGameContextFromUrl(req);
   const bidAmount = parseInt(req.body.bid);
-  //const auction = new AuctionProcessor(bidAmount, context);
+  const auction = new AuctionProcessor(bidAmount, context);
 
-  //const errMsg = auction.getErrMsg();
-  //if (errMsg) {
-  //return res.status(400).send(errMsg);
-  //}
+  const errMsg = auction.getErrMsg();
+  if (errMsg) {
+    return res.status(400).send(errMsg);
+  }
 
-  //auction.placeBid();
+  auction.placeBid();
 
   res.json({
     status: "success",
@@ -139,11 +141,4 @@ export const bid = async (req: Request, res: Response) => {
 
 const playerPassedGo = (player: Player) => {
   player.money = player.money + 200;
-};
-
-const getGameContextFromUrl = (req: Request): GameContext => {
-  const gid: any = req.body.context.gameId;
-  const pid: any = req.body.context.playerId;
-
-  return { gameId: gid, playerId: pid };
 };
