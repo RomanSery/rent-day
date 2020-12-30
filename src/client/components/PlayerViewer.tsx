@@ -1,12 +1,9 @@
-import { faHome, faHotel } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
-import { config } from "process";
 import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";

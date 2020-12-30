@@ -133,4 +133,30 @@ export class AuctionProcessor {
 
     return "";
   }
+
+  public async getAuction(
+    auctionId: string,
+    playerId: string
+  ): Promise<AuctionDocument> {
+    let found: AuctionDocument = await Auction.findById(
+      auctionId,
+      (err: mongoose.CallbackError, existingAuction: AuctionDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return existingAuction;
+      }
+    );
+
+    if (!found.finished) {
+      //for security purposes if auction is not finished, dont return real bid amounts
+      found.bidders.forEach((b) => {
+        if (b._id != playerId) {
+          b.bid = 0;
+        }
+      });
+    }
+
+    return found;
+  }
 }
