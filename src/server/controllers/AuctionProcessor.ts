@@ -6,6 +6,7 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { GameContext } from "../../core/types/GameContext";
 import { Bidder } from "../../core/types/Bidder";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class AuctionProcessor {
   private bid: number;
@@ -31,6 +32,7 @@ export class AuctionProcessor {
     );
     if (myBid && this.auction) {
       myBid.bid = this.bid;
+      myBid.submittedBid = true;
       if (this.isAuctionDone()) {
         this.determineWinner();
 
@@ -54,7 +56,7 @@ export class AuctionProcessor {
     }
     this.auction.finished = true;
 
-    this.auction.bidders.sort((a, b) => (a.bid! > b.bid! ? 1 : -1));
+    this.auction.bidders.sort((a, b) => (a.bid! > b.bid! ? -1 : 1));
 
     const winner = this.auction.bidders[0];
     if (this.isTie(winner.bid!)) {
@@ -76,6 +78,10 @@ export class AuctionProcessor {
       return;
     }
     const squareId = this.auction.squareId.toString();
+    if (!this.game.squareState) {
+      this.game.squareState = new Map<string, SquareGameData>();
+    }
+
     this.game.squareState.set(squareId, {
       owner: winner._id!,
       numHouses: 0,

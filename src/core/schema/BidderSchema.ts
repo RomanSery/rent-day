@@ -5,4 +5,5 @@ export const BidderSchema = new mongoose.Schema({
   bid: { type: Number },
   color: { type: String, required: true },
   type: { type: Number, required: true },
+  submittedBid: { type: Boolean, required: true },
 });

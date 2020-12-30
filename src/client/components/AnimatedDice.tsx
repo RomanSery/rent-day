@@ -27,7 +27,6 @@ export const AnimatedDice: React.FC<Props> = () => {
             repeatDelay: 0
           }}
           style={{ originX: 0.5 }}
-          onAnimationComplete={() => console.log("here")}
         >
           <div className="die-face">{pips}</div>
         </motion.div>

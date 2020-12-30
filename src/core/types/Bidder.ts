@@ -6,4 +6,5 @@ export interface Bidder {
   readonly type: PieceType;
   readonly color: string;
   bid?: number;
+  submittedBid: boolean;
 }

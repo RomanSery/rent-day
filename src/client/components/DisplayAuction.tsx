@@ -17,6 +17,7 @@ import { faCheckSquare, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { GameEvent } from "../../core/types/GameEvent";
+import { CircleLoader } from "./CircleLoader";
 
 
 interface Props {
@@ -38,16 +39,10 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: any) => {
       getAuctionState();
     });
-
-    return function cleanup() {
-      if (socketService) {
-        socketService.disconnect();
-      }
-    };
   }, [context.gameId]);
 
   const getAuctionState = () => {
-    API.post("getAuction", { auctionId: gameInfo?.auctionId })
+    API.post("getAuction", { auctionId: gameInfo?.auctionId, context })
       .then(function (response) {
         setAuctionState(response.data.auction);
       })
@@ -60,6 +55,10 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     return bidder._id == getMyPlayerId();
   }
 
+  const isAuctionFinished = () => {
+    return auctionState?.finished;
+  }
+
   const alreadySubmittedBid = () => {
     const myBid = auctionState?.bidders.find(b => b._id == getMyPlayerId());
     return myBid && myBid.bid;
@@ -67,9 +66,13 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
+      if (bidder._id == auctionState.winnerId) {
+        return (<strong>${bidder.bid}</strong>);
+      }
       return "$" + bidder.bid;
     }
-    if (bidder.bid) {
+
+    if (bidder.submittedBid) {
       return <FontAwesomeIcon icon={faCheckSquare} color="green" />;
     }
     return <FontAwesomeIcon icon={faQuestion} />;
@@ -94,6 +97,20 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     }
     return "Auction";
   }
+
+  const getSubHeader = () => {
+    if (auctionState?.finished) {
+      const winner = auctionState.bidders.find(
+        (b: Bidder) => b._id && b._id.toString() === auctionState.winnerId
+      );
+      return winner?.name + " wins!";
+    }
+    return "The player to bid the highest wins and pays the 2nd highest bid. In the event of a tie, no one wins";
+  }
+
+  const getNameStyle = (bidder: Bidder): React.CSSProperties => {
+    return { color: bidder.color };
+  };
 
   const onSubmitBid = async () => {
     console.log(myBid);
@@ -130,7 +147,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
           {getAuctionHeader()}
         </div>
         <div className="auction-sub-header">
-          The person to bid the highest is the winner.  You pay the 2nd highest bid.
+          {getSubHeader()}
         </div>
 
         <TableContainer component={Paper} className="bid-table">
@@ -138,11 +155,11 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
             <TableBody>
               {auctionState?.bidders.map((row) => (
                 <TableRow key={row._id}>
-                  <TableCell component="th" scope="row">
+                  <TableCell component="th" scope="row" style={getNameStyle(row)}>
                     {row.name}
                   </TableCell>
                   <TableCell align="right">
-                    {isMe(row) ? getInputField() : getBidderIcon(row)}
+                    {isMe(row) && !isAuctionFinished() ? getInputField() : getBidderIcon(row)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -151,6 +168,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
         </TableContainer>
 
         {alreadySubmittedBid() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
+
+        {isAuctionFinished() ? <CircleLoader socketService={socketService} /> : null}
       </Container>
 
     </React.Fragment>

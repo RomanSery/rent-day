@@ -118,6 +118,7 @@ export class RollProcessor {
           type: value.type,
           color: value.color,
           _id: value._id,
+          submittedBid: false,
         };
         bidders.push(newBidder);
       }
