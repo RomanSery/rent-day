@@ -39,7 +39,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
         </div>
 
         <div className="description">
-          what happend: {gameInfo?.results.description}
+          {gameInfo?.results.description}
         </div>
 
       </React.Fragment>

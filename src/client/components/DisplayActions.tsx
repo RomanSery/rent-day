@@ -39,16 +39,16 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return (
       <Container maxWidth="sm">
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          {showRollBtn ? <Button color="primary" onClick={onClickRoll}>Roll dice</Button> : null}
-          <Button color="primary">Build</Button>
-          <Button color="primary">Sell</Button>
+          {showRollBtn ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
+          <Button color="primary" size="small">Build</Button>
+          <Button color="primary" size="small">Sell</Button>
         </ButtonGroup>
 
 
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          <Button color="primary">Mortgage</Button>
-          <Button color="primary">Redeem</Button>
-          <Button color="secondary" onClick={onLeaveGame}> Leave Game</Button>
+          <Button color="primary" size="small">Mortgage</Button>
+          <Button color="primary" size="small">Redeem</Button>
+          <Button color="secondary" onClick={onLeaveGame} size="small"> Leave Game</Button>
         </ButtonGroup>
       </Container>
     );

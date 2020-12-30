@@ -37,9 +37,10 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   useEffect(() => {
     socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: any) => {
+      console.log("AUCTION_UPDATE recieved");
       getAuctionState();
     });
-  }, [context.gameId]);
+  }, [context.gameId, context.playerId]);
 
   const getAuctionState = () => {
     API.post("getAuction", { auctionId: gameInfo?.auctionId, context })
@@ -113,7 +114,6 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const onSubmitBid = async () => {
-    console.log(myBid);
     API.post("actions/bid", { bid: myBid, context })
       .then(function (response) {
         if (socketService) {

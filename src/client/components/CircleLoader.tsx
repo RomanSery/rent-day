@@ -12,10 +12,11 @@ interface Props {
 export const CircleLoader: React.FC<Props> = ({ socketService }) => {
 
   const containerStyle: React.CSSProperties = {
-    position: "relative",
     width: "3rem",
     height: "3rem",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    margin: "auto"
+
   };
 
   const circleStyle: React.CSSProperties = {
@@ -25,10 +26,7 @@ export const CircleLoader: React.FC<Props> = ({ socketService }) => {
     border: "0.5rem solid black",
     borderTop: "0.5rem solid #3498db",
     borderRadius: "50%",
-    position: "absolute",
     boxSizing: "border-box",
-    top: 0,
-    left: 0
   };
 
   const spinTransition: Transition = {
@@ -42,8 +40,6 @@ export const CircleLoader: React.FC<Props> = ({ socketService }) => {
       socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
     }
   };
-
-
 
   return (
     <div style={containerStyle}>

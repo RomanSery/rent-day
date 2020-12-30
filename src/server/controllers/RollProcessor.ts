@@ -11,6 +11,7 @@ import { DiceRoll } from "../../core/types/DiceRoll";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareThemeData } from "../../core/types/SquareThemeData";
 
 export class RollProcessor {
   private context: GameContext;
@@ -61,9 +62,13 @@ export class RollProcessor {
       this.game.nextPlayerToAct = nextPlayer;
     }
 
+    const squareId: number = this.player.position;
+    const squareTheme = this.game.theme.get(squareId.toString());
+    const squarename = squareTheme ? squareTheme.name : "";
+
     this.game.results = {
       roll: newRoll,
-      description: this.player.name + " rolled a: " + newRoll.prettyPrint(),
+      description: this.player.name + " landed on " + squarename,
     };
 
     this.game.save();
