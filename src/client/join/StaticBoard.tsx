@@ -26,20 +26,11 @@ export const StaticBoard: React.FC<Props> = (props) => {
       }
     }
     return {
-      id: '', auctionId: '', theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: {
+      id: '', auctionId: '', auctionSquareId: 0, theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: {
         maxPlayers: 0, initialMoney: 0
       }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []
     };
   }
-
-  const viewSquare = (id: number) => {
-
-  };
-  const clearSquare = () => {
-
-  };
-
-
 
   return (
     <React.Fragment>
@@ -48,7 +39,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
           const id: number = index + 1;
           return (<GameSquare gameInfo={createEmptyState()}
             id={id}
-            key={id} viewSquare={viewSquare} clearSquare={clearSquare}
+            key={id} viewSquare={() => { }} clearSquare={() => { }}
           />)
         })}
 

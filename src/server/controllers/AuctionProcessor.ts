@@ -38,6 +38,7 @@ export class AuctionProcessor {
 
         if (this.game) {
           this.game.auctionId = null;
+          this.game.auctionSquareId = null;
           this.game.save();
         }
       }

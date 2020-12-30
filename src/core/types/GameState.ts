@@ -13,5 +13,6 @@ export interface GameState {
   readonly players: Array<Player>;
   readonly nextPlayerToAct: string;
   readonly auctionId: string;
+  readonly auctionSquareId: number;
   readonly results: LastResult;
 }

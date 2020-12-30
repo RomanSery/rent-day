@@ -54,6 +54,7 @@ export class RollProcessor {
 
       await newAuction.save();
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
+      this.game.auctionSquareId = newAuction.squareId;
     }
 
     const squareId: number = this.player.position;

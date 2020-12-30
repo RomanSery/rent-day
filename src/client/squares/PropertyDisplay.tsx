@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 import _ from "lodash";
 import React from "react";
 import { GameState } from "../../core/types/GameState";
-import { SquareGameData } from "../../core/types/SquareGameData";
 import { getIconProp } from "../helpers";
 import { ColorBar } from "./ColorBar";
+import { getOwnerPlayer, getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
 
 interface Props {
     id: number;
@@ -14,46 +14,43 @@ interface Props {
 
 export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const getTxt = () => {
-        if (gameInfo && gameInfo.theme) {
-            return gameInfo.theme[id].name;
-        }
-        return "";
-    }
-
     const getOwnerIcon = () => {
-        if (gameInfo && gameInfo.squareState && gameInfo.squareState[id]) {
-            const data: SquareGameData = gameInfo.squareState[id];
-            if (data && data.owner && data.color) {
-                const ownerPlayer = gameInfo.players.find(
-                    (p) => p._id && p._id.toString() == data.owner
-                );
-                if (ownerPlayer) {
-                    return (<FontAwesomeIcon icon={getIconProp(ownerPlayer.type)} color={ownerPlayer.color} />);
-                }
-            }
+        const ownerPlayer = getOwnerPlayer(gameInfo, id);
+        if (ownerPlayer) {
+            return (<FontAwesomeIcon icon={getIconProp(ownerPlayer.type)} color={ownerPlayer.color} />);
         }
         return null;
     }
 
-    const getColorStyle = (): React.CSSProperties => {
-        if (gameInfo && gameInfo.squareState && gameInfo.squareState[id]) {
-            const data: SquareGameData = gameInfo.squareState[id];
-            if (data && data.owner && data.color) {
-                return { color: data.color, textDecoration: "underline" };
-            }
-        }
+    const getNormalSquare = () => {
+        return (
+            <div className="square-name">
+                <div className="square-title" style={getSquareStyle(gameInfo, id)}>
+                    {getSquareTxt(gameInfo, id)} {getOwnerIcon()}
+                </div>
+            </div>
+        );
+    }
 
-        return {};
-    };
+    const getAnimatedSquare = () => {
+        return (
+            <motion.div animate={{ scale: 1.1 }} transition={{
+                duration: 1.0,
+                loop: Infinity,
+                repeatDelay: 0
+            }} className="square-name">
+                <div className="square-title" style={getSquareStyle(gameInfo, id)}>
+                    {getSquareTxt(gameInfo, id)} {getOwnerIcon()}
+                </div>
+            </motion.div>
+        );
+    }
 
 
     return (
         <React.Fragment>
             <ColorBar id={id} />
-            <motion.div whileHover={{ scale: 1.1 }} className="square-name">
-                <div className="square-title" style={getColorStyle()}>{getTxt()} {getOwnerIcon()}</div>
-            </motion.div>
+            {isBeingAuctioned(gameInfo, id) ? getAnimatedSquare() : getNormalSquare()}
         </React.Fragment>
     );
 
