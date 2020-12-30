@@ -23,6 +23,17 @@ export const roll = async (req: Request, res: Response) => {
   });
 };
 
+export const completeTurn = async (req: Request, res: Response) => {
+  const context: GameContext = getGameContextFromUrl(req);
+  const rollProcess = new RollProcessor(context);
+  await rollProcess.init();
+  await rollProcess.completeMyTurn();
+
+  res.json({
+    status: "success",
+  });
+};
+
 export const bid = async (req: Request, res: Response) => {
   await check("bid", "Bid is not valid").notEmpty().isNumeric().run(req);
 

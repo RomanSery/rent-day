@@ -106,7 +106,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
           </div>
 
           <div className="player-actions">
-            <DisplayActions gameInfo={gameInfo} socketService={socketService} onRollAction={onRollDice} />
+            <DisplayActions gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
           </div>
 
         </div>

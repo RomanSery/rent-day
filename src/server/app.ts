@@ -48,6 +48,7 @@ app.post("/api/createGame", actions.createGame);
 
 app.post("/api/actions/roll", gameplay.roll);
 app.post("/api/actions/bid", gameplay.bid);
+app.post("/api/actions/completeTurn", gameplay.completeTurn);
 
 const gameServer = new GameServer();
 gameServer.listen();

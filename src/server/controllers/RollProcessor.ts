@@ -11,7 +11,6 @@ import { DiceRoll } from "../../core/types/DiceRoll";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { SquareThemeData } from "../../core/types/SquareThemeData";
 
 export class RollProcessor {
   private context: GameContext;
@@ -39,7 +38,7 @@ export class RollProcessor {
     const newRoll = new DiceRoll();
 
     let newPosition = this.player.position + newRoll.sum();
-    if (newPosition >= 39) {
+    if (newPosition > 39) {
       newPosition = newPosition - 39;
       this.playerPassedGo();
     }
@@ -57,19 +56,39 @@ export class RollProcessor {
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
     }
 
+    const squareId: number = this.player.position;
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    const squareTheme = this.game.theme.get(squareId.toString());
+    let squareName = squareTheme ? squareTheme.name : "";
+    if (squareConfig && squareConfig.type == SquareType.Chance) {
+      squareName = "Chance";
+    } else if (squareConfig && squareConfig.type == SquareType.Jail) {
+      squareName = "Visiting Jail";
+    }
+
+    this.game.results = {
+      roll: newRoll,
+      description: this.player.name + " landed on " + squareName,
+    };
+
+    this.game.save();
+  }
+
+  public async completeMyTurn(): Promise<void> {
+    if (!this.game) {
+      return;
+    }
+
+    const playerObjId = new mongoose.Types.ObjectId(this.context.playerId);
+    if (!playerObjId.equals(this.game.nextPlayerToAct)) {
+      //not your turn!
+      return;
+    }
+
     const nextPlayer: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();
     if (nextPlayer) {
       this.game.nextPlayerToAct = nextPlayer;
     }
-
-    const squareId: number = this.player.position;
-    const squareTheme = this.game.theme.get(squareId.toString());
-    const squarename = squareTheme ? squareTheme.name : "";
-
-    this.game.results = {
-      roll: newRoll,
-      description: this.player.name + " landed on " + squarename,
-    };
 
     this.game.save();
   }

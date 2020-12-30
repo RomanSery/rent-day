@@ -25,3 +25,7 @@ utilities
 you cant mortgage utilities but maybe you can sell them?
 MTA doubles all railroad rent
 con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
+
+
+
+auction doesnt work when winner is the last to bid

@@ -1,8 +1,11 @@
 import React from "react";
 import { Button, ButtonGroup, Container } from "@material-ui/core";
-import { getMyPlayerId, leaveCurrentGameIfJoined } from "../helpers";
+import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
+import API from '../api';
+import { GameContext } from "../../core/types/GameContext";
+import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 
 interface Props {
@@ -13,16 +16,36 @@ interface Props {
 
 export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction }) => {
 
+  const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
   const [showRollBtn, setShowRollBtn] = React.useState(true);
 
   const onClickRoll = async () => {
     setShowRollBtn(false);
     onRollAction();
+  };
 
-    setTimeout(() => {
-      setShowRollBtn(true);
-    }, 5000);
+  const onClickDone = async () => {
+    API.post("actions/completeTurn", { context })
+      .then(function (response) {
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        }
+        setTimeout(() => {
+          setShowRollBtn(true);
+        }, 500);
+
+      })
+      .catch(function (error) {
+        if (error.response) {
+          alert(error.response.data);
+        } else if (error.request) {
+          console.log(error.request);
+        } else {
+          console.log('Error', error.message);
+        }
+      });
+
   };
 
   const onLeaveGame = async () => {
@@ -40,6 +63,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       <Container maxWidth="sm">
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
           {showRollBtn ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
+          {!showRollBtn ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
           <Button color="primary" size="small">Build</Button>
           <Button color="primary" size="small">Sell</Button>
         </ButtonGroup>
@@ -58,9 +82,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   return (
     <React.Fragment>
-
-      {isMyTurn() && getMyActions()}
-
+      {isMyTurn() ? getMyActions() : null}
     </React.Fragment>
   );
 
