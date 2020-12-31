@@ -44,6 +44,9 @@ export class RollProcessor {
       this.playerPassedGo();
     }
     this.player.position = newPosition;
+    this.player.hasRolled = true;
+
+    this.updateRollHistory(newRoll);
 
     if (this.shouldCreateAuction()) {
       const newAuction = new Auction({
@@ -76,8 +79,25 @@ export class RollProcessor {
     this.game.save();
   }
 
+  private updateRollHistory(newRoll: DiceRoll): void {
+    if (!this.player) {
+      return;
+    }
+
+    if (this.player.secondRoll != null) {
+      this.player.thirdRoll = this.player.secondRoll;
+    }
+    if (this.player.lastRoll != null) {
+      this.player.secondRoll = this.player.lastRoll;
+    }
+    this.player.lastRoll = newRoll;
+  }
+
   public async completeMyTurn(): Promise<void> {
     if (!this.game) {
+      return;
+    }
+    if (!this.player) {
       return;
     }
 
@@ -91,6 +111,8 @@ export class RollProcessor {
     if (nextPlayer) {
       this.game.nextPlayerToAct = nextPlayer;
     }
+
+    this.player.hasRolled = true;
 
     this.game.save();
   }
@@ -184,6 +206,10 @@ export class RollProcessor {
     const playerObjId = new mongoose.Types.ObjectId(this.context.playerId);
     if (!playerObjId.equals(this.game.nextPlayerToAct)) {
       return "not your turn!";
+    }
+
+    if (this.player.hasRolled) {
+      return "You already rolled this turn";
     }
 
     //TODO if is in jail, cant roll

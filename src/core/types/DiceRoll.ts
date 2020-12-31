@@ -16,6 +16,6 @@ export class DiceRoll {
   }
 
   isDouble(): boolean {
-    return this.die1 == this.die2;
+    return this.die1 === this.die2;
   }
 }

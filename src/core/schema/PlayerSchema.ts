@@ -12,4 +12,9 @@ export const PlayerSchema = new mongoose.Schema({
   negotiation: { type: Number, required: true },
   speed: { type: Number, required: true },
   intelligence: { type: Number, required: true },
+
+  hasRolled: { type: Boolean, required: true },
+  lastRoll: { type: Schema.Types.Mixed },
+  secondRoll: { type: Schema.Types.Mixed },
+  thirdRoll: { type: Schema.Types.Mixed },
 });

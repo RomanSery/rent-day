@@ -67,6 +67,7 @@ export class GameProcessor {
       negotiation: 2,
       speed: 3,
       intelligence: 4,
+      hasRolled: false,
     };
 
     game.players.push(newPlayer);
@@ -106,6 +107,7 @@ export class GameProcessor {
       p.position = 1;
       p.color = colors[index];
       p.state = PlayerState.ACTIVE;
+      p.hasRolled = false;
     });
 
     game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);

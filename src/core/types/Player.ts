@@ -1,6 +1,7 @@
 import { PieceType } from "../enums/PieceType";
 import { PlayerClass } from "../enums/PlayerClass";
 import { PlayerState } from "../enums/PlayerState";
+import { DiceRoll } from "./DiceRoll";
 
 export interface Player {
   readonly _id?: string;
@@ -15,4 +16,9 @@ export interface Player {
   negotiation: number;
   speed: number;
   intelligence: number;
+
+  hasRolled: boolean;
+  lastRoll?: DiceRoll;
+  secondRoll?: DiceRoll;
+  thirdRoll?: DiceRoll;
 }

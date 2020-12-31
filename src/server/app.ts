@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import helmet from "helmet";
 
 // Controllers (route handlers)
 import * as actions from "./controllers/actions";
@@ -12,9 +13,6 @@ const app = express();
 
 // Connect to MongoDB
 const mongoUrl: string = "mongodb://localhost:27017/monopoly"; //MONGODB_URI;
-console.log(mongoUrl);
-
-//mongoose.Promise = bluebird;
 
 mongoose
   .connect(mongoUrl, {
@@ -36,6 +34,7 @@ mongoose
 app.set("port", process.env.PORT || 4000);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
 
 app.get("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
