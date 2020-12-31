@@ -76,7 +76,7 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
                 <TableCell align="right">$343</TableCell>
               </TableRow>
               <TableRow key="playerViewer3">
-                <TableCell component="th" scope="row">Maintenance</TableCell>
+                <TableCell component="th" scope="row">Electricity</TableCell>
                 <TableCell align="right">$3454</TableCell>
               </TableRow>
             </TableBody>

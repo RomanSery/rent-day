@@ -14,20 +14,20 @@ car:
    good: start with random railroad and all railroad rent is doubled
    bad:  get 100 when pass go
 
-
-LUCK
-
-player classes
-one class is focues on taking advantage of train stations
+PROBLEMS
+auction doesnt work when the person that lands bids first and doesnt win
 
 
 utilities
 you cant mortgage utilities but maybe you can sell them?
-MTA doubles all railroad rent
-con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
+- MTA doubles all railroad rent
+- con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
 
-
-
-auction doesnt work when winner is the last to bid
-
+IDEAS
 in addition to mortgaging properties, maybe you can sell property at 30% of purchase price
+mortgage value should be a % of the purchase price
+
+
+player classes/abilities
+- Luck
+- one class is focues on taking advantage of train stations

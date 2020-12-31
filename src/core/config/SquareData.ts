@@ -61,12 +61,25 @@ SquareConfigDataMap.set(5, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 15,
+
+  mortgageValue: 100,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 22],
+    [1, 44],
+    [2, 88],
+    [3, 555],
+    [4, 666],
+    [5, 777],
+  ]),
 });
 
 SquareConfigDataMap.set(6, {
   type: SquareType.TrainStation,
   section: BoardSection.Bottom,
   groupId: 10,
+
   mortgageValue: 100,
   tax: 1.5,
   rent: new Map<number, number>([
@@ -81,6 +94,18 @@ SquareConfigDataMap.set(7, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 2,
+
+  mortgageValue: 50,
+  houseCost: 50,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 10],
+    [1, 40],
+    [2, 90],
+    [3, 270],
+    [4, 400],
+    [5, 550],
+  ]),
 });
 SquareConfigDataMap.set(8, {
   type: SquareType.Chance,
@@ -90,11 +115,35 @@ SquareConfigDataMap.set(9, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 2,
+
+  mortgageValue: 50,
+  houseCost: 50,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 10],
+    [1, 40],
+    [2, 90],
+    [3, 270],
+    [4, 400],
+    [5, 550],
+  ]),
 });
 SquareConfigDataMap.set(10, {
   type: SquareType.Property,
   section: BoardSection.Bottom,
   groupId: 2,
+
+  mortgageValue: 60,
+  houseCost: 50,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 16],
+    [1, 50],
+    [2, 100],
+    [3, 300],
+    [4, 450],
+    [5, 600],
+  ]),
 });
 
 SquareConfigDataMap.set(11, {
@@ -106,6 +155,18 @@ SquareConfigDataMap.set(12, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 3,
+
+  mortgageValue: 75,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 16],
+    [1, 50],
+    [2, 150],
+    [3, 450],
+    [4, 625],
+    [5, 750],
+  ]),
 });
 SquareConfigDataMap.set(13, {
   type: SquareType.Chance,
@@ -115,23 +176,68 @@ SquareConfigDataMap.set(14, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 3,
+
+  mortgageValue: 75,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 16],
+    [1, 50],
+    [2, 150],
+    [3, 450],
+    [4, 625],
+    [5, 750],
+  ]),
 });
 SquareConfigDataMap.set(15, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 3,
+
+  mortgageValue: 90,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 20],
+    [1, 60],
+    [2, 180],
+    [3, 500],
+    [4, 700],
+    [5, 900],
+  ]),
 });
 
 SquareConfigDataMap.set(16, {
   type: SquareType.TrainStation,
   section: BoardSection.Left,
   groupId: 10,
+
+  mortgageValue: 100,
+  tax: 1.5,
+  rent: new Map<number, number>([
+    [0, 25],
+    [1, 50],
+    [2, 100],
+    [3, 200],
+  ]),
 });
 
 SquareConfigDataMap.set(17, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 4,
+
+  mortgageValue: 100,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 20],
+    [1, 70],
+    [2, 200],
+    [3, 550],
+    [4, 750],
+    [5, 950],
+  ]),
 });
 SquareConfigDataMap.set(18, {
   type: SquareType.Utility,
@@ -142,11 +248,35 @@ SquareConfigDataMap.set(19, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 4,
+
+  mortgageValue: 100,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 20],
+    [1, 70],
+    [2, 200],
+    [3, 550],
+    [4, 750],
+    [5, 950],
+  ]),
 });
 SquareConfigDataMap.set(20, {
   type: SquareType.Property,
   section: BoardSection.Left,
   groupId: 4,
+
+  mortgageValue: 110,
+  houseCost: 100,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 30],
+    [1, 80],
+    [2, 220],
+    [3, 600],
+    [4, 800],
+    [5, 1000],
+  ]),
 });
 
 SquareConfigDataMap.set(21, {
@@ -158,6 +288,18 @@ SquareConfigDataMap.set(22, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 5,
+
+  mortgageValue: 110,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 30],
+    [1, 90],
+    [2, 250],
+    [3, 700],
+    [4, 875],
+    [5, 1050],
+  ]),
 });
 SquareConfigDataMap.set(23, {
   type: SquareType.Chance,
@@ -167,23 +309,68 @@ SquareConfigDataMap.set(24, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 5,
+
+  mortgageValue: 110,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 30],
+    [1, 90],
+    [2, 250],
+    [3, 700],
+    [4, 875],
+    [5, 1050],
+  ]),
 });
 SquareConfigDataMap.set(25, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 5,
+
+  mortgageValue: 120,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 40],
+    [1, 100],
+    [2, 300],
+    [3, 750],
+    [4, 925],
+    [5, 1100],
+  ]),
 });
 
 SquareConfigDataMap.set(26, {
   type: SquareType.TrainStation,
   section: BoardSection.Top,
   groupId: 10,
+
+  mortgageValue: 100,
+  tax: 1.5,
+  rent: new Map<number, number>([
+    [0, 25],
+    [1, 50],
+    [2, 100],
+    [3, 200],
+  ]),
 });
 
 SquareConfigDataMap.set(27, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 6,
+
+  mortgageValue: 140,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 40],
+    [1, 110],
+    [2, 330],
+    [3, 800],
+    [4, 975],
+    [5, 1150],
+  ]),
 });
 SquareConfigDataMap.set(28, {
   type: SquareType.Chance,
@@ -193,11 +380,35 @@ SquareConfigDataMap.set(29, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 6,
+
+  mortgageValue: 140,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 40],
+    [1, 110],
+    [2, 330],
+    [3, 800],
+    [4, 975],
+    [5, 1150],
+  ]),
 });
 SquareConfigDataMap.set(30, {
   type: SquareType.Property,
   section: BoardSection.Top,
   groupId: 6,
+
+  mortgageValue: 150,
+  houseCost: 150,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 50],
+    [1, 120],
+    [2, 360],
+    [3, 850],
+    [4, 1025],
+    [5, 1200],
+  ]),
 });
 
 SquareConfigDataMap.set(31, {
@@ -209,6 +420,18 @@ SquareConfigDataMap.set(32, {
   type: SquareType.Property,
   section: BoardSection.Right,
   groupId: 7,
+
+  mortgageValue: 150,
+  houseCost: 200,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 50],
+    [1, 130],
+    [2, 390],
+    [3, 900],
+    [4, 1100],
+    [5, 1275],
+  ]),
 });
 SquareConfigDataMap.set(33, {
   type: SquareType.Chance,
@@ -218,17 +441,50 @@ SquareConfigDataMap.set(34, {
   type: SquareType.Property,
   section: BoardSection.Right,
   groupId: 7,
+
+  mortgageValue: 150,
+  houseCost: 200,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 50],
+    [1, 130],
+    [2, 390],
+    [3, 900],
+    [4, 1100],
+    [5, 1275],
+  ]),
 });
 SquareConfigDataMap.set(35, {
   type: SquareType.Property,
   section: BoardSection.Right,
   groupId: 7,
+
+  mortgageValue: 160,
+  houseCost: 200,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 60],
+    [1, 150],
+    [2, 450],
+    [3, 1000],
+    [4, 1200],
+    [5, 1400],
+  ]),
 });
 
 SquareConfigDataMap.set(36, {
   type: SquareType.TrainStation,
   section: BoardSection.Right,
   groupId: 10,
+
+  mortgageValue: 100,
+  tax: 1.5,
+  rent: new Map<number, number>([
+    [0, 25],
+    [1, 50],
+    [2, 100],
+    [3, 200],
+  ]),
 });
 
 SquareConfigDataMap.set(37, {
@@ -241,6 +497,18 @@ SquareConfigDataMap.set(38, {
   type: SquareType.Property,
   section: BoardSection.Right,
   groupId: 8,
+
+  mortgageValue: 180,
+  houseCost: 200,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 60],
+    [1, 175],
+    [2, 500],
+    [3, 1100],
+    [4, 1300],
+    [5, 1500],
+  ]),
 });
 SquareConfigDataMap.set(39, {
   type: SquareType.Chance,
@@ -250,6 +518,18 @@ SquareConfigDataMap.set(40, {
   type: SquareType.Property,
   section: BoardSection.Right,
   groupId: 8,
+
+  mortgageValue: 200,
+  houseCost: 200,
+  tax: 1.3,
+  rent: new Map<number, number>([
+    [0, 80],
+    [1, 200],
+    [2, 600],
+    [3, 1400],
+    [4, 1700],
+    [5, 2000],
+  ]),
 });
 
 export { squareGroupColorMap, SquareConfigDataMap };

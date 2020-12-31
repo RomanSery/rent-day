@@ -1,4 +1,4 @@
-import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
+import { Auction } from "../../core/schema/AuctionSchema";
 import mongoose from "mongoose";
 import {
   GameInstance,
@@ -11,6 +11,7 @@ import { DiceRoll } from "../../core/types/DiceRoll";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class RollProcessor {
   private context: GameContext;
@@ -61,9 +62,9 @@ export class RollProcessor {
     const squareConfig = SquareConfigDataMap.get(squareId);
     const squareTheme = this.game.theme.get(squareId.toString());
     let squareName = squareTheme ? squareTheme.name : "";
-    if (squareConfig && squareConfig.type == SquareType.Chance) {
+    if (squareConfig && squareConfig.type === SquareType.Chance) {
       squareName = "Chance";
-    } else if (squareConfig && squareConfig.type == SquareType.Jail) {
+    } else if (squareConfig && squareConfig.type === SquareType.Jail) {
       squareName = "Visiting Jail";
     }
 
@@ -105,38 +106,40 @@ export class RollProcessor {
       return false;
     }
     if (
-      squareConfig.type != SquareType.Property &&
-      squareConfig.type != SquareType.TrainStation &&
-      squareConfig.type != SquareType.Utility
+      squareConfig.type !== SquareType.Property &&
+      squareConfig.type !== SquareType.TrainStation &&
+      squareConfig.type !== SquareType.Utility
     ) {
       return false;
     }
 
-    if (
-      !this.game.squareState ||
-      !this.game.squareState.has(squareId.toString())
-    ) {
+    if (!this.game.squareState) {
+      this.game.squareState = new Map<string, SquareGameData>();
+    }
+
+    const squareData: SquareGameData | undefined = this.game.squareState.get(
+      squareId.toString()
+    );
+    if (squareData == null) {
+      return true;
+    }
+    if (squareData.owner == null) {
       return true;
     }
 
-    const squareData = this.game.squareState.get(squareId.toString());
-    if (!squareData || !squareData.owner) {
-      return false;
-    }
-
-    return true;
+    return false;
   }
 
   private getBidders(): Array<Bidder> {
     if (!this.game) {
-      return new Array();
+      return [];
     }
-    const bidders: Array<Bidder> = new Array();
+    const bidders: Array<Bidder> = [];
 
     this.game.players.forEach((value: Player, key: number) => {
       if (
-        value.state == PlayerState.ACTIVE ||
-        value.state == PlayerState.IN_JAIL
+        value.state === PlayerState.ACTIVE ||
+        value.state === PlayerState.IN_JAIL
       ) {
         const newBidder = {
           name: value.name,
