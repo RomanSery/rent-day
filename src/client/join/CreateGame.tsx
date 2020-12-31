@@ -18,7 +18,7 @@ type Inputs = {
 export const CreateGame: React.FC<Props> = () => {
 
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs>();
 
 
   const onCreateGame: SubmitHandler<Inputs> = (data) => {

@@ -14,6 +14,7 @@ import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
 import { Button, Container, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
+import { SignUpPage } from "./auth/SignUpPage";
 
 
 export const App: React.FC = () => {
@@ -59,6 +60,8 @@ export const App: React.FC = () => {
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
             <Typography component="h2" variant="h5">Rent Day</Typography>
+
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
 
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
@@ -128,14 +131,30 @@ export const App: React.FC = () => {
     );
   };
 
+  const SignUp = () => {
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <Container maxWidth="xs">
+            <SignUpPage />
+          </Container>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
 
   return (
     <Switch>
       <Route exact path="/" component={withRouter(Home)} />
+
       <Route path="/gameinstance" component={GameDisplay} />
       <Route path="/join" component={DisplayJoinGamePage} />
       <Route path="/find" component={FindGamesPage} />
       <Route path="/create" component={CreateGamePage} />
+      <Route path="/newuser" component={SignUp} />
     </Switch>
   );
 }
