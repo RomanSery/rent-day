@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import _ from "lodash";
 import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { getIconProp } from "../helpers";

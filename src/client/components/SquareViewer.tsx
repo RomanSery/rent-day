@@ -1,4 +1,4 @@
-import { faHome, faHotel, faLightbulb, faPlane, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faHotel, faLightbulb, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';

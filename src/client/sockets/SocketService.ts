@@ -1,7 +1,6 @@
 import { Manager, Socket } from "socket.io-client";
 import { PageType } from "../../core/enums/PageType";
 import { GameEvent } from "../../core/types/GameEvent";
-import { JoinedGameMsg } from "../../core/types/messages";
 import {
   getMyGameId,
   getMyPlayerId,
@@ -18,7 +17,7 @@ interface GameClientSocket extends Socket {
 
 export class SocketService {
   private pageType: PageType;
-  private manager;
+  private manager: Manager;
   public socket: GameClientSocket;
 
   constructor(type: PageType) {
@@ -28,7 +27,7 @@ export class SocketService {
     this.socket = this.manager.socket("/");
     this.pageType = type;
 
-    if (this.pageType == PageType.Join) {
+    if (this.pageType === PageType.Join) {
       if (
         hasJoinedGame() &&
         getMyPlayerName() !== null &&

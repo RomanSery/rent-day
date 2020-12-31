@@ -44,11 +44,11 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
   const getSkill = (skillType: SkillType) => {
     const p = getPlayer();
     if (p) {
-      if (skillType == SkillType.Negotiation) {
+      if (skillType === SkillType.Negotiation) {
         return p.negotiation;
-      } else if (skillType == SkillType.Speed) {
+      } else if (skillType === SkillType.Speed) {
         return p.speed;
-      } else if (skillType == SkillType.Intelligence) {
+      } else if (skillType === SkillType.Intelligence) {
         return p.intelligence;
       }
     }

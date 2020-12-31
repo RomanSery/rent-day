@@ -8,7 +8,7 @@ import { CenterDisplay } from "./CenterDisplay";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
-import _ from "lodash";
+import { LatencyInfoMsg } from "../../core/types/messages";
 
 interface Props {
   socketService: SocketService;
@@ -22,7 +22,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [pings, setPings] = useState();
+  const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
@@ -40,7 +40,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       setSnackOpen(true);
     });
 
-    socketService.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
+    socketService.listenForEvent(GameEvent.GET_LATENCY, (data: LatencyInfoMsg[]) => {
       setPings(data);
     });
 
@@ -79,14 +79,16 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   };
 
   const getPing = (playerId: string | undefined) => {
-    if (playerId) {
-      const pingInfo = _.filter(pings, { 'playerId': playerId });
-      if (pingInfo && pingInfo.length > 0) {
-        return "Ping: " + pingInfo[0].latency + "ms";
+    if (playerId && pings) {
+      const pingInfo = pings.find(
+        (p: LatencyInfoMsg) => p.playerId === playerId
+      );
+      if (pingInfo) {
+        return "Ping: " + pingInfo.latency + "ms";
       }
     }
     return "Ping: 0ms";
-  }
+  };
 
   const viewSquare = (id: number) => {
     setSquareToView(id);

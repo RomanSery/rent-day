@@ -10,17 +10,13 @@ export const Die: React.FC<Props> = ({ value }) => {
     return <span className="pip" />;
   }
 
-  const Face = ({ children }) => {
-    return <div className="die-face">{children}</div>;
-  }
-
 
   let pips = Number.isInteger(value)
     ? Array(value)
       .fill(0)
       .map((_, i) => <Pip key={i} />)
     : null;
-  return <Face>{pips}</Face>;
+  return <div className="die-face">{pips}</div>;
 
 
 };

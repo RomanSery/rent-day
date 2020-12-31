@@ -87,11 +87,11 @@ export const tryToRedirectToGame = async (
   }
 
   if (hasJoinedGame()) {
-    if (pageType == PageType.Home || pageType == PageType.Find) {
+    if (pageType === PageType.Home || pageType === PageType.Find) {
       return callback(
-        gameStatus == GameStatus.JOINING ? "/join" : "/gameinstance"
+        gameStatus === GameStatus.JOINING ? "/join" : "/gameinstance"
       );
-    } else if (pageType == PageType.Join && gameStatus == GameStatus.ACTIVE) {
+    } else if (pageType === PageType.Join && gameStatus === GameStatus.ACTIVE) {
       return callback("/gameinstance");
     }
   }
@@ -112,17 +112,17 @@ const getGameStatus = async (gameId: string) => {
 };
 
 export const getIconProp = (type: PieceType): IconDefinition => {
-  if (type == PieceType.Bicycle) {
+  if (type === PieceType.Bicycle) {
     return faBicycle;
-  } else if (type == PieceType.Car) {
+  } else if (type === PieceType.Car) {
     return faCar;
-  } else if (type == PieceType.Hat) {
+  } else if (type === PieceType.Hat) {
     return faHatWizard;
-  } else if (type == PieceType.Pawn) {
+  } else if (type === PieceType.Pawn) {
     return faChessPawn;
-  } else if (type == PieceType.Cat) {
+  } else if (type === PieceType.Cat) {
     return faCat;
-  } else if (type == PieceType.Dog) {
+  } else if (type === PieceType.Dog) {
     return faDog;
   }
   return faChessPawn;

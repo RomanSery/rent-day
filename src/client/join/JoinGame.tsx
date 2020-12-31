@@ -10,10 +10,9 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, TextField, Typography } from "@material-ui/core";
-import { JoinedGameMsg } from "../../core/types/messages";
+import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
-import _ from "lodash";
 import { PlayerClass } from "../../core/enums/PlayerClass";
 
 
@@ -35,7 +34,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [pings, setPings] = useState();
+  const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
@@ -156,15 +155,18 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     return "Players: " + gameState?.players.length + " / " + gameState?.settings.maxPlayers;
   }
 
+
   const getPing = (playerId: string | undefined) => {
-    if (playerId) {
-      const pingInfo = _.filter(pings, { 'playerId': playerId });
-      if (pingInfo && pingInfo.length > 0) {
-        return "Ping: " + pingInfo[0].latency + "ms";
+    if (playerId && pings) {
+      const pingInfo = pings.find(
+        (p: LatencyInfoMsg) => p.playerId === playerId
+      );
+      if (pingInfo) {
+        return "Ping: " + pingInfo.latency + "ms";
       }
     }
-    return "";
-  }
+    return "Ping: 0ms";
+  };
 
 
   return (

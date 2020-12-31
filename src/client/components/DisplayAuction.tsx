@@ -15,7 +15,6 @@ import { Button, Container, TextField } from "@material-ui/core";
 import { Bidder } from "../../core/types/Bidder";
 import { faCheckSquare, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import _ from "lodash";
 import { GameEvent } from "../../core/types/GameEvent";
 import { CircleLoader } from "./CircleLoader";
 import { useIsMountedRef } from "./useIsMountedRef";
@@ -61,7 +60,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const isMe = (bidder: Bidder) => {
-    return bidder._id == getMyPlayerId();
+    return bidder._id === getMyPlayerId();
   }
 
   const isAuctionFinished = () => {
@@ -69,13 +68,13 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   }
 
   const alreadySubmittedBid = () => {
-    const myBid = auctionState?.bidders.find(b => b._id == getMyPlayerId());
+    const myBid = auctionState?.bidders.find(b => b._id === getMyPlayerId());
     return myBid && myBid.bid;
   }
 
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
-      if (bidder._id == auctionState.winnerId) {
+      if (bidder._id === auctionState.winnerId) {
         return (<strong>${bidder.bid}</strong>);
       }
       return "$" + bidder.bid;
@@ -93,7 +92,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getInputField = () => {
     if (alreadySubmittedBid()) {
-      const myBid = auctionState?.bidders.find(b => b._id == getMyPlayerId());
+      const myBid = auctionState?.bidders.find(b => b._id === getMyPlayerId());
       return "$" + myBid?.bid;
     }
     return (<TextField size="small" type="number" label="My Bid ($)" onChange={(e) => onChangeBid(e)} />);

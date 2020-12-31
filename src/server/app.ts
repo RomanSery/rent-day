@@ -1,6 +1,5 @@
 import express from "express";
 import bodyParser from "body-parser";
-import bluebird from "bluebird";
 import mongoose from "mongoose";
 
 // Controllers (route handlers)

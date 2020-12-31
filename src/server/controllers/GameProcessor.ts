@@ -197,16 +197,16 @@ export class GameProcessor {
 
     const status: GameStatus = game.status;
 
-    if (status == GameStatus.JOINING) {
+    if (status === GameStatus.JOINING) {
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id == playerId) {
+        if (game.players[i]._id === playerId) {
           game.players.splice(i, 1);
         }
       }
-    } else if (status == GameStatus.ACTIVE) {
+    } else if (status === GameStatus.ACTIVE) {
       //TODO do something else i think, not sure
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id == playerId) {
+        if (game.players[i]._id === playerId) {
           game.players.splice(i, 1);
         }
       }

@@ -24,7 +24,7 @@ export const UtilityDisplay: React.FC<Props> = ({ id, gameInfo }) => {
     const getUtilityIcon = () => {
         if (gameInfo && gameInfo.theme) {
             const icon = gameInfo.theme[id].icon;
-            return icon == "subway" ? faTrain : faLightbulb;
+            return icon === "subway" ? faTrain : faLightbulb;
         }
         return faTrain;
     };

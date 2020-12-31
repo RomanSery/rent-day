@@ -55,7 +55,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const isMyTurn = () => {
-    return getMyPlayerId() == gameInfo?.nextPlayerToAct && gameInfo?.auctionId == null;
+    return getMyPlayerId() === gameInfo?.nextPlayerToAct && gameInfo?.auctionId == null;
   }
 
   const getMyActions = () => {

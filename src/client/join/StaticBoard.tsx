@@ -3,7 +3,6 @@ import { GameState } from "../../core/types/GameState";
 import { GameSquare } from "../components/GameSquare";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
-import _ from "lodash";
 
 interface Props {
 
@@ -15,7 +14,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
 
   const createEmptyState = (): GameState => {
 
-    let themeArray: Array<SquareThemeData> = new Array();
+    let themeArray: Array<SquareThemeData> = [];
     themeArray.push({ name: "" });
     for (let i = 1; i <= 40; i++) {
       const data: SquareThemeData | undefined = NyThemeData.get(i);

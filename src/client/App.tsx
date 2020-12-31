@@ -2,10 +2,9 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import API from './api';
-import { StorageConstants, tryToRedirectToGame } from './helpers';
+import { tryToRedirectToGame } from './helpers';
 import {
-  Switch, Route, withRouter, useHistory, Link
+  Switch, Route, withRouter, useHistory
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";

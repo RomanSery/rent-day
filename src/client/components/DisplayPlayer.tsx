@@ -26,7 +26,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
   };
 
   const isPlayersTurn = () => {
-    return player._id == gameInfo?.nextPlayerToAct;
+    return player._id === gameInfo?.nextPlayerToAct;
   }
 
 
