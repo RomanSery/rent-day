@@ -7,4 +7,5 @@ export interface AuctionState {
   readonly finished: boolean;
   readonly squareId: number;
   readonly bidders: Array<Bidder>;
+  readonly isTie: boolean;
 }

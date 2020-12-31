@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import _ from "lodash";
 import { GameEvent } from "../../core/types/GameEvent";
 import { CircleLoader } from "./CircleLoader";
+import { useIsMountedRef } from "./useIsMountedRef";
 
 
 interface Props {
@@ -30,19 +31,26 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   const context: GameContext = getGameContextFromLocalStorage();
   const [auctionState, setAuctionState] = useState<AuctionState>();
   const [myBid, setMyBid] = useState<number>();
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    getAuctionState();
+    if (isMountedRef.current) {
+      getAuctionState();
+    }
   }, [context.gameId, context.playerId]);
 
   useEffect(() => {
-    socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: any) => {
-      console.log("AUCTION_UPDATE recieved");
-      getAuctionState();
-    });
+    if (isMountedRef.current) {
+      socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: any) => {
+        getAuctionState();
+      });
+    }
   }, [context.gameId, context.playerId]);
 
   const getAuctionState = () => {
+    if (!isMountedRef.current) {
+      return;
+    }
     API.post("getAuction", { auctionId: gameInfo?.auctionId, context })
       .then(function (response) {
         setAuctionState(response.data.auction);
@@ -101,6 +109,9 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getSubHeader = () => {
     if (auctionState?.finished) {
+      if (auctionState.isTie) {
+        return "It's a tie, you all lose";
+      }
       const winner = auctionState.bidders.find(
         (b: Bidder) => b._id && b._id.toString() === auctionState.winnerId
       );

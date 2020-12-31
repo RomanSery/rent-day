@@ -52,7 +52,7 @@ export const getGame = async (req: Request, res: Response) => {
 
   const gameId = req.body.gameId;
   const process = new GameProcessor();
-  res.json({ game: process.getGame(gameId) });
+  res.json({ game: await process.getGame(gameId) });
 };
 
 export const getAuction = async (req: Request, res: Response) => {
@@ -69,12 +69,12 @@ export const getAuction = async (req: Request, res: Response) => {
   const auctionId = req.body.auctionId;
   const auction = new AuctionProcessor(0, context);
 
-  res.json({ auction: auction.getAuction(auctionId, context.playerId) });
+  res.json({ auction: await auction.getAuction(auctionId, context.playerId) });
 };
 
 export const getGamesToJoin = async (req: Request, res: Response) => {
   const process = new GameProcessor();
-  res.json({ games: process.getGamesToJoin() });
+  res.json({ games: await process.getGamesToJoin() });
 };
 
 export const getGameStatus = async (req: Request, res: Response) => {
@@ -87,7 +87,7 @@ export const getGameStatus = async (req: Request, res: Response) => {
 
   const gameId = req.body.gameId;
   const process = new GameProcessor();
-  res.json({ status: process.getGameStatus(gameId) });
+  res.json({ status: await process.getGameStatus(gameId) });
 };
 
 export const joinGame = async (req: Request, res: Response) => {
@@ -144,7 +144,7 @@ export const leaveGame = async (req: Request, res: Response) => {
   const playerId = req.body.playerId;
 
   const leave = new GameProcessor();
-  leave.leaveGame(gameId, playerId);
+  await leave.leaveGame(gameId, playerId);
 
   res.json({ status: "success" });
 };

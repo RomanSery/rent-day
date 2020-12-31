@@ -6,6 +6,7 @@ import { getGameContextFromLocalStorage } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import { AnimatedDice } from "./AnimatedDice";
 import { Die } from "./Die";
+import { useIsMountedRef } from "./useIsMountedRef";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -16,9 +17,12 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
-
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
+    if (!isMountedRef.current) {
+      return;
+    }
     socketService.listenForEvent(GameEvent.ANIMATE_DICE, () => {
       setShowDiceAnimation(true);
     });
@@ -62,13 +66,8 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   return (
     <React.Fragment>
-
-
       {showDiceAnimation ? <AnimatedDice key={5} /> : null}
-
-
       {gameInfo && !showDiceAnimation && gameInfo.results ? getResults() : getEmptyResults()}
-
     </React.Fragment>
   );
 

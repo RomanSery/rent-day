@@ -29,3 +29,5 @@ con ed utility reduces electricty costs for houses (replace maintance with elect
 
 
 auction doesnt work when winner is the last to bid
+
+in addition to mortgaging properties, maybe you can sell property at 30% of purchase price

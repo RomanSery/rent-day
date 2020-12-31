@@ -26,6 +26,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
 
     API.get("findGames")
       .then(function (response) {
+        console.log(response.data.games);
         setGames(response.data.games);
       })
       .catch(function (error) {

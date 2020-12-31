@@ -44,12 +44,12 @@
 }
 
 .second-row .player-viewer {
-  flex-basis: 50%;
+  flex-basis: 40%;
   border: 1px solid black;
 }
 
 .second-row .property-viewer {
-  flex-basis: 50%;
+  flex-basis: 60%;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
