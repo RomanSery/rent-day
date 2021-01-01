@@ -24,8 +24,12 @@ export enum StorageConstants {
   GAME_ID = "myGameId",
   PLAYER_ID = "myPlayerId",
   PLAYER_NAME = "myPlayerName",
+  JWT_TOKEN = "jwtAuthToken",
 }
 
+export const getMyAuthToken = (): string | null => {
+  return localStorage.getItem(StorageConstants.JWT_TOKEN);
+};
 export const getMyGameId = (): string | null => {
   return localStorage.getItem(StorageConstants.GAME_ID);
 };
@@ -71,10 +75,26 @@ export const setJoinedGameStorage = (
   localStorage.setItem(StorageConstants.PLAYER_NAME, playerName);
 };
 
+export const setAuthToken = (token: string): void => {
+  localStorage.setItem(StorageConstants.JWT_TOKEN, token);
+};
+
+export const isLoggedIn = (): boolean => {
+  return localStorage.getItem(StorageConstants.JWT_TOKEN) != null;
+};
+
+export const logOut = (): void => {
+  localStorage.removeItem(StorageConstants.JWT_TOKEN);
+};
+
 export const tryToRedirectToGame = async (
   pageType: PageType,
   callback: (redirectUrl: string) => void
 ) => {
+  if (!isLoggedIn()) {
+    return;
+  }
+
   const myGameId = getMyGameId();
   if (myGameId === null) {
     return;

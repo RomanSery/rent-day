@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { tryToRedirectToGame } from './helpers';
+import { isLoggedIn, logOut, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory
 } from "react-router-dom";
@@ -15,6 +15,7 @@ import { CreateGame } from "./join/CreateGame";
 import { Button, Container, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { SignUpPage } from "./auth/SignUpPage";
+import { LoginPage } from "./auth/LoginPage";
 
 
 export const App: React.FC = () => {
@@ -52,6 +53,25 @@ export const App: React.FC = () => {
       },
     });
 
+    const getLoggedInButtons = () => {
+      return (
+        <React.Fragment>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { logOut(); history.push("/") }}> LOG OUT</Button>
+        </React.Fragment>
+      );
+    };
+
+    const getLoggedOutButtons = () => {
+      return (
+        <React.Fragment>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
+        </React.Fragment>
+      );
+    };
+
     const classes = homeStyles();
 
     return (
@@ -60,12 +80,7 @@ export const App: React.FC = () => {
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
             <Typography component="h2" variant="h5">Rent Day</Typography>
-
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
-
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
-
+            {isLoggedIn() ? getLoggedInButtons() : getLoggedOutButtons()}
           </Container>
         </StaticBoard>
       </React.Fragment>
@@ -145,6 +160,20 @@ export const App: React.FC = () => {
     );
   };
 
+  const LogIn = () => {
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <Container maxWidth="xs">
+            <LoginPage />
+          </Container>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
 
   return (
     <Switch>
@@ -154,7 +183,9 @@ export const App: React.FC = () => {
       <Route path="/join" component={DisplayJoinGamePage} />
       <Route path="/find" component={FindGamesPage} />
       <Route path="/create" component={CreateGamePage} />
+
       <Route path="/newuser" component={SignUp} />
+      <Route path="/login" component={LogIn} />
     </Switch>
   );
 }
