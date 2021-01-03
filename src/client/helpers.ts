@@ -12,17 +12,18 @@ import { PageType } from "../core/enums/PageType";
 import { PieceType } from "../core/enums/PieceType";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
+import jwt from "jsonwebtoken";
 
 export const getGameContextFromLocalStorage = (): GameContext => {
   const gid: any = getMyGameId();
-  const pid: any = getMyPlayerId();
+  const pid: any = getMyUserId();
+  const token: any = getMyAuthToken();
 
-  return { gameId: gid, playerId: pid };
+  return { gameId: gid, userId: pid, authToken: token };
 };
 
 export enum StorageConstants {
   GAME_ID = "myGameId",
-  PLAYER_ID = "myPlayerId",
   PLAYER_NAME = "myPlayerName",
   JWT_TOKEN = "jwtAuthToken",
 }
@@ -33,17 +34,24 @@ export const getMyAuthToken = (): string | null => {
 export const getMyGameId = (): string | null => {
   return localStorage.getItem(StorageConstants.GAME_ID);
 };
-export const getMyPlayerId = (): string | null => {
-  return localStorage.getItem(StorageConstants.PLAYER_ID);
-};
 export const getMyPlayerName = (): string | null => {
   return localStorage.getItem(StorageConstants.PLAYER_NAME);
 };
 
+export const getMyUserId = (): string | null => {
+  if (!isLoggedIn()) {
+    return null;
+  }
+  const decoded = jwt.decode(getMyAuthToken()!, { json: true });
+  if (decoded) {
+    return decoded["id"];
+  }
+  return null;
+};
+
 export const hasJoinedGame = (): boolean => {
   const myGameId = getMyGameId();
-  const myPlayerId = getMyPlayerId();
-  return myGameId != null && myPlayerId != null;
+  return myGameId != null;
 };
 
 export const leaveCurrentGameIfJoined = async (callback: () => void) => {
@@ -54,7 +62,7 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
 
   await API.post("leaveGame", {
     gameId: getMyGameId(),
-    playerId: getMyPlayerId(),
+    userId: getMyUserId(),
   }).then(function (response) {
     clearMyGameInfo();
     return callback();
@@ -62,16 +70,14 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
 };
 
 export const clearMyGameInfo = (): void => {
-  localStorage.clear();
+  localStorage.removeItem(StorageConstants.GAME_ID);
 };
 
 export const setJoinedGameStorage = (
   gameId: string,
-  playerId: string,
   playerName: string
 ): void => {
   localStorage.setItem(StorageConstants.GAME_ID, gameId);
-  localStorage.setItem(StorageConstants.PLAYER_ID, playerId);
   localStorage.setItem(StorageConstants.PLAYER_NAME, playerName);
 };
 

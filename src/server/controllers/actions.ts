@@ -2,8 +2,7 @@
 import { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 import _ from "lodash";
-import { GameContext } from "../../core/types/GameContext";
-import { getGameContextFromUrl } from "./helpers";
+import { getVerifiedUserId } from "./helpers";
 import { GameProcessor } from "./GameProcessor";
 import { JoinResult } from "../../core/types/JoinResult";
 import { AuctionProcessor } from "./AuctionProcessor";
@@ -28,6 +27,11 @@ export const createGame = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
   const gameName = req.body.data.gameName;
   const maxPlayers = req.body.data.maxPlayers;
   const initialMoney = req.body.data.initialMoney;
@@ -36,7 +40,8 @@ export const createGame = async (req: Request, res: Response) => {
   const newGameId = await process.createGame(
     gameName,
     maxPlayers,
-    initialMoney
+    initialMoney,
+    userId
   );
 
   return res.json({ gameId: newGameId });
@@ -48,6 +53,10 @@ export const getGame = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).send(errors);
+  }
+
+  if (getVerifiedUserId(req.body.context) == null) {
+    return res.status(400).send("Invalid auth token");
   }
 
   const gameId = req.body.gameId;
@@ -65,24 +74,36 @@ export const getAuction = async (req: Request, res: Response) => {
     return res.status(400).send("missing auctionId");
   }
 
-  const context: GameContext = getGameContextFromUrl(req);
-  const auctionId = req.body.auctionId;
-  const auction = new AuctionProcessor(0, context);
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
 
-  res.json({ auction: await auction.getAuction(auctionId, context.playerId) });
+  const auctionId = req.body.auctionId;
+  const auction = new AuctionProcessor(0, "", userId);
+
+  res.json({ auction: await auction.getAuction(auctionId) });
 };
 
 export const getGamesToJoin = async (req: Request, res: Response) => {
+  if (getVerifiedUserId(req.body.context) == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
   const process = new GameProcessor();
   res.json({ games: await process.getGamesToJoin() });
 };
 
 export const getGameStatus = async (req: Request, res: Response) => {
-  await check("gameId", "Please enter a valid gameId.").notEmpty().run(req);
+  await check("gameId", "Missing gameId.").notEmpty().run(req);
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     return res.status(400).send("missing gameId");
+  }
+
+  if (getVerifiedUserId(req.body.context) == null) {
+    return res.status(400).send("Invalid auth token");
   }
 
   const gameId = req.body.gameId;
@@ -92,35 +113,30 @@ export const getGameStatus = async (req: Request, res: Response) => {
 
 export const joinGame = async (req: Request, res: Response) => {
   await check("gameId", "GameId missing").notEmpty().run(req);
-  await check("name", "Name is not valid")
-    .notEmpty()
-    .isLength({ min: 4 })
-    .isAlphanumeric()
-    .run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).send(errors);
   }
 
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
   const gameId = req.body.gameId;
-  const playerName = _.trim(req.body.name);
   const selectedPiece: number = parseInt(_.trim(req.body.piece));
   const selectedPlayerClass: number = parseInt(_.trim(req.body.playerClass));
 
   const join = new GameProcessor();
-  const errMsg = await join.getJoinGameErrMsg(
-    gameId,
-    playerName,
-    selectedPiece
-  );
+  const errMsg = await join.getJoinGameErrMsg(gameId, userId, selectedPiece);
   if (errMsg) {
     return res.status(400).send(errMsg);
   }
 
   const result: JoinResult | null = await join.joinGame(
     gameId,
-    playerName,
+    userId,
     selectedPiece,
     selectedPlayerClass
   );
@@ -133,18 +149,21 @@ export const joinGame = async (req: Request, res: Response) => {
 
 export const leaveGame = async (req: Request, res: Response) => {
   await check("gameId", "GameId missing").notEmpty().run(req);
-  await check("playerId", "playerId missing").notEmpty().run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).send(errors);
   }
 
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
   const gameId = req.body.gameId;
-  const playerId = req.body.playerId;
 
   const leave = new GameProcessor();
-  await leave.leaveGame(gameId, playerId);
+  await leave.leaveGame(gameId, userId);
 
   res.json({ status: "success" });
 };

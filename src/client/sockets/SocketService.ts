@@ -3,14 +3,14 @@ import { PageType } from "../../core/enums/PageType";
 import { GameEvent } from "../../core/types/GameEvent";
 import {
   getMyGameId,
-  getMyPlayerId,
   getMyPlayerName,
+  getMyUserId,
   hasJoinedGame,
 } from "../helpers";
 
 interface GameClientSocket extends Socket {
   playerName?: string;
-  playerId?: string;
+  userId?: string;
   gameId?: string;
   latency?: number;
 }
@@ -31,11 +31,11 @@ export class SocketService {
       if (
         hasJoinedGame() &&
         getMyPlayerName() !== null &&
-        getMyPlayerId() !== null
+        getMyUserId() !== null
       ) {
         this.socket.emit(GameEvent.JOINED_GAME, {
           playerName: getMyPlayerName()!,
-          playerId: getMyPlayerId()!,
+          userId: getMyUserId()!,
           gameId: getMyGameId()!,
           allJoined: false,
         });
@@ -46,7 +46,7 @@ export class SocketService {
       this.socket.emit(
         GameEvent.JOIN_GAME_ROOM,
         getMyGameId(),
-        getMyPlayerId(),
+        getMyUserId(),
         getMyPlayerName()
       );
     }

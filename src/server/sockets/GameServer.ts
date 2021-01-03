@@ -31,7 +31,7 @@ export class GameServer {
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
         socket.playerName = m.playerName;
-        socket.playerId = m.playerId;
+        socket.userId = m.userId;
         socket.gameId = m.gameId;
         socket.latency = 0;
 
@@ -41,10 +41,10 @@ export class GameServer {
 
       socket.on(
         GameEvent.JOIN_GAME_ROOM,
-        (gameId: string, playerId: string, playerName: string) => {
+        (gameId: string, userId: string, playerName: string) => {
           console.log("joined game room %s", gameId);
           socket.playerName = playerName;
-          socket.playerId = playerId;
+          socket.userId = userId;
           socket.gameId = gameId;
           socket.latency = 0;
           socket.join(gameId);
@@ -80,7 +80,7 @@ export class GameServer {
           .sockets.forEach((s) => {
             const gameSocket = <GameSocket>s;
             info.push({
-              playerId: gameSocket.playerId,
+              userId: gameSocket.userId,
               latency: gameSocket.latency,
             });
           });

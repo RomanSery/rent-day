@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getMyPlayerId } from "../helpers";
+import { getGameContextFromLocalStorage, getMyUserId } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import Table from '@material-ui/core/Table';
@@ -36,7 +36,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     if (isMountedRef.current) {
       getAuctionState();
     }
-  }, [context.gameId, context.playerId]);
+  }, []);
 
   useEffect(() => {
     if (isMountedRef.current) {
@@ -44,7 +44,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
         getAuctionState();
       });
     }
-  }, [context.gameId, context.playerId]);
+  }, []);
 
   const getAuctionState = () => {
     if (!isMountedRef.current) {
@@ -60,7 +60,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const isMe = (bidder: Bidder) => {
-    return bidder._id === getMyPlayerId();
+    return bidder._id === getMyUserId();
   }
 
   const isAuctionFinished = () => {
@@ -68,7 +68,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   }
 
   const alreadySubmittedBid = () => {
-    const myBid = auctionState?.bidders.find(b => b._id === getMyPlayerId());
+    const myBid = auctionState?.bidders.find(b => b._id === getMyUserId());
     return myBid && myBid.bid;
   }
 
@@ -92,7 +92,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getInputField = () => {
     if (alreadySubmittedBid()) {
-      const myBid = auctionState?.bidders.find(b => b._id === getMyPlayerId());
+      const myBid = auctionState?.bidders.find(b => b._id === getMyUserId());
       return "$" + myBid?.bid;
     }
     return (<TextField size="small" type="number" label="My Bid ($)" onChange={(e) => onChangeBid(e)} />);

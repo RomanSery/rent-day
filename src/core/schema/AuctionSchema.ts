@@ -1,6 +1,14 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { Bidder } from "../types/Bidder";
-import { BidderSchema } from "./BidderSchema";
+
+const BidderSchema = new mongoose.Schema({
+  _id: { type: Schema.Types.ObjectId, required: true },
+  name: { type: String, required: true },
+  bid: { type: Number },
+  color: { type: String, required: true },
+  type: { type: Number, required: true },
+  submittedBid: { type: Boolean, required: true },
+});
 
 export type AuctionDocument = mongoose.Document & {
   gameId: mongoose.Types.ObjectId;

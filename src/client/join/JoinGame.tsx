@@ -9,7 +9,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, TextField, Typography } from "@material-ui/core";
+import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@material-ui/core";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
@@ -21,7 +21,6 @@ interface Props {
 }
 
 type Inputs = {
-  playerName: string;
   piece: PieceType;
   playerClass: PlayerClass;
 };
@@ -37,12 +36,12 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
 
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+  const { register, handleSubmit } = useForm<Inputs>();
 
 
   useEffect(() => {
     getGameState();
-  }, [context.gameId, context.playerId]);
+  }, []);
 
 
   useEffect(() => {
@@ -75,13 +74,13 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         socketService.disconnect();
       }
     };
-  }, [context.gameId]);
+  }, []);
 
 
 
 
   const getGameState = () => {
-    API.post("getGame", { gameId: context.gameId })
+    API.post("getGame", { gameId: context.gameId, context })
       .then(function (response) {
         setGameState(response.data.game);
       })
@@ -93,18 +92,18 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
-    API.post("joinGame", { gameId: context.gameId, name: data.playerName, piece: data.piece, playerClass: data.playerClass })
+    API.post("joinGame", { gameId: context.gameId, piece: data.piece, playerClass: data.playerClass, context })
       .then(function (response) {
         if (socketService) {
           socketService.socket.emit(GameEvent.JOINED_GAME, {
             playerName: response.data.playerName,
-            playerId: response.data.playerId,
+            userId: response.data.userId,
             allJoined: response.data.allJoined,
             gameId: context.gameId
           });
         }
 
-        setJoinedGameStorage(context.gameId, response.data.playerId, response.data.playerName);
+        setJoinedGameStorage(context.gameId, response.data.playerName);
         getGameState();
 
         if (response.data.allJoined) {
@@ -156,10 +155,10 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   }
 
 
-  const getPing = (playerId: string | undefined) => {
-    if (playerId && pings) {
+  const getPing = (userId: string | undefined) => {
+    if (userId && pings) {
       const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => p.playerId === playerId
+        (p: LatencyInfoMsg) => p.userId === userId
       );
       if (pingInfo) {
         return "Ping: " + pingInfo.latency + "ms";
@@ -188,9 +187,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
         {!hasJoinedGame() &&
           <form onSubmit={handleSubmit(onJoinGame)}>
-
-            <TextField label="Name" fullWidth={true} name="playerName" required={true}
-              inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
 
             <FormControl fullWidth >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>

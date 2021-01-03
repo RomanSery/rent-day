@@ -69,7 +69,6 @@ export const login = async (
       req.logIn(users, () => {
         UserInstance.findOne({ username: req.body.username }).then(
           (user: { id: any }) => {
-            console.log("signing: " + user);
             const token = jwt.sign({ id: user.id }, "jwt-secret", {
               expiresIn: 60 * 60,
             });

@@ -6,11 +6,11 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 
 // Controllers (route handlers)
-import * as passportConfig from "./config/passport";
 import * as actions from "./controllers/actions";
 import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
+import * as passportConfig from "./config/passport";
 
 // Create Express server
 const app = express();
@@ -42,32 +42,22 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(passport.initialize());
 
+passportConfig.initPassportConfig();
+
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
 
-app.get(
-  "/api/findGames",
-  passportConfig.isAuthenticated,
-  actions.getGamesToJoin
-);
-app.post("/api/getGame", passportConfig.isAuthenticated, actions.getGame);
-app.post("/api/getAuction", passportConfig.isAuthenticated, actions.getAuction);
-app.post(
-  "/api/getGameStatus",
-  passportConfig.isAuthenticated,
-  actions.getGameStatus
-);
-app.post("/api/joinGame", passportConfig.isAuthenticated, actions.joinGame);
-app.post("/api/leaveGame", passportConfig.isAuthenticated, actions.leaveGame);
-app.post("/api/createGame", passportConfig.isAuthenticated, actions.createGame);
+app.get("/api/findGames", actions.getGamesToJoin);
+app.post("/api/getGame", actions.getGame);
+app.post("/api/getAuction", actions.getAuction);
+app.post("/api/getGameStatus", actions.getGameStatus);
+app.post("/api/joinGame", actions.joinGame);
+app.post("/api/leaveGame", actions.leaveGame);
+app.post("/api/createGame", actions.createGame);
 
-app.post("/api/actions/roll", passportConfig.isAuthenticated, gameplay.roll);
-app.post("/api/actions/bid", passportConfig.isAuthenticated, gameplay.bid);
-app.post(
-  "/api/actions/completeTurn",
-  passportConfig.isAuthenticated,
-  gameplay.completeTurn
-);
+app.post("/api/actions/roll", gameplay.roll);
+app.post("/api/actions/bid", gameplay.bid);
+app.post("/api/actions/completeTurn", gameplay.completeTurn);
 
 const gameServer = new GameServer();
 gameServer.listen();

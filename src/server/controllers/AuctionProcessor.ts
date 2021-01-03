@@ -4,23 +4,24 @@ import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
-import { GameContext } from "../../core/types/GameContext";
 import { Bidder } from "../../core/types/Bidder";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class AuctionProcessor {
   private bid: number;
-  private context: GameContext;
+  private gameId: string;
+  private userId: string;
   private game?: GameInstanceDocument | null;
   private auction?: AuctionDocument | null;
 
-  constructor(bid: number, context: GameContext) {
+  constructor(bid: number, gameId: string, userId: string) {
     this.bid = bid;
-    this.context = context;
+    this.gameId = gameId;
+    this.userId = userId;
   }
 
   public async init(): Promise<void> {
-    this.game = await GameInstance.findById(this.context.gameId);
+    this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.auction = await Auction.findById(this.game.auctionId);
     }
@@ -28,7 +29,7 @@ export class AuctionProcessor {
 
   public async placeBid(): Promise<void> {
     const myBid = this.auction!.bidders.find(
-      (b) => b._id && b._id.toString() === this.context.playerId
+      (b) => b._id && b._id.toString() === this.userId
     );
     if (myBid && this.auction) {
       myBid.bid = this.bid;
@@ -101,7 +102,7 @@ export class AuctionProcessor {
     }
 
     const playerToBid = this.game.players.find(
-      (p) => p._id && p._id.toString() === this.context.playerId
+      (p) => p._id && p._id.toString() === this.userId
     );
     if (playerToBid == null) {
       return "player not found!";
@@ -115,7 +116,7 @@ export class AuctionProcessor {
     }
 
     const myBid = this.auction.bidders.find(
-      (b) => b._id && b._id.toString() === this.context.playerId
+      (b) => b._id && b._id.toString() === this.userId
     );
     if (myBid == null) {
       return "player bid not found!";
@@ -134,10 +135,7 @@ export class AuctionProcessor {
     return "";
   }
 
-  public async getAuction(
-    auctionId: string,
-    playerId: string
-  ): Promise<AuctionDocument> {
+  public async getAuction(auctionId: string): Promise<AuctionDocument> {
     let found: AuctionDocument = await Auction.findById(
       auctionId,
       (err: mongoose.CallbackError, existingAuction: AuctionDocument) => {
@@ -151,7 +149,7 @@ export class AuctionProcessor {
     if (!found.finished) {
       //for security purposes if auction is not finished, dont return real bid amounts
       found.bidders.forEach((b) => {
-        if (b._id != playerId) {
+        if (b._id != this.userId) {
           b.bid = 0;
         }
       });

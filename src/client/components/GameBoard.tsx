@@ -29,7 +29,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
     getGameState();
-  }, [context.gameId, context.playerId]);
+  }, []);
 
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
   const getGameState = () => {
-    API.post("getGame", { gameId: context.gameId })
+    API.post("getGame", { gameId: context.gameId, context })
       .then(function (response) {
         setGameState(response.data.game);
       })
@@ -78,10 +78,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setSnackOpen(false);
   };
 
-  const getPing = (playerId: string | undefined) => {
-    if (playerId && pings) {
+  const getPing = (userId: string | undefined) => {
+    if (userId && pings) {
       const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => p.playerId === playerId
+        (p: LatencyInfoMsg) => p.userId === userId
       );
       if (pingInfo) {
         return "Ping: " + pingInfo.latency + "ms";

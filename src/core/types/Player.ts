@@ -4,7 +4,7 @@ import { PlayerState } from "../enums/PlayerState";
 import { DiceRoll } from "./DiceRoll";
 
 export interface Player {
-  readonly _id?: string;
+  _id: string;
   readonly name: string;
   money: number;
   position: number;

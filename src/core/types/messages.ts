@@ -1,11 +1,11 @@
 export interface JoinedGameMsg {
   playerName: string;
-  playerId: string;
+  userId: string;
   gameId: string;
   allJoined: boolean;
 }
 
 export interface LatencyInfoMsg {
-  playerId: string;
+  userId: string;
   latency: number;
 }

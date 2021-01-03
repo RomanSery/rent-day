@@ -4,7 +4,6 @@ import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
-import { GameContext } from "../../core/types/GameContext";
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { DiceRoll } from "../../core/types/DiceRoll";
@@ -14,19 +13,21 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class RollProcessor {
-  private context: GameContext;
+  private gameId: string;
+  private userId: string;
   private game?: GameInstanceDocument | null;
   private player?: Player | null;
 
-  constructor(context: GameContext) {
-    this.context = context;
+  constructor(gameId: string, userId: string) {
+    this.gameId = gameId;
+    this.userId = userId;
   }
 
   public async init(): Promise<void> {
-    this.game = await GameInstance.findById(this.context.gameId);
+    this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.player = this.game.players.find(
-        (p: Player) => p._id && p._id.toString() === this.context.playerId
+        (p: Player) => p._id && p._id.toString() === this.userId
       );
     }
   }
@@ -101,7 +102,7 @@ export class RollProcessor {
       return;
     }
 
-    const playerObjId = new mongoose.Types.ObjectId(this.context.playerId);
+    const playerObjId = new mongoose.Types.ObjectId(this.userId);
     if (!playerObjId.equals(this.game.nextPlayerToAct)) {
       //not your turn!
       return;
@@ -163,7 +164,7 @@ export class RollProcessor {
         value.state === PlayerState.ACTIVE ||
         value.state === PlayerState.IN_JAIL
       ) {
-        const newBidder = {
+        const newBidder: Bidder = {
           name: value.name,
           type: value.type,
           color: value.color,
@@ -203,7 +204,7 @@ export class RollProcessor {
       return "player not found";
     }
 
-    const playerObjId = new mongoose.Types.ObjectId(this.context.playerId);
+    const playerObjId = new mongoose.Types.ObjectId(this.userId);
     if (!playerObjId.equals(this.game.nextPlayerToAct)) {
       return "not your turn!";
     }

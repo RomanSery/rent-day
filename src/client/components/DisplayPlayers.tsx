@@ -5,7 +5,7 @@ import { DisplayPlayer } from "./DisplayPlayer";
 
 interface Props {
   gameInfo: GameState | undefined;
-  getPing: (playerId: string | undefined) => string;
+  getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }

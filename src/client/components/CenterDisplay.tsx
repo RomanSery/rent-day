@@ -8,7 +8,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId } from "../helpers";
+import { getGameContextFromLocalStorage, getMyGameId, getMyUserId } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
@@ -16,7 +16,7 @@ import { DisplayAuction } from "./DisplayAuction";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  getPing: (playerId: string | undefined) => string;
+  getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
 }
 
@@ -56,9 +56,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   };
   const clearPlayer = () => {
     if (gameInfo && gameInfo.players) {
-      const myPlayerId = getMyPlayerId();
+      const myUserId = getMyUserId();
       const myPlayer = gameInfo.players.find(
-        (p) => p._id && p._id.toString() === myPlayerId
+        (p: Player) => p._id && p._id.toString() === myUserId
       );
       setPlayerToView(myPlayer);
     } else {
@@ -71,9 +71,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       return playerToView;
     }
     if (gameInfo && gameInfo.players) {
-      const myPlayerId = getMyPlayerId();
+      const myUserId = getMyUserId();
       const myPlayer = gameInfo.players.find(
-        (p) => p._id && p._id.toString() === myPlayerId
+        (p) => p._id && p._id.toString() === myUserId
       );
       return myPlayer;
     }

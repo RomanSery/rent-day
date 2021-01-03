@@ -7,7 +7,7 @@ import { getIconProp } from "../helpers";
 interface Props {
   gameInfo: GameState | undefined;
   player: Player;
-  getPing: (playerId: string | undefined) => string;
+  getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }

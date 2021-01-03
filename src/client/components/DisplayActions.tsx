@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, ButtonGroup, Container } from "@material-ui/core";
-import { getGameContextFromLocalStorage, getMyGameId, getMyPlayerId, leaveCurrentGameIfJoined } from "../helpers";
+import { getGameContextFromLocalStorage, getMyGameId, getMyUserId, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
 import API from '../api';
@@ -55,7 +55,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const isMyTurn = () => {
-    return getMyPlayerId() === gameInfo?.nextPlayerToAct && gameInfo?.auctionId == null;
+    return getMyUserId() === gameInfo?.nextPlayerToAct && gameInfo?.auctionId == null;
   }
 
   const getMyActions = () => {
