@@ -103,7 +103,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           });
         }
 
-        setJoinedGameStorage(context.gameId, response.data.playerName);
+        setJoinedGameStorage(context.gameId);
         getGameState();
 
         if (response.data.allJoined) {

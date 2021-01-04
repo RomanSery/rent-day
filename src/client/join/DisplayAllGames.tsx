@@ -11,7 +11,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
-import { leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
+import { getGameContextFromLocalStorage, leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
+import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
 
@@ -19,12 +20,13 @@ interface Props {
 
 export const DisplayAllGames: React.FC<Props> = () => {
 
+  const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
   const [games, setGames] = useState<GameToJoin[]>([]);
 
   useEffect(() => {
 
-    API.get("findGames")
+    API.post("findGames", { context })
       .then(function (response) {
         console.log(response.data.games);
         setGames(response.data.games);

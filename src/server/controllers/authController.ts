@@ -59,12 +59,7 @@ export const login = async (
       console.error(`error ${err}`);
     }
     if (info !== undefined) {
-      console.error(info.message);
-      if (info.message === "bad username") {
-        res.status(401).send(info.message);
-      } else {
-        res.status(403).send(info.message);
-      }
+      return res.status(400).send("Invalid username/password");
     } else {
       req.logIn(users, () => {
         UserInstance.findOne({ username: req.body.username }).then(
@@ -75,7 +70,7 @@ export const login = async (
             res.status(200).send({
               auth: true,
               token,
-              message: "user found & logged in",
+              username: req.body.username,
             });
           }
         );

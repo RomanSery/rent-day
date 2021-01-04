@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { setAuthToken } from "../helpers";
+import { setAuthToken, setPlayerName } from "../helpers";
 
 
 interface Props {
@@ -25,10 +25,23 @@ export const LoginPage: React.FC<Props> = () => {
     API.post("logIn", { username: data.username, password: data.password })
       .then(function (response) {
         setAuthToken(response.data.token);
+        setPlayerName(response.data.username);
         history.push("/");
       })
       .catch(function (error) {
-        console.log(error);
+        if (error.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          alert(error.response.data);
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          console.log(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
       });
   };
 

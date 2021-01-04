@@ -102,10 +102,6 @@ export const getGameStatus = async (req: Request, res: Response) => {
     return res.status(400).send("missing gameId");
   }
 
-  if (getVerifiedUserId(req.body.context) == null) {
-    return res.status(400).send("Invalid auth token");
-  }
-
   const gameId = req.body.gameId;
   const process = new GameProcessor();
   res.json({ status: await process.getGameStatus(gameId) });

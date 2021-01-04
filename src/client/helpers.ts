@@ -24,6 +24,7 @@ export const getGameContextFromLocalStorage = (): GameContext => {
 
 export enum StorageConstants {
   GAME_ID = "myGameId",
+  JOINED_GAME = "hasJoinedGame",
   PLAYER_NAME = "myPlayerName",
   JWT_TOKEN = "jwtAuthToken",
 }
@@ -51,7 +52,10 @@ export const getMyUserId = (): string | null => {
 
 export const hasJoinedGame = (): boolean => {
   const myGameId = getMyGameId();
-  return myGameId != null;
+  return (
+    myGameId != null &&
+    localStorage.getItem(StorageConstants.JOINED_GAME) != null
+  );
 };
 
 export const leaveCurrentGameIfJoined = async (callback: () => void) => {
@@ -71,18 +75,20 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
 
 export const clearMyGameInfo = (): void => {
   localStorage.removeItem(StorageConstants.GAME_ID);
+  localStorage.removeItem(StorageConstants.JOINED_GAME);
 };
 
-export const setJoinedGameStorage = (
-  gameId: string,
-  playerName: string
-): void => {
+export const setJoinedGameStorage = (gameId: string): void => {
   localStorage.setItem(StorageConstants.GAME_ID, gameId);
-  localStorage.setItem(StorageConstants.PLAYER_NAME, playerName);
+  localStorage.setItem(StorageConstants.JOINED_GAME, "true");
 };
 
 export const setAuthToken = (token: string): void => {
   localStorage.setItem(StorageConstants.JWT_TOKEN, token);
+};
+
+export const setPlayerName = (username: string): void => {
+  localStorage.setItem(StorageConstants.PLAYER_NAME, username);
 };
 
 export const isLoggedIn = (): boolean => {
@@ -115,9 +121,9 @@ export const tryToRedirectToGame = async (
   if (hasJoinedGame()) {
     if (pageType === PageType.Home || pageType === PageType.Find) {
       return callback(
-        gameStatus === GameStatus.JOINING ? "/join" : "/gameinstance"
+        gameStatus == GameStatus.JOINING ? "/join" : "/gameinstance"
       );
-    } else if (pageType === PageType.Join && gameStatus === GameStatus.ACTIVE) {
+    } else if (pageType == PageType.Join && gameStatus == GameStatus.ACTIVE) {
       return callback("/gameinstance");
     }
   }

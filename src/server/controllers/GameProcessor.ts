@@ -147,15 +147,19 @@ export class GameProcessor {
   }
 
   private async getUserName(userId: string): Promise<string> {
-    return await UserInstance.findById(
+    const ud: UserDocument = await UserInstance.findById(
       userId,
       (err: mongoose.CallbackError, u: UserDocument) => {
         if (err) {
           return console.log(err);
         }
-        return u.username;
+        return u;
       }
     );
+    if (ud) {
+      return ud.username;
+    }
+    return "";
   }
 
   public async getGameStatus(gameId: string): Promise<GameStatus | null> {
