@@ -72,7 +72,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
       const data: SquareGameData = gameInfo.squareState[squareId];
       if (data && data.owner) {
         const player = gameInfo.players.find(
-          (p) => p._id && p._id.toString() === data.owner
+          (p) => p._id && p._id.equals(data.owner)
         );
         return player != null ? player.name : "";
       }
@@ -87,7 +87,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
       const data: SquareGameData = gameInfo.squareState[squareId];
       if (data && data.owner) {
         const player = gameInfo.players.find(
-          (p) => p._id && p._id.toString() === data.owner
+          (p) => p._id && p._id.equals(data.owner)
         );
         return player != null ? { color: player.color } : {};
       }

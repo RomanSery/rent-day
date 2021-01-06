@@ -60,7 +60,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const isMe = (bidder: Bidder) => {
-    return bidder._id === getMyUserId();
+    const uid = getMyUserId();
+    return uid && bidder._id.equals(uid);
   }
 
   const isAuctionFinished = () => {
@@ -68,13 +69,17 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   }
 
   const alreadySubmittedBid = () => {
-    const myBid = auctionState?.bidders.find(b => b._id === getMyUserId());
-    return myBid && myBid.bid;
+    const uid = getMyUserId();
+    if (uid) {
+      const myBid = auctionState?.bidders.find(b => b._id.equals(uid));
+      return myBid && myBid.bid;
+    }
+    return false;
   }
 
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
-      if (bidder._id === auctionState.winnerId) {
+      if (auctionState.winnerId && bidder._id.equals(auctionState.winnerId)) {
         return (<strong>${bidder.bid}</strong>);
       }
       return "$" + bidder.bid;
@@ -92,8 +97,12 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getInputField = () => {
     if (alreadySubmittedBid()) {
-      const myBid = auctionState?.bidders.find(b => b._id === getMyUserId());
-      return "$" + myBid?.bid;
+      const uid = getMyUserId();
+      if (uid) {
+        const myBid = auctionState?.bidders.find(b => b._id.equals(uid));
+        return "$" + myBid?.bid;
+      }
+      return "";
     }
     return (<TextField size="small" type="number" label="My Bid ($)" onChange={(e) => onChangeBid(e)} />);
   }
@@ -111,10 +120,14 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
       if (auctionState.isTie) {
         return "It's a tie, you all lose";
       }
-      const winner = auctionState.bidders.find(
-        (b: Bidder) => b._id && b._id.toString() === auctionState.winnerId
-      );
-      return winner?.name + " wins!";
+
+      if (auctionState.winnerId) {
+        const winner = auctionState.bidders.find(
+          (b: Bidder) => b._id && b._id.equals(auctionState.winnerId)
+        );
+        return winner?.name + " wins!";
+      }
+      return "";
     }
     return "The player to bid the highest wins and pays the 2nd highest bid. In the event of a tie, no one wins";
   }
@@ -164,7 +177,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
           <Table size="small" aria-label="a dense table">
             <TableBody>
               {auctionState?.bidders.map((row) => (
-                <TableRow key={row._id}>
+                <TableRow key={row._id.toHexString()}>
                   <TableCell component="th" scope="row" style={getNameStyle(row)}>
                     {row.name}
                   </TableCell>

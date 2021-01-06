@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
@@ -78,10 +79,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setSnackOpen(false);
   };
 
-  const getPing = (userId: string | undefined) => {
+  const getPing = (userId: mongoose.Types.ObjectId | undefined) => {
     if (userId && pings) {
       const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => p.userId === userId
+        (p: LatencyInfoMsg) => p.userId.equals(userId)
       );
       if (pingInfo) {
         return "Ping: " + pingInfo.latency + "ms";

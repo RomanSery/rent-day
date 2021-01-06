@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import mongoose from "mongoose";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
@@ -103,7 +104,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           });
         }
 
-        setJoinedGameStorage(context.gameId);
+        if (context.gameId) {
+          setJoinedGameStorage(context.gameId);
+        }
         getGameState();
 
         if (response.data.allJoined) {
@@ -155,10 +158,10 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   }
 
 
-  const getPing = (userId: string | undefined) => {
+  const getPing = (userId: mongoose.Types.ObjectId | undefined) => {
     if (userId && pings) {
       const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => p.userId === userId
+        (p: LatencyInfoMsg) => p.userId.equals(userId)
       );
       if (pingInfo) {
         return "Ping: " + pingInfo.latency + "ms";
@@ -226,7 +229,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       <div className="players-display">
         {gameState?.players.map((p: Player, index) => {
           return (
-            <React.Fragment key={p._id}>
+            <React.Fragment key={p._id.toHexString()}>
               <div className="player-info" style={getColorStyle()}>
                 <div className="container">
                   <Chip clickable={false} color="primary" size="medium" variant="outlined"

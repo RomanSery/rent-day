@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import mongoose from "mongoose";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { GameSocket } from "../../core/types/GameSocket";
@@ -35,19 +36,25 @@ export class GameServer {
         socket.gameId = m.gameId;
         socket.latency = 0;
 
-        socket.join(m.gameId);
-        socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
+        socket.join(m.gameId.toHexString());
+        socket
+          .to(m.gameId.toHexString())
+          .broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(
         GameEvent.JOIN_GAME_ROOM,
-        (gameId: string, userId: string, playerName: string) => {
+        (
+          gameId: mongoose.Types.ObjectId,
+          userId: mongoose.Types.ObjectId,
+          playerName: string
+        ) => {
           console.log("joined game room %s", gameId);
           socket.playerName = playerName;
           socket.userId = userId;
           socket.gameId = gameId;
           socket.latency = 0;
-          socket.join(gameId);
+          socket.join(gameId.toHexString());
         }
       );
 
@@ -78,7 +85,7 @@ export class GameServer {
           .of("/")
           .in(gameId)
           .sockets.forEach((s) => {
-            const gameSocket = <GameSocket>s;
+            const gameSocket = s as GameSocket;
             info.push({
               userId: gameSocket.userId,
               latency: gameSocket.latency,

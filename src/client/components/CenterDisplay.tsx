@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import mongoose from "mongoose";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
@@ -16,7 +17,7 @@ import { DisplayAuction } from "./DisplayAuction";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  getPing: (userId: string | undefined) => string;
+  getPing: (userId: mongoose.Types.ObjectId | undefined) => string;
   getSquareId: () => number | undefined;
 }
 
@@ -57,10 +58,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const clearPlayer = () => {
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
-      const myPlayer = gameInfo.players.find(
-        (p: Player) => p._id && p._id.toString() === myUserId
-      );
-      setPlayerToView(myPlayer);
+      if (myUserId) {
+        const myPlayer = gameInfo.players.find(
+          (p: Player) => p._id && p._id.equals(myUserId)
+        );
+        setPlayerToView(myPlayer);
+      }
+
     } else {
       setPlayerToView(undefined);
     }
@@ -72,10 +76,12 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     }
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
-      const myPlayer = gameInfo.players.find(
-        (p) => p._id && p._id.toString() === myUserId
-      );
-      return myPlayer;
+      if (myUserId) {
+        return gameInfo.players.find(
+          (p) => p._id && p._id.equals(myUserId)
+        );
+      }
+      return undefined;
     }
     return playerToView;
   }

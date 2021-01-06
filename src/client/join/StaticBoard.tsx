@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { GameSquare } from "../components/GameSquare";
@@ -25,7 +26,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       }
     }
     return {
-      id: '', auctionId: '', auctionSquareId: 0, theme: themeArray, players: [], nextPlayerToAct: '', name: 'static', settings: {
+      id: new mongoose.Types.ObjectId(), auctionId: new mongoose.Types.ObjectId(), auctionSquareId: 0, theme: themeArray, players: [], nextPlayerToAct: new mongoose.Types.ObjectId(), name: 'static', settings: {
         maxPlayers: 0, initialMoney: 0
       }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []
     };

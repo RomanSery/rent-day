@@ -18,7 +18,7 @@ export const SquarePieces: React.FC<Props> = ({ id, gameInfo, cssName }) => {
         {gameInfo?.players.map((p: Player, index) => {
           const pos: number = p.position;
           if (pos === id) {
-            return (<GamePiece type={p.type} color={p.color} key={p._id} />)
+            return (<GamePiece type={p.type} color={p.color} key={p._id.toHexString()} />)
           }
           return null;
         })}

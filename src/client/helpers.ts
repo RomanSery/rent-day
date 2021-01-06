@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faBicycle,
@@ -15,8 +16,8 @@ import API from "./api";
 import jwt from "jsonwebtoken";
 
 export const getGameContextFromLocalStorage = (): GameContext => {
-  const gid: any = getMyGameId();
-  const pid: any = getMyUserId();
+  const gid = getMyGameId();
+  const pid = getMyUserId();
   const token: any = getMyAuthToken();
 
   return { gameId: gid, userId: pid, authToken: token };
@@ -32,14 +33,18 @@ export enum StorageConstants {
 export const getMyAuthToken = (): string | null => {
   return localStorage.getItem(StorageConstants.JWT_TOKEN);
 };
-export const getMyGameId = (): string | null => {
-  return localStorage.getItem(StorageConstants.GAME_ID);
+export const getMyGameId = (): mongoose.Types.ObjectId | null => {
+  const gameId = localStorage.getItem(StorageConstants.GAME_ID);
+  if (gameId) {
+    return new mongoose.Types.ObjectId(gameId);
+  }
+  return null;
 };
 export const getMyPlayerName = (): string | null => {
   return localStorage.getItem(StorageConstants.PLAYER_NAME);
 };
 
-export const getMyUserId = (): string | null => {
+export const getMyUserId = (): mongoose.Types.ObjectId | null => {
   if (!isLoggedIn()) {
     return null;
   }
@@ -81,8 +86,8 @@ export const clearMyGameInfo = (): void => {
   localStorage.removeItem(StorageConstants.JOINED_GAME);
 };
 
-export const setJoinedGameStorage = (gameId: string): void => {
-  localStorage.setItem(StorageConstants.GAME_ID, gameId);
+export const setJoinedGameStorage = (gameId: mongoose.Types.ObjectId): void => {
+  localStorage.setItem(StorageConstants.GAME_ID, gameId.toHexString());
   localStorage.setItem(StorageConstants.JOINED_GAME, "true");
 };
 
@@ -111,7 +116,7 @@ export const tryToRedirectToGame = async (
   }
 
   const myGameId = getMyGameId();
-  if (myGameId === null) {
+  if (myGameId === null || myGameId === undefined) {
     return;
   }
 
@@ -132,7 +137,7 @@ export const tryToRedirectToGame = async (
   }
 };
 
-const getGameStatus = async (gameId: string) => {
+const getGameStatus = async (gameId: mongoose.Types.ObjectId) => {
   const status = await API.post("getGameStatus", {
     gameId: gameId,
   })

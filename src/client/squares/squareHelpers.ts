@@ -33,7 +33,7 @@ export const getOwnerPlayer = (
     const data: SquareGameData = gameInfo.squareState[squareId];
     if (data && data.owner && data.color) {
       const ownerPlayer = gameInfo.players.find(
-        (p) => p._id && p._id.toString() === data.owner
+        (p) => p._id && p._id.equals(data.owner)
       );
       if (ownerPlayer) {
         return ownerPlayer;

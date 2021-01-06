@@ -1,4 +1,5 @@
 import React from "react";
+import mongoose from "mongoose";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,7 +8,7 @@ import { getIconProp } from "../helpers";
 interface Props {
   gameInfo: GameState | undefined;
   player: Player;
-  getPing: (userId: string | undefined) => string;
+  getPing: (userId: mongoose.Types.ObjectId | undefined) => string;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
@@ -26,7 +27,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
   };
 
   const isPlayersTurn = () => {
-    return player._id === gameInfo?.nextPlayerToAct;
+    return gameInfo && gameInfo.nextPlayerToAct && player._id.equals(gameInfo.nextPlayerToAct);
   }
 
 
