@@ -12,6 +12,8 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { JoinResult } from "../../core/types/JoinResult";
 import { Player } from "../../core/types/Player";
 import { UserDocument, UserInstance } from "../../core/schema/UserSchema";
+import { PieceType } from "../../core/enums/PieceType";
+import { PlayerClass } from "../../core/enums/PlayerClass";
 
 export class GameProcessor {
   public async createGame(
@@ -43,8 +45,8 @@ export class GameProcessor {
   public async joinGame(
     gameId: string,
     userId: string,
-    selectedPiece: number,
-    selectedPlayerClass: number
+    selectedPiece: PieceType,
+    selectedPlayerClass: PlayerClass
   ): Promise<JoinResult | null> {
     const errMsg = await this.getJoinGameErrMsg(gameId, userId, selectedPiece);
     if (errMsg) {
@@ -111,7 +113,7 @@ export class GameProcessor {
   public async getJoinGameErrMsg(
     gameId: string,
     userId: string,
-    selectedPiece: number
+    selectedPiece: PieceType
   ): Promise<string> {
     const game = await GameInstance.findById(gameId);
 
@@ -202,7 +204,7 @@ export class GameProcessor {
   }
 
   public async leaveGame(gameId: string, userId: string): Promise<void> {
-    let game = await GameInstance.findById(gameId);
+    let game: GameInstanceDocument = await GameInstance.findById(gameId);
     if (game == null) {
       return;
     }
@@ -212,6 +214,7 @@ export class GameProcessor {
     if (status === GameStatus.JOINING) {
       for (let i = 0; i < game.players.length; i++) {
         if (game.players[i]._id === userId) {
+          console.log("removing player: " + game.players[i]._id);
           game.players.splice(i, 1);
         }
       }
@@ -219,19 +222,12 @@ export class GameProcessor {
       //TODO do something else i think, not sure
       for (let i = 0; i < game.players.length; i++) {
         if (game.players[i]._id === userId) {
+          console.log("removing player: " + game.players[i]._id);
           game.players.splice(i, 1);
         }
       }
     }
 
-    /*
-    if (game.players.length == 0) {
-      GameInstance.findByIdAndDelete(game.id, function (err) {
-        if (err) console.log(err);
-      });
-    } else {
-      game.save();
-    }*/
     game.save();
   }
 }

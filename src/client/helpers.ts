@@ -64,9 +64,12 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
     return callback();
   }
 
+  const context: GameContext = getGameContextFromLocalStorage();
+
   await API.post("leaveGame", {
     gameId: getMyGameId(),
     userId: getMyUserId(),
+    context,
   }).then(function (response) {
     clearMyGameInfo();
     return callback();
@@ -121,9 +124,9 @@ export const tryToRedirectToGame = async (
   if (hasJoinedGame()) {
     if (pageType === PageType.Home || pageType === PageType.Find) {
       return callback(
-        gameStatus == GameStatus.JOINING ? "/join" : "/gameinstance"
+        gameStatus === GameStatus.JOINING ? "/join" : "/gameinstance"
       );
-    } else if (pageType == PageType.Join && gameStatus == GameStatus.ACTIVE) {
+    } else if (pageType === PageType.Join && gameStatus === GameStatus.ACTIVE) {
       return callback("/gameinstance");
     }
   }

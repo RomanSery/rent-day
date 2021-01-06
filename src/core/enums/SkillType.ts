@@ -1,5 +1,5 @@
 export enum SkillType {
-  Negotiation = 1,
-  Speed = 2,
-  Intelligence = 3,
+  Negotiation = "Negotiation",
+  Speed = "Speed",
+  Intelligence = "Intelligence",
 }

@@ -6,6 +6,8 @@ import { getVerifiedUserId } from "./helpers";
 import { GameProcessor } from "./GameProcessor";
 import { JoinResult } from "../../core/types/JoinResult";
 import { AuctionProcessor } from "./AuctionProcessor";
+import { PieceType } from "../../core/enums/PieceType";
+import { PlayerClass } from "../../core/enums/PlayerClass";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "Name missing")
@@ -121,8 +123,10 @@ export const joinGame = async (req: Request, res: Response) => {
   }
 
   const gameId = req.body.gameId;
-  const selectedPiece: number = parseInt(_.trim(req.body.piece));
-  const selectedPlayerClass: number = parseInt(_.trim(req.body.playerClass));
+  const selectedPiece: PieceType = _.trim(req.body.piece) as PieceType;
+  const selectedPlayerClass: PlayerClass = _.trim(
+    req.body.playerClass
+  ) as PlayerClass;
 
   const join = new GameProcessor();
   const errMsg = await join.getJoinGameErrMsg(gameId, userId, selectedPiece);

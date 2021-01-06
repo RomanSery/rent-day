@@ -12,9 +12,9 @@ const PlayerSchema = new mongoose.Schema({
   money: { type: Number, required: true },
   position: { type: Number, required: true },
   color: { type: String, required: true },
-  type: { type: Number, required: true },
-  playerClass: { type: Number, required: true },
-  state: { type: Number, required: true },
+  type: { type: String, required: true },
+  playerClass: { type: String, required: true },
+  state: { type: String, required: true },
 
   negotiation: { type: Number, required: true },
   speed: { type: Number, required: true },

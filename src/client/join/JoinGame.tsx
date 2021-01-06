@@ -191,21 +191,21 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             <FormControl fullWidth >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
               <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true} inputRef={register({ required: true })} >
-                <option value="1">Pawn</option>
-                <option value="2">Hat</option>
-                <option value="3">Car</option>
-                <option value="4">Bicycle</option>
-                <option value="5">Cat</option>
-                <option value="6">Dog</option>
+                <option value="Pawn">Pawn</option>
+                <option value="Hat">Hat</option>
+                <option value="Car">Car</option>
+                <option value="Bicycle">Bicycle</option>
+                <option value="Cat">Cat</option>
+                <option value="Dog">Dog</option>
               </NativeSelect>
             </FormControl>
 
             <FormControl fullWidth >
               <InputLabel htmlFor="class-type">Class Type</InputLabel>
               <NativeSelect id="class-type" name="playerClass" required={true} fullWidth={true} inputRef={register({ required: true })} >
-                <option value="1">Broker</option>
-                <option value="2">Conductor</option>
-                <option value="3">Banker</option>
+                <option value="Broker">Broker</option>
+                <option value="Conductor">Conductor</option>
+                <option value="Banker">Banker</option>
               </NativeSelect>
             </FormControl>
 
