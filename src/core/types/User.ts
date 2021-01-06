@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 export interface User {
-  readonly id: string;
+  readonly id: mongoose.Types.ObjectId;
   readonly username: string;
   readonly password: string;
 }

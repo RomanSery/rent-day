@@ -13,12 +13,15 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class RollProcessor {
-  private gameId: string;
-  private userId: string;
+  private gameId: mongoose.Types.ObjectId;
+  private userId: mongoose.Types.ObjectId;
   private game?: GameInstanceDocument | null;
   private player?: Player | null;
 
-  constructor(gameId: string, userId: string) {
+  constructor(
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
+  ) {
     this.gameId = gameId;
     this.userId = userId;
   }

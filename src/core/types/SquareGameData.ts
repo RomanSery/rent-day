@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 export interface SquareGameData {
-  owner: string;
+  owner: mongoose.Types.ObjectId;
   color: string;
   numHouses: number;
   isMortgaged: boolean;

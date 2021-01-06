@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 export interface GameContext {
-  readonly gameId: string;
-  readonly userId: string;
+  readonly gameId: mongoose.Types.ObjectId;
+  readonly userId: mongoose.Types.ObjectId;
   readonly authToken: string;
 }

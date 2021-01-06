@@ -20,7 +20,7 @@ export class GameProcessor {
     gameName: string,
     maxPlayers: number,
     initialMoney: number,
-    userId: string
+    userId: mongoose.Types.ObjectId
   ): Promise<number> {
     const themeData = new Map<string, SquareThemeData>();
     NyThemeData.forEach((value: SquareThemeData, key: number) => {
@@ -43,8 +43,8 @@ export class GameProcessor {
   }
 
   public async joinGame(
-    gameId: string,
-    userId: string,
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId,
     selectedPiece: PieceType,
     selectedPlayerClass: PlayerClass
   ): Promise<JoinResult | null> {
@@ -55,10 +55,10 @@ export class GameProcessor {
     }
 
     const playerName: string = await this.getUserName(userId);
-    let game = await GameInstance.findById(gameId);
+    let game: GameInstanceDocument = await GameInstance.findById(gameId);
 
     const newPlayer: Player = {
-      _id: userId,
+      _id: new mongoose.Types.ObjectId(userId),
       name: playerName,
       position: 1,
       money: 0,
@@ -106,16 +106,16 @@ export class GameProcessor {
       p.hasRolled = false;
     });
 
-    game.nextPlayerToAct = mongoose.Types.ObjectId(game.players[0]._id);
+    game.nextPlayerToAct = game.players[0]._id;
     game.status = GameStatus.ACTIVE;
   }
 
   public async getJoinGameErrMsg(
-    gameId: string,
-    userId: string,
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId,
     selectedPiece: PieceType
   ): Promise<string> {
-    const game = await GameInstance.findById(gameId);
+    const game: GameInstanceDocument = await GameInstance.findById(gameId);
 
     if (game == null) {
       return "game not found";
@@ -136,7 +136,9 @@ export class GameProcessor {
     return "";
   }
 
-  public async getGame(gameId: string): Promise<GameInstanceDocument> {
+  public async getGame(
+    gameId: mongoose.Types.ObjectId
+  ): Promise<GameInstanceDocument> {
     return await GameInstance.findById(
       gameId,
       (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
@@ -148,7 +150,7 @@ export class GameProcessor {
     );
   }
 
-  private async getUserName(userId: string): Promise<string> {
+  private async getUserName(userId: mongoose.Types.ObjectId): Promise<string> {
     const ud: UserDocument = await UserInstance.findById(
       userId,
       (err: mongoose.CallbackError, u: UserDocument) => {
@@ -164,7 +166,9 @@ export class GameProcessor {
     return "";
   }
 
-  public async getGameStatus(gameId: string): Promise<GameStatus | null> {
+  public async getGameStatus(
+    gameId: mongoose.Types.ObjectId
+  ): Promise<GameStatus | null> {
     const found = await GameInstance.findById(
       gameId,
       (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
@@ -203,7 +207,10 @@ export class GameProcessor {
     return gamesToJoin;
   }
 
-  public async leaveGame(gameId: string, userId: string): Promise<void> {
+  public async leaveGame(
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
+  ): Promise<void> {
     let game: GameInstanceDocument = await GameInstance.findById(gameId);
     if (game == null) {
       return;
@@ -214,7 +221,6 @@ export class GameProcessor {
     if (status === GameStatus.JOINING) {
       for (let i = 0; i < game.players.length; i++) {
         if (game.players[i]._id === userId) {
-          console.log("removing player: " + game.players[i]._id);
           game.players.splice(i, 1);
         }
       }
@@ -222,7 +228,6 @@ export class GameProcessor {
       //TODO do something else i think, not sure
       for (let i = 0; i < game.players.length; i++) {
         if (game.players[i]._id === userId) {
-          console.log("removing player: " + game.players[i]._id);
           game.players.splice(i, 1);
         }
       }

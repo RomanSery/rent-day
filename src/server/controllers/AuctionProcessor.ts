@@ -9,12 +9,16 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class AuctionProcessor {
   private bid: number;
-  private gameId: string;
-  private userId: string;
+  private gameId: mongoose.Types.ObjectId;
+  private userId: mongoose.Types.ObjectId;
   private game?: GameInstanceDocument | null;
   private auction?: AuctionDocument | null;
 
-  constructor(bid: number, gameId: string, userId: string) {
+  constructor(
+    bid: number,
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
+  ) {
     this.bid = bid;
     this.gameId = gameId;
     this.userId = userId;
@@ -70,7 +74,7 @@ export class AuctionProcessor {
   }
 
   private isTie(winningBid: number): boolean {
-    const count = this.auction!.bidders.filter((b) => b.bid == winningBid)
+    const count = this.auction!.bidders.filter((b) => b.bid === winningBid)
       .length;
     return count > 1;
   }
