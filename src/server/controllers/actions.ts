@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 import _ from "lodash";
@@ -81,10 +82,8 @@ export const getAuction = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
 
-  const auctionId = req.body.auctionId;
-  const auction = new AuctionProcessor(0, "", userId);
-
-  res.json({ auction: await auction.getAuction(auctionId) });
+  const auctionId = new mongoose.Types.ObjectId(req.body.auctionId);
+  res.json({ auction: await AuctionProcessor.getAuction(auctionId, userId) });
 };
 
 export const getGamesToJoin = async (req: Request, res: Response) => {

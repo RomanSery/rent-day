@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
-export const getVerifiedUserId = (requestContext: any): string | null => {
+export const getVerifiedUserId = (
+  requestContext: any
+): mongoose.Types.ObjectId | null => {
   const authToken = requestContext.authToken;
   const userId = requestContext.userId;
   const uid = new mongoose.Types.ObjectId(userId);
@@ -15,7 +17,7 @@ export const getVerifiedUserId = (requestContext: any): string | null => {
       const verifiedUserId = verified.id;
       if (verifiedUserId) {
         const verifiedUid = new mongoose.Types.ObjectId(verifiedUserId);
-        if (verifiedUid === uid) {
+        if (verifiedUid.equals(uid)) {
           return userId;
         }
       }

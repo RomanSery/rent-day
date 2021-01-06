@@ -33,7 +33,7 @@ export class AuctionProcessor {
 
   public async placeBid(): Promise<void> {
     const myBid = this.auction!.bidders.find(
-      (b) => b._id && b._id.toString() === this.userId
+      (b) => b._id && b._id.equals(this.userId)
     );
     if (myBid && this.auction) {
       myBid.bid = this.bid;
@@ -68,7 +68,7 @@ export class AuctionProcessor {
     if (this.isTie(winner.bid!)) {
       this.auction.isTie = true;
     } else {
-      this.auction.winnerId = new mongoose.Types.ObjectId(winner._id);
+      this.auction.winnerId = winner._id;
       this.purchaseSquare(winner);
     }
   }
@@ -106,7 +106,7 @@ export class AuctionProcessor {
     }
 
     const playerToBid = this.game.players.find(
-      (p) => p._id && p._id.toString() === this.userId
+      (p) => p._id && p._id.equals(this.userId)
     );
     if (playerToBid == null) {
       return "player not found!";
@@ -120,7 +120,7 @@ export class AuctionProcessor {
     }
 
     const myBid = this.auction.bidders.find(
-      (b) => b._id && b._id.toString() === this.userId
+      (b) => b._id && b._id.equals(this.userId)
     );
     if (myBid == null) {
       return "player bid not found!";
@@ -139,7 +139,10 @@ export class AuctionProcessor {
     return "";
   }
 
-  public async getAuction(auctionId: string): Promise<AuctionDocument> {
+  public static async getAuction(
+    auctionId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
+  ): Promise<AuctionDocument> {
     let found: AuctionDocument = await Auction.findById(
       auctionId,
       (err: mongoose.CallbackError, existingAuction: AuctionDocument) => {
@@ -153,7 +156,7 @@ export class AuctionProcessor {
     if (!found.finished) {
       //for security purposes if auction is not finished, dont return real bid amounts
       found.bidders.forEach((b) => {
-        if (b._id != this.userId) {
+        if (!b._id.equals(userId)) {
           b.bid = 0;
         }
       });

@@ -58,7 +58,7 @@ export class GameProcessor {
     let game: GameInstanceDocument = await GameInstance.findById(gameId);
 
     const newPlayer: Player = {
-      _id: new mongoose.Types.ObjectId(userId),
+      _id: userId,
       name: playerName,
       position: 1,
       money: 0,
@@ -220,14 +220,14 @@ export class GameProcessor {
 
     if (status === GameStatus.JOINING) {
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id === userId) {
+        if (game.players[i]._id.equals(userId)) {
           game.players.splice(i, 1);
         }
       }
     } else if (status === GameStatus.ACTIVE) {
       //TODO do something else i think, not sure
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id === userId) {
+        if (game.players[i]._id.equals(userId)) {
           game.players.splice(i, 1);
         }
       }

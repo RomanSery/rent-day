@@ -56,7 +56,7 @@ export const initPassportConfig = () => {
                 return done(null, false, { message: "bad username" });
               }
 
-              if (password != user.password) {
+              if (password !== user.password) {
                 console.log("passwords do not match");
                 return done(null, false, { message: "passwords do not match" });
               } else {

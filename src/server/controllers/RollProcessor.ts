@@ -1,4 +1,4 @@
-import { Auction } from "../../core/schema/AuctionSchema";
+import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
 import mongoose from "mongoose";
 import {
   GameInstance,
@@ -30,7 +30,7 @@ export class RollProcessor {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.player = this.game.players.find(
-        (p: Player) => p._id && p._id.toString() === this.userId
+        (p: Player) => p._id && p._id.equals(this.userId)
       );
     }
   }
@@ -53,7 +53,7 @@ export class RollProcessor {
     this.updateRollHistory(newRoll);
 
     if (this.shouldCreateAuction()) {
-      const newAuction = new Auction({
+      const newAuction: AuctionDocument = new Auction({
         gameId: this.game.id,
         squareId: this.player.position,
         finished: false,
@@ -105,8 +105,7 @@ export class RollProcessor {
       return;
     }
 
-    const playerObjId = new mongoose.Types.ObjectId(this.userId);
-    if (!playerObjId.equals(this.game.nextPlayerToAct)) {
+    if (!this.userId.equals(this.game.nextPlayerToAct)) {
       //not your turn!
       return;
     }
@@ -190,7 +189,7 @@ export class RollProcessor {
       index < this.game.players.length - 1
         ? this.game.players[index + 1]
         : this.game.players[0];
-    return new mongoose.Types.ObjectId(nextPlayer._id);
+    return nextPlayer._id;
   }
 
   private playerPassedGo(): void {
@@ -207,8 +206,7 @@ export class RollProcessor {
       return "player not found";
     }
 
-    const playerObjId = new mongoose.Types.ObjectId(this.userId);
-    if (!playerObjId.equals(this.game.nextPlayerToAct)) {
+    if (!this.userId.equals(this.game.nextPlayerToAct)) {
       return "not your turn!";
     }
 

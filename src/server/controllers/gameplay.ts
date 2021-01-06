@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+import mongoose from "mongoose";
 import { Request, Response } from "express";
 import { check } from "express-validator";
 import { getVerifiedUserId } from "./helpers";
@@ -10,7 +11,7 @@ export const roll = async (req: Request, res: Response) => {
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
-  const gameId: string = req.body.context.gameId;
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
 
   const rollProcess = new RollProcessor(gameId, userId);
   await rollProcess.init();
@@ -33,7 +34,7 @@ export const completeTurn = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
 
-  const gameId: string = req.body.context.gameId;
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const rollProcess = new RollProcessor(gameId, userId);
   await rollProcess.init();
   await rollProcess.completeMyTurn();
@@ -51,7 +52,7 @@ export const bid = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
 
-  const gameId: string = req.body.context.gameId;
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const bidAmount = parseInt(req.body.bid);
   const auction = new AuctionProcessor(bidAmount, gameId, userId);
   await auction.init();
