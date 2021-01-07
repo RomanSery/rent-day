@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 export interface JoinedGameMsg {
   playerName: string;
-  userId: mongoose.Types.ObjectId;
-  gameId: mongoose.Types.ObjectId;
+  userId: string;
+  gameId: string;
   allJoined: boolean;
 }
 

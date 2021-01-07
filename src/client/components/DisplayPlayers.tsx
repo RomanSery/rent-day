@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { DisplayPlayer } from "./DisplayPlayer";
+import { getObjectIdAsHexString } from "../helpers";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -17,7 +18,7 @@ export const DisplayPlayers: React.FC<Props> = ({ gameInfo, getPing, viewPlayer,
     <React.Fragment>
       <div className="players-display">
         {gameInfo?.players.map((p: Player, index) => {
-          return (<DisplayPlayer gameInfo={gameInfo} player={p} key={p._id.toHexString()} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />)
+          return (<DisplayPlayer gameInfo={gameInfo} player={p} key={getObjectIdAsHexString(p._id)} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />)
         })}
       </div>
     </React.Fragment>

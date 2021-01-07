@@ -87,7 +87,10 @@ export const clearMyGameInfo = (): void => {
 };
 
 export const setJoinedGameStorage = (gameId: mongoose.Types.ObjectId): void => {
-  localStorage.setItem(StorageConstants.GAME_ID, gameId.toHexString());
+  localStorage.setItem(
+    StorageConstants.GAME_ID,
+    getObjectIdAsHexString(gameId)
+  );
   localStorage.setItem(StorageConstants.JOINED_GAME, "true");
 };
 
@@ -166,4 +169,14 @@ export const getIconProp = (type: PieceType): IconDefinition => {
     return faDog;
   }
   return faChessPawn;
+};
+
+export const getObjectIdAsHexString = (
+  id: mongoose.Types.ObjectId | any
+): string => {
+  if (typeof id === "string") {
+    return new mongoose.Types.ObjectId(id).toHexString();
+  }
+
+  return (id as mongoose.Types.ObjectId).toHexString();
 };

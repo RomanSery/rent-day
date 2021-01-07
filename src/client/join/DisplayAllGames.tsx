@@ -12,7 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
-import { getGameContextFromLocalStorage, leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
+import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
@@ -40,7 +40,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
   const onJoinGame = (gameId: mongoose.Types.ObjectId) => {
 
     leaveCurrentGameIfJoined(() => {
-      localStorage.setItem(StorageConstants.GAME_ID, gameId.toHexString());
+      localStorage.setItem(StorageConstants.GAME_ID, getObjectIdAsHexString(gameId));
       history.push("/join");
     });
   };
@@ -59,7 +59,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
           </TableHead>
           <TableBody>
             {games.map((g) => (
-              <TableRow key={g.gameId.toHexString()}>
+              <TableRow key={getObjectIdAsHexString(g.gameId)}>
                 <TableCell component="th" scope="row">
                   {g.name}
                 </TableCell>

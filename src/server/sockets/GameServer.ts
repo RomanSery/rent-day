@@ -32,29 +32,23 @@ export class GameServer {
 
       socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
         socket.playerName = m.playerName;
-        socket.userId = m.userId;
-        socket.gameId = m.gameId;
+        socket.userId = new mongoose.Types.ObjectId(m.userId);
+        socket.gameId = new mongoose.Types.ObjectId(m.gameId);
         socket.latency = 0;
 
-        socket.join(m.gameId.toHexString());
-        socket
-          .to(m.gameId.toHexString())
-          .broadcast.emit(GameEvent.JOINED_GAME, m);
+        socket.join(m.gameId);
+        socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
       });
 
       socket.on(
         GameEvent.JOIN_GAME_ROOM,
-        (
-          gameId: mongoose.Types.ObjectId,
-          userId: mongoose.Types.ObjectId,
-          playerName: string
-        ) => {
+        (gameId: string, userId: string, playerName: string) => {
           console.log("joined game room %s", gameId);
           socket.playerName = playerName;
-          socket.userId = userId;
-          socket.gameId = gameId;
+          socket.userId = new mongoose.Types.ObjectId(userId);
+          socket.gameId = new mongoose.Types.ObjectId(gameId);
           socket.latency = 0;
-          socket.join(gameId.toHexString());
+          socket.join(gameId);
         }
       );
 

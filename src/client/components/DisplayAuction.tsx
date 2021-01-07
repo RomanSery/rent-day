@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getMyUserId } from "../helpers";
+import { getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import Table from '@material-ui/core/Table';
@@ -177,7 +177,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
           <Table size="small" aria-label="a dense table">
             <TableBody>
               {auctionState?.bidders.map((row) => (
-                <TableRow key={row._id.toHexString()}>
+                <TableRow key={getObjectIdAsHexString(row._id)}>
                   <TableCell component="th" scope="row" style={getNameStyle(row)}>
                     {row.name}
                   </TableCell>

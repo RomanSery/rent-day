@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getIconProp, getMyGameId, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -229,7 +229,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       <div className="players-display">
         {gameState?.players.map((p: Player, index) => {
           return (
-            <React.Fragment key={p._id.toHexString()}>
+            <React.Fragment key={getObjectIdAsHexString(p._id)}>
               <div className="player-info" style={getColorStyle()}>
                 <div className="container">
                   <Chip clickable={false} color="primary" size="medium" variant="outlined"
