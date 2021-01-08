@@ -30,7 +30,8 @@ export class RollProcessor {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.player = this.game.players.find(
-        (p: Player) => p._id && p._id.equals(this.userId)
+        (p: Player) =>
+          p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
       );
     }
   }
@@ -106,7 +107,12 @@ export class RollProcessor {
     }
 
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
-      //not your turn!
+      console.log("not %s's turn", this.player.name);
+      return;
+    }
+
+    if (!this.player.hasRolled) {
+      console.log("%s didnt roll yet", this.player.name);
       return;
     }
 
@@ -115,7 +121,7 @@ export class RollProcessor {
       this.game.nextPlayerToAct = nextPlayer;
     }
 
-    this.player.hasRolled = true;
+    this.player.hasRolled = false;
 
     this.game.save();
   }
@@ -186,7 +192,7 @@ export class RollProcessor {
       index < this.game.players.length - 1
         ? this.game.players[index + 1]
         : this.game.players[0];
-    return nextPlayer._id;
+    return new mongoose.Types.ObjectId(nextPlayer._id);
   }
 
   private playerPassedGo(): void {

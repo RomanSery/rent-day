@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 export interface JoinedGameMsg {
   playerName: string;
   userId: string;
@@ -7,6 +6,6 @@ export interface JoinedGameMsg {
 }
 
 export interface LatencyInfoMsg {
-  userId: mongoose.Types.ObjectId;
+  userId: string;
   latency: number;
 }

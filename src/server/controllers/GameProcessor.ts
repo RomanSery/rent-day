@@ -58,7 +58,7 @@ export class GameProcessor {
     let game: GameInstanceDocument = await GameInstance.findById(gameId);
 
     const newPlayer: Player = {
-      _id: userId,
+      _id: userId.toHexString(),
       name: playerName,
       position: 1,
       money: 0,
@@ -106,7 +106,7 @@ export class GameProcessor {
       p.hasRolled = false;
     });
 
-    game.nextPlayerToAct = game.players[0]._id;
+    game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
   }
 
@@ -220,14 +220,14 @@ export class GameProcessor {
 
     if (status === GameStatus.JOINING) {
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id.equals(userId)) {
+        if (new mongoose.Types.ObjectId(game.players[i]._id).equals(userId)) {
           game.players.splice(i, 1);
         }
       }
     } else if (status === GameStatus.ACTIVE) {
       //TODO do something else i think, not sure
       for (let i = 0; i < game.players.length; i++) {
-        if (game.players[i]._id.equals(userId)) {
+        if (new mongoose.Types.ObjectId(game.players[i]._id).equals(userId)) {
           game.players.splice(i, 1);
         }
       }

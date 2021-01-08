@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import mongoose from "mongoose";
 import { useHistory } from "react-router-dom";
 import API from '../api';
 import { Button } from "@material-ui/core";
@@ -37,7 +36,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
       });
   });
 
-  const onJoinGame = (gameId: mongoose.Types.ObjectId) => {
+  const onJoinGame = (gameId: string) => {
 
     leaveCurrentGameIfJoined(() => {
       localStorage.setItem(StorageConstants.GAME_ID, getObjectIdAsHexString(gameId));

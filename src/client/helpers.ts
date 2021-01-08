@@ -33,10 +33,10 @@ export enum StorageConstants {
 export const getMyAuthToken = (): string | null => {
   return localStorage.getItem(StorageConstants.JWT_TOKEN);
 };
-export const getMyGameId = (): mongoose.Types.ObjectId | null => {
+export const getMyGameId = (): string | null => {
   const gameId = localStorage.getItem(StorageConstants.GAME_ID);
   if (gameId) {
-    return new mongoose.Types.ObjectId(gameId);
+    return gameId;
   }
   return null;
 };
@@ -44,7 +44,7 @@ export const getMyPlayerName = (): string | null => {
   return localStorage.getItem(StorageConstants.PLAYER_NAME);
 };
 
-export const getMyUserId = (): mongoose.Types.ObjectId | null => {
+export const getMyUserId = (): string | null => {
   if (!isLoggedIn()) {
     return null;
   }
@@ -86,7 +86,7 @@ export const clearMyGameInfo = (): void => {
   localStorage.removeItem(StorageConstants.JOINED_GAME);
 };
 
-export const setJoinedGameStorage = (gameId: mongoose.Types.ObjectId): void => {
+export const setJoinedGameStorage = (gameId: string): void => {
   localStorage.setItem(
     StorageConstants.GAME_ID,
     getObjectIdAsHexString(gameId)
@@ -140,7 +140,7 @@ export const tryToRedirectToGame = async (
   }
 };
 
-const getGameStatus = async (gameId: mongoose.Types.ObjectId) => {
+const getGameStatus = async (gameId: string) => {
   const status = await API.post("getGameStatus", {
     gameId: gameId,
   })
@@ -171,9 +171,7 @@ export const getIconProp = (type: PieceType): IconDefinition => {
   return faChessPawn;
 };
 
-export const getObjectIdAsHexString = (
-  id: mongoose.Types.ObjectId | any
-): string => {
+export const getObjectIdAsHexString = (id: string | any): string => {
   if (typeof id === "string") {
     return new mongoose.Types.ObjectId(id).toHexString();
   }
@@ -182,8 +180,8 @@ export const getObjectIdAsHexString = (
 };
 
 export const areObjectIdsEqual = (
-  id1: mongoose.Types.ObjectId | any,
-  id2: mongoose.Types.ObjectId | any
+  id1: string | any,
+  id2: string | any
 ): boolean => {
   if (id1 && id2) {
     const objectId1 = new mongoose.Types.ObjectId(id1);

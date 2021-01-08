@@ -1,8 +1,7 @@
-import mongoose from "mongoose";
 import { PieceType } from "../enums/PieceType";
 
 export interface Bidder {
-  _id: mongoose.Types.ObjectId;
+  _id: string;
   readonly name: string;
   readonly type: PieceType;
   readonly color: string;

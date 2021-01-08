@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import mongoose from "mongoose";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
@@ -17,7 +16,7 @@ import { DisplayAuction } from "./DisplayAuction";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  getPing: (userId: mongoose.Types.ObjectId | undefined) => string;
+  getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
 }
 

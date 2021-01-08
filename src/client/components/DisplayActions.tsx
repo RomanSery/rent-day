@@ -17,25 +17,12 @@ interface Props {
 
 export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction }) => {
 
-  const getInitialRollBtnValue = (): boolean => {
-    if (gameInfo) {
-      const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
-      if (myPlayer && myPlayer.hasRolled) {
-        return false;
-      }
-      return true;
-    }
-
-    return false;
-  }
-
-
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
-  const [showRollBtn, setShowRollBtn] = React.useState(() => getInitialRollBtnValue());
+  //const [showRollBtn, setShowRollBtn] = React.useState(true);
 
   const onClickRoll = async () => {
-    setShowRollBtn(false);
+    //setShowRollBtn(false);
     onRollAction();
   };
 
@@ -47,9 +34,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         if (socketService) {
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
         }
-        setTimeout(() => {
-          setShowRollBtn(true);
-        }, 500);
+        // setTimeout(() => {
+        // setShowRollBtn(true);
+        //}, 500);
 
       })
       .catch(function (error) {
@@ -75,12 +62,24 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
   }
 
+  const hasAlreadyRolled = (): boolean => {
+    if (gameInfo) {
+      const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
+      if (myPlayer && myPlayer.hasRolled) {
+        return true;
+      }
+      return false;
+    }
+
+    return true;
+  }
+
   const getMyActions = () => {
     return (
       <Container maxWidth="sm">
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          {showRollBtn ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
-          {!showRollBtn ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
+          {!hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
+          {hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
           <Button color="primary" size="small">Build</Button>
           <Button color="primary" size="small">Sell</Button>
         </ButtonGroup>

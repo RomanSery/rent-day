@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import mongoose from "mongoose";
+
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
@@ -158,7 +158,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   }
 
 
-  const getPing = (userId: mongoose.Types.ObjectId | undefined) => {
+  const getPing = (userId: string | undefined) => {
     if (userId && pings) {
       const pingInfo = pings.find(
         (p: LatencyInfoMsg) => areObjectIdsEqual(p.userId, userId)

@@ -1,5 +1,4 @@
 import React from "react";
-import mongoose from "mongoose";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,7 +7,7 @@ import { areObjectIdsEqual, getIconProp } from "../helpers";
 interface Props {
   gameInfo: GameState | undefined;
   player: Player;
-  getPing: (userId: mongoose.Types.ObjectId | undefined) => string;
+  getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
