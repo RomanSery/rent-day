@@ -1,12 +1,13 @@
 import React from "react";
 import { Button, ButtonGroup, Container } from "@material-ui/core";
-import { getGameContextFromLocalStorage, getMyGameId, getMyUserId, leaveCurrentGameIfJoined } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
+import { Player } from "../../core/types/Player";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -16,14 +17,29 @@ interface Props {
 
 export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction }) => {
 
+  const getInitialRollBtnValue = (): boolean => {
+    if (gameInfo) {
+      const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
+      if (myPlayer && myPlayer.hasRolled) {
+        return false;
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
-  const [showRollBtn, setShowRollBtn] = React.useState(true);
+  const [showRollBtn, setShowRollBtn] = React.useState(() => getInitialRollBtnValue());
 
   const onClickRoll = async () => {
     setShowRollBtn(false);
     onRollAction();
   };
+
+
 
   const onClickDone = async () => {
     API.post("actions/completeTurn", { context })
@@ -56,7 +72,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const isMyTurn = () => {
     const uid = getMyUserId();
-    return uid && gameInfo && gameInfo.nextPlayerToAct && uid.equals(gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
   }
 
   const getMyActions = () => {

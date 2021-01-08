@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -161,7 +161,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const getPing = (userId: mongoose.Types.ObjectId | undefined) => {
     if (userId && pings) {
       const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => p.userId.equals(userId)
+        (p: LatencyInfoMsg) => areObjectIdsEqual(p.userId, userId)
       );
       if (pingInfo) {
         return "Ping: " + pingInfo.latency + "ms";

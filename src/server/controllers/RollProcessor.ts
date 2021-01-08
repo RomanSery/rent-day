@@ -161,16 +161,13 @@ export class RollProcessor {
     }
     const bidders: Array<Bidder> = [];
 
-    this.game.players.forEach((value: Player, key: number) => {
-      if (
-        value.state === PlayerState.ACTIVE ||
-        value.state === PlayerState.IN_JAIL
-      ) {
+    this.game.players.forEach((p: Player, key: number) => {
+      if (p.state === PlayerState.ACTIVE || p.state === PlayerState.IN_JAIL) {
         const newBidder: Bidder = {
-          name: value.name,
-          type: value.type,
-          color: value.color,
-          _id: value._id,
+          name: p.name,
+          type: p.type,
+          color: p.color,
+          _id: p._id,
           submittedBid: false,
         };
         bidders.push(newBidder);

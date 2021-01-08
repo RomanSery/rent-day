@@ -12,6 +12,7 @@ import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { areObjectIdsEqual } from "../helpers";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -71,9 +72,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
       const data: SquareGameData = gameInfo.squareState[squareId];
       if (data && data.owner) {
-        const player = gameInfo.players.find(
-          (p) => p._id && p._id.equals(data.owner)
-        );
+        const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
         return player != null ? player.name : "";
       }
     }
@@ -86,9 +85,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
       const data: SquareGameData = gameInfo.squareState[squareId];
       if (data && data.owner) {
-        const player = gameInfo.players.find(
-          (p) => p._id && p._id.equals(data.owner)
-        );
+        const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
         return player != null ? { color: player.color } : {};
       }
     }

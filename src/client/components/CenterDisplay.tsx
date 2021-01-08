@@ -9,7 +9,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { getGameContextFromLocalStorage, getMyGameId, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
@@ -59,9 +59,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
       if (myUserId) {
-        const myPlayer = gameInfo.players.find(
-          (p: Player) => p._id && p._id.equals(myUserId)
-        );
+        const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, myUserId));
         setPlayerToView(myPlayer);
       }
 
@@ -77,9 +75,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
       if (myUserId) {
-        return gameInfo.players.find(
-          (p) => p._id && p._id.equals(myUserId)
-        );
+        return gameInfo.players.find((p) => areObjectIdsEqual(p._id, myUserId));
       }
       return undefined;
     }

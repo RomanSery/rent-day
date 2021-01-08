@@ -1,5 +1,6 @@
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { areObjectIdsEqual } from "../helpers";
 
 export const getSquareTxt = (
   gameInfo: GameState | undefined,
@@ -32,8 +33,8 @@ export const getOwnerPlayer = (
   if (gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
     const data: SquareGameData = gameInfo.squareState[squareId];
     if (data && data.owner && data.color) {
-      const ownerPlayer = gameInfo.players.find(
-        (p) => p._id && p._id.equals(data.owner)
+      const ownerPlayer = gameInfo.players.find((p) =>
+        areObjectIdsEqual(p._id, data.owner)
       );
       if (ownerPlayer) {
         return ownerPlayer;

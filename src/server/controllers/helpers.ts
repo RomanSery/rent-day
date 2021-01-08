@@ -18,7 +18,7 @@ export const getVerifiedUserId = (
       if (verifiedUserId) {
         const verifiedUid = new mongoose.Types.ObjectId(verifiedUserId);
         if (verifiedUid.equals(uid)) {
-          return userId;
+          return uid;
         }
       }
     }

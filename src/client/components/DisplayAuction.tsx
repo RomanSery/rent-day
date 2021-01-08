@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import Table from '@material-ui/core/Table';
@@ -61,7 +61,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const isMe = (bidder: Bidder) => {
     const uid = getMyUserId();
-    return uid && bidder._id.equals(uid);
+    return areObjectIdsEqual(bidder._id, uid);
   }
 
   const isAuctionFinished = () => {
@@ -71,7 +71,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   const alreadySubmittedBid = () => {
     const uid = getMyUserId();
     if (uid) {
-      const myBid = auctionState?.bidders.find(b => b._id.equals(uid));
+      const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
       return myBid && myBid.bid;
     }
     return false;
@@ -79,7 +79,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
-      if (auctionState.winnerId && bidder._id.equals(auctionState.winnerId)) {
+      if (auctionState.winnerId && areObjectIdsEqual(bidder._id, auctionState.winnerId)) {
         return (<strong>${bidder.bid}</strong>);
       }
       return "$" + bidder.bid;
@@ -99,7 +99,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     if (alreadySubmittedBid()) {
       const uid = getMyUserId();
       if (uid) {
-        const myBid = auctionState?.bidders.find(b => b._id.equals(uid));
+        const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
         return "$" + myBid?.bid;
       }
       return "";
@@ -123,7 +123,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
       if (auctionState.winnerId) {
         const winner = auctionState.bidders.find(
-          (b: Bidder) => b._id && b._id.equals(auctionState.winnerId)
+          (b: Bidder) => areObjectIdsEqual(b._id, auctionState.winnerId)
         );
         return winner?.name + " wins!";
       }
