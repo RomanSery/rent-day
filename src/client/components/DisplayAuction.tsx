@@ -33,18 +33,16 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    if (isMountedRef.current) {
-      getAuctionState();
-    }
+    getAuctionState();
   }, []);
 
   useEffect(() => {
     if (isMountedRef.current) {
-      socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: any) => {
-        getAuctionState();
+      socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: AuctionState) => {
+        setAuctionState(data);
       });
     }
-  }, []);
+  });
 
   const getAuctionState = () => {
     if (!isMountedRef.current) {
@@ -140,10 +138,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     API.post("actions/bid", { bid: myBid, context })
       .then(function (response) {
         if (socketService) {
-          socketService.socket.emit(GameEvent.AUCTION_BID, { gameId: context.gameId });
+          socketService.socket.emit(GameEvent.AUCTION_BID, context.gameId, auctionState?._id);
         }
-
-        getAuctionState();
       })
       .catch(function (error) {
         if (error.response) {

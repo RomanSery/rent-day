@@ -19,14 +19,10 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
-  //const [showRollBtn, setShowRollBtn] = React.useState(true);
 
   const onClickRoll = async () => {
-    //setShowRollBtn(false);
     onRollAction();
   };
-
-
 
   const onClickDone = async () => {
     API.post("actions/completeTurn", { context })
@@ -34,9 +30,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         if (socketService) {
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
         }
-        // setTimeout(() => {
-        // setShowRollBtn(true);
-        //}, 500);
 
       })
       .catch(function (error) {

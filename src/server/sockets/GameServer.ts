@@ -1,7 +1,10 @@
 import { Server } from "socket.io";
+import mongoose from "mongoose";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { GameSocket } from "../../core/types/GameSocket";
+import { AuctionProcessor } from "../controllers/AuctionProcessor";
+import { AuctionDocument } from "../../core/schema/AuctionSchema";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -96,9 +99,21 @@ export class GameServer {
         this.io.in(gameId).emit(GameEvent.ANIMATE_DICE);
       });
 
-      socket.on(GameEvent.AUCTION_BID, (gameId: string) => {
-        this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE);
-      });
+      this.auctionEvents(socket);
     });
+  }
+
+  private auctionEvents(socket: GameSocket): void {
+    socket.on(
+      GameEvent.AUCTION_BID,
+      async (gameId: string, auctionId: string) => {
+        const auction: AuctionDocument = await AuctionProcessor.getAuction(
+          new mongoose.Types.ObjectId(auctionId),
+          new mongoose.Types.ObjectId(socket.userId)
+        );
+
+        this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE, auction);
+      }
+    );
   }
 }

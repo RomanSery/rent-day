@@ -1,7 +1,7 @@
 import { Bidder } from "./Bidder";
 
 export interface AuctionState {
-  readonly id: string;
+  readonly _id: string;
   readonly gameId: string;
   readonly winnerId: string;
   readonly finished: boolean;

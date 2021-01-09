@@ -153,7 +153,7 @@ export class AuctionProcessor {
       }
     );
 
-    if (!found.finished) {
+    if (found && !found.finished) {
       //for security purposes if auction is not finished, dont return real bid amounts
       found.bidders.forEach((b) => {
         if (!new mongoose.Types.ObjectId(b._id).equals(userId)) {
