@@ -34,6 +34,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   useEffect(() => {
     getAuctionState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -42,7 +43,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
         setAuctionState(data);
       });
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getAuctionState = () => {
     if (!isMountedRef.current) {

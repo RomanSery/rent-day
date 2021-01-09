@@ -27,6 +27,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
       setShowDiceAnimation(false);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 

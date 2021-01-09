@@ -29,6 +29,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
     getGameState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -47,8 +48,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     socketService.sendPingToServer();
 
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
-      getGameState();
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
+      setGameState(data);
     });
 
     return function cleanup() {
@@ -56,7 +57,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         socketService.disconnect();
       }
     };
-  }, [context.gameId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   const getGameState = () => {

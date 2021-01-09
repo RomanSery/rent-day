@@ -5,6 +5,8 @@ import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { GameSocket } from "../../core/types/GameSocket";
 import { AuctionProcessor } from "../controllers/AuctionProcessor";
 import { AuctionDocument } from "../../core/schema/AuctionSchema";
+import { GameProcessor } from "../controllers/GameProcessor";
+import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -32,37 +34,10 @@ export class GameServer {
     this.io.on(GameEvent.CONNECT, (socket: GameSocket) => {
       console.log("Connected client on port %s", this.port);
 
-      socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
-        socket.playerName = m.playerName;
-        socket.userId = m.userId;
-        socket.gameId = m.gameId;
-        socket.latency = 0;
-
-        socket.join(m.gameId);
-        socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
-      });
-
-      socket.on(
-        GameEvent.JOIN_GAME_ROOM,
-        (gameId: string, userId: string, playerName: string) => {
-          console.log("joined game room %s", gameId);
-          socket.playerName = playerName;
-          socket.userId = userId;
-          socket.gameId = gameId;
-          socket.latency = 0;
-          socket.join(gameId);
-        }
-      );
-
-      socket.on(GameEvent.LEAVE_GAME, (gameId: string) => {
-        socket.leave(gameId);
-        socket
-          .to(gameId)
-          .broadcast.emit(
-            GameEvent.LEAVE_GAME,
-            socket.playerName + " has left"
-          );
-      });
+      this.joinedGame(socket);
+      this.joinGameRoom(socket);
+      this.leaveGame(socket);
+      this.getLatency(socket);
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
         console.log(
@@ -72,34 +47,22 @@ export class GameServer {
         );
       });
 
-      socket.on(GameEvent.GET_LATENCY, (start, gameId: string) => {
-        const latency = Date.now() - start;
-        socket.latency = latency;
-
-        const info: LatencyInfoMsg[] = [];
-        this.io
-          .of("/")
-          .in(gameId)
-          .sockets.forEach((s) => {
-            const gameSocket = s as GameSocket;
-            info.push({
-              userId: gameSocket.userId,
-              latency: gameSocket.latency,
-            });
-          });
-
-        socket.to(gameId).broadcast.emit(GameEvent.GET_LATENCY, info);
-      });
-
-      socket.on(GameEvent.UPDATE_GAME_STATE, (gameId: string) => {
-        this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE);
-      });
+      this.updateGameState(socket);
 
       socket.on(GameEvent.ROLL_DICE, (gameId: string) => {
         this.io.in(gameId).emit(GameEvent.ANIMATE_DICE);
       });
 
       this.auctionEvents(socket);
+    });
+  }
+
+  private updateGameState(socket: GameSocket): void {
+    socket.on(GameEvent.UPDATE_GAME_STATE, async (gameId: string) => {
+      const gameState: GameInstanceDocument = await GameProcessor.getGame(
+        new mongoose.Types.ObjectId(gameId)
+      );
+      this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE, gameState);
     });
   }
 
@@ -115,5 +78,61 @@ export class GameServer {
         this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE, auction);
       }
     );
+  }
+
+  private getLatency(socket: GameSocket): void {
+    socket.on(GameEvent.GET_LATENCY, (start, gameId: string) => {
+      const latency = Date.now() - start;
+      socket.latency = latency;
+
+      const info: LatencyInfoMsg[] = [];
+      this.io
+        .of("/")
+        .in(gameId)
+        .sockets.forEach((s) => {
+          const gameSocket = s as GameSocket;
+          info.push({
+            userId: gameSocket.userId,
+            latency: gameSocket.latency,
+          });
+        });
+
+      socket.to(gameId).broadcast.emit(GameEvent.GET_LATENCY, info);
+    });
+  }
+
+  private joinedGame(socket: GameSocket): void {
+    socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
+      socket.playerName = m.playerName;
+      socket.userId = m.userId;
+      socket.gameId = m.gameId;
+      socket.latency = 0;
+
+      socket.join(m.gameId);
+      socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
+    });
+  }
+
+  private joinGameRoom(socket: GameSocket): void {
+    socket.on(
+      GameEvent.JOIN_GAME_ROOM,
+      (gameId: string, userId: string, playerName: string) => {
+        console.log("joined game room %s", gameId);
+        socket.playerName = playerName;
+        socket.userId = userId;
+        socket.gameId = gameId;
+        socket.latency = 0;
+        socket.join(gameId);
+      }
+    );
+  }
+
+  private leaveGame(socket: GameSocket): void {
+    socket.on(GameEvent.LEAVE_GAME, (gameId: string) => {
+      socket.leave(gameId);
+      socket
+        .to(gameId)
+        .broadcast.emit(GameEvent.LEAVE_GAME, socket.playerName + " has left");
+    });
   }
 }

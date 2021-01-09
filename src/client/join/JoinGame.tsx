@@ -42,6 +42,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
     getGameState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -75,6 +76,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         socketService.disconnect();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 

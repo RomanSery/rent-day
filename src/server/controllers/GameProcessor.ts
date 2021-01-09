@@ -136,7 +136,7 @@ export class GameProcessor {
     return "";
   }
 
-  public async getGame(
+  public static async getGame(
     gameId: mongoose.Types.ObjectId
   ): Promise<GameInstanceDocument> {
     return await GameInstance.findById(

@@ -63,8 +63,7 @@ export const getGame = async (req: Request, res: Response) => {
   }
 
   const gameId = req.body.gameId;
-  const process = new GameProcessor();
-  res.json({ game: await process.getGame(gameId) });
+  res.json({ game: await GameProcessor.getGame(gameId) });
 };
 
 export const getAuction = async (req: Request, res: Response) => {
