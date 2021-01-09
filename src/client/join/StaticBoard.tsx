@@ -25,7 +25,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       }
     }
     return {
-      id: '', auctionId: '', auctionSquareId: 0,
+      id: '', auctionId: '', auctionSquareId: 0, treasureId: '',
       theme: themeArray, players: [],
       nextPlayerToAct: '',
       name: 'static',

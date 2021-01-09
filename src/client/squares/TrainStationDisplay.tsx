@@ -2,7 +2,6 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSubway } from '@fortawesome/free-solid-svg-icons'
 import { GameState } from "../../core/types/GameState";
-import { motion } from "framer-motion";
 import { getIconProp } from "../helpers";
 import { getOwnerPlayer, getSquareStyle, getSquareTxt } from "./squareHelpers";
 
@@ -29,9 +28,9 @@ export const TrainStationDisplay: React.FC<Props> = ({ id, gameInfo }) => {
                 <FontAwesomeIcon icon={faSubway} size="3x" />
             </div>
 
-            <motion.div whileHover={{ scale: 1.1 }} className="square-name" style={getSquareStyle(gameInfo, id)}>
+            <div className="square-name" style={getSquareStyle(gameInfo, id)}>
                 {getSquareTxt(gameInfo, id)} {getOwnerIcon()}
-            </motion.div>
+            </div>
 
         </React.Fragment>
     );

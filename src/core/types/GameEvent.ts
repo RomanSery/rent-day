@@ -11,4 +11,6 @@ export enum GameEvent {
 
   AUCTION_BID = "auctionBid",
   AUCTION_UPDATE = "auctionUpdate",
+
+  TREASURE_UPDATE = "treasureUpdate",
 }

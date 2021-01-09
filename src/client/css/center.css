@@ -38,6 +38,23 @@
   font-weight: bold;
 }
 
+.treasure-container .header {
+  font-weight: bold;
+}
+.treasure-container .treasure-options {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+.treasure-container .treasure-option {
+  flex-basis: 33%;
+}
+.treasure-container .prize-amount {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 130%;
+}
+
 .second-row {
   flex-basis: 50%;
   display: flex;

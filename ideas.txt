@@ -17,6 +17,7 @@ car:
 PROBLEMS
 auction doesnt work when the person that lands bids first and doesnt win
 can click on roll, refresh page, and click roll again
+unify error handling in ajax calls
 
 
 utilities

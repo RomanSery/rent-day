@@ -1,23 +1,18 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { TreasureState } from "../../core/types/TreasureState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import { Button, Container, TextField } from "@material-ui/core";
-import { Bidder } from "../../core/types/Bidder";
-import { faCheckSquare, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { Container } from "@material-ui/core";
+import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GameEvent } from "../../core/types/GameEvent";
-import { CircleLoader } from "./CircleLoader";
+
 import { useIsMountedRef } from "./useIsMountedRef";
+import { motion } from "framer-motion";
 
 
 interface Props {
@@ -32,135 +27,129 @@ export const DisplayTreasure: React.FC<Props> = ({ gameInfo, socketService }) =>
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
-    getAuctionState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getTreasureState();
   }, []);
 
   useEffect(() => {
     if (isMountedRef.current) {
-      socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: AuctionState) => {
-        setAuctionState(data);
+      socketService.listenForEvent(GameEvent.TREASURE_UPDATE, (data: TreasureState) => {
+        setTreasureState(data);
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getAuctionState = () => {
+  const getTreasureState = () => {
     if (!isMountedRef.current) {
       return;
     }
-    API.post("getAuction", { auctionId: gameInfo?.auctionId, context })
+    API.post("getTreasure", { treasureId: gameInfo?.treasureId, context })
       .then(function (response) {
-        setAuctionState(response.data.auction);
+        setTreasureState(response.data.treasure);
       })
       .catch(function (error) {
         console.log(error);
       });
   };
 
-  const isMe = (bidder: Bidder) => {
-    const uid = getMyUserId();
-    return areObjectIdsEqual(bidder._id, uid);
-  }
+  const getPrizeAmount = (optNum: number): number => {
+    if (treasureState) {
+      if (optNum === 1) {
+        return treasureState.option1Amount;
+      }
+      if (optNum === 2) {
+        return treasureState.option2Amount;
+      }
+      if (optNum === 3) {
+        return treasureState.option3Amount;
+      }
+    }
+    return 0;
+  };
 
-  const isAuctionFinished = () => {
-    return auctionState?.finished;
-  }
+  const getPrizeChance = (optNum: number): number => {
+    if (treasureState) {
+      if (optNum === 1) {
+        return treasureState.option1Percent;
+      }
+      if (optNum === 2) {
+        return treasureState.option2Percent;
+      }
+      if (optNum === 3) {
+        return treasureState.option3Percent;
+      }
+    }
+    return 0;
+  };
 
-  const alreadySubmittedBid = () => {
-    const uid = getMyUserId();
-    if (uid) {
-      const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
-      return myBid && myBid.bid;
+  const isMyTreasure = () => {
+    if (treasureState) {
+      const uid = getMyUserId();
+      return areObjectIdsEqual(treasureState.playerId, uid);
     }
     return false;
   }
 
+  const isTreasureFinished = () => {
+    return treasureState?.optionPicked;
+  }
 
-  const getAuctionHeader = () => {
-    const squareId = auctionState?.squareId;
-    if (gameInfo && gameInfo.theme && squareId) {
-      return "Auction - " + gameInfo.theme[squareId].name;
+
+  const onPickOption = async (optNum: number) => {
+    if (!isMyTreasure()) {
+      return;
     }
-    return "Auction";
-  };
 
-  const getSubHeader = () => {
-    if (auctionState?.finished) {
-      if (auctionState.isTie) {
-        return "It's a tie, you all lose";
-      }
-
-      if (auctionState.winnerId) {
-        const winner = auctionState.bidders.find(
-          (b: Bidder) => areObjectIdsEqual(b._id, auctionState.winnerId)
-        );
-        return winner?.name + " wins!";
-      }
-      return "";
-    }
-    return "The player to bid the highest wins and pays the 2nd highest bid. In the event of a tie, no one wins";
-  };
-
-  const getNameStyle = (bidder: Bidder): React.CSSProperties => {
-    return { color: bidder.color };
-  };
-
-  const onSubmitBid = async () => {
-    API.post("actions/bid", { bid: myBid, context })
+    API.post("actions/pickTreasure", { opt: optNum, context })
       .then(function (response) {
         if (socketService) {
-          socketService.socket.emit(GameEvent.AUCTION_BID, context.gameId, auctionState?._id);
+          socketService.socket.emit(GameEvent.TREASURE_UPDATE, context.gameId, treasureState?._id);
         }
       })
       .catch(function (error) {
         if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
           alert(error.response.data);
         } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
           console.log(error.request);
         } else {
-          // Something happened in setting up the request that triggered an Error
           console.log('Error', error.message);
         }
       });
-
   };
+
+
+  const getTreasureOption = (optNum: number) => {
+    if (isMyTreasure()) {
+      return (
+        <motion.div whileHover={{ scale: 1.3 }} className="treasure-option" onClick={() => onPickOption(optNum)}>
+          <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
+          <div className="prize-amount">${getPrizeAmount(optNum)}</div>
+          <div className="prize-percentage">{getPrizeChance(optNum)}% to win</div>
+        </motion.div>
+      );
+    } else {
+      return (
+        <div className="treasure-option">
+          <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
+          <div className="prize-amount">${getPrizeAmount(optNum)}</div>
+          <div className="prize-percentage">{getPrizeChance(optNum)}% to win</div>
+        </div>
+      );
+    }
+  }
 
   return (
     <React.Fragment>
-      <Container maxWidth="sm" className="auction-container">
-        <div className="auction-header">
-          {getAuctionHeader()}
-        </div>
-        <div className="auction-sub-header">
-          {getSubHeader()}
+      <Container maxWidth="sm" className="treasure-container">
+        <div className="header">
+          Pick a lottery ticket for a chance to win the prize
         </div>
 
-        <TableContainer component={Paper} className="bid-table">
-          <Table size="small" aria-label="a dense table">
-            <TableBody>
-              {auctionState?.bidders.map((row) => (
-                <TableRow key={getObjectIdAsHexString(row._id)}>
-                  <TableCell component="th" scope="row" style={getNameStyle(row)}>
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">
-                    {isMe(row) && !isAuctionFinished() ? getInputField() : getBidderIcon(row)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+        <div className="treasure-options">
+          {getTreasureOption(1)}
+          {getTreasureOption(2)}
+          {getTreasureOption(3)}
+        </div>
 
-        {alreadySubmittedBid() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
-
-        {isAuctionFinished() ? <CircleLoader socketService={socketService} /> : null}
       </Container>
 
     </React.Fragment>

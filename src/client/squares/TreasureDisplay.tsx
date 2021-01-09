@@ -14,7 +14,7 @@ export const TreasureDisplay: React.FC<Props> = ({ id }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
             </div>
-            <div className="square-name"> TREASURE</div>
+            <div className="square-name"> NY LOTTO</div>
         </React.Fragment>
     );
 
