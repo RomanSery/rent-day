@@ -12,6 +12,7 @@ import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUs
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
+import { DisplayTreasure } from "./DisplayTreasure";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -84,6 +85,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const getGameResultsDisplayComp = () => {
     if (gameInfo?.auctionId) {
       return (<DisplayAuction gameInfo={gameInfo} socketService={socketService} />);
+    }
+    if (gameInfo?.treasureId) {
+      return (<DisplayTreasure gameInfo={gameInfo} socketService={socketService} />);
     }
     return (<DisplayResults gameInfo={gameInfo} socketService={socketService} />);
   }

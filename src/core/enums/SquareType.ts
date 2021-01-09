@@ -7,4 +7,5 @@ export enum SquareType {
   GoToJail = "GoToJail",
   CentralPark = "CentralPark",
   Utility = "Utility",
+  Treasure = "Treasure",
 }

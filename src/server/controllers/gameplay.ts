@@ -5,6 +5,7 @@ import { check } from "express-validator";
 import { getVerifiedUserId } from "./helpers";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { RollProcessor } from "./RollProcessor";
+import { TreasureProcessor } from "./TreasureProcessor";
 
 export const roll = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req.body.context);
@@ -63,6 +64,31 @@ export const bid = async (req: Request, res: Response) => {
   }
 
   await auction.placeBid();
+
+  res.json({
+    status: "success",
+  });
+};
+
+export const pickTreasure = async (req: Request, res: Response) => {
+  await check("opt", "Opt is not valid").notEmpty().isNumeric().run(req);
+
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const optNum = parseInt(req.body.opt);
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const treasure = new TreasureProcessor(optNum, gameId, userId);
+  await treasure.init();
+
+  const errMsg = await treasure.getErrMsg();
+  if (errMsg) {
+    return res.status(400).send(errMsg);
+  }
+
+  await treasure.pickOption();
 
   res.json({
     status: "success",

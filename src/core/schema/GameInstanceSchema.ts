@@ -40,6 +40,7 @@ export type GameInstanceDocument = mongoose.Document & {
   nextPlayerToAct: mongoose.Types.ObjectId;
   auctionId: mongoose.Types.ObjectId | null;
   auctionSquareId: number | null;
+  treasureId: mongoose.Types.ObjectId | null;
   allJoined: boolean;
   status: GameStatus;
   results: LastResult;
@@ -56,6 +57,7 @@ const gameInstanceSchema = new mongoose.Schema(
     nextPlayerToAct: mongoose.Types.ObjectId,
     auctionId: mongoose.Types.ObjectId,
     auctionSquareId: Number,
+    treasureId: mongoose.Types.ObjectId,
     allJoined: Boolean,
     status: String,
     results: Schema.Types.Mixed,

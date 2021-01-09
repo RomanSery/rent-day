@@ -1,4 +1,5 @@
 import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
+import { Treasure, TreasureDocument } from "../../core/schema/TreasureSchema";
 import mongoose from "mongoose";
 import {
   GameInstance,
@@ -64,6 +65,20 @@ export class RollProcessor {
       await newAuction.save();
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
+    } else if (this.shouldCreateTreasure()) {
+      const newTreasure: TreasureDocument = new Treasure({
+        gameId: this.game.id,
+        playerId: this.userId,
+        option1Amount: 100,
+        option1Percent: 50,
+        option2Amount: 300,
+        option2Percent: 20,
+        option3Amount: 500,
+        option3Percent: 10,
+      });
+
+      await newTreasure.save();
+      this.game.treasureId = new mongoose.Types.ObjectId(newTreasure._id);
     }
 
     const squareId: number = this.player.position;
@@ -74,6 +89,8 @@ export class RollProcessor {
       squareName = "Chance";
     } else if (squareConfig && squareConfig.type === SquareType.Jail) {
       squareName = "Visiting Jail";
+    } else if (squareConfig && squareConfig.type === SquareType.Treasure) {
+      squareName = "Treasure";
     }
 
     this.game.results = {
@@ -181,6 +198,20 @@ export class RollProcessor {
     });
 
     return bidders;
+  }
+
+  private shouldCreateTreasure(): boolean {
+    if (!this.player || !this.game) {
+      return false;
+    }
+
+    const squareId: number = this.player.position;
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig) {
+      return false;
+    }
+
+    return squareConfig.type === SquareType.Treasure;
   }
 
   private getNextPlayerToAct(): mongoose.Types.ObjectId | null {

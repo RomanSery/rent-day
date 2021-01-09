@@ -8,6 +8,7 @@ import { CentralParkDisplay } from "../squares/CentralParkDisplay";
 import { GoDisplay } from "../squares/GoDisplay";
 import { UtilityDisplay } from "../squares/UtilityDisplay";
 import { GameState } from "../../core/types/GameState";
+import { TreasureDisplay } from "../squares/TreasureDisplay";
 
 
 interface Props {
@@ -25,6 +26,9 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
         }
         if (type === SquareType.Chance) {
             return <ChanceDisplay id={id} />
+        }
+        if (type === SquareType.Treasure) {
+            return <TreasureDisplay id={id} />
         }
         if (type === SquareType.CentralPark) {
             return <CentralParkDisplay id={id} />

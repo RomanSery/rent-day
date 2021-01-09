@@ -9,6 +9,7 @@ import { JoinResult } from "../../core/types/JoinResult";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PieceType } from "../../core/enums/PieceType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
+import { TreasureProcessor } from "./TreasureProcessor";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "Name missing")
@@ -164,4 +165,21 @@ export const leaveGame = async (req: Request, res: Response) => {
   await leave.leaveGame(gameId, userId);
 
   res.json({ status: "success" });
+};
+
+export const getTreasure = async (req: Request, res: Response) => {
+  await check("treasureId", "Missing treasureId").notEmpty().run(req);
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(400).send("missing treasureId");
+  }
+
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const treasureId = new mongoose.Types.ObjectId(req.body.treasureId);
+  res.json({ treasure: await TreasureProcessor.getTreasure(treasureId) });
 };
