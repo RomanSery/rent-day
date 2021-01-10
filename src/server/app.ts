@@ -61,6 +61,9 @@ app.post("/api/actions/bid", gameplay.bid);
 app.post("/api/actions/pickTreasure", gameplay.pickTreasure);
 app.post("/api/actions/completeTurn", gameplay.completeTurn);
 
+app.post("/api/actions/mortgage", gameplay.mortage);
+app.post("/api/actions/redeem", gameplay.redeem);
+
 const gameServer = new GameServer();
 gameServer.listen();
 

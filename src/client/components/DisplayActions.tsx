@@ -63,14 +63,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
           {!hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
           {hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
-          <Button color="primary" size="small">Build</Button>
-          <Button color="primary" size="small">Sell</Button>
-        </ButtonGroup>
-
-
-        <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          <Button color="primary" size="small">Mortgage</Button>
-          <Button color="primary" size="small">Redeem</Button>
           <Button color="secondary" onClick={onLeaveGame} size="small"> Leave Game</Button>
         </ButtonGroup>
       </Container>

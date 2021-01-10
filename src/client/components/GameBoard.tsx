@@ -94,7 +94,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setSquareToView(id);
   };
   const clearSquare = () => {
-    setSquareToView(undefined);
+    //setSquareToView(undefined);
   };
 
   return (

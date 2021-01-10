@@ -6,6 +6,7 @@ import { getVerifiedUserId } from "./helpers";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { RollProcessor } from "./RollProcessor";
 import { TreasureProcessor } from "./TreasureProcessor";
+import { PropertyProcessor } from "./PropertyProcessor";
 
 export const roll = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req.body.context);
@@ -89,6 +90,52 @@ export const pickTreasure = async (req: Request, res: Response) => {
   }
 
   await treasure.pickOption();
+
+  res.json({
+    status: "success",
+  });
+};
+
+export const mortage = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const squareId = parseInt(req.body.context.squareId);
+  const errMsg = await PropertyProcessor.mortgageProperty(
+    squareId,
+    gameId,
+    userId
+  );
+
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({
+    status: "success",
+  });
+};
+
+export const redeem = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const squareId = parseInt(req.body.context.squareId);
+  const errMsg = await PropertyProcessor.redeemProperty(
+    squareId,
+    gameId,
+    userId
+  );
+
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
 
   res.json({
     status: "success",

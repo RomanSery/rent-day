@@ -12,7 +12,10 @@ import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
+import { ButtonGroup, Button } from "@material-ui/core";
+import API from '../api';
+import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -20,6 +23,8 @@ interface Props {
 }
 
 export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
+
+  const context: GameContext = getGameContextFromLocalStorage();
 
   const getSquareTxt = () => {
     const squareId = getSquareId();
@@ -68,53 +73,53 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
 
   const getowner = (): string => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-      const data: SquareGameData = gameInfo.squareState[squareId];
-      if (data && data.owner) {
-        const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
-        return player != null ? player.name : "";
-      }
+    const data = getSquareGameData();
+    if (data && gameInfo && data.owner) {
+      const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+      return player != null ? player.name : "";
     }
 
     return "";
   };
 
+  const isOwnedByMe = (): boolean => {
+    const data = getSquareGameData();
+    if (data && gameInfo && data.owner && areObjectIdsEqual(getMyUserId(), data.owner)) {
+      return true;
+    }
+    return false;
+  };
+
   const getNameColorStyle = (): React.CSSProperties => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-      const data: SquareGameData = gameInfo.squareState[squareId];
-      if (data && data.owner) {
-        const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
-        return player != null ? { color: player.color } : {};
-      }
+    const data = getSquareGameData();
+    if (data && gameInfo && data.owner) {
+      const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+      return player != null ? { color: player.color } : {};
     }
 
     return {};
   };
 
   const getPurchasePrice = (): string => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-      const data: SquareGameData = gameInfo.squareState[squareId];
-      if (data && data.owner && data.purchasePrice) {
-        return "$" + data.purchasePrice;
-      }
+    const data = getSquareGameData();
+    if (data && data.owner && data.purchasePrice) {
+      return "$" + data.purchasePrice;
     }
 
     return "";
   };
 
   const getMortgageValue = (): string => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-      const data: SquareGameData = gameInfo.squareState[squareId];
-      if (data && data.owner && data.mortgageValue) {
-        return "$" + data.mortgageValue;
-      }
+    const data = getSquareGameData();
+    if (data && data.owner && data.mortgageValue) {
+      return "$" + data.mortgageValue;
     }
-
     return "";
+  };
+
+  const isMortgaged = (): boolean => {
+    const data = getSquareGameData();
+    return data && data.isMortgaged ? true : false;
   };
 
   const getIcon = () => {
@@ -125,6 +130,52 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     return "";
   }
 
+  const isMyTurn = () => {
+    const uid = getMyUserId();
+    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+  }
+
+
+  const getSquareGameData = (): SquareGameData | null => {
+    const squareId = getSquareId();
+    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
+      return gameInfo.squareState[squareId];
+    }
+    return null;
+  };
+
+
+  const onMortgageProperty = async () => {
+    API.post("actions/mortgage", { squareId: getSquareId(), context })
+      .then(function (response) {
+
+      })
+      .catch(handleApiError);
+  };
+
+  const onRedeemProperty = async () => {
+    API.post("actions/redeem", { squareId: getSquareId(), context })
+      .then(function (response) {
+
+      })
+      .catch(handleApiError);
+  };
+
+  const getPropertyActions = () => {
+    if (!isMyTurn() || !isOwnedByMe()) {
+      return null;
+    }
+
+    return (
+      <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
+        {!isMortgaged() ? <Button color="primary" size="small" onClick={onMortgageProperty}>Mortgage</Button> : null}
+        {isMortgaged() ? <Button color="primary" size="small" onClick={onRedeemProperty}>Redeem</Button> : null}
+
+        <Button color="primary" size="small">Build</Button>
+        <Button color="primary" size="small">Sell</Button>
+      </ButtonGroup>
+    );
+  }
 
   const getPropertyView = (config: SquareConfigData) => {
     return (
@@ -189,8 +240,9 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
             </Table>
           </TableContainer>
         </div>
-
-
+        <div className="actions">
+          {getPropertyActions()}
+        </div>
       </React.Fragment>
     );
   };
@@ -209,15 +261,15 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer2">
-                  <TableCell component="th" scope="row">If you have 2 stations</TableCell>
+                  <TableCell component="th" scope="row">2 stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer3">
-                  <TableCell component="th" scope="row">If you have 3 stations</TableCell>
+                  <TableCell component="th" scope="row">3 stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer4">
-                  <TableCell component="th" scope="row">If you all stations</TableCell>
+                  <TableCell component="th" scope="row">All 4 stations</TableCell>
                   <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
                 </TableRow>
               </TableBody>
