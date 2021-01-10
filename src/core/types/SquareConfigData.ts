@@ -7,7 +7,6 @@ export interface SquareConfigData {
   readonly groupId?: number;
   readonly description?: string;
 
-  readonly mortgageValue?: number;
   readonly houseCost?: number;
   readonly tax?: number;
   readonly rent?: Map<number, number>;

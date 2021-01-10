@@ -4,4 +4,5 @@ export interface SquareGameData {
   numHouses: number;
   isMortgaged: boolean;
   purchasePrice: number;
+  mortgageValue: number;
 }

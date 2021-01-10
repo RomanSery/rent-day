@@ -105,6 +105,18 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
     return "";
   };
 
+  const getMortgageValue = (): string => {
+    const squareId = getSquareId();
+    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
+      const data: SquareGameData = gameInfo.squareState[squareId];
+      if (data && data.owner && data.mortgageValue) {
+        return "$" + data.mortgageValue;
+      }
+    }
+
+    return "";
+  };
+
   const getIcon = () => {
     const squareId = getSquareId();
     if (squareId && gameInfo && gameInfo.theme) {
@@ -155,7 +167,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
               <TableBody>
                 <TableRow key="propertyViewer10">
                   <TableCell component="th" scope="row">Mortgage Value</TableCell>
-                  <TableCell align="right">{config.mortgageValue ? "$" + config.mortgageValue : ""}</TableCell>
+                  <TableCell align="right">{getMortgageValue()}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer11">
                   <TableCell component="th" scope="row">House Cost</TableCell>
@@ -217,7 +229,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
               <TableBody>
                 <TableRow key="stationViewer5">
                   <TableCell component="th" scope="row">Mortgage Value</TableCell>
-                  <TableCell align="right">{config.mortgageValue ? "$" + config.mortgageValue : ""}</TableCell>
+                  <TableCell align="right">{getMortgageValue()}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer6">
                   <TableCell component="th" scope="row">Tax</TableCell>

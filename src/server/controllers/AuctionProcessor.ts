@@ -96,7 +96,12 @@ export class AuctionProcessor {
       isMortgaged: false,
       color: winner.color!,
       purchasePrice: winner.bid!,
+      mortgageValue: this.getMortgageValue(winner.bid!),
     });
+  }
+
+  private getMortgageValue(purchasePrice: number): number {
+    return Math.round(purchasePrice * 0.3);
   }
 
   public async getErrMsg(): Promise<string> {
