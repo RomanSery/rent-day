@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 export type TreasureDocument = mongoose.Document & {
   gameId: mongoose.Types.ObjectId;
   playerId: mongoose.Types.ObjectId;
+  playerName: string;
+  playerColor: string;
 
   option1Amount: number;
   option1Percent: number;
@@ -23,6 +25,8 @@ const treasureSchema = new mongoose.Schema(
   {
     gameId: mongoose.Types.ObjectId,
     playerId: mongoose.Types.ObjectId,
+    playerName: String,
+    playerColor: String,
     option1Amount: Number,
     option1Percent: Number,
     option2Amount: Number,

@@ -1,17 +1,16 @@
-import { Auction, AuctionDocument } from "../../core/schema/AuctionSchema";
-import { Treasure, TreasureDocument } from "../../core/schema/TreasureSchema";
+import { AuctionDocument } from "../../core/schema/AuctionSchema";
 import mongoose from "mongoose";
 import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
-import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { DiceRoll } from "../../core/types/DiceRoll";
-import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { TreasureProcessor } from "./TreasureProcessor";
+import { AuctionProcessor } from "./AuctionProcessor";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -55,30 +54,17 @@ export class RollProcessor {
     this.updateRollHistory(newRoll);
 
     if (this.shouldCreateAuction()) {
-      const newAuction: AuctionDocument = new Auction({
-        gameId: this.game.id,
-        squareId: this.player.position,
-        finished: false,
-        bidders: this.getBidders(),
-      });
-
-      await newAuction.save();
+      const newAuction: AuctionDocument = await AuctionProcessor.createAuction(
+        this.game,
+        this.player
+      );
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
     } else if (this.shouldCreateTreasure()) {
-      const newTreasure: TreasureDocument = new Treasure({
-        gameId: this.game.id,
-        playerId: this.userId,
-        option1Amount: 100,
-        option1Percent: 50,
-        option2Amount: 300,
-        option2Percent: 20,
-        option3Amount: 500,
-        option3Percent: 10,
-      });
-
-      await newTreasure.save();
-      this.game.treasureId = new mongoose.Types.ObjectId(newTreasure._id);
+      this.game.treasureId = await TreasureProcessor.createTreasure(
+        this.game.id,
+        this.player
+      );
     }
 
     const squareId: number = this.player.position;
@@ -176,28 +162,6 @@ export class RollProcessor {
     }
 
     return false;
-  }
-
-  private getBidders(): Array<Bidder> {
-    if (!this.game) {
-      return [];
-    }
-    const bidders: Array<Bidder> = [];
-
-    this.game.players.forEach((p: Player, key: number) => {
-      if (p.state === PlayerState.ACTIVE || p.state === PlayerState.IN_JAIL) {
-        const newBidder: Bidder = {
-          name: p.name,
-          type: p.type,
-          color: p.color,
-          _id: p._id,
-          submittedBid: false,
-        };
-        bidders.push(newBidder);
-      }
-    });
-
-    return bidders;
   }
 
   private shouldCreateTreasure(): boolean {

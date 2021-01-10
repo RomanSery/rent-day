@@ -48,20 +48,31 @@ export class TreasureProcessor {
     this.treasure.randomNum = randomNum;
 
     const neededToWin = this.getChanceToWin();
-    if (randomNum >= neededToWin) {
+
+    console.log(
+      "randonNum: %s optionPicked: %s neededToWin: %s",
+      randomNum,
+      this.optNum,
+      neededToWin
+    );
+
+    if (randomNum <= neededToWin) {
       this.treasure.prize = this.getPrizeAmount();
       if (this.player) {
+        console.log("won");
         this.player.money = this.player.money + this.treasure.prize;
       }
     } else {
+      console.log("lost");
       this.treasure.prize = 0;
     }
 
     this.treasure.save();
 
+    //TODO
     if (this.game) {
-      this.game.treasureId = null;
-      this.game.save();
+      //this.game.treasureId = null;
+      //this.game.save();
     }
   }
 
@@ -142,5 +153,26 @@ export class TreasureProcessor {
         return existingTreasure;
       }
     );
+  }
+
+  public static async createTreasure(
+    gameId: mongoose.Types.ObjectId,
+    player: Player
+  ): Promise<mongoose.Types.ObjectId> {
+    const newTreasure: TreasureDocument = new Treasure({
+      gameId: gameId,
+      playerId: player._id,
+      playerName: player.name,
+      playerColor: player.color,
+      option1Amount: 100,
+      option1Percent: 50,
+      option2Amount: 300,
+      option2Percent: 20,
+      option3Amount: 500,
+      option3Percent: 10,
+    });
+
+    await newTreasure.save();
+    return new mongoose.Types.ObjectId(newTreasure._id);
   }
 }

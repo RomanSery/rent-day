@@ -7,6 +7,8 @@ import { AuctionProcessor } from "../controllers/AuctionProcessor";
 import { AuctionDocument } from "../../core/schema/AuctionSchema";
 import { GameProcessor } from "../controllers/GameProcessor";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
+import { TreasureDocument } from "../../core/schema/TreasureSchema";
+import { TreasureProcessor } from "../controllers/TreasureProcessor";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -54,6 +56,7 @@ export class GameServer {
       });
 
       this.auctionEvents(socket);
+      this.treasureEvents(socket);
     });
   }
 
@@ -76,6 +79,19 @@ export class GameServer {
         );
 
         this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE, auction);
+      }
+    );
+  }
+
+  private treasureEvents(socket: GameSocket): void {
+    socket.on(
+      GameEvent.TREASURE_UPDATE,
+      async (gameId: string, treasureId: string) => {
+        const treasure: TreasureDocument = await TreasureProcessor.getTreasure(
+          new mongoose.Types.ObjectId(treasureId)
+        );
+
+        this.io.in(gameId).emit(GameEvent.TREASURE_UPDATE, treasure);
       }
     );
   }

@@ -2,6 +2,8 @@ export interface TreasureState {
   readonly _id: string;
   readonly gameId: string;
   readonly playerId: string;
+  readonly playerName: string;
+  readonly playerColor: string;
   readonly option1Amount: number;
   readonly option1Percent: number;
   readonly option2Amount: number;

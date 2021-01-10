@@ -48,11 +48,22 @@
 }
 .treasure-container .treasure-option {
   flex-basis: 33%;
+  cursor: pointer;
 }
+
+.treasure-container .treasure-option.picked {
+  border-radius: 5px;
+  border: 5px solid black;
+}
+
 .treasure-container .prize-amount {
   margin-top: 10px;
   font-weight: bold;
   font-size: 130%;
+}
+
+.treasure-container .treasure-animation {
+  margin-top: 10px;
 }
 
 .second-row {

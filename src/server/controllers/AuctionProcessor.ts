@@ -6,6 +6,8 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { Bidder } from "../../core/types/Bidder";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { Player } from "../../core/types/Player";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export class AuctionProcessor {
   private bid: number;
@@ -163,5 +165,39 @@ export class AuctionProcessor {
     }
 
     return found;
+  }
+
+  public static async createAuction(
+    game: GameInstanceDocument,
+    player: Player
+  ): Promise<AuctionDocument> {
+    const newAuction: AuctionDocument = new Auction({
+      gameId: game.id,
+      squareId: player.position,
+      finished: false,
+      bidders: AuctionProcessor.getBidders(game),
+    });
+
+    await newAuction.save();
+    return newAuction;
+  }
+
+  private static getBidders(game: GameInstanceDocument): Array<Bidder> {
+    const bidders: Array<Bidder> = [];
+
+    game.players.forEach((p: Player, key: number) => {
+      if (p.state === PlayerState.ACTIVE || p.state === PlayerState.IN_JAIL) {
+        const newBidder: Bidder = {
+          name: p.name,
+          type: p.type,
+          color: p.color,
+          _id: p._id,
+          submittedBid: false,
+        };
+        bidders.push(newBidder);
+      }
+    });
+
+    return bidders;
   }
 }
