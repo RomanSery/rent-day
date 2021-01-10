@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
@@ -66,9 +66,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       .then(function (response) {
         setGameState(response.data.game);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   };
 
 

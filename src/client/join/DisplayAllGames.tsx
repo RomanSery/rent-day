@@ -11,7 +11,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
-import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
+import { getGameContextFromLocalStorage, getObjectIdAsHexString, handleApiError, leaveCurrentGameIfJoined, StorageConstants } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
@@ -28,12 +28,9 @@ export const DisplayAllGames: React.FC<Props> = () => {
 
     API.post("findGames", { context })
       .then(function (response) {
-        console.log(response.data.games);
         setGames(response.data.games);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

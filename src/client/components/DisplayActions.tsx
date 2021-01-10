@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, ButtonGroup, Container } from "@material-ui/core";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, leaveCurrentGameIfJoined } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
 import API from '../api';
@@ -30,18 +30,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         if (socketService) {
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
         }
-
       })
-      .catch(function (error) {
-        if (error.response) {
-          alert(error.response.data);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log('Error', error.message);
-        }
-      });
-
+      .catch(handleApiError);
   };
 
   const onLeaveGame = async () => {

@@ -8,7 +8,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
@@ -39,15 +39,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
             socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
           }
         })
-        .catch(function (error) {
-          if (error.response) {
-            alert(error.response.data);
-          } else if (error.request) {
-            console.log(error.request);
-          } else {
-            console.log('Error', error.message);
-          }
-        });
+        .catch(handleApiError);
     }, 1200);
 
   };

@@ -75,10 +75,12 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
     gameId: getMyGameId(),
     userId: getMyUserId(),
     context,
-  }).then(function (response) {
-    clearMyGameInfo();
-    return callback();
-  });
+  })
+    .then(function (response) {
+      clearMyGameInfo();
+      return callback();
+    })
+    .catch(handleApiError);
 };
 
 export const clearMyGameInfo = (): void => {
@@ -147,9 +149,7 @@ const getGameStatus = async (gameId: string) => {
     .then(function (response) {
       return response.data.status;
     })
-    .catch(function (error) {
-      console.log(error);
-    });
+    .catch(handleApiError);
 
   return status;
 };
@@ -190,4 +190,20 @@ export const areObjectIdsEqual = (
   }
 
   return false;
+};
+
+export const handleApiError = (error: any) => {
+  if (error.response) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    alert(error.response.data);
+  } else if (error.request) {
+    // The request was made but no response was received
+    // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+    // http.ClientRequest in node.js
+    console.log(error.request);
+  } else {
+    // Something happened in setting up the request that triggered an Error
+    console.log("Error", error.message);
+  }
 };

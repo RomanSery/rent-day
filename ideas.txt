@@ -1,23 +1,5 @@
-ship:
-   good: Collect 400 when you pass go
-   bad:  any pay to bank is doubled
-
-cannon:
-   good: Rent is 1.5  the normal rent(the first set the player gets)   
-   bad:  house and hotel costs are doubled	
-
-horse:
-   good: Get 2 ability points when you pass go
-   bad:  you start with 0 ability points
-
-car:
-   good: start with random railroad and all railroad rent is doubled
-   bad:  get 100 when pass go
-
 PROBLEMS
-auction doesnt work when the person that lands bids first and doesnt win
-can click on roll, refresh page, and click roll again
-unify error handling in ajax calls
+user can click done withouth picking lotto option
 
 
 utilities

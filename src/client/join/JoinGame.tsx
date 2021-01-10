@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -87,9 +87,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       .then(function (response) {
         setGameState(response.data.game);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   };
 
 
@@ -115,21 +113,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           history.push("/gameinstance");
         }
       })
-      .catch(function (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          alert(error.response.data);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-        }
-      });
+      .catch(handleApiError);
 
   };
 

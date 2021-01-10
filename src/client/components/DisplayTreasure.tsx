@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { TreasureState } from "../../core/types/TreasureState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import { Container } from "@material-ui/core";
@@ -35,9 +35,7 @@ export const DisplayTreasure: React.FC<Props> = ({ gameInfo, socketService }) =>
       .then(function (response) {
         setTreasureState(response.data.treasure);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   }, []);
 
   useEffect(() => {
@@ -104,15 +102,7 @@ export const DisplayTreasure: React.FC<Props> = ({ gameInfo, socketService }) =>
           socketService.socket.emit(GameEvent.TREASURE_UPDATE, context.gameId, treasureState?._id);
         }
       })
-      .catch(function (error) {
-        if (error.response) {
-          alert(error.response.data);
-        } else if (error.request) {
-          console.log(error.request);
-        } else {
-          console.log('Error', error.message);
-        }
-      });
+      .catch(handleApiError);
   };
 
   const getNameStyle = (): React.CSSProperties => {

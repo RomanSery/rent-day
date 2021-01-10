@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import API from '../api';
-import { getGameContextFromLocalStorage, StorageConstants } from "../helpers";
+import { getGameContextFromLocalStorage, handleApiError, StorageConstants } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
@@ -29,9 +29,7 @@ export const CreateGame: React.FC<Props> = () => {
         localStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
         history.push("/join");
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   };
 
   const createStyles = makeStyles({

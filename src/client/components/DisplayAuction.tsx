@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import Table from '@material-ui/core/Table';
@@ -54,9 +54,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
       .then(function (response) {
         setAuctionState(response.data.auction);
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   };
 
   const isMe = (bidder: Bidder) => {
@@ -143,21 +141,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
           socketService.socket.emit(GameEvent.AUCTION_BID, context.gameId, auctionState?._id);
         }
       })
-      .catch(function (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          alert(error.response.data);
-        } else if (error.request) {
-          // The request was made but no response was received
-          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-          // http.ClientRequest in node.js
-          console.log(error.request);
-        } else {
-          // Something happened in setting up the request that triggered an Error
-          console.log('Error', error.message);
-        }
-      });
+      .catch(handleApiError);
 
   };
 

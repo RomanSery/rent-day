@@ -175,8 +175,7 @@ export class RollProcessor {
       return false;
     }
 
-    //TODO
-    return true; //squareConfig.type === SquareType.Treasure;
+    return squareConfig.type === SquareType.Treasure;
   }
 
   private getNextPlayerToAct(): mongoose.Types.ObjectId | null {

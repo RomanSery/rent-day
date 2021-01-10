@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
+import { handleApiError } from "../helpers";
 
 
 interface Props {
@@ -25,9 +26,7 @@ export const SignUpPage: React.FC<Props> = () => {
       .then(function (response) {
         history.push("/");
       })
-      .catch(function (error) {
-        console.log(error);
-      });
+      .catch(handleApiError);
   };
 
 
