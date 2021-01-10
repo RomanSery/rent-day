@@ -32,4 +32,17 @@ mortgage value should be a % of the purchase price
 
 player classes/abilities
 - Luck
+
+conductor
+- all rent from railroads is doubled
 - one class is focues on taking advantage of train stations
+
+-gambler
+start with luck 3
+higher prizes/chances in lotto games
+
+-governer
+- rent for governs island is doubled
+
+-banker
+property taxes are lowered

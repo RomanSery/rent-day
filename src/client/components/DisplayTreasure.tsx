@@ -154,14 +154,8 @@ export const DisplayTreasure: React.FC<Props> = ({ gameInfo, socketService }) =>
   const getTreasureResults = () => {
     if (treasureState && isTreasureFinished()) {
       return (
-        <React.Fragment>
-          <div className="treasure-animation">
-            <AnimatedTreasureResult randomNum={treasureState.randomNum} chanceToWin={getPrizeChance(treasureState.optionPicked)} />
-          </div>
-          <div className="treasure-result">
-            {treasureState && treasureState.prize > 0 ? "You Won $" + treasureState.prize : "You lost"}
-          </div>
-        </React.Fragment>
+        <AnimatedTreasureResult socketService={socketService} treasureState={treasureState}
+          randomNum={treasureState.randomNum} chanceToWin={getPrizeChance(treasureState.optionPicked)} />
       );
     }
 

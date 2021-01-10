@@ -69,10 +69,9 @@ export class TreasureProcessor {
 
     this.treasure.save();
 
-    //TODO
     if (this.game) {
-      //this.game.treasureId = null;
-      //this.game.save();
+      this.game.treasureId = null;
+      this.game.save();
     }
   }
 
@@ -159,6 +158,9 @@ export class TreasureProcessor {
     gameId: mongoose.Types.ObjectId,
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
+    //TODO modify this for luck attributes, etc
+    //make prize amounts random
+
     const newTreasure: TreasureDocument = new Treasure({
       gameId: gameId,
       playerId: player._id,
