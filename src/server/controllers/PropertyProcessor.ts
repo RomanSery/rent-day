@@ -25,7 +25,9 @@ export class PropertyProcessor {
   public async init(): Promise<void> {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
-      this.state = this.game.squareState.get(this.squareId.toString());
+      this.state = this.game.squareState.find(
+        (p: SquareGameData) => p.squareId === this.squareId
+      );
     }
   }
 
@@ -48,10 +50,7 @@ export class PropertyProcessor {
     }
 
     this.state.isMortgaged = true;
-    this.game.squareState.set(this.squareId.toString(), this.state);
-    console.log(this.game.isModified("squareState"));
-
-    await this.game.updateOne();
+    await this.game.save();
     console.log("square %s mortgaged", this.squareId);
     return "";
   }
@@ -75,7 +74,6 @@ export class PropertyProcessor {
     }
 
     this.state.isMortgaged = false;
-    this.game.squareState.set(this.squareId.toString(), this.state);
     await this.game.save();
     return "";
   }

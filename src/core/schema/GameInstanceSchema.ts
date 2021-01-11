@@ -26,6 +26,16 @@ const PlayerSchema = new mongoose.Schema({
   thirdRoll: { type: Schema.Types.Mixed },
 });
 
+const SquareGameDataSchema = new mongoose.Schema({
+  squareId: { type: Number, required: true },
+  owner: { type: String, required: true },
+  color: { type: String, required: true },
+  numHouses: { type: Number, required: true },
+  isMortgaged: { type: Boolean, required: true },
+  purchasePrice: { type: Number },
+  mortgageValue: { type: Number },
+});
+
 const SettingsSchema = new mongoose.Schema({
   initialMoney: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
@@ -36,7 +46,7 @@ export type GameInstanceDocument = mongoose.Document & {
   players: Player[];
   settings: Settings;
   theme: Map<string, SquareThemeData>;
-  squareState: Map<string, SquareGameData>;
+  squareState: SquareGameData[];
   nextPlayerToAct: mongoose.Types.ObjectId;
   auctionId: mongoose.Types.ObjectId | null;
   auctionSquareId: number | null;
@@ -53,7 +63,7 @@ const gameInstanceSchema = new mongoose.Schema(
     players: [PlayerSchema],
     settings: SettingsSchema,
     theme: Map,
-    squareState: Map,
+    squareState: [SquareGameDataSchema],
     nextPlayerToAct: mongoose.Types.ObjectId,
     auctionId: mongoose.Types.ObjectId,
     auctionSquareId: Number,

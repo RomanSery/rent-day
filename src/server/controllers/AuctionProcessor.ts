@@ -85,19 +85,18 @@ export class AuctionProcessor {
     if (!this.game || !this.auction) {
       return;
     }
-    const squareId = this.auction.squareId.toString();
-    if (!this.game.squareState) {
-      this.game.squareState = new Map<string, SquareGameData>();
-    }
 
-    this.game.squareState.set(squareId, {
+    const squareData: SquareGameData = {
+      squareId: this.auction.squareId,
       owner: winner._id!,
       numHouses: 0,
       isMortgaged: false,
       color: winner.color!,
       purchasePrice: winner.bid!,
       mortgageValue: this.getMortgageValue(winner.bid!),
-    });
+    };
+
+    this.game.squareState.push(squareData);
   }
 
   private getMortgageValue(purchasePrice: number): number {

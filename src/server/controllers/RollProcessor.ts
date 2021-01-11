@@ -147,12 +147,8 @@ export class RollProcessor {
       return false;
     }
 
-    if (!this.game.squareState) {
-      this.game.squareState = new Map<string, SquareGameData>();
-    }
-
-    const squareData: SquareGameData | undefined = this.game.squareState.get(
-      squareId.toString()
+    const squareData: SquareGameData | undefined = this.game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
     );
     if (squareData == null) {
       return true;

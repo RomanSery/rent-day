@@ -136,12 +136,12 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   }
 
 
-  const getSquareGameData = (): SquareGameData | null => {
+  const getSquareGameData = (): SquareGameData | undefined => {
     const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-      return gameInfo.squareState[squareId];
+    if (squareId && gameInfo && gameInfo.squareState) {
+      return gameInfo.squareState.find((p: SquareGameData) => p.squareId === squareId);
     }
-    return null;
+    return undefined;
   };
 
 

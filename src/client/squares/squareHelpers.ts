@@ -16,11 +16,9 @@ export const getSquareStyle = (
   gameInfo: GameState | undefined,
   squareId: number
 ): React.CSSProperties => {
-  if (gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-    const data: SquareGameData = gameInfo.squareState[squareId];
-    if (data && data.owner && data.color) {
-      return { color: data.color, textDecoration: "underline" };
-    }
+  const data = getSquareGameData(gameInfo, squareId);
+  if (data && data.owner && data.color) {
+    return { color: data.color, textDecoration: "underline" };
   }
 
   return {};
@@ -30,15 +28,13 @@ export const getOwnerPlayer = (
   gameInfo: GameState | undefined,
   squareId: number
 ) => {
-  if (gameInfo && gameInfo.squareState && gameInfo.squareState[squareId]) {
-    const data: SquareGameData = gameInfo.squareState[squareId];
-    if (data && data.owner && data.color) {
-      const ownerPlayer = gameInfo.players.find((p) =>
-        areObjectIdsEqual(p._id, data.owner)
-      );
-      if (ownerPlayer) {
-        return ownerPlayer;
-      }
+  const data = getSquareGameData(gameInfo, squareId);
+  if (data && gameInfo && data.owner && data.color) {
+    const ownerPlayer = gameInfo.players.find((p) =>
+      areObjectIdsEqual(p._id, data.owner)
+    );
+    if (ownerPlayer) {
+      return ownerPlayer;
     }
   }
   return null;
@@ -54,4 +50,16 @@ export const isBeingAuctioned = (
     gameInfo.auctionSquareId &&
     gameInfo.auctionSquareId === squareId
   );
+};
+
+const getSquareGameData = (
+  gameInfo: GameState | undefined,
+  squareId: number
+): SquareGameData | undefined => {
+  if (squareId && gameInfo && gameInfo.squareState) {
+    return gameInfo.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+  }
+  return undefined;
 };

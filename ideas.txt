@@ -11,6 +11,7 @@ IDEAS
 in addition to mortgaging properties, maybe you can sell property at 30% of purchase price
 mortgage value should be a % of the purchase price
 store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
+The player to bid the highest wins and pays the 2nd highest bid
 
 player classes/abilities
 - Luck
