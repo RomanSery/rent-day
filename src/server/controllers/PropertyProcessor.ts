@@ -6,77 +6,77 @@ import {
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class PropertyProcessor {
-  public static async mortgageProperty(
+  private squareId: number;
+  private gameId: mongoose.Types.ObjectId;
+  private userId: mongoose.Types.ObjectId;
+  private game?: GameInstanceDocument | null;
+  private state: SquareGameData | undefined;
+
+  constructor(
     squareId: number,
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId
-  ): Promise<string> {
-    const game: GameInstanceDocument | null = await GameInstance.findById(
-      gameId
-    );
-    if (!game) {
+  ) {
+    this.squareId = squareId;
+    this.gameId = gameId;
+    this.userId = userId;
+  }
+
+  public async init(): Promise<void> {
+    this.game = await GameInstance.findById(this.gameId);
+    if (this.game) {
+      this.state = this.game.squareState.get(this.squareId.toString());
+    }
+  }
+
+  public async mortgageProperty(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
       return "game not found";
     }
-
-    if (game.squareState) {
-      game.squareState = new Map<string, SquareGameData>();
-    }
-
-    const state: SquareGameData | undefined = game.squareState.get(
-      squareId.toString()
-    );
-
-    if (!state) {
+    if (!this.state) {
       return "property not owned";
     }
-
-    if (state.isMortgaged) {
+    if (this.state.isMortgaged) {
       return "property already mortgaged";
     }
 
-    if (!userId.equals(new mongoose.Types.ObjectId(state.owner))) {
+    const ownerId = new mongoose.Types.ObjectId(this.state.owner);
+    if (!this.userId.equals(ownerId)) {
       return "you are not the owner";
     }
 
-    state.isMortgaged = true;
-    await game.save();
+    this.state.isMortgaged = true;
+    this.game.squareState.set(this.squareId.toString(), this.state);
+    console.log(this.game.isModified("squareState"));
+
+    await this.game.updateOne();
+    console.log("square %s mortgaged", this.squareId);
     return "";
   }
 
-  public static async redeemProperty(
-    squareId: number,
-    gameId: mongoose.Types.ObjectId,
-    userId: mongoose.Types.ObjectId
-  ): Promise<string> {
-    const game: GameInstanceDocument | null = await GameInstance.findById(
-      gameId
-    );
-    if (!game) {
+  public async redeemProperty(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
       return "game not found";
     }
-
-    if (game.squareState) {
-      game.squareState = new Map<string, SquareGameData>();
-    }
-
-    const state: SquareGameData | undefined = game.squareState.get(
-      squareId.toString()
-    );
-
-    if (!state) {
+    if (!this.state) {
       return "property not owned";
     }
-
-    if (!state.isMortgaged) {
+    if (!this.state.isMortgaged) {
       return "property not mortgaged";
     }
 
-    if (!userId.equals(new mongoose.Types.ObjectId(state.owner))) {
+    const ownerId = new mongoose.Types.ObjectId(this.state.owner);
+    if (!this.userId.equals(ownerId)) {
       return "you are not the owner";
     }
 
-    state.isMortgaged = false;
-    await game.save();
+    this.state.isMortgaged = false;
+    this.game.squareState.set(this.squareId.toString(), this.state);
+    await this.game.save();
     return "";
   }
 }

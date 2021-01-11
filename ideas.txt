@@ -10,7 +10,7 @@ you cant mortgage utilities but maybe you can sell them?
 IDEAS
 in addition to mortgaging properties, maybe you can sell property at 30% of purchase price
 mortgage value should be a % of the purchase price
-
+store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
 
 player classes/abilities
 - Luck

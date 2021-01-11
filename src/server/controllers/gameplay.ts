@@ -103,12 +103,9 @@ export const mortage = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const squareId = parseInt(req.body.context.squareId);
-  const errMsg = await PropertyProcessor.mortgageProperty(
-    squareId,
-    gameId,
-    userId
-  );
+  const squareId = parseInt(req.body.squareId);
+  const processor = new PropertyProcessor(squareId, gameId, userId);
+  const errMsg = await processor.mortgageProperty();
 
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
@@ -126,12 +123,9 @@ export const redeem = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const squareId = parseInt(req.body.context.squareId);
-  const errMsg = await PropertyProcessor.redeemProperty(
-    squareId,
-    gameId,
-    userId
-  );
+  const squareId = parseInt(req.body.squareId);
+  const processor = new PropertyProcessor(squareId, gameId, userId);
+  const errMsg = await processor.redeemProperty();
 
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
