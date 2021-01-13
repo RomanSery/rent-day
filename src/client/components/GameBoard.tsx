@@ -35,6 +35,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
 
+    socketService.listenForEvent(GameEvent.SHOW_SNACK_MSG, (data: any) => {
+      setSnackMsg(data);
+      setSnackOpen(true);
+    });
+
     socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any) => {
       getGameState();
       setSnackMsg(data);

@@ -57,6 +57,10 @@ export class GameServer {
 
       this.auctionEvents(socket);
       this.treasureEvents(socket);
+
+      socket.on(GameEvent.SHOW_SNACK_MSG, (gameId: string, msg: string) => {
+        socket.to(gameId).broadcast.emit(GameEvent.SHOW_SNACK_MSG, msg);
+      });
     });
   }
 

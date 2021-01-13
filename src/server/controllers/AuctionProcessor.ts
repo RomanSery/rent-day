@@ -5,9 +5,9 @@ import {
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
 import { Bidder } from "../../core/types/Bidder";
-import { SquareGameData } from "../../core/types/SquareGameData";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { PropertyProcessor } from "./PropertyProcessor";
 
 export class AuctionProcessor {
   private bid: number;
@@ -59,7 +59,7 @@ export class AuctionProcessor {
   }
 
   private determineWinner(): void {
-    if (!this.auction) {
+    if (!this.auction || !this.game) {
       return;
     }
     this.auction.finished = true;
@@ -71,7 +71,12 @@ export class AuctionProcessor {
       this.auction.isTie = true;
     } else {
       this.auction.winnerId = new mongoose.Types.ObjectId(winner._id);
-      this.purchaseSquare(winner);
+      const processor = new PropertyProcessor(
+        this.auction.squareId,
+        this.gameId,
+        this.userId
+      );
+      processor.purchaseSquare(this.game, winner);
     }
   }
 
@@ -79,28 +84,6 @@ export class AuctionProcessor {
     const count = this.auction!.bidders.filter((b) => b.bid === winningBid)
       .length;
     return count > 1;
-  }
-
-  private purchaseSquare(winner: Bidder): void {
-    if (!this.game || !this.auction) {
-      return;
-    }
-
-    const squareData: SquareGameData = {
-      squareId: this.auction.squareId,
-      owner: winner._id!,
-      numHouses: 0,
-      isMortgaged: false,
-      color: winner.color!,
-      purchasePrice: winner.bid!,
-      mortgageValue: this.getMortgageValue(winner.bid!),
-    };
-
-    this.game.squareState.push(squareData);
-  }
-
-  private getMortgageValue(purchasePrice: number): number {
-    return Math.round(purchasePrice * 0.3);
   }
 
   public async getErrMsg(): Promise<string> {

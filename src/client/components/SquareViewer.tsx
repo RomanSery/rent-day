@@ -12,17 +12,20 @@ import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyPlayerName, getMyUserId, handleApiError } from "../helpers";
 import { ButtonGroup, Button } from "@material-ui/core";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
+import { GameEvent } from "../../core/types/GameEvent";
+import { SocketService } from "../sockets/SocketService";
 
 interface Props {
   gameInfo: GameState | undefined;
   getSquareId: () => number | undefined;
+  socketService: SocketService;
 }
 
-export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
+export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
 
@@ -148,7 +151,10 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   const onMortgageProperty = async () => {
     API.post("actions/mortgage", { squareId: getSquareId(), context })
       .then(function (response) {
-
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyPlayerName() + " mortaged " + getSquareTxt());
+        }
       })
       .catch(handleApiError);
   };
@@ -156,7 +162,10 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   const onRedeemProperty = async () => {
     API.post("actions/redeem", { squareId: getSquareId(), context })
       .then(function (response) {
-
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyPlayerName() + " redeemed " + getSquareTxt());
+        }
       })
       .catch(handleApiError);
   };
@@ -180,7 +189,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   const getPropertyView = (config: SquareConfigData) => {
     return (
       <React.Fragment>
-        <div className={getClassName()}>{getSquareTxt()}</div>
+        <div className={getClassName()}>{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
         <div className="info-tables">
           <TableContainer component={Paper} className="rent-info">
             <Table size="small" aria-label="a dense table">
@@ -251,7 +260,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   const getTrainStationView = (config: SquareConfigData) => {
     return (
       <React.Fragment>
-        <div className="train-station-name square-color-bar">{getSquareTxt()}</div>
+        <div className="train-station-name square-color-bar">{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
         <div className="info-tables">
           <TableContainer component={Paper} className="rent-info">
             <Table size="small" aria-label="a dense table">

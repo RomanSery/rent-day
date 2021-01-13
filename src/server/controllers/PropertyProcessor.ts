@@ -3,6 +3,7 @@ import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
+import { Bidder } from "../../core/types/Bidder";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class PropertyProcessor {
@@ -76,5 +77,23 @@ export class PropertyProcessor {
     this.state.isMortgaged = false;
     await this.game.save();
     return "";
+  }
+
+  public purchaseSquare(gameDoc: GameInstanceDocument, winner: Bidder): void {
+    const squareData: SquareGameData = {
+      squareId: this.squareId,
+      owner: winner._id!,
+      numHouses: 0,
+      isMortgaged: false,
+      color: winner.color!,
+      purchasePrice: winner.bid!,
+      mortgageValue: this.getMortgageValue(winner.bid!),
+    };
+
+    gameDoc.squareState.push(squareData);
+  }
+
+  private getMortgageValue(purchasePrice: number): number {
+    return Math.round(purchasePrice * 0.3);
   }
 }

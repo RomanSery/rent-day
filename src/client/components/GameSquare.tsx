@@ -5,6 +5,7 @@ import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquarePieces } from "./SquarePieces";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 interface Props {
   id: number;
@@ -37,7 +38,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   };
 
   const getSquareClassName = () => {
-    return "square " + squareTypeClass.get(squareType);
+    return "square " + squareTypeClass.get(squareType) + (isMortgaged() ? " mortgaged" : "");
   };
 
   const getSquareId = () => {
@@ -49,6 +50,18 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   };
   const leaveSquare = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     clearSquare();
+  };
+
+  const getSquareGameData = (): SquareGameData | undefined => {
+    if (gameInfo && gameInfo.squareState) {
+      return gameInfo.squareState.find((p: SquareGameData) => p.squareId === id);
+    }
+    return undefined;
+  };
+
+  const isMortgaged = (): boolean => {
+    const data = getSquareGameData();
+    return data && data.isMortgaged ? true : false;
   };
 
 

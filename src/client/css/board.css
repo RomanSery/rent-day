@@ -21,6 +21,17 @@
   height: 100%;
 }
 
+.square.mortgaged .container {
+  background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      #ccc 10px,
+      #ccc 20px
+    ),
+    linear-gradient(to bottom, #eee, #999);
+}
+
 .square .container-bottom {
   flex-direction: column;
 }

@@ -97,7 +97,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
               <PlayerViewer gameInfo={gameInfo} getPlayer={getPlayerToView} />
             </div>
             <div className="property-viewer">
-              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
+              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} socketService={socketService} />
             </div>
 
           </div>
