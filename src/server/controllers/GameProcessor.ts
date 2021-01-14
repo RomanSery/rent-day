@@ -14,6 +14,9 @@ import { Player } from "../../core/types/Player";
 import { UserDocument, UserInstance } from "../../core/schema/UserSchema";
 import { PieceType } from "../../core/enums/PieceType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
+import { SquareGameData } from "../../core/types/SquareGameData";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareConfigData } from "../../core/types/SquareConfigData";
 
 export class GameProcessor {
   public async createGame(
@@ -27,9 +30,29 @@ export class GameProcessor {
       themeData.set(_.toString(key), value);
     });
 
+    const squareState: SquareGameData[] = [];
+    SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+      const squareData: SquareGameData = {
+        squareId: key,
+        numHouses: 0,
+        isMortgaged: false,
+        houseCost: d.houseCost ? d.houseCost : 0,
+        tax: d.tax ? d.tax : 0,
+        rent0: d.rent && d.rent.has(0) ? d.rent.get(0) : undefined,
+        rent1: d.rent && d.rent.has(1) ? d.rent.get(1) : undefined,
+        rent2: d.rent && d.rent.has(2) ? d.rent.get(2) : undefined,
+        rent3: d.rent && d.rent.has(3) ? d.rent.get(3) : undefined,
+        rent4: d.rent && d.rent.has(4) ? d.rent.get(4) : undefined,
+        rent5: d.rent && d.rent.has(5) ? d.rent.get(5) : undefined,
+      };
+
+      squareState.push(squareData);
+    });
+
     const newGame = new GameInstance({
       name: gameName,
       theme: themeData,
+      squareState: squareState,
       allJoined: false,
       maxPlayers: maxPlayers,
       settings: { initialMoney: initialMoney, maxPlayers: maxPlayers },

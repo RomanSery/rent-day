@@ -10,7 +10,6 @@ import React from "react";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
-import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyPlayerName, getMyUserId, handleApiError } from "../helpers";
 import { ButtonGroup, Button } from "@material-ui/core";
@@ -40,17 +39,21 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
   const getInfo = () => {
     const squareId = getSquareId();
     const config = squareId ? SquareConfigDataMap.get(squareId) : undefined;
-
     if (config == null) {
       return null;
     }
 
+    const squareData = getSquareGameData();
+    if (squareData == null) {
+      return null;
+    }
+
     if (config.type === SquareType.Property) {
-      return getPropertyView(config);
+      return getPropertyView(squareData);
     } else if (config.type === SquareType.TrainStation) {
-      return getTrainStationView(config);
+      return getTrainStationView(squareData);
     } else if (config.type === SquareType.Utility) {
-      return getUtilityView(config);
+      return getUtilityView();
     }
 
     return null;
@@ -175,18 +178,30 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
       return null;
     }
 
+    const squareId = getSquareId();
+    const config = squareId ? SquareConfigDataMap.get(squareId) : undefined;
+    if (config == null) {
+      return null;
+    }
+
+    const showMortgageRedeemOptions = config.type === SquareType.Property || config.type === SquareType.TrainStation;
+    const showBuildingOptions = config.type === SquareType.Property;
+    if (!showMortgageRedeemOptions && !showBuildingOptions) {
+      return null;
+    }
+
     return (
       <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-        {!isMortgaged() ? <Button color="primary" size="small" onClick={onMortgageProperty}>Mortgage</Button> : null}
-        {isMortgaged() ? <Button color="primary" size="small" onClick={onRedeemProperty}>Redeem</Button> : null}
+        {showMortgageRedeemOptions && !isMortgaged() ? <Button color="primary" size="small" onClick={onMortgageProperty}>Mortgage</Button> : null}
+        {showMortgageRedeemOptions && isMortgaged() ? <Button color="primary" size="small" onClick={onRedeemProperty}>Redeem</Button> : null}
 
-        <Button color="primary" size="small">Build</Button>
-        <Button color="primary" size="small">Sell</Button>
+        {showBuildingOptions ? <Button color="primary" size="small">Build</Button> : null}
+        {showBuildingOptions ? <Button color="primary" size="small">Sell</Button> : null}
       </ButtonGroup>
     );
   }
 
-  const getPropertyView = (config: SquareConfigData) => {
+  const getPropertyView = (config: SquareGameData) => {
     return (
       <React.Fragment>
         <div className={getClassName()}>{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
@@ -196,27 +211,27 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
               <TableBody>
                 <TableRow key="propertyViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
+                  <TableCell align="right">{config.rent0 ? "$" + config.rent0 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer2">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
+                  <TableCell align="right">{config.rent1 ? "$" + config.rent1 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer3">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
+                  <TableCell align="right">{config.rent2 ? "$" + config.rent2 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer4">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
+                  <TableCell align="right">{config.rent3 ? "$" + config.rent3 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer5">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(4) : ""}</TableCell>
+                  <TableCell align="right">{config.rent4 ? "$" + config.rent4 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer6">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHotel} /></TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(5) : ""}</TableCell>
+                  <TableCell align="right">{config.rent5 ? "$" + config.rent5 : ""}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -257,7 +272,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
   };
 
 
-  const getTrainStationView = (config: SquareConfigData) => {
+  const getTrainStationView = (config: SquareGameData) => {
     return (
       <React.Fragment>
         <div className="train-station-name square-color-bar">{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
@@ -267,19 +282,19 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
               <TableBody>
                 <TableRow key="stationViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(0) : ""}</TableCell>
+                  <TableCell align="right">{config.rent0 ? "$" + config.rent0 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer2">
                   <TableCell component="th" scope="row">2 stations</TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(1) : ""}</TableCell>
+                  <TableCell align="right">{config.rent1 ? "$" + config.rent1 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer3">
                   <TableCell component="th" scope="row">3 stations</TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(2) : ""}</TableCell>
+                  <TableCell align="right">{config.rent2 ? "$" + config.rent2 : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer4">
                   <TableCell component="th" scope="row">All 4 stations</TableCell>
-                  <TableCell align="right">{config.rent ? "$" + config.rent.get(3) : ""}</TableCell>
+                  <TableCell align="right">{config.rent3 ? "$" + config.rent3 : ""}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -308,14 +323,15 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
             </Table>
           </TableContainer>
         </div>
-
-
+        <div className="actions">
+          {getPropertyActions()}
+        </div>
       </React.Fragment>
     );
   };
 
 
-  const getUtilityView = (config: SquareConfigData) => {
+  const getUtilityView = () => {
     return (
       <React.Fragment>
         <div className="utility-name square-color-bar">{getSquareTxt()}</div>
@@ -324,6 +340,9 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
         </div>
         <div className="utility-description">
           {getDescription()}
+        </div>
+        <div className="actions">
+          {getPropertyActions()}
         </div>
       </React.Fragment>
     );

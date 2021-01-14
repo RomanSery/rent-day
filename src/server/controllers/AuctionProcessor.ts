@@ -77,6 +77,15 @@ export class AuctionProcessor {
         this.userId
       );
       processor.purchaseSquare(this.game, winner);
+
+      const playerWinner = this.game.players.find(
+        (p) =>
+          p._id &&
+          new mongoose.Types.ObjectId(p._id).equals(this.auction!.winnerId)
+      );
+      if (playerWinner && winner.bid) {
+        playerWinner.money = playerWinner.money - winner.bid;
+      }
     }
   }
 

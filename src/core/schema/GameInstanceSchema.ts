@@ -28,12 +28,21 @@ const PlayerSchema = new mongoose.Schema({
 
 const SquareGameDataSchema = new mongoose.Schema({
   squareId: { type: Number, required: true },
-  owner: { type: String, required: true },
-  color: { type: String, required: true },
+  owner: { type: String },
+  color: { type: String },
   numHouses: { type: Number, required: true },
   isMortgaged: { type: Boolean, required: true },
   purchasePrice: { type: Number },
   mortgageValue: { type: Number },
+
+  houseCost: { type: Number },
+  tax: { type: Number },
+  rent0: { type: Number },
+  rent1: { type: Number },
+  rent2: { type: Number },
+  rent3: { type: Number },
+  rent4: { type: Number },
+  rent5: { type: Number },
 });
 
 const SettingsSchema = new mongoose.Schema({
