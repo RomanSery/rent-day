@@ -18,7 +18,5 @@ export interface Player {
   intelligence: number;
 
   hasRolled: boolean;
-  lastRoll?: DiceRoll;
-  secondRoll?: DiceRoll;
-  thirdRoll?: DiceRoll;
+  rollHistory: Array<DiceRoll>;
 }

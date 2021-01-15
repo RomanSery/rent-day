@@ -93,6 +93,7 @@ export class GameProcessor {
       speed: 3,
       intelligence: 4,
       hasRolled: false,
+      rollHistory: [],
     };
 
     game.players.push(newPlayer);

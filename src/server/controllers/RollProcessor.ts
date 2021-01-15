@@ -54,10 +54,11 @@ export class RollProcessor {
     }
 
     this.updateRollHistory();
+    const lastRoll = this.getLastRoll();
 
     let newPosition = this.getNewPlayerPosition();
     this.player.position = newPosition;
-    if (!this.player.lastRoll!.isDouble()) {
+    if (lastRoll && !lastRoll.isDouble()) {
       this.player.hasRolled = true;
     }
 
@@ -92,12 +93,12 @@ export class RollProcessor {
     }
 
     let desc = this.player.name + " landed on " + squareName;
-    if (this.player.lastRoll!.isDouble()) {
+    if (lastRoll && lastRoll.isDouble()) {
       desc += " <br /> rolled a double so go again";
     }
 
     this.game.results = {
-      roll: this.player.lastRoll!,
+      roll: lastRoll!,
       description: desc,
     };
 
@@ -111,7 +112,8 @@ export class RollProcessor {
       return RollProcessor.isolation_position;
     }
 
-    let newPosition = this.player!.position + this.player!.lastRoll!.sum();
+    const lastRoll = this.getLastRoll();
+    let newPosition = this.player!.position + lastRoll!.sum();
     if (newPosition > 39) {
       newPosition = newPosition - 39;
       this.playerPassedPayDay = true;
@@ -133,13 +135,11 @@ export class RollProcessor {
       newRoll.die2 = this.forceDie2;
     }
 
-    this.player.lastRoll = newRoll;
+    //insert latest roll into the beginning of array
+    this.player.rollHistory.unshift(newRoll);
 
-    if (this.player.secondRoll != null) {
-      this.player.thirdRoll = this.player.secondRoll;
-    }
-    if (this.player.lastRoll != null) {
-      this.player.secondRoll = this.player.lastRoll;
+    if (this.player.rollHistory.length > 3) {
+      this.player.rollHistory.pop();
     }
   }
 
@@ -148,35 +148,29 @@ export class RollProcessor {
       return false;
     }
 
-    return (
-      this.isPlayerRollADouble(1) &&
-      this.isPlayerRollADouble(2) &&
-      this.isPlayerRollADouble(3)
-    );
+    if (this.player.rollHistory.length >= 3) {
+      return (
+        this.isRollDouble(this.player.rollHistory[0]) &&
+        this.isRollDouble(this.player.rollHistory[1]) &&
+        this.isRollDouble(this.player.rollHistory[2])
+      );
+    }
+
+    return false;
   }
 
-  private isPlayerRollADouble(num: number): boolean {
+  private isRollDouble(roll: DiceRoll): boolean {
     if (!this.player) {
       return false;
     }
+    return roll.die1 === roll.die2 ? true : false;
+  }
 
-    if (num === 1) {
-      return this.player.lastRoll &&
-        this.player.lastRoll.die1 === this.player.lastRoll.die2
-        ? true
-        : false;
-    } else if (num === 2) {
-      return this.player.secondRoll &&
-        this.player.secondRoll.die1 === this.player.secondRoll.die2
-        ? true
-        : false;
-    } else if (num === 3) {
-      return this.player.thirdRoll &&
-        this.player.thirdRoll.die1 === this.player.thirdRoll.die2
-        ? true
-        : false;
+  private getLastRoll(): DiceRoll | null {
+    if (!this.player || this.player.rollHistory.length === 0) {
+      return null;
     }
-    return false;
+    return this.player.rollHistory[0];
   }
 
   public async completeMyTurn(): Promise<void> {

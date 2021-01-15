@@ -21,9 +21,7 @@ const PlayerSchema = new mongoose.Schema({
   intelligence: { type: Number, required: true },
 
   hasRolled: { type: Boolean, required: true },
-  lastRoll: { type: Schema.Types.Mixed },
-  secondRoll: { type: Schema.Types.Mixed },
-  thirdRoll: { type: Schema.Types.Mixed },
+  rollHistory: { type: Schema.Types.Array },
 });
 
 const SquareGameDataSchema = new mongoose.Schema({
