@@ -20,15 +20,22 @@ export class RollProcessor {
   private player?: Player | null;
   private playerPassedPayDay: boolean;
 
+  private forceDie1: number | null;
+  private forceDie2: number | null;
+
   private static isolation_position = 11;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
-    userId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId,
+    forceDie1: number | null,
+    forceDie2: number | null
   ) {
     this.gameId = gameId;
     this.userId = userId;
     this.playerPassedPayDay = false;
+    this.forceDie1 = forceDie1;
+    this.forceDie2 = forceDie2;
   }
 
   public async init(): Promise<void> {
@@ -121,6 +128,11 @@ export class RollProcessor {
     }
 
     const newRoll = new DiceRoll();
+    if (this.forceDie1 && this.forceDie2) {
+      newRoll.die1 = this.forceDie1;
+      newRoll.die2 = this.forceDie2;
+    }
+
     this.player.lastRoll = newRoll;
 
     if (this.player.secondRoll != null) {
@@ -136,17 +148,35 @@ export class RollProcessor {
       return false;
     }
 
-    if (!this.player.lastRoll || !this.player.lastRoll.isDouble()) {
-      return false;
-    }
-    if (!this.player.secondRoll || !this.player.secondRoll.isDouble()) {
-      return false;
-    }
-    if (!this.player.thirdRoll || !this.player.thirdRoll.isDouble()) {
+    return (
+      this.isPlayerRollADouble(1) &&
+      this.isPlayerRollADouble(2) &&
+      this.isPlayerRollADouble(3)
+    );
+  }
+
+  private isPlayerRollADouble(num: number): boolean {
+    if (!this.player) {
       return false;
     }
 
-    return true;
+    if (num === 1) {
+      return this.player.lastRoll &&
+        this.player.lastRoll.die1 === this.player.lastRoll.die2
+        ? true
+        : false;
+    } else if (num === 2) {
+      return this.player.secondRoll &&
+        this.player.secondRoll.die1 === this.player.secondRoll.die2
+        ? true
+        : false;
+    } else if (num === 3) {
+      return this.player.thirdRoll &&
+        this.player.thirdRoll.die1 === this.player.thirdRoll.die2
+        ? true
+        : false;
+    }
+    return false;
   }
 
   public async completeMyTurn(): Promise<void> {

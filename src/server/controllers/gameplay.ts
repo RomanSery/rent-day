@@ -15,7 +15,12 @@ export const roll = async (req: Request, res: Response) => {
   }
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
 
-  const rollProcess = new RollProcessor(gameId, userId);
+  const rollProcess = new RollProcessor(
+    gameId,
+    userId,
+    req.body.forceDie1,
+    req.body.forceDie2
+  );
   await rollProcess.init();
 
   const errMsg = await rollProcess.getErrMsg();
@@ -37,7 +42,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const rollProcess = new RollProcessor(gameId, userId);
+  const rollProcess = new RollProcessor(gameId, userId, null, null);
   await rollProcess.init();
   await rollProcess.completeMyTurn();
 

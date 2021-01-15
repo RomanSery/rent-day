@@ -13,6 +13,7 @@ import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayTreasure } from "./DisplayTreasure";
+import { TextField } from "@material-ui/core";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -27,13 +28,16 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [playerToView, setPlayerToView] = useState<Player | undefined>(undefined);
 
+  const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
+  const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
+
   const onRollDice = async () => {
     if (socketService) {
       socketService.socket.emit(GameEvent.ROLL_DICE, getMyGameId());
     }
 
     setTimeout(() => {
-      API.post("actions/roll", { context })
+      API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
           if (socketService) {
             socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
@@ -90,6 +94,12 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <div className="center-left-side">
           <div className="game-results">
             {getGameResultsDisplayComp()}
+
+            <div>
+              <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
+              <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
+            </div>
+
           </div>
 
           <div className="second-row">
