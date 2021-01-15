@@ -5,7 +5,7 @@ import { TrainStationDisplay } from "../squares/TrainStationDisplay";
 import { ChanceDisplay } from "../squares/ChanceDisplay";
 import { PropertyDisplay } from "../squares/PropertyDisplay";
 import { CentralParkDisplay } from "../squares/CentralParkDisplay";
-import { GoDisplay } from "../squares/GoDisplay";
+import { PayDayDisplay } from "../squares/PayDayDisplay";
 import { UtilityDisplay } from "../squares/UtilityDisplay";
 import { GameState } from "../../core/types/GameState";
 import { TreasureDisplay } from "../squares/TreasureDisplay";
@@ -33,14 +33,14 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
         if (type === SquareType.CentralPark) {
             return <CentralParkDisplay id={id} />
         }
-        if (type === SquareType.Go) {
-            return <GoDisplay id={id} />
+        if (type === SquareType.PayDay) {
+            return <PayDayDisplay id={id} />
         }
         if (type === SquareType.Utility) {
             return <UtilityDisplay id={id} gameInfo={gameInfo} />
         }
 
-        if (type === SquareType.Jail || type === SquareType.GoToJail) {
+        if (type === SquareType.Isolation || type === SquareType.GoToIsolation) {
             return null;
         }
 

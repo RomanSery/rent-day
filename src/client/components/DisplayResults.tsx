@@ -40,8 +40,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
           <Die key={2} value={gameInfo!.results.roll.die2} />
         </div>
 
-        <div className="description">
-          {gameInfo?.results.description}
+        <div className="description" dangerouslySetInnerHTML={{ __html: gameInfo?.results.description ? gameInfo?.results.description : "" }}>
         </div>
 
       </React.Fragment>

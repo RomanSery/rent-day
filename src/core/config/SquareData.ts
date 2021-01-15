@@ -16,7 +16,7 @@ const squareGroupColorMap = new Map<number, string>([
 
 const SquareConfigDataMap = new Map<number, SquareConfigData>();
 SquareConfigDataMap.set(1, {
-  type: SquareType.Go,
+  type: SquareType.PayDay,
   section: BoardSection.Bottom,
 });
 SquareConfigDataMap.set(2, {
@@ -140,7 +140,7 @@ SquareConfigDataMap.set(10, {
 });
 
 SquareConfigDataMap.set(11, {
-  type: SquareType.Jail,
+  type: SquareType.Isolation,
   section: BoardSection.Bottom,
 });
 
@@ -391,7 +391,7 @@ SquareConfigDataMap.set(30, {
 });
 
 SquareConfigDataMap.set(31, {
-  type: SquareType.GoToJail,
+  type: SquareType.GoToIsolation,
   section: BoardSection.Top,
 });
 

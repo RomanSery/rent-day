@@ -1,10 +1,10 @@
 export enum SquareType {
   Property = "Property",
   TrainStation = "Train",
-  Jail = "Jail",
-  Go = "Go",
+  Isolation = "Isolation",
+  PayDay = "PayDay",
   Chance = "Chance",
-  GoToJail = "GoToJail",
+  GoToIsolation = "GoToIsolation",
   CentralPark = "CentralPark",
   Utility = "Utility",
   Treasure = "Treasure",

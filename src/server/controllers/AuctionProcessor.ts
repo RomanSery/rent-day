@@ -182,7 +182,10 @@ export class AuctionProcessor {
     const bidders: Array<Bidder> = [];
 
     game.players.forEach((p: Player, key: number) => {
-      if (p.state === PlayerState.ACTIVE || p.state === PlayerState.IN_JAIL) {
+      if (
+        p.state === PlayerState.ACTIVE ||
+        p.state === PlayerState.IN_ISOLATION
+      ) {
         const newBidder: Bidder = {
           name: p.name,
           type: p.type,

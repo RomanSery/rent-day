@@ -1,5 +1,5 @@
 export enum PlayerState {
   ACTIVE = "Active",
-  IN_JAIL = "In_Jail",
+  IN_ISOLATION = "In_Isolation",
   BANKRUPT = "Bankrupt",
 }

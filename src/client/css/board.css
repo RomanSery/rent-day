@@ -286,14 +286,14 @@
   flex-basis: auto;
 }
 
-.square.jail {
+.square.isolation {
   background-image: url("../images/prisoner.svg");
   background-repeat: no-repeat;
   background-size: cover;
   opacity: 0.5;
 }
 
-.square.go-to-jail {
+.square.go-to-isolation {
   background-image: url("../images/policeman.svg");
   background-repeat: no-repeat;
   background-size: cover;
@@ -309,7 +309,7 @@
   flex-basis: 10%;
 }
 
-.square.passgo .icon {
+.square.payday .icon {
   font-size: calc(2rem + 0.5vw + 0.5vh);
 }
 
