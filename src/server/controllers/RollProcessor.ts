@@ -12,6 +12,7 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 import { TreasureProcessor } from "./TreasureProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { PropertyProcessor } from "./PropertyProcessor";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -22,6 +23,7 @@ export class RollProcessor {
 
   private forceDie1: number | null;
   private forceDie2: number | null;
+  private rollDesc: string;
 
   private static isolation_position = 11;
   private static payToGetOutFee = 100;
@@ -37,6 +39,7 @@ export class RollProcessor {
     this.playerPassedPayDay = false;
     this.forceDie1 = forceDie1;
     this.forceDie2 = forceDie2;
+    this.rollDesc = "";
   }
 
   public async init(): Promise<void> {
@@ -75,34 +78,17 @@ export class RollProcessor {
       );
     }
 
-    const squareId: number = this.player.position;
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    const squareTheme = this.game.theme.get(squareId.toString());
-    let squareName = squareTheme ? squareTheme.name : "";
-    if (squareConfig && squareConfig.type === SquareType.Chance) {
-      squareName = "Chance";
-    } else if (squareConfig && squareConfig.type === SquareType.Isolation) {
-      squareName = "Visiting Isolation";
-    } else if (squareConfig && squareConfig.type === SquareType.Treasure) {
-      squareName = "Treasure";
-    }
-
     const lastRoll = this.getLastRoll()!;
-    let desc = this.player.name + " landed on " + squareName;
-    if (lastRoll.isDouble()) {
-      desc += " <br /> rolled a double so go again";
-    }
-
     this.game.results = {
       roll: lastRoll,
-      description: desc,
+      description: this.player.name + "<br /> " + this.rollDesc,
     };
 
     this.game.save();
   }
 
   private updatePlayerPosition(): void {
-    if (!this.player) {
+    if (!this.player || !this.game) {
       return;
     }
     const lastRoll = this.getLastRoll();
@@ -110,12 +96,24 @@ export class RollProcessor {
       return;
     }
 
+    let gotOutOfIsolation = false;
+    let updatePosition = false;
+
     if (this.player.state === PlayerState.IN_ISOLATION) {
       if (lastRoll.isDouble() || this.player.numTurnsInIsolation >= 2) {
         this.player.state = PlayerState.ACTIVE;
         this.player.numTurnsInIsolation = 0;
+        updatePosition = true;
+        gotOutOfIsolation = true;
+        this.player.rollHistory = [lastRoll];
+        this.rollDesc += lastRoll.isDouble()
+          ? " <br /> rolled a double to get out of quarantine"
+          : " <br /> left quarantine after 3 turns";
       } else {
         this.player.numTurnsInIsolation += 1;
+        this.rollDesc +=
+          " <br /> still in quarantine # turns:" +
+          this.player.numTurnsInIsolation;
       }
       this.player.hasRolled = true;
     } else if (this.hasRolledThreeConsecutiveDoubles()) {
@@ -123,19 +121,33 @@ export class RollProcessor {
       this.player.state = PlayerState.IN_ISOLATION;
       this.player.position = RollProcessor.isolation_position;
       this.player.hasRolled = true;
+      this.rollDesc += " <br /> caught speeding and put into quarantine";
+      this.player.rollHistory = [lastRoll];
     } else {
+      updatePosition = true;
+    }
+
+    if (updatePosition) {
       let newPosition = this.player.position + lastRoll.sum();
       if (newPosition > 39) {
         newPosition = newPosition - 39;
         this.playerPassedPayDay = true;
+        this.rollDesc += " <br /> Payday, collect your salary!";
       } else {
         this.playerPassedPayDay = false;
       }
 
       this.player.position = newPosition;
 
+      this.rollDesc +=
+        " <br /> landed on " +
+        PropertyProcessor.getSquareName(this.game, this.player.position);
+
       if (!lastRoll.isDouble()) {
         this.player.hasRolled = true;
+        this.player.rollHistory = [lastRoll];
+      } else if (!gotOutOfIsolation) {
+        this.rollDesc += " <br /> rolled a double so go again";
       }
     }
   }

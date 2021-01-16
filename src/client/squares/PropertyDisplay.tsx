@@ -1,10 +1,8 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 import React from "react";
 import { GameState } from "../../core/types/GameState";
-import { getIconProp } from "../helpers";
 import { ColorBar } from "./ColorBar";
-import { getOwnerPlayer, getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
+import { getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
 
 interface Props {
     id: number;
@@ -13,19 +11,11 @@ interface Props {
 
 export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
-    const getOwnerIcon = () => {
-        const ownerPlayer = getOwnerPlayer(gameInfo, id);
-        if (ownerPlayer) {
-            return (<FontAwesomeIcon icon={getIconProp(ownerPlayer.type)} color={ownerPlayer.color} />);
-        }
-        return null;
-    }
-
     const getNormalSquare = () => {
         return (
             <div className="square-name">
                 <div className="square-title" style={getSquareStyle(gameInfo, id)}>
-                    {getSquareTxt(gameInfo, id)} {getOwnerIcon()}
+                    {getSquareTxt(gameInfo, id)}
                 </div>
             </div>
         );
@@ -39,7 +29,7 @@ export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
                 repeatDelay: 0
             }} className="square-name">
                 <div className="square-title" style={getSquareStyle(gameInfo, id)}>
-                    {getSquareTxt(gameInfo, id)} {getOwnerIcon()}
+                    {getSquareTxt(gameInfo, id)}
                 </div>
             </motion.div>
         );

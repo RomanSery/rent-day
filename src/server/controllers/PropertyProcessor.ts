@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
 import {
   GameInstance,
   GameInstanceDocument,
@@ -120,5 +122,23 @@ export class PropertyProcessor {
 
   private getMortgageValue(purchasePrice: number): number {
     return Math.round(purchasePrice * 0.3);
+  }
+
+  public static getSquareName(
+    gameDoc: GameInstanceDocument,
+    squareId: number
+  ): string {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+
+    if (squareConfig && squareConfig.type === SquareType.Chance) {
+      return "Chance";
+    } else if (squareConfig && squareConfig.type === SquareType.Isolation) {
+      return "Visiting Quarantine";
+    } else if (squareConfig && squareConfig.type === SquareType.Treasure) {
+      return "Lotto";
+    } else {
+      const squareTheme = gameDoc.theme.get(squareId.toString());
+      return squareTheme ? squareTheme.name : "";
+    }
   }
 }
