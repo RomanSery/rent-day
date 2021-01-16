@@ -94,6 +94,7 @@ export class GameProcessor {
       intelligence: 4,
       hasRolled: false,
       rollHistory: [],
+      numTurnsInIsolation: 0,
     };
 
     game.players.push(newPlayer);

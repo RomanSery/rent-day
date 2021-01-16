@@ -24,6 +24,7 @@ export class RollProcessor {
   private forceDie2: number | null;
 
   private static isolation_position = 11;
+  private static payToGetOutFee = 100;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -54,13 +55,7 @@ export class RollProcessor {
     }
 
     this.updateRollHistory();
-    const lastRoll = this.getLastRoll();
-
-    let newPosition = this.getNewPlayerPosition();
-    this.player.position = newPosition;
-    if (lastRoll && !lastRoll.isDouble()) {
-      this.player.hasRolled = true;
-    }
+    this.updatePlayerPosition();
 
     if (this.playerPassedPayDay === true) {
       this.playerPassedGo();
@@ -92,36 +87,57 @@ export class RollProcessor {
       squareName = "Treasure";
     }
 
+    const lastRoll = this.getLastRoll()!;
     let desc = this.player.name + " landed on " + squareName;
-    if (lastRoll && lastRoll.isDouble()) {
+    if (lastRoll.isDouble()) {
       desc += " <br /> rolled a double so go again";
     }
 
     this.game.results = {
-      roll: lastRoll!,
+      roll: lastRoll,
       description: desc,
     };
 
     this.game.save();
   }
 
-  private getNewPlayerPosition(): number {
-    if (this.hasRolledThreeConsecutiveDoubles()) {
-      this.playerPassedPayDay = false;
-      this.player!.state = PlayerState.IN_ISOLATION;
-      return RollProcessor.isolation_position;
+  private updatePlayerPosition(): void {
+    if (!this.player) {
+      return;
     }
-
     const lastRoll = this.getLastRoll();
-    let newPosition = this.player!.position + lastRoll!.sum();
-    if (newPosition > 39) {
-      newPosition = newPosition - 39;
-      this.playerPassedPayDay = true;
-    } else {
-      this.playerPassedPayDay = false;
+    if (!lastRoll) {
+      return;
     }
 
-    return newPosition;
+    if (this.player.state === PlayerState.IN_ISOLATION) {
+      if (lastRoll.isDouble() || this.player.numTurnsInIsolation >= 2) {
+        this.player.state = PlayerState.ACTIVE;
+        this.player.numTurnsInIsolation = 0;
+      } else {
+        this.player.numTurnsInIsolation += 1;
+      }
+      this.player.hasRolled = true;
+    } else if (this.hasRolledThreeConsecutiveDoubles()) {
+      this.playerPassedPayDay = false;
+      this.player.state = PlayerState.IN_ISOLATION;
+      this.player.position = RollProcessor.isolation_position;
+      this.player.hasRolled = true;
+    } else {
+      let newPosition = this.player.position + lastRoll.sum();
+      if (newPosition > 39) {
+        newPosition = newPosition - 39;
+        this.playerPassedPayDay = true;
+      } else {
+        this.playerPassedPayDay = false;
+      }
+
+      this.player.position = newPosition;
+
+      if (!lastRoll.isDouble()) {
+        this.player.hasRolled = true;
+      }
+    }
   }
 
   private updateRollHistory(): void {
@@ -264,6 +280,37 @@ export class RollProcessor {
     }
   }
 
+  public async payToGetOut(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
+    }
+    if (!this.player) {
+      return "player not owned";
+    }
+    if (!this.userId.equals(this.game.nextPlayerToAct)) {
+      return "not your turn!";
+    }
+    if (this.player.hasRolled) {
+      return "You already rolled this turn";
+    }
+    if (this.player.state !== PlayerState.IN_ISOLATION) {
+      return "You are not in quarantine";
+    }
+
+    if (this.player.money < RollProcessor.payToGetOutFee) {
+      return "You don't have enough money to get out of quarantine";
+    }
+
+    this.player.numTurnsInIsolation = 0;
+    this.player.money = this.player.money - RollProcessor.payToGetOutFee;
+    this.player.state = PlayerState.ACTIVE;
+    this.player.rollHistory = [];
+    await this.game.save();
+    return "";
+  }
+
   public async getErrMsg(): Promise<string> {
     if (!this.game) {
       return "game not found";
@@ -280,11 +327,6 @@ export class RollProcessor {
       return "You already rolled this turn";
     }
 
-    if (this.player.state === PlayerState.IN_ISOLATION) {
-      return "You are in quarantine and can't roll";
-    }
-
-    //TODO if is in Isolation, cant roll
     //TODO if negative $, cant roll
     //etc
 

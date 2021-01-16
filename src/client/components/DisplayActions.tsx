@@ -8,6 +8,7 @@ import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -34,6 +35,16 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       .catch(handleApiError);
   };
 
+  const onGetOut = async () => {
+    API.post("actions/getOut", { context })
+      .then(function (response) {
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        }
+      })
+      .catch(handleApiError);
+  };
+
   const onLeaveGame = async () => {
     leaveCurrentGameIfJoined(() => {
       history.push("/");
@@ -46,22 +57,47 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   }
 
   const hasAlreadyRolled = (): boolean => {
-    if (gameInfo) {
-      const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
-      if (myPlayer && myPlayer.hasRolled) {
-        return true;
+    const myPlayer = getMyPlayer();
+    return myPlayer && myPlayer.hasRolled ? true : false;
+  }
+
+  const canRoll = (): boolean => {
+    const myPlayer = getMyPlayer();
+    if (myPlayer != null && myPlayer !== undefined) {
+      if (myPlayer.hasRolled) {
+        return false;
       }
-      return false;
+      if (myPlayer.state === PlayerState.BANKRUPT) {
+        return false;
+      }
+      return true;
     }
 
-    return true;
+    return false;
+  }
+
+  const canPayToGetOutOfIsolation = (): boolean => {
+    const myPlayer = getMyPlayer();
+    if (myPlayer != null && myPlayer !== undefined) {
+      return !myPlayer.hasRolled && myPlayer.state === PlayerState.IN_ISOLATION ? true : false;
+    }
+
+    return false;
+  }
+
+  const getMyPlayer = (): Player | undefined => {
+    if (gameInfo) {
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
+    }
+    return undefined;
   }
 
   const getMyActions = () => {
     return (
       <Container maxWidth="sm">
         <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          {!hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
+          {canRoll() ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
+          {canPayToGetOutOfIsolation() ? <Button color="primary" size="small" onClick={onGetOut}>Pay To Get Out</Button> : null}
           {hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
           <Button color="secondary" onClick={onLeaveGame} size="small"> Leave Game</Button>
         </ButtonGroup>

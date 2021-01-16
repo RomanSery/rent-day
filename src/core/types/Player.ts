@@ -19,4 +19,5 @@ export interface Player {
 
   hasRolled: boolean;
   rollHistory: Array<DiceRoll>;
+  numTurnsInIsolation: number;
 }

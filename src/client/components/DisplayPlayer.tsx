@@ -3,6 +3,8 @@ import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { areObjectIdsEqual, getIconProp } from "../helpers";
+import { faBiohazard } from "@fortawesome/free-solid-svg-icons";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -46,6 +48,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
         <div className="container">
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
+            {player.state === PlayerState.IN_ISOLATION ? <FontAwesomeIcon icon={faBiohazard} size="2x" color="black" /> : null}
             <div className="ping">{getPing(player._id)}</div>
           </div>
           <div className="sub-name" style={getNameColorStyle()}>

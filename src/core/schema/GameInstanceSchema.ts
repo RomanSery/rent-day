@@ -22,6 +22,7 @@ const PlayerSchema = new mongoose.Schema({
 
   hasRolled: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
+  numTurnsInIsolation: { type: Number, required: true },
 });
 
 const SquareGameDataSchema = new mongoose.Schema({
