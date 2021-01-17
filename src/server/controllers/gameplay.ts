@@ -21,14 +21,11 @@ export const roll = async (req: Request, res: Response) => {
     req.body.forceDie1,
     req.body.forceDie2
   );
-  await processor.init();
 
-  const errMsg = await processor.getErrMsg();
-  if (errMsg) {
+  const errMsg = await processor.roll();
+  if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
-
-  await processor.roll();
 
   res.json({
     status: "success",
@@ -43,8 +40,11 @@ export const completeTurn = async (req: Request, res: Response) => {
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new RollProcessor(gameId, userId, null, null);
-  await processor.init();
-  await processor.completeMyTurn();
+
+  const errMsg = await processor.completeMyTurn();
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
 
   res.json({
     status: "success",
@@ -62,14 +62,11 @@ export const bid = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const bidAmount = parseInt(req.body.bid);
   const processor = new AuctionProcessor(bidAmount, gameId, userId);
-  await processor.init();
 
-  const errMsg = await processor.getErrMsg();
-  if (errMsg) {
+  const errMsg = await processor.placeBid();
+  if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
-
-  await processor.placeBid();
 
   res.json({
     status: "success",
@@ -87,14 +84,11 @@ export const pickLotto = async (req: Request, res: Response) => {
   const optNum = parseInt(req.body.opt);
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new LottoProcessor(optNum, gameId, userId);
-  await processor.init();
+  const errMsg = await processor.pickOption();
 
-  const errMsg = await processor.getErrMsg();
-  if (errMsg) {
+  if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
-
-  await processor.pickOption();
 
   res.json({
     status: "success",

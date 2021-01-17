@@ -29,32 +29,68 @@ export class AuctionProcessor {
     this.userId = userId;
   }
 
-  public async init(): Promise<void> {
+  private async init(): Promise<void> {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.auction = await Auction.findById(this.game.auctionId);
     }
   }
 
-  public async placeBid(): Promise<void> {
-    const myBid = this.auction!.bidders.find(
+  public async placeBid(): Promise<string> {
+    await this.init();
+
+    if (this.game == null) {
+      return "game not found";
+    }
+    if (this.game.auctionId == null) {
+      return "no active auction";
+    }
+
+    const playerToBid = this.game.players.find(
+      (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
+    );
+    if (playerToBid == null) {
+      return "player not found!";
+    }
+
+    if (this.auction == null) {
+      return "auction not found";
+    }
+    if (this.auction.finished) {
+      return "auction is finished";
+    }
+
+    const myBid = this.auction.bidders.find(
       (b) => b._id && new mongoose.Types.ObjectId(b._id).equals(this.userId)
     );
-    if (myBid && this.auction) {
-      myBid.bid = this.bid;
-      myBid.submittedBid = true;
-      if (this.isAuctionDone()) {
-        this.determineWinner();
-
-        if (this.game) {
-          this.game.auctionId = null;
-          this.game.auctionSquareId = null;
-          this.game.save();
-        }
-      }
-
-      this.auction.save();
+    if (myBid == null) {
+      return "player bid not found!";
     }
+    if (myBid.bid) {
+      return "player already placed bid";
+    }
+
+    if (this.bid < 0) {
+      return "bid cant be less than 0";
+    }
+    if (this.bid > playerToBid.money) {
+      return "bid cant be more than what you have";
+    }
+
+    myBid.bid = this.bid;
+    myBid.submittedBid = true;
+    if (this.isAuctionDone()) {
+      this.determineWinner();
+
+      if (this.game) {
+        this.game.auctionId = null;
+        this.game.auctionSquareId = null;
+        this.game.save();
+      }
+    }
+
+    this.auction.save();
+    return "";
   }
 
   private isAuctionDone(): boolean {
@@ -96,48 +132,6 @@ export class AuctionProcessor {
     const count = this.auction!.bidders.filter((b) => b.bid === winningBid)
       .length;
     return count > 1;
-  }
-
-  public async getErrMsg(): Promise<string> {
-    if (this.game == null) {
-      return "game not found";
-    }
-    if (this.game.auctionId == null) {
-      return "no active auction";
-    }
-
-    const playerToBid = this.game.players.find(
-      (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
-    );
-    if (playerToBid == null) {
-      return "player not found!";
-    }
-
-    if (this.auction == null) {
-      return "auction not found";
-    }
-    if (this.auction.finished) {
-      return "auction is finished";
-    }
-
-    const myBid = this.auction.bidders.find(
-      (b) => b._id && new mongoose.Types.ObjectId(b._id).equals(this.userId)
-    );
-    if (myBid == null) {
-      return "player bid not found!";
-    }
-    if (myBid.bid) {
-      return "player already placed bid";
-    }
-
-    if (this.bid < 0) {
-      return "bid cant be less than 0";
-    }
-    if (this.bid > playerToBid.money) {
-      return "bid cant be more than what you have";
-    }
-
-    return "";
   }
 
   public static async getAuction(

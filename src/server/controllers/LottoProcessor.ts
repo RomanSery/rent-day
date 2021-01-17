@@ -26,7 +26,7 @@ export class LottoProcessor {
     this.userId = userId;
   }
 
-  public async init(): Promise<void> {
+  private async init(): Promise<void> {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game && this.game.lottoId) {
       this.lotto = await Lotto.findById(this.game.lottoId);
@@ -39,9 +39,32 @@ export class LottoProcessor {
     }
   }
 
-  public async pickOption(): Promise<void> {
-    if (!this.game || !this.lotto) {
-      return;
+  public async pickOption(): Promise<string> {
+    await this.init();
+
+    if (this.game == null) {
+      return "game not found";
+    }
+    if (this.game.lottoId == null) {
+      return "no active lotto";
+    }
+
+    const playerToPick = this.game.players.find(
+      (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
+    );
+    if (playerToPick == null) {
+      return "player not found!";
+    }
+
+    if (this.lotto == null) {
+      return "lotto not found";
+    }
+    if (this.lotto.prize) {
+      return "lotto is finished";
+    }
+
+    if (this.optNum < 1 || this.optNum > 3) {
+      return "invalid picked option";
     }
 
     const randomNum = Math.floor(Math.random() * 100) + 1;
@@ -75,6 +98,8 @@ export class LottoProcessor {
       this.game.lottoId = null;
       this.game.save();
     }
+
+    return "";
   }
 
   private getPrizeAmount(): number {
@@ -111,35 +136,6 @@ export class LottoProcessor {
     }
 
     return 0;
-  }
-
-  public async getErrMsg(): Promise<string> {
-    if (this.game == null) {
-      return "game not found";
-    }
-    if (this.game.lottoId == null) {
-      return "no active lotto";
-    }
-
-    const playerToPick = this.game.players.find(
-      (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
-    );
-    if (playerToPick == null) {
-      return "player not found!";
-    }
-
-    if (this.lotto == null) {
-      return "lotto not found";
-    }
-    if (this.lotto.prize) {
-      return "lotto is finished";
-    }
-
-    if (this.optNum < 1 || this.optNum > 3) {
-      return "invalid picked option";
-    }
-
-    return "";
   }
 
   public static async getLotto(

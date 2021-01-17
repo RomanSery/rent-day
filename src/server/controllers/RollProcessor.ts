@@ -40,7 +40,7 @@ export class RollProcessor {
     this.rollDesc = "";
   }
 
-  public async init(): Promise<void> {
+  private async init(): Promise<void> {
     this.game = await GameInstance.findById(this.gameId);
     if (this.game) {
       this.player = this.game.players.find(
@@ -50,10 +50,25 @@ export class RollProcessor {
     }
   }
 
-  public async roll(): Promise<void> {
-    if (!this.game || !this.player) {
-      return;
+  public async roll(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
     }
+    if (!this.player) {
+      return "player not found";
+    }
+
+    if (!this.userId.equals(this.game.nextPlayerToAct)) {
+      return "not your turn!";
+    }
+
+    if (this.player.hasRolled) {
+      return "You already rolled this turn";
+    }
+
+    //TODO if negative $, cant roll
 
     this.updateRollHistory();
     this.updatePlayerPosition();
@@ -88,6 +103,7 @@ export class RollProcessor {
     };
 
     this.game.save();
+    return "";
   }
 
   private updatePlayerPosition(): void {
@@ -204,22 +220,22 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
-  public async completeMyTurn(): Promise<void> {
+  public async completeMyTurn(): Promise<string> {
+    await this.init();
+
     if (!this.game) {
-      return;
+      return "game not found";
     }
     if (!this.player) {
-      return;
+      return "player not found";
     }
 
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
-      console.log("not %s's turn", this.player.name);
-      return;
+      return "not your turn";
     }
 
     if (!this.player.hasRolled) {
-      console.log("%s didnt roll yet", this.player.name);
-      return;
+      return "you didnt roll yet";
     }
 
     const nextPlayer: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();
@@ -230,6 +246,8 @@ export class RollProcessor {
     this.player.hasRolled = false;
 
     this.game.save();
+
+    return "";
   }
 
   private getNextPlayerToAct(): mongoose.Types.ObjectId | null {
@@ -272,28 +290,6 @@ export class RollProcessor {
     this.player.state = PlayerState.ACTIVE;
     this.player.rollHistory = [];
     await this.game.save();
-    return "";
-  }
-
-  public async getErrMsg(): Promise<string> {
-    if (!this.game) {
-      return "game not found";
-    }
-    if (!this.player) {
-      return "player not found";
-    }
-
-    if (!this.userId.equals(this.game.nextPlayerToAct)) {
-      return "not your turn!";
-    }
-
-    if (this.player.hasRolled) {
-      return "You already rolled this turn";
-    }
-
-    //TODO if negative $, cant roll
-    //etc
-
     return "";
   }
 }
