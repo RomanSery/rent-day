@@ -13,6 +13,7 @@ import { TreasureProcessor } from "./TreasureProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
+import { MoneyCalculator } from "./MoneyCalculator";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -61,7 +62,7 @@ export class RollProcessor {
     this.updatePlayerPosition();
 
     if (this.playerPassedPayDay === true) {
-      this.playerPassedGo();
+      MoneyCalculator.collectSalary(this.player);
     }
 
     if (this.shouldCreateAuction()) {
@@ -77,6 +78,8 @@ export class RollProcessor {
         this.player
       );
     }
+
+    MoneyCalculator.payRent(this.game, this.player);
 
     const lastRoll = this.getLastRoll()!;
     this.game.results = {
@@ -284,12 +287,6 @@ export class RollProcessor {
         ? this.game.players[index + 1]
         : this.game.players[0];
     return new mongoose.Types.ObjectId(nextPlayer._id);
-  }
-
-  private playerPassedGo(): void {
-    if (this.player) {
-      this.player.money = this.player.money + 200;
-    }
   }
 
   public async payToGetOut(): Promise<string> {
