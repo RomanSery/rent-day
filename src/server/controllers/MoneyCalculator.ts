@@ -10,10 +10,33 @@ export class MoneyCalculator {
     player.money = player.money + 200;
   }
 
-  public static payRent(game: GameInstanceDocument, player: Player): void {
+  public static payRent(game: GameInstanceDocument, player: Player): string {
     if (!this.shouldPayRent(game, player)) {
-      return;
+      return "";
     }
+
+    const squareId: number = player.position;
+    const squareData: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+
+    const owner = game.players.find(
+      (p) =>
+        p._id &&
+        new mongoose.Types.ObjectId(p._id).equals(
+          new mongoose.Types.ObjectId(squareData!.owner)
+        )
+    );
+
+    const rentToPay = squareData!.rent0;
+    if (!rentToPay || rentToPay <= 0) {
+      return "";
+    }
+
+    player.money -= rentToPay;
+    owner!.money += rentToPay;
+
+    return "Payed " + owner!.name + " $" + rentToPay + " in rent";
   }
 
   private static shouldPayRent(

@@ -79,7 +79,10 @@ export class RollProcessor {
       );
     }
 
-    MoneyCalculator.payRent(this.game, this.player);
+    const payDesc = MoneyCalculator.payRent(this.game, this.player);
+    if (payDesc.length > 0) {
+      this.rollDesc += "<br />" + payDesc;
+    }
 
     const lastRoll = this.getLastRoll()!;
     this.game.results = {
