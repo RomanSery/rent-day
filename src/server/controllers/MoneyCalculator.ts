@@ -10,6 +10,17 @@ export class MoneyCalculator {
     player.money = player.money + 200;
   }
 
+  public static getMortgageValue(purchasePrice: number): number {
+    return Math.round(purchasePrice * 0.3);
+  }
+
+  public static getRedeemValue(state: SquareGameData): number {
+    if (state.mortgageValue) {
+      return Math.round(state.mortgageValue + state.mortgageValue * 0.1);
+    }
+    return 0;
+  }
+
   public static payRent(game: GameInstanceDocument, player: Player): string {
     if (!this.shouldPayRent(game, player)) {
       return "";

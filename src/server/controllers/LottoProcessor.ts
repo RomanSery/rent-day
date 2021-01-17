@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
 import {
   GameInstance,
   GameInstanceDocument,
@@ -176,5 +178,14 @@ export class LottoProcessor {
 
     await newObj.save();
     return new mongoose.Types.ObjectId(newObj._id);
+  }
+
+  public static shouldCreateLotto(squareId: number): boolean {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig) {
+      return false;
+    }
+
+    return squareConfig.type === SquareType.Lotto;
   }
 }

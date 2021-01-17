@@ -13,7 +13,6 @@ mortgage value should be a % of the purchase price
 store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
 The player to bid the highest wins and pays the 2nd highest bid
  rename to quarentine, "you must quarentine", "in quarentine"  use biohazard symbol
-rename "go" to "pay day"
 change square view table to do header than detail rows to make it less wide
 
 player classes/abilities

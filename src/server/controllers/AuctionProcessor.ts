@@ -8,6 +8,9 @@ import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class AuctionProcessor {
   private bid: number;
@@ -198,5 +201,34 @@ export class AuctionProcessor {
     });
 
     return bidders;
+  }
+
+  public static shouldCreateAuction(
+    game: GameInstanceDocument,
+    squareId: number
+  ): boolean {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig) {
+      return false;
+    }
+    if (
+      squareConfig.type !== SquareType.Property &&
+      squareConfig.type !== SquareType.TrainStation &&
+      squareConfig.type !== SquareType.Utility
+    ) {
+      return false;
+    }
+
+    const squareData: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+    if (squareData == null) {
+      return true;
+    }
+    if (squareData.owner == null) {
+      return true;
+    }
+
+    return false;
   }
 }

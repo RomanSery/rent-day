@@ -8,6 +8,7 @@ import {
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { MoneyCalculator } from "./MoneyCalculator";
 
 export class PropertyProcessor {
   private squareId: number;
@@ -93,16 +94,14 @@ export class PropertyProcessor {
       return "you are not the owner";
     }
 
-    if (
-      this.state.mortgageValue &&
-      this.player.money < this.state.mortgageValue
-    ) {
+    const redeemAmount = MoneyCalculator.getRedeemValue(this.state);
+    if (this.player.money < redeemAmount) {
       return "You don't have enought money to redeem";
     }
 
     this.state.isMortgaged = false;
     if (this.state.mortgageValue) {
-      this.player.money = this.player.money - this.state.mortgageValue;
+      this.player.money = this.player.money - redeemAmount;
     }
     await this.game.save();
     return "";
@@ -113,15 +112,11 @@ export class PropertyProcessor {
       (p: SquareGameData) => p.squareId === this.squareId
     );
     if (state) {
-      state.mortgageValue = this.getMortgageValue(winner.bid!);
+      state.mortgageValue = MoneyCalculator.getMortgageValue(winner.bid!);
       state.purchasePrice = winner.bid!;
       state.color = winner.color!;
       state.owner = winner._id!;
     }
-  }
-
-  private getMortgageValue(purchasePrice: number): number {
-    return Math.round(purchasePrice * 0.3);
   }
 
   public static getSquareName(

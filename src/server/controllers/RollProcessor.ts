@@ -6,9 +6,6 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { DiceRoll } from "../../core/types/DiceRoll";
-import { SquareType } from "../../core/enums/SquareType";
-import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { SquareGameData } from "../../core/types/SquareGameData";
 import { LottoProcessor } from "./LottoProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
@@ -65,14 +62,14 @@ export class RollProcessor {
       MoneyCalculator.collectSalary(this.player);
     }
 
-    if (this.shouldCreateAuction()) {
+    if (AuctionProcessor.shouldCreateAuction(this.game, this.player.position)) {
       const newAuction: AuctionDocument = await AuctionProcessor.createAuction(
         this.game,
         this.player
       );
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
-    } else if (this.shouldCreateLotto()) {
+    } else if (LottoProcessor.shouldCreateLotto(this.player.position)) {
       this.game.lottoId = await LottoProcessor.createLotto(
         this.game.id,
         this.player
@@ -233,51 +230,6 @@ export class RollProcessor {
     this.player.hasRolled = false;
 
     this.game.save();
-  }
-
-  private shouldCreateAuction(): boolean {
-    if (!this.player || !this.game) {
-      return false;
-    }
-
-    const squareId: number = this.player.position;
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    if (!squareConfig) {
-      return false;
-    }
-    if (
-      squareConfig.type !== SquareType.Property &&
-      squareConfig.type !== SquareType.TrainStation &&
-      squareConfig.type !== SquareType.Utility
-    ) {
-      return false;
-    }
-
-    const squareData: SquareGameData | undefined = this.game.squareState.find(
-      (p: SquareGameData) => p.squareId === squareId
-    );
-    if (squareData == null) {
-      return true;
-    }
-    if (squareData.owner == null) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private shouldCreateLotto(): boolean {
-    if (!this.player || !this.game) {
-      return false;
-    }
-
-    const squareId: number = this.player.position;
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    if (!squareConfig) {
-      return false;
-    }
-
-    return squareConfig.type === SquareType.Lotto;
   }
 
   private getNextPlayerToAct(): mongoose.Types.ObjectId | null {
