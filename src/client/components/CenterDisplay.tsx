@@ -12,7 +12,7 @@ import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUs
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
-import { DisplayTreasure } from "./DisplayTreasure";
+import { DisplayLotto } from "./DisplayLotto";
 import { TextField } from "@material-ui/core";
 
 interface Props {
@@ -82,8 +82,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     if (gameInfo?.auctionId) {
       return (<DisplayAuction gameInfo={gameInfo} socketService={socketService} />);
     }
-    if (gameInfo?.treasureId) {
-      return (<DisplayTreasure gameInfo={gameInfo} socketService={socketService} />);
+    if (gameInfo?.lottoId) {
+      return (<DisplayLotto gameInfo={gameInfo} socketService={socketService} />);
     }
     return (<DisplayResults gameInfo={gameInfo} socketService={socketService} />);
   }

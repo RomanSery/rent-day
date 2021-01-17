@@ -9,7 +9,7 @@ import { DiceRoll } from "../../core/types/DiceRoll";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { TreasureProcessor } from "./TreasureProcessor";
+import { LottoProcessor } from "./LottoProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
@@ -72,8 +72,8 @@ export class RollProcessor {
       );
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
-    } else if (this.shouldCreateTreasure()) {
-      this.game.treasureId = await TreasureProcessor.createTreasure(
+    } else if (this.shouldCreateLotto()) {
+      this.game.lottoId = await LottoProcessor.createLotto(
         this.game.id,
         this.player
       );
@@ -263,7 +263,7 @@ export class RollProcessor {
     return false;
   }
 
-  private shouldCreateTreasure(): boolean {
+  private shouldCreateLotto(): boolean {
     if (!this.player || !this.game) {
       return false;
     }
@@ -274,7 +274,7 @@ export class RollProcessor {
       return false;
     }
 
-    return squareConfig.type === SquareType.Treasure;
+    return squareConfig.type === SquareType.Lotto;
   }
 
   private getNextPlayerToAct(): mongoose.Types.ObjectId | null {

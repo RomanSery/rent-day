@@ -134,7 +134,7 @@ export class PropertyProcessor {
       return "Chance";
     } else if (squareConfig && squareConfig.type === SquareType.Isolation) {
       return "Visiting Quarantine";
-    } else if (squareConfig && squareConfig.type === SquareType.Treasure) {
+    } else if (squareConfig && squareConfig.type === SquareType.Lotto) {
       return "Lotto";
     } else {
       const squareTheme = gameDoc.theme.get(squareId.toString());

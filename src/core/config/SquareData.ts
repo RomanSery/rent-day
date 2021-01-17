@@ -161,7 +161,7 @@ SquareConfigDataMap.set(12, {
   ]),
 });
 SquareConfigDataMap.set(13, {
-  type: SquareType.Treasure,
+  type: SquareType.Lotto,
   section: BoardSection.Left,
 });
 SquareConfigDataMap.set(14, {
@@ -354,7 +354,7 @@ SquareConfigDataMap.set(27, {
   ]),
 });
 SquareConfigDataMap.set(28, {
-  type: SquareType.Treasure,
+  type: SquareType.Lotto,
   section: BoardSection.Top,
 });
 SquareConfigDataMap.set(29, {
@@ -485,7 +485,7 @@ SquareConfigDataMap.set(38, {
   ]),
 });
 SquareConfigDataMap.set(39, {
-  type: SquareType.Treasure,
+  type: SquareType.Lotto,
   section: BoardSection.Right,
 });
 SquareConfigDataMap.set(40, {

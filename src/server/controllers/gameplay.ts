@@ -5,7 +5,7 @@ import { check } from "express-validator";
 import { getVerifiedUserId } from "./helpers";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { RollProcessor } from "./RollProcessor";
-import { TreasureProcessor } from "./TreasureProcessor";
+import { LottoProcessor } from "./LottoProcessor";
 import { PropertyProcessor } from "./PropertyProcessor";
 
 export const roll = async (req: Request, res: Response) => {
@@ -76,7 +76,7 @@ export const bid = async (req: Request, res: Response) => {
   });
 };
 
-export const pickTreasure = async (req: Request, res: Response) => {
+export const pickLotto = async (req: Request, res: Response) => {
   await check("opt", "Opt is not valid").notEmpty().isNumeric().run(req);
 
   const userId = getVerifiedUserId(req.body.context);
@@ -86,7 +86,7 @@ export const pickTreasure = async (req: Request, res: Response) => {
 
   const optNum = parseInt(req.body.opt);
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const processor = new TreasureProcessor(optNum, gameId, userId);
+  const processor = new LottoProcessor(optNum, gameId, userId);
   await processor.init();
 
   const errMsg = await processor.getErrMsg();

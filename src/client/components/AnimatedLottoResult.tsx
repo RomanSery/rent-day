@@ -5,16 +5,16 @@ import LinearProgress from '@material-ui/core/LinearProgress';
 import { GameEvent } from "../../core/types/GameEvent";
 import { getMyGameId } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
-import { TreasureState } from "../../core/types/TreasureState";
+import { LottoState } from "../../core/types/LottoState";
 
 interface Props {
   chanceToWin: number;
   randomNum: number;
   socketService: SocketService;
-  treasureState: TreasureState;
+  lottoState: LottoState;
 }
 
-export const AnimatedTreasureResult: React.FC<Props> = ({ chanceToWin, randomNum, socketService, treasureState }) => {
+export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, socketService, lottoState }) => {
 
   const x = useMotionValue<number>(0);
   const [animValue, setAnimValue] = useState<number>(0);
@@ -34,12 +34,12 @@ export const AnimatedTreasureResult: React.FC<Props> = ({ chanceToWin, randomNum
     return 100 - randomNum;
   };
 
-  const getTreasureResult = (): string => {
+  const getLottoResult = (): string => {
     if (!showResult) {
       return "";
     }
-    if (treasureState && treasureState.prize > 0) {
-      return "You Won $" + treasureState.prize;
+    if (lottoState && lottoState.prize > 0) {
+      return "You Won $" + lottoState.prize;
     }
     return "You lost, better luck next time!"
   };
@@ -71,11 +71,11 @@ export const AnimatedTreasureResult: React.FC<Props> = ({ chanceToWin, randomNum
 
   return (
     <React.Fragment>
-      <div className="treasure-animation">
+      <div className="lotto-animation">
         <LinearProgress variant="buffer" value={animValue} valueBuffer={getBufferValue()} />
       </div>
-      <div className="treasure-result">
-        {getTreasureResult()}
+      <div className="lotto-result">
+        {getLottoResult()}
       </div>
     </React.Fragment>
   );

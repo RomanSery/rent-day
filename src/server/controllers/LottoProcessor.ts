@@ -3,15 +3,15 @@ import {
   GameInstance,
   GameInstanceDocument,
 } from "../../core/schema/GameInstanceSchema";
-import { Treasure, TreasureDocument } from "../../core/schema/TreasureSchema";
+import { Lotto, LottoDocument } from "../../core/schema/LottoSchema";
 import { Player } from "../../core/types/Player";
 
-export class TreasureProcessor {
+export class LottoProcessor {
   private optNum: number;
   private gameId: mongoose.Types.ObjectId;
   private userId: mongoose.Types.ObjectId;
   private game?: GameInstanceDocument | null;
-  private treasure?: TreasureDocument | null;
+  private lotto?: LottoDocument | null;
   private player?: Player | null;
 
   constructor(
@@ -26,8 +26,8 @@ export class TreasureProcessor {
 
   public async init(): Promise<void> {
     this.game = await GameInstance.findById(this.gameId);
-    if (this.game && this.game.treasureId) {
-      this.treasure = await Treasure.findById(this.game.treasureId);
+    if (this.game && this.game.lottoId) {
+      this.lotto = await Lotto.findById(this.game.lottoId);
     }
     if (this.game) {
       this.player = this.game.players.find(
@@ -38,14 +38,14 @@ export class TreasureProcessor {
   }
 
   public async pickOption(): Promise<void> {
-    if (!this.game || !this.treasure) {
+    if (!this.game || !this.lotto) {
       return;
     }
 
     const randomNum = Math.floor(Math.random() * 100) + 1;
 
-    this.treasure.optionPicked = this.optNum;
-    this.treasure.randomNum = randomNum;
+    this.lotto.optionPicked = this.optNum;
+    this.lotto.randomNum = randomNum;
 
     const neededToWin = this.getChanceToWin();
 
@@ -57,55 +57,55 @@ export class TreasureProcessor {
     );
 
     if (randomNum <= neededToWin) {
-      this.treasure.prize = this.getPrizeAmount();
+      this.lotto.prize = this.getPrizeAmount();
       if (this.player) {
         console.log("won");
-        this.player.money = this.player.money + this.treasure.prize;
+        this.player.money = this.player.money + this.lotto.prize;
       }
     } else {
       console.log("lost");
-      this.treasure.prize = 0;
+      this.lotto.prize = 0;
     }
 
-    this.treasure.save();
+    this.lotto.save();
 
     if (this.game) {
-      this.game.treasureId = null;
+      this.game.lottoId = null;
       this.game.save();
     }
   }
 
   private getPrizeAmount(): number {
-    if (!this.game || !this.treasure) {
+    if (!this.game || !this.lotto) {
       return 0;
     }
 
     if (this.optNum === 1) {
-      return this.treasure.option1Amount;
+      return this.lotto.option1Amount;
     }
     if (this.optNum === 2) {
-      return this.treasure.option2Amount;
+      return this.lotto.option2Amount;
     }
     if (this.optNum === 3) {
-      return this.treasure.option3Amount;
+      return this.lotto.option3Amount;
     }
 
     return 0;
   }
 
   private getChanceToWin(): number {
-    if (!this.game || !this.treasure) {
+    if (!this.game || !this.lotto) {
       return 0;
     }
 
     if (this.optNum === 1) {
-      return this.treasure.option1Percent;
+      return this.lotto.option1Percent;
     }
     if (this.optNum === 2) {
-      return this.treasure.option2Percent;
+      return this.lotto.option2Percent;
     }
     if (this.optNum === 3) {
-      return this.treasure.option3Percent;
+      return this.lotto.option3Percent;
     }
 
     return 0;
@@ -115,8 +115,8 @@ export class TreasureProcessor {
     if (this.game == null) {
       return "game not found";
     }
-    if (this.game.treasureId == null) {
-      return "no active treasure";
+    if (this.game.lottoId == null) {
+      return "no active lotto";
     }
 
     const playerToPick = this.game.players.find(
@@ -126,11 +126,11 @@ export class TreasureProcessor {
       return "player not found!";
     }
 
-    if (this.treasure == null) {
-      return "treasure not found";
+    if (this.lotto == null) {
+      return "lotto not found";
     }
-    if (this.treasure.prize) {
-      return "treasure is finished";
+    if (this.lotto.prize) {
+      return "lotto is finished";
     }
 
     if (this.optNum < 1 || this.optNum > 3) {
@@ -140,28 +140,28 @@ export class TreasureProcessor {
     return "";
   }
 
-  public static async getTreasure(
-    treasureId: mongoose.Types.ObjectId
-  ): Promise<TreasureDocument> {
-    return await Treasure.findById(
-      treasureId,
-      (err: mongoose.CallbackError, existingTreasure: TreasureDocument) => {
+  public static async getLotto(
+    lottoId: mongoose.Types.ObjectId
+  ): Promise<LottoDocument> {
+    return await Lotto.findById(
+      lottoId,
+      (err: mongoose.CallbackError, existing: LottoDocument) => {
         if (err) {
           return console.log(err);
         }
-        return existingTreasure;
+        return existing;
       }
     );
   }
 
-  public static async createTreasure(
+  public static async createLotto(
     gameId: mongoose.Types.ObjectId,
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
     //TODO modify this for luck attributes, etc
     //make prize amounts random
 
-    const newTreasure: TreasureDocument = new Treasure({
+    const newObj: LottoDocument = new Lotto({
       gameId: gameId,
       playerId: player._id,
       playerName: player.name,
@@ -174,7 +174,7 @@ export class TreasureProcessor {
       option3Percent: 10,
     });
 
-    await newTreasure.save();
-    return new mongoose.Types.ObjectId(newTreasure._id);
+    await newObj.save();
+    return new mongoose.Types.ObjectId(newObj._id);
   }
 }

@@ -38,31 +38,31 @@
   font-weight: bold;
 }
 
-.treasure-container .header {
+.lotto-container .header {
   font-weight: bold;
 }
-.treasure-container .treasure-options {
+.lotto-container .lotto-options {
   display: flex;
   flex-direction: row;
   margin-top: 10px;
 }
-.treasure-container .treasure-option {
+.lotto-container .lotto-option {
   flex-basis: 33%;
   cursor: pointer;
 }
 
-.treasure-container .treasure-option.picked {
+.lotto-container .lotto-option.picked {
   border-radius: 5px;
   border: 5px solid black;
 }
 
-.treasure-container .prize-amount {
+.lotto-container .prize-amount {
   margin-top: 10px;
   font-weight: bold;
   font-size: 130%;
 }
 
-.treasure-container .treasure-animation {
+.lotto-container .lotto-animation {
   margin-top: 10px;
 }
 

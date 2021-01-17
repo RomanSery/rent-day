@@ -50,7 +50,7 @@ app.post("/api/login", authController.login);
 app.post("/api/findGames", actions.getGamesToJoin);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/getAuction", actions.getAuction);
-app.post("/api/getTreasure", actions.getTreasure);
+app.post("/api/getLotto", actions.getLotto);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
 app.post("/api/leaveGame", actions.leaveGame);
@@ -58,7 +58,7 @@ app.post("/api/createGame", actions.createGame);
 
 app.post("/api/actions/roll", gameplay.roll);
 app.post("/api/actions/bid", gameplay.bid);
-app.post("/api/actions/pickTreasure", gameplay.pickTreasure);
+app.post("/api/actions/pickLotto", gameplay.pickLotto);
 app.post("/api/actions/completeTurn", gameplay.completeTurn);
 
 app.post("/api/actions/mortgage", gameplay.mortage);

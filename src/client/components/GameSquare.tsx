@@ -26,7 +26,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const squareTypeClass = new Map<SquareType, string>([
     [SquareType.TrainStation, "train-station"], [SquareType.Chance, "chance"], [SquareType.PayDay, "payday"],
     [SquareType.GoToIsolation, "go-to-isolation"], [SquareType.Isolation, "isolation"], [SquareType.Property, "property"],
-    [SquareType.CentralPark, "central-park"], [SquareType.Utility, "utility"], [SquareType.Treasure, "treasure"]
+    [SquareType.CentralPark, "central-park"], [SquareType.Utility, "utility"], [SquareType.Lotto, "lotto"]
   ]);
 
   const getContainerClassName = () => {

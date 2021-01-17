@@ -145,52 +145,52 @@
   flex-basis: auto;
 }
 
-/* treasure */
-.square.treasure .container {
+/* lotto */
+.square.lotto .container {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
 }
-.square.treasure .container-top {
+.square.lotto .container-top {
   flex-wrap: nowrap;
 }
-.square.treasure .container-bottom {
+.square.lotto .container-bottom {
   flex-wrap: nowrap;
 }
 
-.square.treasure .blank {
+.square.lotto .blank {
   flex-basis: 10%;
 }
-.square.treasure .icon {
+.square.lotto .icon {
   flex-basis: 70%;
   font-size: calc(0.1rem + 0.4vw + 0.4vh);
 }
-.square.treasure .square-name {
+.square.lotto .square-name {
   flex-basis: 20%;
   order: 2;
   font-size: 70%;
 }
-.square.treasure .container-top .square-name {
+.square.lotto .container-top .square-name {
   order: -2;
 }
-.square.treasure .container-left .square-name {
+.square.lotto .container-left .square-name {
   order: -2;
   font-size: 70%;
 }
-.square.treasure .container-left .blank {
+.square.lotto .container-left .blank {
   order: 5;
 }
-.square.treasure .container-left .icon {
+.square.lotto .container-left .icon {
   flex-basis: auto;
 }
-.square.treasure .container-right .square-name {
+.square.lotto .container-right .square-name {
   order: 2;
   font-size: 70%;
 }
-.square.treasure .container-right .blank {
+.square.lotto .container-right .blank {
   order: -5;
 }
-.square.treasure .container-right .icon {
+.square.lotto .container-right .icon {
   flex-basis: auto;
 }
 

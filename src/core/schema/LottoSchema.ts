@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export type TreasureDocument = mongoose.Document & {
+export type LottoDocument = mongoose.Document & {
   gameId: mongoose.Types.ObjectId;
   playerId: mongoose.Types.ObjectId;
   playerName: string;
@@ -21,7 +21,7 @@ export type TreasureDocument = mongoose.Document & {
   prize: number;
 };
 
-const treasureSchema = new mongoose.Schema(
+const lottoSchema = new mongoose.Schema(
   {
     gameId: mongoose.Types.ObjectId,
     playerId: mongoose.Types.ObjectId,
@@ -40,7 +40,4 @@ const treasureSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const Treasure = mongoose.model<TreasureDocument>(
-  "treasures",
-  treasureSchema
-);
+export const Lotto = mongoose.model<LottoDocument>("lotto", lottoSchema);

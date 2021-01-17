@@ -9,7 +9,7 @@ import { JoinResult } from "../../core/types/JoinResult";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { PieceType } from "../../core/enums/PieceType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
-import { TreasureProcessor } from "./TreasureProcessor";
+import { LottoProcessor } from "./LottoProcessor";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "Name missing")
@@ -167,12 +167,12 @@ export const leaveGame = async (req: Request, res: Response) => {
   res.json({ status: "success" });
 };
 
-export const getTreasure = async (req: Request, res: Response) => {
-  await check("treasureId", "Missing treasureId").notEmpty().run(req);
+export const getLotto = async (req: Request, res: Response) => {
+  await check("lottoId", "Missing lottoId").notEmpty().run(req);
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).send("missing treasureId");
+    return res.status(400).send("missing lottoId");
   }
 
   const userId = getVerifiedUserId(req.body.context);
@@ -180,6 +180,6 @@ export const getTreasure = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
 
-  const treasureId = new mongoose.Types.ObjectId(req.body.treasureId);
-  res.json({ treasure: await TreasureProcessor.getTreasure(treasureId) });
+  const lottoId = new mongoose.Types.ObjectId(req.body.lottoId);
+  res.json({ lotto: await LottoProcessor.getLotto(lottoId) });
 };

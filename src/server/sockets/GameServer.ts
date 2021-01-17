@@ -7,8 +7,8 @@ import { AuctionProcessor } from "../controllers/AuctionProcessor";
 import { AuctionDocument } from "../../core/schema/AuctionSchema";
 import { GameProcessor } from "../controllers/GameProcessor";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
-import { TreasureDocument } from "../../core/schema/TreasureSchema";
-import { TreasureProcessor } from "../controllers/TreasureProcessor";
+import { LottoDocument } from "../../core/schema/LottoSchema";
+import { LottoProcessor } from "../controllers/LottoProcessor";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -56,7 +56,7 @@ export class GameServer {
       });
 
       this.auctionEvents(socket);
-      this.treasureEvents(socket);
+      this.lottoEvents(socket);
 
       socket.on(GameEvent.SHOW_SNACK_MSG, (gameId: string, msg: string) => {
         socket.to(gameId).broadcast.emit(GameEvent.SHOW_SNACK_MSG, msg);
@@ -87,15 +87,15 @@ export class GameServer {
     );
   }
 
-  private treasureEvents(socket: GameSocket): void {
+  private lottoEvents(socket: GameSocket): void {
     socket.on(
-      GameEvent.TREASURE_UPDATE,
-      async (gameId: string, treasureId: string) => {
-        const treasure: TreasureDocument = await TreasureProcessor.getTreasure(
-          new mongoose.Types.ObjectId(treasureId)
+      GameEvent.LOTTO_UPDATE,
+      async (gameId: string, lottoId: string) => {
+        const lotto: LottoDocument = await LottoProcessor.getLotto(
+          new mongoose.Types.ObjectId(lottoId)
         );
 
-        this.io.in(gameId).emit(GameEvent.TREASURE_UPDATE, treasure);
+        this.io.in(gameId).emit(GameEvent.LOTTO_UPDATE, lotto);
       }
     );
   }

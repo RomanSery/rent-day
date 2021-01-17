@@ -6,7 +6,7 @@ interface Props {
     id: number;
 }
 
-export const TreasureDisplay: React.FC<Props> = ({ id }) => {
+export const LottoDisplay: React.FC<Props> = ({ id }) => {
 
     return (
         <React.Fragment>

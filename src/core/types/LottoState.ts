@@ -1,4 +1,4 @@
-export interface TreasureState {
+export interface LottoState {
   readonly _id: string;
   readonly gameId: string;
   readonly playerId: string;
