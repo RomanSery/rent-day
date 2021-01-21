@@ -119,6 +119,76 @@ export class PropertyProcessor {
     }
   }
 
+  public async buildHouse(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
+    }
+    if (!this.player) {
+      return "player not owned";
+    }
+    if (!this.state) {
+      return "property not owned";
+    }
+    if (this.state.isMortgaged) {
+      return "property is mortgaged, you have to redeem it before building";
+    }
+
+    const ownerId = new mongoose.Types.ObjectId(this.state.owner);
+    if (!this.userId.equals(ownerId)) {
+      return "you are not the owner";
+    }
+
+    if (this.state.numHouses >= 5) {
+      return "cant build anymore";
+    }
+
+    this.state.numHouses += 1;
+    if (this.state.houseCost) {
+      this.player.money = this.player.money - this.state.houseCost;
+    }
+
+    await this.game.save();
+
+    return "";
+  }
+
+  public async sellHouse(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
+    }
+    if (!this.player) {
+      return "player not owned";
+    }
+    if (!this.state) {
+      return "property not owned";
+    }
+    if (this.state.isMortgaged) {
+      return "property is mortgaged, you have to redeem it before building/selling";
+    }
+
+    const ownerId = new mongoose.Types.ObjectId(this.state.owner);
+    if (!this.userId.equals(ownerId)) {
+      return "you are not the owner";
+    }
+
+    if (this.state.numHouses <= 0) {
+      return "no houses to sell";
+    }
+
+    this.state.numHouses -= 1;
+    if (this.state.houseCost) {
+      this.player.money = this.player.money + this.state.houseCost;
+    }
+
+    await this.game.save();
+
+    return "";
+  }
+
   public static getSquareName(
     gameDoc: GameInstanceDocument,
     squareId: number

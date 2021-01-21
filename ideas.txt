@@ -1,6 +1,6 @@
 PROBLEMS
 user can click done withouth picking lotto option
-
+switch auth token from localstorage to cookie
 
 utilities
 you cant mortgage utilities but maybe you can sell them?
@@ -14,6 +14,8 @@ store gameId in user profile, when they join a game and start playing. when logg
 The player to bid the highest wins and pays the 2nd highest bid
  rename to quarentine, "you must quarentine", "in quarentine"  use biohazard symbol
 change square view table to do header than detail rows to make it less wide
+in property viewer, highlight applicable rent row
+add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
 
 player classes/abilities
 - Luck

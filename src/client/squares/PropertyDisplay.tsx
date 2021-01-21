@@ -38,7 +38,7 @@ export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
     return (
         <React.Fragment>
-            <ColorBar id={id} />
+            <ColorBar id={id} gameInfo={gameInfo} />
             {isBeingAuctioned(gameInfo, id) ? getAnimatedSquare() : getNormalSquare()}
         </React.Fragment>
     );

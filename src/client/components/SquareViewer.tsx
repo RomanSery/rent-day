@@ -173,6 +173,28 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
       .catch(handleApiError);
   };
 
+  const onBuildHouse = async () => {
+    API.post("actions/buildHouse", { squareId: getSquareId(), context })
+      .then(function (response) {
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyPlayerName() + " built house on " + getSquareTxt());
+        }
+      })
+      .catch(handleApiError);
+  };
+
+  const onSellHouse = async () => {
+    API.post("actions/sellHouse", { squareId: getSquareId(), context })
+      .then(function (response) {
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyPlayerName() + " sold house on " + getSquareTxt());
+        }
+      })
+      .catch(handleApiError);
+  };
+
   const getPropertyActions = () => {
     if (!isMyTurn() || !isOwnedByMe()) {
       return null;
@@ -195,8 +217,8 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
         {showMortgageRedeemOptions && !isMortgaged() ? <Button color="primary" size="small" onClick={onMortgageProperty}>Mortgage</Button> : null}
         {showMortgageRedeemOptions && isMortgaged() ? <Button color="primary" size="small" onClick={onRedeemProperty}>Redeem</Button> : null}
 
-        {showBuildingOptions ? <Button color="primary" size="small">Build</Button> : null}
-        {showBuildingOptions ? <Button color="primary" size="small">Sell</Button> : null}
+        {showBuildingOptions ? <Button color="primary" size="small" onClick={onBuildHouse}>Build</Button> : null}
+        {showBuildingOptions ? <Button color="primary" size="small" onClick={onSellHouse}>Sell</Button> : null}
       </ButtonGroup>
     );
   }

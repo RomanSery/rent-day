@@ -152,3 +152,43 @@ export const getOut = async (req: Request, res: Response) => {
     status: "success",
   });
 };
+
+export const buildHouse = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const squareId = parseInt(req.body.squareId);
+  const processor = new PropertyProcessor(squareId, gameId, userId);
+  const errMsg = await processor.buildHouse();
+
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({
+    status: "success",
+  });
+};
+
+export const sellHouse = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const squareId = parseInt(req.body.squareId);
+  const processor = new PropertyProcessor(squareId, gameId, userId);
+  const errMsg = await processor.sellHouse();
+
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({
+    status: "success",
+  });
+};

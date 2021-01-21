@@ -63,6 +63,8 @@ app.post("/api/actions/completeTurn", gameplay.completeTurn);
 
 app.post("/api/actions/mortgage", gameplay.mortage);
 app.post("/api/actions/redeem", gameplay.redeem);
+app.post("/api/actions/buildHouse", gameplay.buildHouse);
+app.post("/api/actions/sellHouse", gameplay.sellHouse);
 app.post("/api/actions/getOut", gameplay.getOut);
 
 const gameServer = new GameServer();
