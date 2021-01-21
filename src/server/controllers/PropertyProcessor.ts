@@ -140,13 +140,28 @@ export class PropertyProcessor {
       return "you are not the owner";
     }
 
+    if (
+      !MoneyCalculator.doesOwnAllPropertiesInGroup(
+        this.game,
+        this.squareId,
+        this.userId
+      )
+    ) {
+      return "you cant build, you have to own all properties in the group";
+    }
+
     if (this.state.numHouses >= 5) {
       return "cant build anymore";
     }
 
+    const houseCost = MoneyCalculator.getHouseCost(this.state);
+    if (this.player.money < houseCost) {
+      return "You don't have enought money to build a house";
+    }
+
     this.state.numHouses += 1;
-    if (this.state.houseCost) {
-      this.player.money = this.player.money - this.state.houseCost;
+    if (houseCost) {
+      this.player.money -= houseCost;
     }
 
     await this.game.save();
@@ -175,13 +190,23 @@ export class PropertyProcessor {
       return "you are not the owner";
     }
 
+    if (
+      !MoneyCalculator.doesOwnAllPropertiesInGroup(
+        this.game,
+        this.squareId,
+        this.userId
+      )
+    ) {
+      return "you cant sell, you have to own all properties in the group";
+    }
+
     if (this.state.numHouses <= 0) {
       return "no houses to sell";
     }
 
     this.state.numHouses -= 1;
     if (this.state.houseCost) {
-      this.player.money = this.player.money + this.state.houseCost;
+      this.player.money += MoneyCalculator.getSellPriceForHouse(this.state);
     }
 
     await this.game.save();

@@ -1,6 +1,7 @@
 PROBLEMS
 user can click done withouth picking lotto option
 switch auth token from localstorage to cookie
+if you own all properties in group, rent has to be doubled
 
 utilities
 you cant mortgage utilities but maybe you can sell them?
@@ -8,14 +9,13 @@ you cant mortgage utilities but maybe you can sell them?
 - con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
 
 IDEAS
-in addition to mortgaging properties, maybe you can sell property at 30% of purchase price
-mortgage value should be a % of the purchase price
 store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
 The player to bid the highest wins and pays the 2nd highest bid
  rename to quarentine, "you must quarentine", "in quarentine"  use biohazard symbol
 change square view table to do header than detail rows to make it less wide
 in property viewer, highlight applicable rent row
 add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
+show list of players, wins, # games played, game playing right now, rating
 
 player classes/abilities
 - Luck

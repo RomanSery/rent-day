@@ -4,6 +4,7 @@ import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import mongoose from "mongoose";
+import { SquareConfigData } from "../../core/types/SquareConfigData";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -17,6 +18,20 @@ export class MoneyCalculator {
   public static getRedeemValue(state: SquareGameData): number {
     if (state.mortgageValue) {
       return Math.round(state.mortgageValue + state.mortgageValue * 0.1);
+    }
+    return 0;
+  }
+
+  public static getHouseCost(state: SquareGameData): number {
+    if (state.houseCost) {
+      return state.houseCost;
+    }
+    return 0;
+  }
+
+  public static getSellPriceForHouse(state: SquareGameData): number {
+    if (state.houseCost) {
+      return state.houseCost / 2;
     }
     return 0;
   }
@@ -87,5 +102,37 @@ export class MoneyCalculator {
     }
 
     return true;
+  }
+
+  public static doesOwnAllPropertiesInGroup(
+    game: GameInstanceDocument,
+    squareId: number,
+    playerId: mongoose.Types.ObjectId
+  ): boolean {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig || !squareConfig.groupId) {
+      return false;
+    }
+
+    const groupId = squareConfig.groupId;
+    let ownsAll = true;
+    SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+      if (d.groupId && d.groupId === groupId) {
+        const squareData: SquareGameData | undefined = game.squareState.find(
+          (p: SquareGameData) => p.squareId === key
+        );
+
+        if (!squareData || !squareData.owner) {
+          ownsAll = false;
+          return;
+        }
+        if (!new mongoose.Types.ObjectId(squareData.owner).equals(playerId)) {
+          ownsAll = false;
+          return;
+        }
+      }
+    });
+
+    return ownsAll;
   }
 }
