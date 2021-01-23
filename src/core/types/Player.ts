@@ -14,8 +14,8 @@ export interface Player {
   state: PlayerState;
 
   negotiation: number;
-  speed: number;
-  intelligence: number;
+  luck: number;
+  corruption: number;
 
   hasRolled: boolean;
   rollHistory: Array<DiceRoll>;

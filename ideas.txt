@@ -5,10 +5,7 @@ need to implement train travel
 
 IDEAS
 store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
-The player to bid the highest wins and pays the 2nd highest bid
- rename to quarentine, "you must quarentine", "in quarentine"  use biohazard symbol
-change square view table to do header than detail rows to make it less wide
-in property viewer, highlight applicable rent row
+The player to bid the highest wins and pays the 2nd highest bid 
 add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
 show list of players, wins, # games played, game playing right now, rating
 

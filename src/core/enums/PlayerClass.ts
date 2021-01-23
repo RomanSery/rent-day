@@ -1,5 +1,6 @@
 export enum PlayerClass {
-  Broker = "Broker",
+  Gambler = "Gambler",
   Conductor = "Conductor",
+  Governor = "Governor",
   Banker = "Banker",
 }

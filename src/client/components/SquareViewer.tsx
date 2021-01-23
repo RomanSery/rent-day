@@ -262,25 +262,36 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
           <TableContainer component={Paper} className="other-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key="propertyViewer10">
-                  <TableCell component="th" scope="row">Mortgage Value</TableCell>
-                  <TableCell align="right">{getMortgageValue()}</TableCell>
-                </TableRow>
                 <TableRow key="propertyViewer11">
-                  <TableCell component="th" scope="row">House Cost</TableCell>
-                  <TableCell align="right">{config.houseCost ? "$" + config.houseCost : ""}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">House Cost</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer11a">
+                  <TableCell>{config.houseCost ? "$" + config.houseCost : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer12">
-                  <TableCell component="th" scope="row">Tax</TableCell>
-                  <TableCell align="right">{config.tax ? config.tax + "%" : ""}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Tax</TableCell>
                 </TableRow>
+                <TableRow key="propertyViewer12a">
+                  <TableCell>{config.tax ? config.tax + "%" : ""}</TableCell>
+                </TableRow>
+
                 <TableRow key="propertyViewer13">
-                  <TableCell component="th" scope="row">Owner</TableCell>
-                  <TableCell align="right" style={getNameColorStyle()}>{getowner()}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Owner</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer13a">
+                  <TableCell style={getNameColorStyle()}>{getowner()}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer14">
-                  <TableCell component="th" scope="row">Purchase Price</TableCell>
-                  <TableCell align="right">{getPurchasePrice()}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Purchase Price</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer14a">
+                  <TableCell>{getPurchasePrice()}</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer10">
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Mortgage Value</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer10a">
+                  <TableCell>{getMortgageValue()}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -325,22 +336,36 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
           <TableContainer component={Paper} className="other-info">
             <Table size="small" aria-label="a dense table">
               <TableBody>
-                <TableRow key="stationViewer5">
-                  <TableCell component="th" scope="row">Mortgage Value</TableCell>
-                  <TableCell align="right">{getMortgageValue()}</TableCell>
-                </TableRow>
                 <TableRow key="stationViewer6">
-                  <TableCell component="th" scope="row">Tax</TableCell>
-                  <TableCell align="right">{config.tax ? config.tax + "%" : ""}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Tax</TableCell>
                 </TableRow>
+                <TableRow key="stationViewer6a">
+                  <TableCell>{config.tax ? config.tax + "%" : ""}</TableCell>
+                </TableRow>
+
                 <TableRow key="stationViewer7">
-                  <TableCell component="th" scope="row">Owner</TableCell>
-                  <TableCell align="right" style={getNameColorStyle()}>{getowner()}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Owner</TableCell>
                 </TableRow>
+                <TableRow key="stationViewer7a">
+                  <TableCell style={getNameColorStyle()}>{getowner()}</TableCell>
+                </TableRow>
+
                 <TableRow key="stationViewer8">
-                  <TableCell component="th" scope="row">Purchase Price</TableCell>
-                  <TableCell align="right">{getPurchasePrice()}</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Purchase Price</TableCell>
                 </TableRow>
+                <TableRow key="stationViewer8a">
+                  <TableCell>{getPurchasePrice()}</TableCell>
+                </TableRow>
+
+                <TableRow key="stationViewer5">
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Mortgage Value</TableCell>
+                </TableRow>
+                <TableRow key="stationViewer5a">
+                  <TableCell>{getMortgageValue()}</TableCell>
+                </TableRow>
+
+
+
               </TableBody>
             </Table>
           </TableContainer>

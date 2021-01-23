@@ -102,6 +102,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
           </div>
 
+          <div className="player-actions">
+            <DisplayActions gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
+          </div>
+
           <div className="second-row">
             <div className="player-viewer">
               <PlayerViewer gameInfo={gameInfo} getPlayer={getPlayerToView} />
@@ -110,10 +114,6 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
               <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} socketService={socketService} />
             </div>
 
-          </div>
-
-          <div className="player-actions">
-            <DisplayActions gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
           </div>
 
         </div>

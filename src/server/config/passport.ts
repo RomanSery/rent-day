@@ -27,6 +27,8 @@ export const initPassportConfig = () => {
               UserInstance.create({
                 username: username,
                 password: password,
+                wins: 0,
+                gamesPlayed: 0,
               }).then((user) => {
                 console.log("user created");
                 return done(null, user);

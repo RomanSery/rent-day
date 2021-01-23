@@ -46,10 +46,10 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
     if (p) {
       if (skillType === SkillType.Negotiation) {
         return p.negotiation;
-      } else if (skillType === SkillType.Speed) {
-        return p.speed;
-      } else if (skillType === SkillType.Intelligence) {
-        return p.intelligence;
+      } else if (skillType === SkillType.Luck) {
+        return p.luck;
+      } else if (skillType === SkillType.Corruption) {
+        return p.corruption;
       }
     }
     return 0;
@@ -91,12 +91,12 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
                 <TableCell align="right">{getSkill(SkillType.Negotiation)}</TableCell>
               </TableRow>
               <TableRow key="playerViewer5">
-                <TableCell component="th" scope="row">Speed</TableCell>
-                <TableCell align="right">{getSkill(SkillType.Speed)}</TableCell>
+                <TableCell component="th" scope="row">Luck</TableCell>
+                <TableCell align="right">{getSkill(SkillType.Luck)}</TableCell>
               </TableRow>
               <TableRow key="playerViewer6">
-                <TableCell component="th" scope="row">Intelligence</TableCell>
-                <TableCell align="right">{getSkill(SkillType.Intelligence)}</TableCell>
+                <TableCell component="th" scope="row">Corruption</TableCell>
+                <TableCell align="right">{getSkill(SkillType.Corruption)}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

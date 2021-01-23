@@ -27,7 +27,6 @@ export const createAccount = async (
       console.error("error: " + err);
     }
     if (info !== undefined) {
-      console.error("error 2:" + info.message);
       res.status(403).send(info.message);
     } else {
       req.logIn(user, (error) => {

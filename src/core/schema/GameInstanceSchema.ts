@@ -17,8 +17,8 @@ const PlayerSchema = new mongoose.Schema({
   state: { type: String, required: true },
 
   negotiation: { type: Number, required: true },
-  speed: { type: Number, required: true },
-  intelligence: { type: Number, required: true },
+  luck: { type: Number, required: true },
+  corruption: { type: Number, required: true },
 
   hasRolled: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
