@@ -9,6 +9,7 @@ import { PayDayDisplay } from "../squares/PayDayDisplay";
 import { UtilityDisplay } from "../squares/UtilityDisplay";
 import { GameState } from "../../core/types/GameState";
 import { LottoDisplay } from "../squares/LottoDisplay";
+import { IsolationDisplay } from "../squares/IsolationDisplay";
 
 
 interface Props {
@@ -39,8 +40,11 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
         if (type === SquareType.Utility) {
             return <UtilityDisplay id={id} gameInfo={gameInfo} />
         }
+        if (type === SquareType.Isolation) {
+            return <IsolationDisplay id={id} />
+        }
 
-        if (type === SquareType.Isolation || type === SquareType.GoToIsolation) {
+        if (type === SquareType.GoToIsolation) {
             return null;
         }
 

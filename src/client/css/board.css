@@ -316,10 +316,16 @@
 }
 
 .square.isolation {
-  background-image: url("../images/prisoner.svg");
-  background-repeat: no-repeat;
-  background-size: cover;
   opacity: 0.5;
+}
+.square.isolation .container {
+  justify-content: center;
+}
+.square.isolation .icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: calc(0.1rem + 0.5vw + 0.5vh);
 }
 
 .square.go-to-isolation {
