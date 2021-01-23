@@ -1,7 +1,6 @@
 PROBLEMS
 user can click done withouth picking lotto option
 switch auth token from localstorage to cookie
-if you own all properties in group, rent has to be doubled
 need to implement train travel
 
 IDEAS

@@ -93,3 +93,73 @@ export const howManyTrainStationsDoesPlayerOwn = (
 
   return numOwned;
 };
+
+export const doesPropertyHaveHouses = (
+  game: GameInstanceDocument,
+  squareId: number
+): boolean => {
+  const squareData: SquareGameData | undefined = game.squareState.find(
+    (p: SquareGameData) => p.squareId === squareId
+  );
+
+  return squareData && squareData.numHouses > 0 ? true : false;
+};
+
+export const doesGroupHaveAnyHouses = (
+  game: GameInstanceDocument,
+  groupId: number
+): boolean => {
+  let hasHouses = false;
+  SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+    if (d.groupId && d.groupId === groupId) {
+      const squareData: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === key
+      );
+
+      if (squareData && squareData.numHouses > 0) {
+        hasHouses = true;
+        return;
+      }
+    }
+  });
+
+  return hasHouses;
+};
+
+export const areHousesEven = (
+  game: GameInstanceDocument,
+  squareId: number,
+  building: boolean
+): boolean => {
+  const squareConfig = SquareConfigDataMap.get(squareId);
+  if (!squareConfig || !squareConfig.groupId) {
+    return false;
+  }
+
+  const groupId = squareConfig.groupId;
+  let numHousesOnTargetSquare = 0;
+  const numHousesMap: Map<number, number> = new Map();
+
+  SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+    if (d.groupId && d.groupId === groupId) {
+      const squareData: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === key
+      );
+
+      if (squareData && squareData.owner) {
+        numHousesMap.set(key, squareData.numHouses);
+        if (key === squareId) {
+          numHousesOnTargetSquare = squareData.numHouses;
+        }
+      }
+    }
+  });
+
+  return (
+    Array.from(numHousesMap.values()).filter((numHouses) =>
+      building
+        ? numHousesOnTargetSquare > numHouses
+        : numHousesOnTargetSquare < numHouses
+    ).length === 0
+  );
+};

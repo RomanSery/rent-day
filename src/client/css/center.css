@@ -4,6 +4,7 @@
   grid-row-end: 11;
   grid-column-start: 2;
   grid-column-end: 11;
+  padding: 5px 5px 5px 5px;
 
   display: flex;
   flex-direction: row;
@@ -23,7 +24,6 @@
   flex-basis: 40%;
   display: flex;
   flex-direction: column;
-  border: 1px solid black;
 }
 
 .game-results .dice-roll {

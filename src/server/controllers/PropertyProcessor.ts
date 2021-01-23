@@ -8,7 +8,11 @@ import {
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { doesOwnAllPropertiesInGroup } from "./helpers";
+import {
+  doesOwnAllPropertiesInGroup,
+  areHousesEven,
+  doesGroupHaveAnyHouses,
+} from "./helpers";
 import { MoneyCalculator } from "./MoneyCalculator";
 
 export class PropertyProcessor {
@@ -62,6 +66,11 @@ export class PropertyProcessor {
     const ownerId = new mongoose.Types.ObjectId(this.state.owner);
     if (!this.userId.equals(ownerId)) {
       return "you are not the owner";
+    }
+
+    const squareConfig = SquareConfigDataMap.get(this.squareId);
+    if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
+      return "You have to sell all the houses in the group first";
     }
 
     this.state.isMortgaged = true;
@@ -154,6 +163,10 @@ export class PropertyProcessor {
       return "You don't have enought money to build a house";
     }
 
+    if (!areHousesEven(this.game, this.squareId, true)) {
+      return "you must build evenly";
+    }
+
     this.state.numHouses += 1;
     if (houseCost) {
       this.player.money -= houseCost;
@@ -191,6 +204,10 @@ export class PropertyProcessor {
 
     if (this.state.numHouses <= 0) {
       return "no houses to sell";
+    }
+
+    if (!areHousesEven(this.game, this.squareId, false)) {
+      return "You must sell evenly";
     }
 
     this.state.numHouses -= 1;
