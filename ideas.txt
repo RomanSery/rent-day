@@ -2,11 +2,7 @@ PROBLEMS
 user can click done withouth picking lotto option
 switch auth token from localstorage to cookie
 if you own all properties in group, rent has to be doubled
-
-utilities
-you cant mortgage utilities but maybe you can sell them?
-- MTA doubles all railroad rent
-- con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
+need to implement train travel
 
 IDEAS
 store gameId in user profile, when they join a game and start playing. when logging in, redirect to game for user if applies
@@ -16,6 +12,13 @@ change square view table to do header than detail rows to make it less wide
 in property viewer, highlight applicable rent row
 add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
 show list of players, wins, # games played, game playing right now, rating
+
+
+
+utilities
+you cant mortgage utilities but maybe you can sell them?
+- MTA doubles all railroad rent
+- con ed utility reduces electricty costs for houses (replace maintance with electricty costs?  every house has electricity costs)
 
 player classes/abilities
 - Luck

@@ -133,6 +133,36 @@ export class GameProcessor {
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
+
+    //TODO just for testing
+    GameProcessor.assignSquareTesting(game, game.players[0], 2);
+    GameProcessor.assignSquareTesting(game, game.players[0], 4);
+    GameProcessor.assignSquareTesting(game, game.players[0], 7);
+    GameProcessor.assignSquareTesting(game, game.players[0], 9);
+    GameProcessor.assignSquareTesting(game, game.players[0], 10);
+    GameProcessor.assignSquareTesting(game, game.players[0], 6);
+    GameProcessor.assignSquareTesting(game, game.players[0], 16);
+
+    GameProcessor.assignSquareTesting(game, game.players[1], 5);
+    GameProcessor.assignSquareTesting(game, game.players[1], 17);
+    GameProcessor.assignSquareTesting(game, game.players[1], 19);
+    GameProcessor.assignSquareTesting(game, game.players[1], 20);
+  }
+
+  private static assignSquareTesting(
+    game: GameInstanceDocument,
+    owner: Player,
+    squareId: number
+  ): void {
+    const state: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+    if (state) {
+      state.mortgageValue = 50;
+      state.purchasePrice = 100;
+      state.color = owner.color!;
+      state.owner = owner._id!;
+    }
   }
 
   public async getJoinGameErrMsg(

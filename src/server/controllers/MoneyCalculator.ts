@@ -4,7 +4,10 @@ import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import mongoose from "mongoose";
-import { SquareConfigData } from "../../core/types/SquareConfigData";
+import {
+  doesOwnAllPropertiesInGroup,
+  howManyTrainStationsDoesPlayerOwn,
+} from "./helpers";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -54,8 +57,13 @@ export class MoneyCalculator {
         )
     );
 
-    const rentToPay = squareData!.rent0;
-    if (!rentToPay || rentToPay <= 0) {
+    const rentToPay = MoneyCalculator.getRentToPay(
+      game,
+      squareId,
+      owner,
+      squareData
+    );
+    if (rentToPay <= 0) {
       return "";
     }
 
@@ -63,6 +71,82 @@ export class MoneyCalculator {
     owner!.money += rentToPay;
 
     return "Payed " + owner!.name + " $" + rentToPay + " in rent";
+  }
+
+  private static getRentToPay(
+    game: GameInstanceDocument,
+    squareId: number,
+    owner: Player | undefined,
+    squareData: SquareGameData | undefined
+  ): number {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig) {
+      return 0;
+    }
+    if (!owner || !squareData) {
+      return 0;
+    }
+
+    if (squareConfig.type === SquareType.TrainStation) {
+      return MoneyCalculator.getTrainStationRent(game, owner, squareData);
+    } else if (squareConfig.type === SquareType.Property) {
+      return MoneyCalculator.getPropertyRent(game, squareId, owner, squareData);
+    }
+
+    return 0;
+  }
+
+  private static getTrainStationRent(
+    game: GameInstanceDocument,
+    owner: Player,
+    squareData: SquareGameData
+  ): number {
+    const numOwned = howManyTrainStationsDoesPlayerOwn(game, owner);
+    if (numOwned === 1) {
+      return squareData.rent0!;
+    } else if (numOwned === 2) {
+      return squareData.rent1!;
+    } else if (numOwned === 3) {
+      return squareData.rent2!;
+    } else if (numOwned === 4) {
+      return squareData.rent3!;
+    } else {
+      return 0;
+    }
+  }
+
+  private static getPropertyRent(
+    game: GameInstanceDocument,
+    squareId: number,
+    owner: Player,
+    squareData: SquareGameData
+  ): number {
+    const numHouses = squareData.numHouses;
+    if (numHouses === 0 && squareData.rent0) {
+      const ownsGroup = doesOwnAllPropertiesInGroup(
+        game,
+        squareId,
+        new mongoose.Types.ObjectId(owner._id)
+      );
+      if (ownsGroup) {
+        return squareData.rent0 * 2;
+      }
+      return squareData.rent0;
+    }
+
+    if (squareData.numHouses === 1) {
+      return squareData.rent1!;
+    } else if (squareData.numHouses === 2) {
+      return squareData.rent2!;
+    } else if (squareData.numHouses === 3) {
+      return squareData.rent3!;
+    } else if (squareData.numHouses === 4) {
+      return squareData.rent4!;
+    } else if (squareData.numHouses === 5) {
+      return squareData.rent5!;
+    }
+
+    return 0;
   }
 
   private static shouldPayRent(
@@ -102,37 +186,5 @@ export class MoneyCalculator {
     }
 
     return true;
-  }
-
-  public static doesOwnAllPropertiesInGroup(
-    game: GameInstanceDocument,
-    squareId: number,
-    playerId: mongoose.Types.ObjectId
-  ): boolean {
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    if (!squareConfig || !squareConfig.groupId) {
-      return false;
-    }
-
-    const groupId = squareConfig.groupId;
-    let ownsAll = true;
-    SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
-      if (d.groupId && d.groupId === groupId) {
-        const squareData: SquareGameData | undefined = game.squareState.find(
-          (p: SquareGameData) => p.squareId === key
-        );
-
-        if (!squareData || !squareData.owner) {
-          ownsAll = false;
-          return;
-        }
-        if (!new mongoose.Types.ObjectId(squareData.owner).equals(playerId)) {
-          ownsAll = false;
-          return;
-        }
-      }
-    });
-
-    return ownsAll;
   }
 }

@@ -8,6 +8,7 @@ import {
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { doesOwnAllPropertiesInGroup } from "./helpers";
 import { MoneyCalculator } from "./MoneyCalculator";
 
 export class PropertyProcessor {
@@ -140,13 +141,7 @@ export class PropertyProcessor {
       return "you are not the owner";
     }
 
-    if (
-      !MoneyCalculator.doesOwnAllPropertiesInGroup(
-        this.game,
-        this.squareId,
-        this.userId
-      )
-    ) {
+    if (!doesOwnAllPropertiesInGroup(this.game, this.squareId, this.userId)) {
       return "you cant build, you have to own all properties in the group";
     }
 
@@ -190,13 +185,7 @@ export class PropertyProcessor {
       return "you are not the owner";
     }
 
-    if (
-      !MoneyCalculator.doesOwnAllPropertiesInGroup(
-        this.game,
-        this.squareId,
-        this.userId
-      )
-    ) {
+    if (!doesOwnAllPropertiesInGroup(this.game, this.squareId, this.userId)) {
       return "you cant sell, you have to own all properties in the group";
     }
 

@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { isLoggedIn, logOut, tryToRedirectToGame } from './helpers';
+import { isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory
 } from "react-router-dom";
@@ -24,6 +24,12 @@ export const App: React.FC = () => {
 
 
   const GameDisplay = () => {
+
+    redirectToHomeIfGameNotFound((redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
 
     const socket = new SocketService(PageType.Game);
 

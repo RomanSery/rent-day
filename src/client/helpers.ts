@@ -142,6 +142,29 @@ export const tryToRedirectToGame = async (
   }
 };
 
+export const redirectToHomeIfGameNotFound = async (
+  callback: (redirectUrl: string) => void
+) => {
+  if (!isLoggedIn()) {
+    clearMyGameInfo();
+    return callback("/");
+  }
+
+  const myGameId = getMyGameId();
+  if (myGameId === null || myGameId === undefined) {
+    clearMyGameInfo();
+    return callback("/");
+  }
+
+  const gameStatus: GameStatus = await getGameStatus(myGameId);
+  if (gameStatus == null) {
+    clearMyGameInfo();
+    return callback("/");
+  }
+
+  return;
+};
+
 const getGameStatus = async (gameId: string) => {
   const status = await API.post("getGameStatus", {
     gameId: gameId,
