@@ -48,6 +48,7 @@ app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
 
 app.post("/api/findGames", actions.getGamesToJoin);
+app.post("/api/findPlayers", actions.getAllPlayers);
 app.post("/api/getGame", actions.getGame);
 app.post("/api/getAuction", actions.getAuction);
 app.post("/api/getLotto", actions.getLotto);

@@ -10,6 +10,8 @@ import { AuctionProcessor } from "./AuctionProcessor";
 import { PieceType } from "../../core/enums/PieceType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
 import { LottoProcessor } from "./LottoProcessor";
+import { UserInstance } from "../../core/schema/UserSchema";
+import { PlayerInfo } from "../../core/types/PlayerInfo";
 
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "Name missing")
@@ -93,6 +95,30 @@ export const getGamesToJoin = async (req: Request, res: Response) => {
 
   const process = new GameProcessor();
   res.json({ games: await process.getGamesToJoin() });
+};
+
+export const getAllPlayers = async (req: Request, res: Response) => {
+  if (getVerifiedUserId(req.body.context) == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const players: PlayerInfo[] = [];
+  await UserInstance.find({}, function (err, users) {
+    if (err) {
+      return console.log(err);
+    }
+
+    for (let u of users) {
+      players.push({
+        name: u.username,
+        wins: u.wins,
+        gamesPlayed: u.gamesPlayed,
+        currGame: u.currGameName,
+      });
+    }
+  });
+
+  res.json({ players: players });
 };
 
 export const getGameStatus = async (req: Request, res: Response) => {

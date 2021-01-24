@@ -10,6 +10,7 @@ import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
+import { DisplayAllPlayers } from "./join/DisplayAllPlayers";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
 import { Button, Container, Typography } from "@material-ui/core";
@@ -64,6 +65,7 @@ export const App: React.FC = () => {
         <React.Fragment>
           <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
           <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
+          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
           <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { logOut(); history.push("/") }}> LOG OUT</Button>
         </React.Fragment>
       );
@@ -108,6 +110,24 @@ export const App: React.FC = () => {
         <CssBaseline />
         <StaticBoard>
           <JoinGame socketService={socket} />
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
+  const DisplayPlayersPage = () => {
+
+    tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        history.push(redirectUrl);
+      }
+    });
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <DisplayAllPlayers />
         </StaticBoard>
       </React.Fragment>
     );
@@ -187,6 +207,7 @@ export const App: React.FC = () => {
 
       <Route path="/gameinstance" component={GameDisplay} />
       <Route path="/join" component={DisplayJoinGamePage} />
+      <Route path="/players" component={DisplayPlayersPage} />
       <Route path="/find" component={FindGamesPage} />
       <Route path="/create" component={CreateGamePage} />
 
