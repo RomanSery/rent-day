@@ -12,6 +12,7 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { faDice, faTimesCircle, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
@@ -108,6 +109,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         {hasAlreadyRolled() ?
           <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
           : null}
+
 
         <div className="leave-game">
           <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Leave</Button>

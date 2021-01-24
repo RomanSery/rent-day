@@ -2,8 +2,8 @@ import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { areObjectIdsEqual, getIconProp } from "../helpers";
-import { faBiohazard } from "@fortawesome/free-solid-svg-icons";
+import { areObjectIdsEqual, getIconProp, getMyUserId } from "../helpers";
+import { faBiohazard, faHandshake } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
@@ -31,6 +31,14 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
     return gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(player._id, gameInfo.nextPlayerToAct);
   }
 
+  const canOfferTrade = () => {
+    const uid = getMyUserId();
+    if (areObjectIdsEqual(player._id, uid)) {
+      return false;
+    }
+    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+  }
+
 
   const setPlayerToView = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (player && player._id) {
@@ -41,6 +49,9 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
     clearPlayer();
   };
 
+  const onOpenTradeModal = () => {
+
+  };
 
   return (
     <React.Fragment>
@@ -57,7 +68,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
               ${player.money}
             </div>
           </div>
-
+          {canOfferTrade() ? <div className="trade" onClick={() => onOpenTradeModal()}><FontAwesomeIcon icon={faHandshake} /></div> : null}
 
         </div>
 
