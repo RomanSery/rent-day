@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, ButtonGroup, Container } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
@@ -9,6 +9,8 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { faDice, faTimesCircle, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -94,14 +96,24 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const getMyActions = () => {
     return (
-      <Container maxWidth="sm">
-        <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-          {canRoll() ? <Button color="primary" size="small" onClick={onClickRoll}>Roll dice</Button> : null}
-          {canPayToGetOutOfIsolation() ? <Button color="primary" size="small" onClick={onGetOut}>Pay To Get Out</Button> : null}
-          {hasAlreadyRolled() ? <Button color="primary" size="small" onClick={onClickDone}>Done</Button> : null}
-          <Button color="secondary" onClick={onLeaveGame} size="small"> Leave Game</Button>
-        </ButtonGroup>
-      </Container>
+      <React.Fragment>
+        {canRoll() ?
+          <div><Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button></div>
+          : null}
+
+        {canPayToGetOutOfIsolation() ?
+          <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
+          : null}
+
+        {hasAlreadyRolled() ?
+          <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
+          : null}
+
+        <div className="leave-game">
+          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Leave</Button>
+        </div>
+
+      </React.Fragment>
     );
   }
 

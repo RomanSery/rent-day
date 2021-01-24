@@ -123,12 +123,14 @@ export class GameProcessor {
       "#f58a42",
     ];
 
-    _.forEach(game.players, function (p, index) {
+    game.players.forEach(async (p, index) => {
       p.money = game.settings.initialMoney;
       p.position = 1;
       p.color = colors[index];
       p.state = PlayerState.ACTIVE;
       p.hasRolled = false;
+
+      await this.assignUserToGame(p, game);
     });
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
@@ -219,6 +221,27 @@ export class GameProcessor {
       return ud.username;
     }
     return "";
+  }
+
+  private async assignUserToGame(
+    p: Player,
+    game: GameInstanceDocument
+  ): Promise<void> {
+    const ud: UserDocument = await UserInstance.findById(
+      new mongoose.Types.ObjectId(p._id),
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      ud.gamesPlayed++;
+      ud.currGameId = game.id;
+      ud.currGameName = game.name;
+      await ud.save();
+    }
   }
 
   public async getGameStatus(

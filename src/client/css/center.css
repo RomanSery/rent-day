@@ -130,6 +130,8 @@
 
 .player-actions {
   flex-basis: 10%;
+  display: flex;
+  padding-bottom: 5px;
 }
 
 /* players */

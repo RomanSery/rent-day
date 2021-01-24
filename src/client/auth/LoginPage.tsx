@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
-import { handleApiError, setAuthToken, setPlayerName } from "../helpers";
+import { handleApiError, setAuthToken, setPlayerName, setJoinedGameStorage } from "../helpers";
 
 
 interface Props {
@@ -26,6 +26,11 @@ export const LoginPage: React.FC<Props> = () => {
       .then(function (response) {
         setAuthToken(response.data.token);
         setPlayerName(response.data.username);
+
+        if (response.data.gameId && response.data.gameId.length > 0) {
+          setJoinedGameStorage(response.data.gameId);
+        }
+
         history.push("/");
       })
       .catch(handleApiError);

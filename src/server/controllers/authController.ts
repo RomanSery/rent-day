@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 import passport from "passport";
-import { UserInstance } from "../../core/schema/UserSchema";
+import { UserDocument, UserInstance } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
 
 export const createAccount = async (
@@ -62,7 +62,7 @@ export const login = async (
     } else {
       req.logIn(users, () => {
         UserInstance.findOne({ username: req.body.username }).then(
-          (user: { id: any }) => {
+          (user: UserDocument) => {
             const token = jwt.sign({ id: user.id }, "jwt-secret", {
               expiresIn: 60 * 60,
             });
@@ -70,6 +70,7 @@ export const login = async (
               auth: true,
               token,
               username: req.body.username,
+              gameId: user.currGameId,
             });
           }
         );
