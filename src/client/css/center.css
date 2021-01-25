@@ -192,3 +192,12 @@
   background-color: rgb(77, 75, 75);
   color: white !important;
 }
+
+.trade-dialog-cont {
+  display: flex;
+  align-items: flex-start !important;
+}
+
+.trade-item {
+  padding: 0px 5px 0px 0px !important;
+}

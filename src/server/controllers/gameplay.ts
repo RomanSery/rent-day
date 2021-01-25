@@ -192,3 +192,14 @@ export const sellHouse = async (req: Request, res: Response) => {
     status: "success",
   });
 };
+
+export const offerTrade = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  res.json({
+    status: "success",
+  });
+};

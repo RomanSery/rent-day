@@ -68,6 +68,8 @@ app.post("/api/actions/buildHouse", gameplay.buildHouse);
 app.post("/api/actions/sellHouse", gameplay.sellHouse);
 app.post("/api/actions/getOut", gameplay.getOut);
 
+app.post("/api/actions/offerTrade", gameplay.offerTrade);
+
 const gameServer = new GameServer();
 gameServer.listen();
 

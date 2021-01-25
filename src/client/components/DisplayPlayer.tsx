@@ -11,10 +11,11 @@ interface Props {
   player: Player;
   getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
+  tradeWithPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
 
-export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer }) => {
+export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer, tradeWithPlayer }) => {
 
   const getColorStyle = (): React.CSSProperties => {
     if (isPlayersTurn()) {
@@ -49,10 +50,6 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
     clearPlayer();
   };
 
-  const onOpenTradeModal = () => {
-
-  };
-
   return (
     <React.Fragment>
       <div className="player-info" style={getColorStyle()} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
@@ -68,7 +65,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
               ${player.money}
             </div>
           </div>
-          {canOfferTrade() ? <div className="trade" onClick={() => onOpenTradeModal()}><FontAwesomeIcon icon={faHandshake} /></div> : null}
+          {canOfferTrade() ? <div className="trade" onClick={() => tradeWithPlayer(player)}><FontAwesomeIcon icon={faHandshake} /></div> : null}
 
         </div>
 

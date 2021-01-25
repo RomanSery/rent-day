@@ -14,6 +14,7 @@ import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
 import { TextField } from "@material-ui/core";
+import { TradeDialog } from "./TradeDialog";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -30,6 +31,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
   const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
+
+  const [tradeOpen, setTradeOpen] = useState(false);
+  const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
+
 
   const onRollDice = async () => {
     if (socketService) {
@@ -88,6 +93,11 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     return (<DisplayResults gameInfo={gameInfo} socketService={socketService} />);
   }
 
+  const tradeWithPlayer = (player: Player) => {
+    setTradingWithPlayerId(player._id);
+    setTradeOpen(true);
+  };
+
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -118,9 +128,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
         </div>
 
-        <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
-
+        <DisplayPlayers tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
+
+      <TradeDialog gameInfo={gameInfo} open={tradeOpen} onClose={() => setTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
     </React.Fragment>
   );
 
