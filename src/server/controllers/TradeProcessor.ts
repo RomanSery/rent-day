@@ -130,4 +130,33 @@ export class TradeProcessor {
       }
     );
   }
+
+  public static async acceptTrade(
+    userId: mongoose.Types.ObjectId,
+    tradeId: mongoose.Types.ObjectId,
+    gameId: mongoose.Types.ObjectId
+  ): Promise<string> {
+    const tradeDoc: TradeDocument = await this.getTrade(tradeId);
+    if (!tradeDoc) {
+      return "game not found";
+    }
+
+    tradeDoc.accepted = true;
+    await tradeDoc.save();
+
+    return "";
+  }
+
+  public static async declineTrade(
+    userId: mongoose.Types.ObjectId,
+    tradeId: mongoose.Types.ObjectId,
+    gameId: mongoose.Types.ObjectId
+  ): Promise<string> {
+    const tradeDoc: TradeDocument = await this.getTrade(tradeId);
+    if (!tradeDoc) {
+      return "game not found";
+    }
+
+    return "";
+  }
 }

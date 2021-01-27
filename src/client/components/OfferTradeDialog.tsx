@@ -32,7 +32,7 @@ interface Props {
   socketService: SocketService;
 }
 
-export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingWithPlayerId, socketService }) => {
+export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingWithPlayerId, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [myChecked, setMyChecked] = React.useState<number[]>([]);

@@ -229,3 +229,45 @@ export const offerTrade = async (req: Request, res: Response) => {
     newTradeId: processor.getNewTradeId(),
   });
 };
+
+export const acceptTrade = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const tradeId = new mongoose.Types.ObjectId(req.body.context.tradeId);
+
+  const errMsg = await TradeProcessor.acceptTrade(
+    new mongoose.Types.ObjectId(userId),
+    tradeId,
+    gameId
+  );
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({ status: "success" });
+};
+
+export const declineTrade = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const tradeId = new mongoose.Types.ObjectId(req.body.context.tradeId);
+
+  const errMsg = await TradeProcessor.declineTrade(
+    new mongoose.Types.ObjectId(userId),
+    tradeId,
+    gameId
+  );
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({ status: "success" });
+};

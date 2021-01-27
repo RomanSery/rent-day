@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { GameState } from "../../core/types/GameState";
@@ -14,7 +15,9 @@ import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
 import { TextField } from "@material-ui/core";
-import { TradeDialog } from "./TradeDialog";
+import { OfferTradeDialog } from "./OfferTradeDialog";
+import { TradeOffer } from "../../core/types/TradeOffer";
+import { ReviewTradeDialog } from "./ReviewTradeDialog";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -32,17 +35,21 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
   const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
 
-  const [tradeOpen, setTradeOpen] = useState(false);
+  const [offerTradeOpen, setOfferTradeOpen] = useState(false);
+  const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
+
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
+  const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
 
 
   useEffect(() => {
 
-    socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: any) => {
-
+    socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: TradeOffer) => {
+      if (areObjectIdsEqual(data.participant2.playerId, getMyUserId())) {
+        setTradeOffer(data);
+        setReviewTradeOpen(true);
+      }
     });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onRollDice = async () => {
@@ -104,7 +111,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const tradeWithPlayer = (player: Player) => {
     setTradingWithPlayerId(player._id);
-    setTradeOpen(true);
+    setOfferTradeOpen(true);
   };
 
   return (
@@ -140,7 +147,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <DisplayPlayers tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
-      <TradeDialog gameInfo={gameInfo} open={tradeOpen} onClose={() => setTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
+      <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
+
+      <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
     </React.Fragment>
   );
 
