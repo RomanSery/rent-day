@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
@@ -35,6 +35,15 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const [tradeOpen, setTradeOpen] = useState(false);
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
 
+
+  useEffect(() => {
+
+    socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: any) => {
+
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onRollDice = async () => {
     if (socketService) {

@@ -17,9 +17,11 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { getSquareTxt } from "../squares/squareHelpers";
-import { ListSubheader } from "@material-ui/core";
+import { ListSubheader, TextField } from "@material-ui/core";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { GameEvent } from "../../core/types/GameEvent";
+import { SocketService } from "../sockets/SocketService";
 
 
 interface Props {
@@ -27,18 +29,28 @@ interface Props {
   gameInfo: GameState | undefined;
   onClose: () => void;
   tradingWithPlayerId: string | null;
+  socketService: SocketService;
 }
 
-export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingWithPlayerId }) => {
+export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingWithPlayerId, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const [checked, setChecked] = React.useState<number[]>([]);
+  const [myChecked, setMyChecked] = React.useState<number[]>([]);
+  const [theirChecked, setTheirChecked] = React.useState<number[]>([]);
+  const [myAmount, setMyAmount] = React.useState<number>(0);
+  const [theirAmount, setTheirAmount] = React.useState<number>(0);
 
   const onOfferTrade = () => {
 
-    API.post("actions/offerTrade", { context })
+    API.post("actions/offerTrade", {
+      context, mines: myChecked, theirs: theirChecked,
+      tradingWithPlayerId: tradingWithPlayerId, myAmount: myAmount, theirAmount: theirAmount
+    })
       .then(function (response) {
-
+        if (socketService) {
+          socketService.socket.emit(GameEvent.SEND_TRADE_OFFER, response.data.newTradeId);
+        }
+        onClose();
       })
       .catch(handleApiError);
 
@@ -83,9 +95,9 @@ export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingW
   }
 
 
-  const handleToggle = (value: number) => () => {
-    const currentIndex = checked.indexOf(value);
-    const newChecked = [...checked];
+  const handleToggle = (mine: boolean, value: number) => () => {
+    const currentIndex = mine ? myChecked.indexOf(value) : theirChecked.indexOf(value);
+    const newChecked = mine ? [...myChecked] : [...theirChecked];
 
     if (currentIndex === -1) {
       newChecked.push(value);
@@ -93,7 +105,11 @@ export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingW
       newChecked.splice(currentIndex, 1);
     }
 
-    setChecked(newChecked);
+    if (mine) {
+      setMyChecked(newChecked);
+    } else {
+      setTheirChecked(newChecked);
+    }
   };
 
   const propertyList = (mine: boolean) => {
@@ -102,13 +118,19 @@ export const TradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingW
     return (
       <Paper>
         <List dense disablePadding component="div" role="list" subheader={getPlayerHeader(mine)}>
+
+          <TextField label="Amount ($)" type="number"
+            value={mine ? myAmount : theirAmount}
+            onChange={(e) => mine ? setMyAmount(parseInt(e.currentTarget.value)) : setTheirAmount(parseInt(e.currentTarget.value))}
+            name={mine ? "myAmount" : "theirAmount"} />
+
           {items.map((squareId: number) => {
             const labelId = `transfer-list-item-${squareId}-label`;
 
             return (
-              <ListItem key={squareId} role="listitem" button onClick={handleToggle(squareId)} className="trade-item">
+              <ListItem key={squareId} role="listitem" button onClick={handleToggle(mine, squareId)} className="trade-item">
                 <ListItemIcon>
-                  <Checkbox tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': labelId }} />
+                  <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': labelId }} />
                 </ListItemIcon>
                 <ListItemText id={labelId} primary={getSquareTxt(gameInfo, squareId)} />
               </ListItem>

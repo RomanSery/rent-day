@@ -15,4 +15,6 @@ export enum GameEvent {
   LOTTO_UPDATE = "lottoUpdate",
 
   SHOW_SNACK_MSG = "showSnackMsg",
+
+  SEND_TRADE_OFFER = "sendTradeOffer",
 }

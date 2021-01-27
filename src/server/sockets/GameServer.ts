@@ -9,6 +9,8 @@ import { GameProcessor } from "../controllers/GameProcessor";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { LottoDocument } from "../../core/schema/LottoSchema";
 import { LottoProcessor } from "../controllers/LottoProcessor";
+import { TradeProcessor } from "../controllers/TradeProcessor";
+import { TradeDocument } from "../../core/schema/TradeSchema";
 
 export class GameServer {
   public static readonly PORT: number = 8080;
@@ -56,6 +58,7 @@ export class GameServer {
       });
 
       this.auctionEvents(socket);
+      this.tradeEvents(socket);
       this.lottoEvents(socket);
 
       socket.on(GameEvent.SHOW_SNACK_MSG, (gameId: string, msg: string) => {
@@ -85,6 +88,18 @@ export class GameServer {
         this.io.in(gameId).emit(GameEvent.AUCTION_UPDATE, auction);
       }
     );
+  }
+
+  private tradeEvents(socket: GameSocket): void {
+    socket.on(GameEvent.SEND_TRADE_OFFER, async (tradeId: string) => {
+      const tradeOffer: TradeDocument = await TradeProcessor.getTrade(
+        new mongoose.Types.ObjectId(tradeId)
+      );
+
+      this.io
+        .in(tradeOffer.gameId.toHexString())
+        .emit(GameEvent.SEND_TRADE_OFFER, tradeOffer);
+    });
   }
 
   private lottoEvents(socket: GameSocket): void {

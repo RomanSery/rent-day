@@ -7,6 +7,7 @@ import { AuctionProcessor } from "./AuctionProcessor";
 import { RollProcessor } from "./RollProcessor";
 import { LottoProcessor } from "./LottoProcessor";
 import { PropertyProcessor } from "./PropertyProcessor";
+import { TradeProcessor } from "./TradeProcessor";
 
 export const roll = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req.body.context);
@@ -199,7 +200,32 @@ export const offerTrade = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
 
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const tradingWithPlayerId = new mongoose.Types.ObjectId(
+    req.body.tradingWithPlayerId
+  );
+  const mines: number[] = req.body.mines;
+  const theirs: number[] = req.body.theirs;
+  const myAmount: number = parseInt(req.body.myAmount);
+  const theirAmount: number = parseInt(req.body.theirAmount);
+
+  const processor = new TradeProcessor(
+    gameId,
+    userId,
+    tradingWithPlayerId,
+    mines,
+    theirs,
+    myAmount,
+    theirAmount
+  );
+  const errMsg = await processor.offerTrade();
+
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
   res.json({
     status: "success",
+    newTradeId: processor.getNewTradeId(),
   });
 };

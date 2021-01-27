@@ -112,7 +112,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
 
         <div className="leave-game">
-          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Leave</Button>
+          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
         </div>
 
       </React.Fragment>
