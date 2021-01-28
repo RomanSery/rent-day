@@ -17,5 +17,5 @@ export enum GameEvent {
   SHOW_SNACK_MSG = "showSnackMsg",
 
   SEND_TRADE_OFFER = "sendTradeOffer",
-  TRADE_OFFER_ACCEPTED = "tradeOfferAccepted",
+  TRADE_OFFER_REVIEWED = "tradeOfferReviewed",
 }

@@ -5,9 +5,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
-import API from '../api';
-import { getGameContextFromLocalStorage, handleApiError, areObjectIdsEqual, getIconProp } from "../helpers";
-import { GameContext } from "../../core/types/GameContext";
+import { areObjectIdsEqual, getIconProp } from "../helpers";
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -16,10 +14,9 @@ import Paper from '@material-ui/core/Paper';
 import { ListSubheader } from "@material-ui/core";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SocketService } from "../sockets/SocketService";
 import { TradeOffer } from "../../core/types/TradeOffer";
 import { getSquareTxt } from "../squares/squareHelpers";
-import { GameEvent } from "../../core/types/GameEvent";
+import { TradeStatus } from "../../core/enums/TradeStatus";
 
 
 interface Props {
@@ -27,40 +24,9 @@ interface Props {
   gameInfo: GameState | undefined;
   onClose: () => void;
   tradeOffer: TradeOffer | null;
-  socketService: SocketService;
 }
 
-export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeOffer, socketService }) => {
-
-  const context: GameContext = getGameContextFromLocalStorage();
-
-  const onAcceptTrade = () => {
-    if (!tradeOffer) {
-      return;
-    }
-
-    API.post("actions/acceptTrade", { context, tradeId: tradeOffer._id })
-      .then(function (response) {
-        if (socketService) {
-          socketService.socket.emit(GameEvent.TRADE_OFFER_ACCEPTED, response.data.newTradeId);
-        }
-        onClose();
-      })
-      .catch(handleApiError);
-  };
-
-  const onDeclineTrade = () => {
-    if (!tradeOffer) {
-      return;
-    }
-
-    API.post("actions/declineTrade", { context, tradeId: tradeOffer._id })
-      .then(function (response) {
-        onClose();
-      })
-      .catch(handleApiError);
-  };
-
+export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeOffer }) => {
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
     if (!gameInfo || !tradeOffer) {
@@ -81,6 +47,13 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
         {p.name}
       </ListSubheader>
     );
+  }
+
+  const getResultHeadline = () => {
+    if (tradeOffer) {
+      return tradeOffer.status === TradeStatus.ACCEPTED ? "Blockbuster Trade Accepted" : "Trade Declined";
+    }
+    return "Trade Results";
   }
 
   const propertyList = (mine: boolean) => {
@@ -114,8 +87,8 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="trade-dialog-title" open={open}>
-      <DialogTitle id="trade-dialog-title">Accept/Decline Trade Offer</DialogTitle>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="trade-dialog-title" open={open}>
+      <DialogTitle id="trade-dialog-title">{getResultHeadline()}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
           <Grid className="trade-left" item>{propertyList(true)}</Grid>
@@ -124,8 +97,7 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onDeclineTrade} color="primary">Decline</Button>
-        <Button onClick={onAcceptTrade} color="primary">Accept</Button>
+        <Button onClick={onClose} color="primary">Close</Button>
       </DialogActions>
     </Dialog>
   );

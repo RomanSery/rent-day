@@ -15,9 +15,10 @@ import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
 import { TextField } from "@material-ui/core";
-import { OfferTradeDialog } from "./OfferTradeDialog";
+import { OfferTradeDialog } from "../dialogs/OfferTradeDialog";
 import { TradeOffer } from "../../core/types/TradeOffer";
-import { ReviewTradeDialog } from "./ReviewTradeDialog";
+import { ReviewTradeDialog } from "../dialogs/ReviewTradeDialog";
+import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -37,6 +38,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [offerTradeOpen, setOfferTradeOpen] = useState(false);
   const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
+  const [tradeReviewedOpen, setTradeReviewedOpen] = useState(false);
 
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
   const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
@@ -49,6 +51,11 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         setTradeOffer(data);
         setReviewTradeOpen(true);
       }
+    });
+
+    socketService.listenForEvent(GameEvent.TRADE_OFFER_REVIEWED, (data: TradeOffer) => {
+      setTradeOffer(data);
+      setTradeReviewedOpen(true);
     });
   }, []);
 
@@ -148,8 +155,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       </div>
 
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
-
       <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
+      <TradeOfferReviewedDialog gameInfo={gameInfo} open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />
+
     </React.Fragment>
   );
 

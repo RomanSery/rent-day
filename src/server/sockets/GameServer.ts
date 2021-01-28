@@ -100,6 +100,16 @@ export class GameServer {
         .in(tradeOffer.gameId.toHexString())
         .emit(GameEvent.SEND_TRADE_OFFER, tradeOffer);
     });
+
+    socket.on(GameEvent.TRADE_OFFER_REVIEWED, async (tradeId: string) => {
+      const tradeOffer: TradeDocument = await TradeProcessor.getTrade(
+        new mongoose.Types.ObjectId(tradeId)
+      );
+
+      this.io
+        .in(tradeOffer.gameId.toHexString())
+        .emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer);
+    });
   }
 
   private lottoEvents(socket: GameSocket): void {
