@@ -237,7 +237,7 @@ export const acceptTrade = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const tradeId = new mongoose.Types.ObjectId(req.body.context.tradeId);
+  const tradeId = new mongoose.Types.ObjectId(req.body.tradeId);
 
   const errMsg = await TradeProcessor.acceptTrade(
     new mongoose.Types.ObjectId(userId),
@@ -258,7 +258,7 @@ export const declineTrade = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const tradeId = new mongoose.Types.ObjectId(req.body.context.tradeId);
+  const tradeId = new mongoose.Types.ObjectId(req.body.tradeId);
 
   const errMsg = await TradeProcessor.declineTrade(
     new mongoose.Types.ObjectId(userId),

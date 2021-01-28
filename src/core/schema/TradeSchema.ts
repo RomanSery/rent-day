@@ -13,7 +13,7 @@ export type TradeDocument = mongoose.Document & {
   gameId: mongoose.Types.ObjectId;
   participant1: TradeParticipant;
   participant2: TradeParticipant;
-  accepted: boolean;
+  status: string;
 };
 
 const tradeSchema = new mongoose.Schema(
@@ -21,7 +21,7 @@ const tradeSchema = new mongoose.Schema(
     gameId: mongoose.Types.ObjectId,
     participant1: TradeParticipantSchema,
     participant2: TradeParticipantSchema,
-    accepted: Boolean,
+    status: String,
   },
   { timestamps: true }
 );

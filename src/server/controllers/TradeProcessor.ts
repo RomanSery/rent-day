@@ -6,6 +6,10 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { TradeParticipant } from "../../core/types/TradeParticipant";
+import { TradeStatus } from "../../core/enums/TradeStatus";
+import { GameProcessor } from "./GameProcessor";
+import { GameStatus } from "../../core/enums/GameStatus";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class TradeProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -108,7 +112,7 @@ export class TradeProcessor {
       gameId: this.gameId,
       participant1: me,
       participant2: them,
-      accepted: false,
+      status: TradeStatus.OFFERED,
     });
 
     await newTrade.save();
@@ -138,13 +142,94 @@ export class TradeProcessor {
   ): Promise<string> {
     const tradeDoc: TradeDocument = await this.getTrade(tradeId);
     if (!tradeDoc) {
-      return "game not found";
+      return "Trade not found";
     }
 
-    tradeDoc.accepted = true;
+    if (tradeDoc.status === TradeStatus.ACCEPTED) {
+      return "Trade already accepted";
+    }
+    if (tradeDoc.status === TradeStatus.DECLINED) {
+      return "Trade already declined";
+    }
+
+    if (!gameId.equals(tradeDoc.gameId)) {
+      return "GameId/TradeId mismatch";
+    }
+
+    if (
+      !userId.equals(
+        new mongoose.Types.ObjectId(tradeDoc.participant2.playerId)
+      )
+    ) {
+      return "You can't accept this trade";
+    }
+
+    const game: GameInstanceDocument = await GameProcessor.getGame(gameId);
+    if (!game) {
+      return "Game not found";
+    }
+    if (game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+
+    //TODO need to do more validation
+
+    tradeDoc.status = TradeStatus.ACCEPTED;
     await tradeDoc.save();
 
+    await TradeProcessor.doTradeTransfer(game, tradeDoc);
+
     return "";
+  }
+
+  private static async doTradeTransfer(
+    game: GameInstanceDocument,
+    tradeDoc: TradeDocument
+  ): Promise<void> {
+    const player1 = game.players.find((p: Player) =>
+      new mongoose.Types.ObjectId(p._id).equals(
+        new mongoose.Types.ObjectId(tradeDoc.participant1.playerId)
+      )
+    )!;
+
+    const player2 = game.players.find((p: Player) =>
+      new mongoose.Types.ObjectId(p._id).equals(
+        new mongoose.Types.ObjectId(tradeDoc.participant2.playerId)
+      )
+    )!;
+
+    player1!.money -= tradeDoc.participant1.amountGiven;
+    player2!.money += tradeDoc.participant1.amountGiven;
+
+    player2!.money -= tradeDoc.participant2.amountGiven;
+    player1!.money += tradeDoc.participant2.amountGiven;
+
+    const giveToPlayer2: number[] = tradeDoc.participant1.squaresGiven;
+    const giveToPlayer1: number[] = tradeDoc.participant2.squaresGiven;
+
+    giveToPlayer2.forEach((squareId) => {
+      const state: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (state) {
+        state.color = player2.color;
+        state.owner = player2._id;
+        state.numHouses = 0;
+      }
+    });
+
+    giveToPlayer1.forEach((squareId) => {
+      const state: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (state) {
+        state.color = player1.color;
+        state.owner = player1._id;
+        state.numHouses = 0;
+      }
+    });
+
+    await game.save();
   }
 
   public static async declineTrade(
@@ -154,8 +239,38 @@ export class TradeProcessor {
   ): Promise<string> {
     const tradeDoc: TradeDocument = await this.getTrade(tradeId);
     if (!tradeDoc) {
-      return "game not found";
+      return "trade not found";
     }
+
+    if (tradeDoc.status === TradeStatus.ACCEPTED) {
+      return "Trade already accepted";
+    }
+    if (tradeDoc.status === TradeStatus.DECLINED) {
+      return "Trade already declined";
+    }
+
+    if (!gameId.equals(tradeDoc.gameId)) {
+      return "GameId/TradeId mismatch";
+    }
+
+    if (
+      !userId.equals(
+        new mongoose.Types.ObjectId(tradeDoc.participant2.playerId)
+      )
+    ) {
+      return "You can't decline this trade";
+    }
+
+    const game: GameInstanceDocument = await GameProcessor.getGame(gameId);
+    if (!game) {
+      return "Game not found";
+    }
+    if (game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+
+    tradeDoc.status = TradeStatus.DECLINED;
+    await tradeDoc.save();
 
     return "";
   }
