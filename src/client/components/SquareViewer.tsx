@@ -11,7 +11,7 @@ import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/Squa
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyPlayerName, getMyUserId, handleApiError } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyGameId, getMyPlayerName, getMyUserId, handleApiError } from "../helpers";
 import { ButtonGroup, Button } from "@material-ui/core";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
@@ -109,7 +109,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
   const getPurchasePrice = (): string => {
     const data = getSquareGameData();
     if (data && data.owner && data.purchasePrice) {
-      return "$" + data.purchasePrice;
+      return dollarFormatter.format(data.purchasePrice);
     }
 
     return "";
@@ -118,7 +118,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
   const getMortgageValue = (): string => {
     const data = getSquareGameData();
     if (data && data.owner && data.mortgageValue) {
-      return "$" + data.mortgageValue;
+      return dollarFormatter.format(data.mortgageValue);
     }
     return "";
   };
@@ -233,27 +233,27 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
               <TableBody>
                 <TableRow key="propertyViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent0 ? "$" + config.rent0 : ""}</TableCell>
+                  <TableCell align="right">{config.rent0 ? dollarFormatter.format(config.rent0) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer2">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent1 ? "$" + config.rent1 : ""}</TableCell>
+                  <TableCell align="right">{config.rent1 ? dollarFormatter.format(config.rent1) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer3">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent2 ? "$" + config.rent2 : ""}</TableCell>
+                  <TableCell align="right">{config.rent2 ? dollarFormatter.format(config.rent2) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer4">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent3 ? "$" + config.rent3 : ""}</TableCell>
+                  <TableCell align="right">{config.rent3 ? dollarFormatter.format(config.rent3) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer5">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent4 ? "$" + config.rent4 : ""}</TableCell>
+                  <TableCell align="right">{config.rent4 ? dollarFormatter.format(config.rent4) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer6">
                   <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHotel} /></TableCell>
-                  <TableCell align="right">{config.rent5 ? "$" + config.rent5 : ""}</TableCell>
+                  <TableCell align="right">{config.rent5 ? dollarFormatter.format(config.rent5) : ""}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -266,7 +266,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                   <TableCell component="th" className="square-viewer-header-row" scope="row">House Cost</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer11a">
-                  <TableCell>{config.houseCost ? "$" + config.houseCost : ""}</TableCell>
+                  <TableCell>{config.houseCost ? dollarFormatter.format(config.houseCost) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer12">
                   <TableCell component="th" className="square-viewer-header-row" scope="row">Tax</TableCell>
@@ -315,19 +315,19 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
               <TableBody>
                 <TableRow key="stationViewer1">
                   <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent0 ? "$" + config.rent0 : ""}</TableCell>
+                  <TableCell align="right">{config.rent0 ? dollarFormatter.format(config.rent0) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer2">
                   <TableCell component="th" scope="row">2 stations</TableCell>
-                  <TableCell align="right">{config.rent1 ? "$" + config.rent1 : ""}</TableCell>
+                  <TableCell align="right">{config.rent1 ? dollarFormatter.format(config.rent1) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer3">
                   <TableCell component="th" scope="row">3 stations</TableCell>
-                  <TableCell align="right">{config.rent2 ? "$" + config.rent2 : ""}</TableCell>
+                  <TableCell align="right">{config.rent2 ? dollarFormatter.format(config.rent2) : ""}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer4">
                   <TableCell component="th" scope="row">All 4 stations</TableCell>
-                  <TableCell align="right">{config.rent3 ? "$" + config.rent3 : ""}</TableCell>
+                  <TableCell align="right">{config.rent3 ? dollarFormatter.format(config.rent3) : ""}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>

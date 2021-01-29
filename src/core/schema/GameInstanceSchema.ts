@@ -10,6 +10,8 @@ const PlayerSchema = new mongoose.Schema({
   _id: { type: Schema.Types.ObjectId, required: true },
   name: { type: String, required: true },
   money: { type: Number, required: true },
+  taxesPerTurn: { type: Number, required: true },
+  electricityCostsPerTurn: { type: Number, required: true },
   position: { type: Number, required: true },
   color: { type: String, required: true },
   type: { type: String, required: true },

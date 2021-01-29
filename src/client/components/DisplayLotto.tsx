@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { LottoState } from "../../core/types/LottoState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import { Container } from "@material-ui/core";
@@ -124,7 +124,7 @@ export const DisplayLotto: React.FC<Props> = ({ gameInfo, socketService }) => {
       return (
         <motion.div whileHover={{ scale: 1.3 }} className="loto-option" onClick={() => onPickOption(optNum)}>
           <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
-          <div className="prize-amount">${getPrizeAmount(optNum)}</div>
+          <div className="prize-amount">{dollarFormatter.format(getPrizeAmount(optNum))}</div>
           <div className="prize-percentage">{getPrizeChance(optNum)}% to win</div>
         </motion.div>
       );
@@ -132,7 +132,7 @@ export const DisplayLotto: React.FC<Props> = ({ gameInfo, socketService }) => {
       return (
         <div className={getOptionClassName(optNum)}>
           <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
-          <div className="prize-amount">${getPrizeAmount(optNum)}</div>
+          <div className="prize-amount">{dollarFormatter.format(getPrizeAmount(optNum))}</div>
           <div className="prize-percentage">{getPrizeChance(optNum)}% to win</div>
         </div>
       );

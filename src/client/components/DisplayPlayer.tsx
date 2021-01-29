@@ -2,7 +2,7 @@ import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { areObjectIdsEqual, getIconProp, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
 import { faBiohazard, faHandshake } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 
@@ -62,7 +62,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
           <div className="sub-name" style={getNameColorStyle()}>
             {player.name}
             <div className="money">
-              ${player.money}
+              {dollarFormatter.format(player.money)}
             </div>
           </div>
           {canOfferTrade() ? <div className="trade" onClick={() => tradeWithPlayer(player)}><FontAwesomeIcon icon={faHandshake} /></div> : null}

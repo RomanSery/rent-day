@@ -15,6 +15,13 @@ import { GameContext } from "../core/types/GameContext";
 import API from "./api";
 import jwt from "jsonwebtoken";
 
+export const dollarFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 export const getGameContextFromLocalStorage = (): GameContext => {
   const gid = getMyGameId();
   const pid = getMyUserId();

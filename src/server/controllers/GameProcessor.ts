@@ -85,6 +85,8 @@ export class GameProcessor {
       name: playerName,
       position: 1,
       money: 0,
+      taxesPerTurn: 0,
+      electricityCostsPerTurn: 0,
       color: "#f58a42",
       type: selectedPiece,
       playerClass: selectedPlayerClass,

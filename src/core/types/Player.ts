@@ -7,6 +7,8 @@ export interface Player {
   _id: string;
   readonly name: string;
   money: number;
+  taxesPerTurn: number;
+  electricityCostsPerTurn: number;
   position: number;
   color: string;
   readonly type: PieceType;

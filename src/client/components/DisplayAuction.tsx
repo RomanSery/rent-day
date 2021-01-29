@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
 import Table from '@material-ui/core/Table';
@@ -78,9 +78,9 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
       if (auctionState.winnerId && areObjectIdsEqual(bidder._id, auctionState.winnerId)) {
-        return (<strong>${bidder.bid}</strong>);
+        return (<strong>{dollarFormatter.format(bidder.bid!)}</strong>);
       }
-      return "$" + bidder.bid;
+      return bidder.bid ? dollarFormatter.format(bidder.bid) : "";
     }
 
     if (bidder.submittedBid) {
@@ -98,7 +98,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
       const uid = getMyUserId();
       if (uid) {
         const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
-        return "$" + myBid?.bid;
+        return myBid ? dollarFormatter.format(myBid.bid!) : "";
       }
       return "";
     }

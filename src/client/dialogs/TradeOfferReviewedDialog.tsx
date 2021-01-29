@@ -5,7 +5,7 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
-import { areObjectIdsEqual, getIconProp } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -68,7 +68,7 @@ export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, gameInfo, onCl
         <List dense disablePadding component="div" role="list" subheader={getPlayerHeader(mine)}>
 
           <ListItem key={"moneyGiven" + (mine ? 1 : 0)} role="listitem" className="trade-item">
-            <ListItemText primary={mine ? "$" + tradeOffer.participant1.amountGiven : "$" + tradeOffer.participant2.amountGiven} />
+            <ListItemText primary={mine ? dollarFormatter.format(tradeOffer.participant1.amountGiven) : dollarFormatter.format(tradeOffer.participant2.amountGiven)} />
           </ListItem>
 
           {items.map((squareId: number) => {

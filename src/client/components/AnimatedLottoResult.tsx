@@ -3,7 +3,7 @@ import { animate, useMotionValue } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { GameEvent } from "../../core/types/GameEvent";
-import { getMyGameId } from "../helpers";
+import { dollarFormatter, getMyGameId } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import { LottoState } from "../../core/types/LottoState";
 
@@ -39,7 +39,7 @@ export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, s
       return "";
     }
     if (lottoState && lottoState.prize > 0) {
-      return "You Won $" + lottoState.prize;
+      return "You Won " + dollarFormatter.format(lottoState.prize);
     }
     return "You lost, better luck next time!"
   };
