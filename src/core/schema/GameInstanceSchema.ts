@@ -49,6 +49,7 @@ const SquareGameDataSchema = new mongoose.Schema({
 const SettingsSchema = new mongoose.Schema({
   initialMoney: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
+  electricityCostPerHouse: { type: Number, required: true },
 });
 
 export type GameInstanceDocument = mongoose.Document & {

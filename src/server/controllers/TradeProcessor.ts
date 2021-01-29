@@ -261,6 +261,8 @@ export class TradeProcessor {
       }
     });
 
+    //TODO cant trade properties with houses on them
+
     tradeDoc.status = TradeStatus.ACCEPTED;
     await tradeDoc.save();
 

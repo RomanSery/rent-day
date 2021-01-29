@@ -172,6 +172,11 @@ export class PropertyProcessor {
       this.player.money -= houseCost;
     }
 
+    this.player.electricityCostsPerTurn = MoneyCalculator.calculateElectrictyCostsForPlayer(
+      this.game,
+      this.player
+    );
+
     await this.game.save();
 
     return "";
@@ -214,6 +219,11 @@ export class PropertyProcessor {
     if (this.state.houseCost) {
       this.player.money += MoneyCalculator.getSellPriceForHouse(this.state);
     }
+
+    this.player.electricityCostsPerTurn = MoneyCalculator.calculateElectrictyCostsForPlayer(
+      this.game,
+      this.player
+    );
 
     await this.game.save();
 

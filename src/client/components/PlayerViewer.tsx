@@ -89,11 +89,11 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
                 <TableCell align="right">{getPlayerMoney()}</TableCell>
               </TableRow>
               <TableRow key="playerViewer2">
-                <TableCell component="th" scope="row">Tax</TableCell>
+                <TableCell component="th" scope="row">Tax per Turn</TableCell>
                 <TableCell align="right">{getPlayerTaxes()}</TableCell>
               </TableRow>
               <TableRow key="playerViewer3">
-                <TableCell component="th" scope="row">Electricity</TableCell>
+                <TableCell component="th" scope="row">Electricity per Turn</TableCell>
                 <TableCell align="right">{getPlayerElectricityCosts()}</TableCell>
               </TableRow>
             </TableBody>

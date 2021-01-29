@@ -17,6 +17,7 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
+import { defaultElectricityCostPerHouse } from "./MoneyCalculator";
 
 export class GameProcessor {
   public async createGame(
@@ -55,7 +56,11 @@ export class GameProcessor {
       squareState: squareState,
       allJoined: false,
       maxPlayers: maxPlayers,
-      settings: { initialMoney: initialMoney, maxPlayers: maxPlayers },
+      settings: {
+        initialMoney: initialMoney,
+        maxPlayers: maxPlayers,
+        electricityCostPerHouse: defaultElectricityCostPerHouse,
+      },
       players: [],
       status: GameStatus.JOINING,
       createdBy: userId,

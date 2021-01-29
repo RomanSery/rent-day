@@ -5,9 +5,12 @@ import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import mongoose from "mongoose";
 import {
+  areIdsEqual,
   doesOwnAllPropertiesInGroup,
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
+
+export const defaultElectricityCostPerHouse: number = 2;
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -186,5 +189,30 @@ export class MoneyCalculator {
     }
 
     return true;
+  }
+
+  public static calculateElectrictyCostsForPlayer(
+    game: GameInstanceDocument,
+    player: Player
+  ): number {
+    const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, player._id) &&
+          s.numHouses > 0 &&
+          !s.isMortgaged
+        );
+      }
+    );
+
+    let total = 0;
+
+    playerOwnedSquaresWithHouses.forEach((squareState: SquareGameData) => {
+      const cost =
+        squareState.numHouses * game.settings.electricityCostPerHouse;
+      total += cost;
+    });
+    return total;
   }
 }
