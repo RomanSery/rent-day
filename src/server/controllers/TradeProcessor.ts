@@ -10,6 +10,8 @@ import { TradeStatus } from "../../core/enums/TradeStatus";
 import { GameProcessor } from "./GameProcessor";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { PlayerState } from "../../core/enums/PlayerState";
+import { areIdsEqual } from "./helpers";
 
 export class TradeProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -72,8 +74,17 @@ export class TradeProcessor {
     if (!this.game) {
       return "game not found";
     }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
     if (!this.me || !this.otherPlayer) {
-      return "player not owned";
+      return "player(s) not found";
+    }
+    if (this.me.state === PlayerState.BANKRUPT) {
+      return this.me.name + " is bankrupt";
+    }
+    if (this.otherPlayer.state === PlayerState.BANKRUPT) {
+      return this.otherPlayer.name + " is bankrupt";
     }
 
     if (this.myAmount < 0 || this.myAmount > this.me.money) {
@@ -91,6 +102,30 @@ export class TradeProcessor {
     if (this.theirs.length === 0 && this.theirAmount === 0) {
       return "You must get something in return";
     }
+
+    this.mines.forEach((squareId) => {
+      const state: SquareGameData | undefined = this.game!.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (!state || !state.owner) {
+        return "You dont own some of the properties you are trying to trade.";
+      }
+      if (!areIdsEqual(state.owner, this.me!._id)) {
+        return "You dont own some of the properties you are trying to trade.";
+      }
+    });
+
+    this.theirs.forEach((squareId) => {
+      const state: SquareGameData | undefined = this.game!.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (!state || !state.owner) {
+        return "They dont own some of the properties you are trying to trade.";
+      }
+      if (!areIdsEqual(state.owner, this.otherPlayer!._id)) {
+        return "They dont own some of the properties you are trying to trade.";
+      }
+    });
 
     const me: TradeParticipant = {
       playerId: this.userId.toHexString(),
@@ -172,7 +207,59 @@ export class TradeProcessor {
       return "Game is not active";
     }
 
-    //TODO need to do more validation
+    const participant1 = game.players.find(
+      (p: Player) => p._id && areIdsEqual(p._id, tradeDoc.participant1.playerId)
+    );
+    const participant2 = game.players.find(
+      (p: Player) => p._id && areIdsEqual(p._id, tradeDoc.participant2.playerId)
+    );
+    if (!participant1 || !participant2) {
+      return "Players not found";
+    }
+
+    if (participant1.state === PlayerState.BANKRUPT) {
+      return participant1.name + " is bankrupt";
+    }
+    if (participant2.state === PlayerState.BANKRUPT) {
+      return participant2.name + " is bankrupt";
+    }
+
+    if (
+      tradeDoc.participant1.amountGiven < 0 ||
+      tradeDoc.participant1.amountGiven > participant1.money
+    ) {
+      return "Can't give more than you have";
+    }
+    if (
+      tradeDoc.participant2.amountGiven < 0 ||
+      tradeDoc.participant2.amountGiven > participant2.money
+    ) {
+      return "Can't get more than they have";
+    }
+
+    tradeDoc.participant1.squaresGiven.forEach((squareId) => {
+      const state: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (!state || !state.owner) {
+        return "You dont own some of the properties you are trying to trade.";
+      }
+      if (!areIdsEqual(state.owner, tradeDoc.participant1.playerId)) {
+        return "You dont own some of the properties you are trying to trade.";
+      }
+    });
+
+    tradeDoc.participant2.squaresGiven.forEach((squareId) => {
+      const state: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === squareId
+      );
+      if (!state || !state.owner) {
+        return "They dont own some of the properties you are trying to trade.";
+      }
+      if (!areIdsEqual(state.owner, tradeDoc.participant2.playerId)) {
+        return "They dont own some of the properties you are trying to trade.";
+      }
+    });
 
     tradeDoc.status = TradeStatus.ACCEPTED;
     await tradeDoc.save();
