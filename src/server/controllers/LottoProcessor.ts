@@ -157,7 +157,6 @@ export class LottoProcessor {
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
     //TODO modify this for luck attributes, etc
-    //make prize amounts random
 
     const newObj: LottoDocument = new Lotto({
       gameId: gameId,

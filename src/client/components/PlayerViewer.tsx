@@ -16,6 +16,8 @@ import { GameContext } from '../../core/types/GameContext';
 import API from '../api';
 import { SocketService } from '../sockets/SocketService';
 import { GameEvent } from '../../core/types/GameEvent';
+import { getSkillTypeTooltip } from '../uiHelpers';
+
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -137,21 +139,21 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
           <Table size="small" aria-label="a dense table">
             <TableBody>
               <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row">Negotiation</TableCell>
+                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Negotiation)}</TableCell>
                 <TableCell align="right">
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Negotiation)} /> : null}
                   {getSkill(SkillType.Negotiation)}
                 </TableCell>
               </TableRow>
               <TableRow key="playerViewer5">
-                <TableCell component="th" scope="row">Luck</TableCell>
+                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Luck)}</TableCell>
                 <TableCell align="right">
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Luck)} /> : null}
                   {getSkill(SkillType.Luck)}
                 </TableCell>
               </TableRow>
               <TableRow key="playerViewer6">
-                <TableCell component="th" scope="row">Corruption</TableCell>
+                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Corruption)}</TableCell>
                 <TableCell align="right">
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Corruption)} /> : null}
                   {getSkill(SkillType.Corruption)}
