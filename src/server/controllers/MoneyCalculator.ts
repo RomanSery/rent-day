@@ -9,6 +9,7 @@ import {
   doesOwnAllPropertiesInGroup,
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
+import { conEd_position, mta_position } from "../../core/constants";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -102,18 +103,23 @@ export class MoneyCalculator {
     owner: Player,
     squareData: SquareGameData
   ): number {
+    let rent: number = 0;
     const numOwned = howManyTrainStationsDoesPlayerOwn(game, owner);
     if (numOwned === 1) {
-      return squareData.rent0!;
+      rent = squareData.rent0!;
     } else if (numOwned === 2) {
-      return squareData.rent1!;
+      rent = squareData.rent1!;
     } else if (numOwned === 3) {
-      return squareData.rent2!;
+      rent = squareData.rent2!;
     } else if (numOwned === 4) {
-      return squareData.rent3!;
-    } else {
-      return 0;
+      rent = squareData.rent3!;
     }
+
+    const ownsMta = MoneyCalculator.doesPlayerOwnMTA(game, owner._id);
+    if (ownsMta) {
+      rent = rent * 2;
+    }
+    return rent;
   }
 
   private static getPropertyRent(
@@ -193,6 +199,10 @@ export class MoneyCalculator {
     game: GameInstanceDocument,
     player: Player
   ): number {
+    if (MoneyCalculator.doesPlayerOwnConEd(game, player._id)) {
+      return 0;
+    }
+
     const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
       (s: SquareGameData) => {
         return (
@@ -242,5 +252,33 @@ export class MoneyCalculator {
       }
     });
     return total;
+  }
+
+  private static doesPlayerOwnMTA(
+    game: GameInstanceDocument,
+    playerId: string
+  ): boolean {
+    const squareData: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === mta_position
+    );
+    return squareData &&
+      squareData.owner &&
+      areIdsEqual(squareData.owner, playerId)
+      ? true
+      : false;
+  }
+
+  private static doesPlayerOwnConEd(
+    game: GameInstanceDocument,
+    playerId: string
+  ): boolean {
+    const squareData: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === conEd_position
+    );
+    return squareData &&
+      squareData.owner &&
+      areIdsEqual(squareData.owner, playerId)
+      ? true
+      : false;
   }
 }

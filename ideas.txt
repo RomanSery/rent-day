@@ -1,7 +1,7 @@
-PROBLEMS
 user can click done withouth picking lotto option
 bcrypt user password
 switch auth token from localstorage to cookie
+encrypt localStorage.myGameId
 need to implement train travel
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
 dont allow mortgaging utilities
@@ -10,16 +10,12 @@ collect email address at sign up
 consider removing gameContext.userId
 in property square view, when mortgaged show redeem cost instead of mortgage value
 add tooltips for explaining your tax per turn and electricty costs per turn
-
-IDEAS
+should not be able to mortgage/reddem utilities
 The player to bid the highest wins and pays the 2nd highest bid 
 add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
+have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
 
 
-
-utilities
-- MTA doubles all railroad rent
-- con ed utility elimates your eletricity costs
 
 player classes/abilities
 - Luck - each point increases your chance to win lotto prizes by 2%
@@ -38,4 +34,4 @@ higher prizes/chances in lotto games
 - rent for governs island is doubled
 
 -banker
-property taxes are lowered
+property taxes are lowered by 50%
