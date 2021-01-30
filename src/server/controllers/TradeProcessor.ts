@@ -318,6 +318,9 @@ export class TradeProcessor {
       }
     });
 
+    GameProcessor.updatePlayerCosts(game, player1);
+    GameProcessor.updatePlayerCosts(game, player2);
+
     await game.save();
   }
 

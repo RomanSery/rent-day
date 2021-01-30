@@ -11,6 +11,7 @@ import { PropertyProcessor } from "./PropertyProcessor";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { GameProcessor } from "./GameProcessor";
 
 export class AuctionProcessor {
   private bid: number;
@@ -124,6 +125,7 @@ export class AuctionProcessor {
       );
       if (playerWinner && winner.bid) {
         playerWinner.money = playerWinner.money - winner.bid;
+        GameProcessor.updatePlayerCosts(this.game, playerWinner);
       }
     }
   }

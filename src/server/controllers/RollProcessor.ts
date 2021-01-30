@@ -11,6 +11,8 @@ import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
+import { isolation_position, payToGetOutFee } from "../../core/constants";
+import { GameProcessor } from "./GameProcessor";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -22,9 +24,6 @@ export class RollProcessor {
   private forceDie1: number | null;
   private forceDie2: number | null;
   private rollDesc: string;
-
-  private static isolation_position = 11;
-  private static payToGetOutFee = 100;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -138,7 +137,7 @@ export class RollProcessor {
     } else if (this.hasRolledThreeConsecutiveDoubles()) {
       this.playerPassedPayDay = false;
       this.player.state = PlayerState.IN_ISOLATION;
-      this.player.position = RollProcessor.isolation_position;
+      this.player.position = isolation_position;
       this.player.hasRolled = true;
       this.rollDesc += " <br /> caught speeding and put into quarantine";
       this.player.rollHistory = [lastRoll];
@@ -245,6 +244,8 @@ export class RollProcessor {
 
     this.player.hasRolled = false;
 
+    GameProcessor.updatePlayerCosts(this.game, this.player);
+
     this.game.save();
 
     return "";
@@ -281,12 +282,12 @@ export class RollProcessor {
       return "You are not in quarantine";
     }
 
-    if (this.player.money < RollProcessor.payToGetOutFee) {
+    if (this.player.money < payToGetOutFee) {
       return "You don't have enough money to get out of quarantine";
     }
 
     this.player.numTurnsInIsolation = 0;
-    this.player.money = this.player.money - RollProcessor.payToGetOutFee;
+    this.player.money = this.player.money - payToGetOutFee;
     this.player.state = PlayerState.ACTIVE;
     this.player.rollHistory = [];
     await this.game.save();

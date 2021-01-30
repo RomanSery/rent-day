@@ -8,6 +8,7 @@ dont allow mortgaging utilities
 user can click on roll button right after clicking on it, before animation finishes
 collect email address at sign up
 consider removing gameContext.userId
+in property square view, when mortgaged show redeem cost instead of mortgage value
 
 IDEAS
 The player to bid the highest wins and pays the 2nd highest bid 

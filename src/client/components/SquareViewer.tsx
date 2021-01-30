@@ -223,6 +223,16 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
     );
   }
 
+  const getSquareTaxAmount = () => {
+    const data = getSquareGameData();
+    if (data && data.owner && data.purchasePrice && data.purchasePrice > 0 && data.tax && data.tax > 0) {
+      const taxRate = data.tax / 100.0;
+      const tax = data.purchasePrice * taxRate;
+      return " (" + dollarFormatter.format(tax) + ")";
+    }
+    return "";
+  }
+
   const getPropertyView = (config: SquareGameData) => {
     return (
       <React.Fragment>
@@ -272,7 +282,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                   <TableCell component="th" className="square-viewer-header-row" scope="row">Tax</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer12a">
-                  <TableCell>{config.tax ? config.tax + "%" : ""}</TableCell>
+                  <TableCell>{config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}</TableCell>
                 </TableRow>
 
                 <TableRow key="propertyViewer13">
@@ -340,7 +350,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                   <TableCell component="th" className="square-viewer-header-row" scope="row">Tax</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer6a">
-                  <TableCell>{config.tax ? config.tax + "%" : ""}</TableCell>
+                  <TableCell>{config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}</TableCell>
                 </TableRow>
 
                 <TableRow key="stationViewer7">

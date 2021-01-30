@@ -8,6 +8,7 @@ import {
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { GameProcessor } from "./GameProcessor";
 import {
   doesOwnAllPropertiesInGroup,
   areHousesEven,
@@ -78,6 +79,8 @@ export class PropertyProcessor {
       this.player.money = this.player.money + this.state.mortgageValue;
     }
 
+    GameProcessor.updatePlayerCosts(this.game, this.player);
+
     await this.game.save();
 
     return "";
@@ -113,6 +116,9 @@ export class PropertyProcessor {
     if (this.state.mortgageValue) {
       this.player.money = this.player.money - redeemAmount;
     }
+
+    GameProcessor.updatePlayerCosts(this.game, this.player);
+
     await this.game.save();
     return "";
   }
@@ -172,10 +178,7 @@ export class PropertyProcessor {
       this.player.money -= houseCost;
     }
 
-    this.player.electricityCostsPerTurn = MoneyCalculator.calculateElectrictyCostsForPlayer(
-      this.game,
-      this.player
-    );
+    GameProcessor.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
 
@@ -220,10 +223,7 @@ export class PropertyProcessor {
       this.player.money += MoneyCalculator.getSellPriceForHouse(this.state);
     }
 
-    this.player.electricityCostsPerTurn = MoneyCalculator.calculateElectrictyCostsForPlayer(
-      this.game,
-      this.player
-    );
+    GameProcessor.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
 

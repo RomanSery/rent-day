@@ -10,8 +10,6 @@ import {
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
 
-export const defaultElectricityCostPerHouse: number = 2;
-
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
     player.money = player.money + 200;
@@ -212,6 +210,36 @@ export class MoneyCalculator {
       const cost =
         squareState.numHouses * game.settings.electricityCostPerHouse;
       total += cost;
+    });
+    return total;
+  }
+
+  public static calculateTaxCostsForPlayer(
+    game: GameInstanceDocument,
+    player: Player
+  ): number {
+    const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, player._id) &&
+          !s.isMortgaged &&
+          s.tax &&
+          s.tax > 0 &&
+          s.purchasePrice &&
+          s.purchasePrice > 0
+        );
+      }
+    );
+
+    let total = 0;
+
+    playerOwnedSquares.forEach((squareState: SquareGameData) => {
+      if (squareState.purchasePrice && squareState.tax) {
+        const taxRate = squareState.tax / 100.0;
+        const tax = squareState.purchasePrice * taxRate;
+        total += tax;
+      }
     });
     return total;
   }
