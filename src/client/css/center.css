@@ -201,3 +201,7 @@
 .trade-item {
   padding: 0px 5px 0px 0px !important;
 }
+
+.upgrade-skill {
+  padding-right: 5px;
+}

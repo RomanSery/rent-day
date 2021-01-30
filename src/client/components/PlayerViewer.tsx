@@ -9,14 +9,23 @@ import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { SkillType } from "../../core/enums/SkillType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
-import { dollarFormatter } from '../helpers';
+import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError } from '../helpers';
+import { faPlusSquare } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GameContext } from '../../core/types/GameContext';
+import API from '../api';
+import { SocketService } from '../sockets/SocketService';
+import { GameEvent } from '../../core/types/GameEvent';
 
 interface Props {
   gameInfo: GameState | undefined;
+  socketService: SocketService;
   getPlayer: () => Player | undefined;
 }
 
-export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
+export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketService }) => {
+
+  const context: GameContext = getGameContextFromLocalStorage();
 
   const getPlayerName = () => {
     const p = getPlayer();
@@ -38,6 +47,14 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
     const p = getPlayer();
     if (p) {
       return dollarFormatter.format(p.money);
+    }
+    return "";
+  }
+
+  const getPlayerPointsAvailable = () => {
+    const p = getPlayer();
+    if (p) {
+      return p.numAbilityPoints;
     }
     return "";
   }
@@ -72,9 +89,25 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
     return 0;
   }
 
+  const isMyTurn = () => {
+    const uid = getMyUserId();
+    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+  }
 
+  const upgradeSkill = async (skillType: SkillType) => {
+    API.post("actions/upgradeSkill", { skillType: skillType, context })
+      .then(function (response) {
+        if (socketService) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        }
+      })
+      .catch(handleApiError);
+  };
 
-
+  const canUpgradeSkill = () => {
+    const p = getPlayer();
+    return p && areObjectIdsEqual(p._id, getMyUserId()) && p.numAbilityPoints > 0 && isMyTurn() ? true : false;
+  }
 
 
   return (
@@ -105,15 +138,28 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer }) => {
             <TableBody>
               <TableRow key="playerViewer4">
                 <TableCell component="th" scope="row">Negotiation</TableCell>
-                <TableCell align="right">{getSkill(SkillType.Negotiation)}</TableCell>
+                <TableCell align="right">
+                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Negotiation)} /> : null}
+                  {getSkill(SkillType.Negotiation)}
+                </TableCell>
               </TableRow>
               <TableRow key="playerViewer5">
                 <TableCell component="th" scope="row">Luck</TableCell>
-                <TableCell align="right">{getSkill(SkillType.Luck)}</TableCell>
+                <TableCell align="right">
+                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Luck)} /> : null}
+                  {getSkill(SkillType.Luck)}
+                </TableCell>
               </TableRow>
               <TableRow key="playerViewer6">
                 <TableCell component="th" scope="row">Corruption</TableCell>
-                <TableCell align="right">{getSkill(SkillType.Corruption)}</TableCell>
+                <TableCell align="right">
+                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Corruption)} /> : null}
+                  {getSkill(SkillType.Corruption)}
+                </TableCell>
+              </TableRow>
+              <TableRow key="playerViewer7">
+                <TableCell component="th" scope="row">Points available</TableCell>
+                <TableCell align="right">{getPlayerPointsAvailable()}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

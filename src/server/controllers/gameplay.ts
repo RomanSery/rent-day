@@ -8,6 +8,8 @@ import { RollProcessor } from "./RollProcessor";
 import { LottoProcessor } from "./LottoProcessor";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { TradeProcessor } from "./TradeProcessor";
+import { PlayerProcessor } from "./PlayerProcessor";
+import { SkillType } from "../../core/enums/SkillType";
 
 export const roll = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req.body.context);
@@ -265,6 +267,32 @@ export const declineTrade = async (req: Request, res: Response) => {
     tradeId,
     gameId
   );
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({ status: "success" });
+};
+
+export const upgradeSkill = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req.body.context);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const skillType = req.body.skillType;
+  if (
+    skillType !== SkillType.Negotiation &&
+    skillType !== SkillType.Corruption &&
+    skillType !== SkillType.Luck
+  ) {
+    return res.status(400).send("Invalid request");
+  }
+
+  const processor = new PlayerProcessor(gameId, userId);
+  const errMsg = await processor.upgradeSkill(skillType);
+
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }

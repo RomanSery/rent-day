@@ -15,6 +15,7 @@ export interface Player {
   readonly playerClass: PlayerClass;
   state: PlayerState;
 
+  numAbilityPoints: number;
   negotiation: number;
   luck: number;
   corruption: number;

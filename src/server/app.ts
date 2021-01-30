@@ -72,6 +72,8 @@ app.post("/api/actions/offerTrade", gameplay.offerTrade);
 app.post("/api/actions/acceptTrade", gameplay.acceptTrade);
 app.post("/api/actions/declineTrade", gameplay.declineTrade);
 
+app.post("/api/actions/upgradeSkill", gameplay.upgradeSkill);
+
 const gameServer = new GameServer();
 gameServer.listen();
 
