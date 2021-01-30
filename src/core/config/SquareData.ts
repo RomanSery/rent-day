@@ -230,7 +230,7 @@ SquareConfigDataMap.set(17, {
 SquareConfigDataMap.set(18, {
   type: SquareType.Utility,
   section: BoardSection.Left,
-  description: "Doubles all rent for all of your TrainStations",
+  description: "Doubles all rent for every train station you own",
 });
 SquareConfigDataMap.set(19, {
   type: SquareType.Property,
@@ -465,7 +465,7 @@ SquareConfigDataMap.set(36, {
 SquareConfigDataMap.set(37, {
   type: SquareType.Utility,
   section: BoardSection.Right,
-  description: "Reduces electricity costs for building houses",
+  description: "You don't have to pay any electricity costs if you own this",
 });
 
 SquareConfigDataMap.set(38, {

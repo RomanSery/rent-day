@@ -1,4 +1,4 @@
-import { faHome, faHotel, faLightbulb, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faDollarSign, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -17,6 +17,7 @@ import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
+import { faEye } from "@fortawesome/free-regular-svg-icons";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -54,7 +55,20 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
       return getTrainStationView(squareData);
     } else if (config.type === SquareType.Utility) {
       return getUtilityView();
+    } else if (config.type === SquareType.Chance) {
+      return getChanceView();
+    } else if (config.type === SquareType.Lotto) {
+      return getLottoView();
+    } else if (config.type === SquareType.CentralPark) {
+      return getCentralParkView();
+    } else if (config.type === SquareType.PayDay) {
+      return getPayDayView();
+    } else if (config.type === SquareType.Isolation) {
+      return getIsolationView();
+    } else if (config.type === SquareType.GoToIsolation) {
+      return getGoToIsolationView();
     }
+
 
     return null;
   };
@@ -404,6 +418,96 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
       </React.Fragment>
     );
   };
+
+  const getChanceView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">Chance</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={faQuestion} size="3x" color="orange" />
+        </div>
+        <div className="utility-description">
+          Take a chance.  <br />Maybe something good will happen.  <br />Or you might regret coming here.
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const getLottoView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">NY Lotto</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
+        </div>
+        <div className="utility-description">
+          Play the lotto for a chance to win great prizes!
+          <br />
+          But be careful, it can be very addicting.
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const getCentralParkView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">Central park</div>
+        <div className="utility-description">
+          Enjoy a relaxing rent-free day strolling in the park!
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const getPayDayView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">Pay Day</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={faHandHoldingUsd} size="3x" color="green" />
+        </div>
+        <div className="utility-description">
+          It's pay day!
+          <br />
+          Collect your salary plus an additional skill point.
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const getIsolationView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">Quarantine</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={faBiohazard} size="4x" color="red" />
+        </div>
+        <div className="utility-description">
+          You don't want to end up here.
+          <br />
+          Unless you are just visiting a friend.
+        </div>
+      </React.Fragment>
+    );
+  };
+
+  const getGoToIsolationView = () => {
+    return (
+      <React.Fragment>
+        <div className="utility-name square-color-bar">Big Brother</div>
+        <div className="utility-icon">
+          <FontAwesomeIcon icon={faEye} size="3x" color="black" />
+        </div>
+        <div className="utility-description">
+          You've been caught violating lockdown rules.
+          <br />
+          If you land here, be ready for forced quarantine.
+        </div>
+      </React.Fragment>
+    );
+  };
+
 
   return (
     getInfo()
