@@ -14,7 +14,7 @@ should not be able to mortgage/reddem utilities
 The player to bid the highest wins and pays the 2nd highest bid 
 add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
-
+put purchase price and owner on utilities square viewer
 
 
 player classes/abilities
@@ -23,15 +23,19 @@ player classes/abilities
 - corruption - each point lowers your taxes per turn by 3%
 
 
-conductor
-- all rent from railroads is doubled
+Gambler
++ start with luck 5
++ lotto prize amounts are 25% higher
+- you are unemployed, only collect $75 on payday
 
--gambler
-start with luck 3
-higher prizes/chances in lotto games
+Conductor
++ rent from railroads you own is doubled
++ start with negotiation 2
 
--governer
-- rent for governs island is doubled
+Governer
++ If you own Governors Island, rent is doubled and you dont have to pay any taxes on it.
++ Start with corruption 2
 
--banker
-property taxes are lowered by 50%
+Banker
++ Your taxes for each property you own are lowered by 50%
++ You have a high paying job, collect $300 on payday
