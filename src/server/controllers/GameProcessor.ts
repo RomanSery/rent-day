@@ -19,6 +19,8 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { defaultElectricityCostPerHouse } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
+import { Traits } from "traits/Traits";
+import { SkillSettings } from "../../core/types/SkillSettings";
 
 export class GameProcessor {
   public async createGame(
@@ -86,6 +88,10 @@ export class GameProcessor {
     const playerName: string = await this.getUserName(userId);
     let game: GameInstanceDocument = await GameInstance.findById(gameId);
 
+    const initialSkills: SkillSettings = Traits.getInitialSkills(
+      selectedPlayerClass
+    );
+
     const newPlayer: Player = {
       _id: userId.toHexString(),
       name: playerName,
@@ -97,10 +103,10 @@ export class GameProcessor {
       type: selectedPiece,
       playerClass: selectedPlayerClass,
       state: PlayerState.ACTIVE,
-      numAbilityPoints: 5,
-      negotiation: 0,
-      luck: 0,
-      corruption: 0,
+      numAbilityPoints: initialSkills.numAbilityPoints,
+      negotiation: initialSkills.negotiation,
+      luck: initialSkills.luck,
+      corruption: initialSkills.corruption,
       hasRolled: false,
       rollHistory: [],
       numTurnsInIsolation: 0,
