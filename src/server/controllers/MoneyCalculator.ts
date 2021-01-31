@@ -66,14 +66,22 @@ export class MoneyCalculator {
       owner,
       squareData
     );
-    if (rentToPay <= 0) {
+
+    const adjustedRentToPay = Traits.modifyRentToPay(
+      squareData,
+      player,
+      owner,
+      rentToPay
+    );
+
+    if (adjustedRentToPay <= 0) {
       return "";
     }
 
-    player.money -= rentToPay;
-    owner!.money += rentToPay;
+    player.money -= adjustedRentToPay;
+    owner!.money += adjustedRentToPay;
 
-    return "Payed " + owner!.name + " $" + rentToPay + " in rent";
+    return "Payed " + owner!.name + " $" + adjustedRentToPay + " in rent";
   }
 
   private static getRentToPay(
@@ -249,7 +257,13 @@ export class MoneyCalculator {
       if (squareState.purchasePrice && squareState.tax) {
         const taxRate = squareState.tax / 100.0;
         const tax = squareState.purchasePrice * taxRate;
-        total += tax;
+        const adjustedTax = Traits.modifyTaxAmount(
+          player.playerClass,
+          squareState,
+          tax
+        );
+
+        total += adjustedTax;
       }
     });
     return total;

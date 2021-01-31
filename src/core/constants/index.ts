@@ -1,6 +1,7 @@
 export const isolation_position: number = 11;
 export const mta_position: number = 18;
 export const conEd_position: number = 37;
+export const island_position: number = 5;
 
 export const defaultStartSkillPoints: number = 5;
 

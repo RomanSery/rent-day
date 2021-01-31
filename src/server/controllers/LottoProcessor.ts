@@ -159,16 +159,20 @@ export class LottoProcessor {
     //TODO modify this for luck attributes, etc
     //TODO make prize amounts random within the 3 ranges
 
+    const smallPrize = Math.floor(Math.random() * 250) + 100;
+    const mediumPrize = Math.floor(Math.random() * 450) + 300;
+    const largePrize = Math.floor(Math.random() * 750) + 500;
+
     const newObj: LottoDocument = new Lotto({
       gameId: gameId,
       playerId: player._id,
       playerName: player.name,
       playerColor: player.color,
-      option1Amount: 100,
+      option1Amount: smallPrize,
       option1Percent: 50,
-      option2Amount: 300,
+      option2Amount: mediumPrize,
       option2Percent: 20,
-      option3Amount: 500,
+      option3Amount: largePrize,
       option3Percent: 10,
     });
 

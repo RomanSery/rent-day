@@ -1,5 +1,7 @@
-import { defaultStartSkillPoints } from "../../core/constants";
+import { defaultStartSkillPoints, island_position } from "../../core/constants";
+import { Player } from "../../core/types/Player";
 import { SkillSettings } from "../../core/types/SkillSettings";
+import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class Governor {
   public static getPaydaySalary(): number {
@@ -13,5 +15,35 @@ export class Governor {
       corruption: 2,
       numAbilityPoints: defaultStartSkillPoints,
     };
+  }
+
+  public static modifyRentToPay(
+    squareData: SquareGameData,
+    playerToPay: Player,
+    owner: Player,
+    rent: number
+  ): number {
+    const isGovernorsIsland = squareData.squareId === island_position;
+    if (isGovernorsIsland) {
+      return rent * 2;
+    }
+
+    return rent;
+  }
+
+  public static modifyTaxAmount(
+    squareState: SquareGameData,
+    tax: number
+  ): number {
+    const isGovernorsIsland = squareState.squareId === island_position;
+    if (isGovernorsIsland) {
+      return 0;
+    }
+
+    return tax;
+  }
+
+  public static modifyLottoPrizeAmount(prize: number): number {
+    return prize;
   }
 }
