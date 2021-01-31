@@ -9,8 +9,9 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faTimesCircle, faCheckCircle, faChartBar } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { StatsDialog } from "../dialogs/StatsDialog";
 
 
 interface Props {
@@ -23,6 +24,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
+  const [statsViewOpen, setStatsViewOpen] = React.useState(false);
 
   const onClickRoll = async () => {
     onRollAction();
@@ -95,6 +97,10 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return undefined;
   }
 
+  const onViewStats = async () => {
+    setStatsViewOpen(true);
+  };
+
   const getMyActions = () => {
     return (
       <React.Fragment>
@@ -110,10 +116,11 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
           <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
           : null}
 
+        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
 
-        <div className="leave-game">
-          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
-        </div>
+
+        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
+
 
       </React.Fragment>
     );
@@ -124,6 +131,10 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   return (
     <React.Fragment>
       {isMyTurn() ? getMyActions() : null}
+
+      <StatsDialog socketService={socketService} gameInfo={gameInfo}
+        open={statsViewOpen} onClose={() => setStatsViewOpen(false)}
+      />
     </React.Fragment>
   );
 

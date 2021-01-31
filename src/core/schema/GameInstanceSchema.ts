@@ -12,6 +12,10 @@ const PlayerSchema = new mongoose.Schema({
   money: { type: Number, required: true },
   taxesPerTurn: { type: Number, required: true },
   electricityCostsPerTurn: { type: Number, required: true },
+  totalAssets: { type: Number, required: true },
+  mortgageableValue: { type: Number, required: true },
+  redeemableValue: { type: Number, required: true },
+
   position: { type: Number, required: true },
   color: { type: String, required: true },
   type: { type: String, required: true },

@@ -9,7 +9,7 @@ import {
   doesOwnAllPropertiesInGroup,
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
-import { conEd_position, mta_position } from "../../core/constants";
+import { mta_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 
 export class MoneyCalculator {
@@ -208,96 +208,12 @@ export class MoneyCalculator {
     return true;
   }
 
-  public static calculateElectrictyCostsForPlayer(
-    game: GameInstanceDocument,
-    player: Player
-  ): number {
-    if (MoneyCalculator.doesPlayerOwnConEd(game, player._id)) {
-      return 0;
-    }
-
-    const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
-      (s: SquareGameData) => {
-        return (
-          s.owner &&
-          areIdsEqual(s.owner, player._id) &&
-          s.numHouses > 0 &&
-          !s.isMortgaged
-        );
-      }
-    );
-
-    let total = 0;
-
-    playerOwnedSquaresWithHouses.forEach((squareState: SquareGameData) => {
-      const cost =
-        squareState.numHouses * game.settings.electricityCostPerHouse;
-      total += cost;
-    });
-    return total;
-  }
-
-  public static calculateTaxCostsForPlayer(
-    game: GameInstanceDocument,
-    player: Player
-  ): number {
-    const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
-      (s: SquareGameData) => {
-        return (
-          s.owner &&
-          areIdsEqual(s.owner, player._id) &&
-          !s.isMortgaged &&
-          s.tax &&
-          s.tax > 0 &&
-          s.purchasePrice &&
-          s.purchasePrice > 0
-        );
-      }
-    );
-
-    let total = 0;
-
-    playerOwnedSquares.forEach((squareState: SquareGameData) => {
-      if (squareState.purchasePrice && squareState.tax) {
-        const taxRate = squareState.tax / 100.0;
-        const tax = squareState.purchasePrice * taxRate;
-        const adjustedTax = Traits.modifyTaxAmount(
-          player.playerClass,
-          squareState,
-          tax
-        );
-
-        total += adjustedTax;
-      }
-    });
-
-    const corruptionAdjustment = (player.corruption * 3) / 100.0;
-    const substraction = total * corruptionAdjustment;
-    const finalTotal = total - substraction;
-
-    return finalTotal;
-  }
-
   private static doesPlayerOwnMTA(
     game: GameInstanceDocument,
     playerId: string
   ): boolean {
     const squareData: SquareGameData | undefined = game.squareState.find(
       (p: SquareGameData) => p.squareId === mta_position
-    );
-    return squareData &&
-      squareData.owner &&
-      areIdsEqual(squareData.owner, playerId)
-      ? true
-      : false;
-  }
-
-  private static doesPlayerOwnConEd(
-    game: GameInstanceDocument,
-    playerId: string
-  ): boolean {
-    const squareData: SquareGameData | undefined = game.squareState.find(
-      (p: SquareGameData) => p.squareId === conEd_position
     );
     return squareData &&
       squareData.owner &&

@@ -329,19 +329,4 @@ export class GameProcessor {
 
     game.save();
   }
-
-  public static updatePlayerCosts(
-    game: GameInstanceDocument,
-    player: Player
-  ): void {
-    player.electricityCostsPerTurn = MoneyCalculator.calculateElectrictyCostsForPlayer(
-      game,
-      player
-    );
-
-    player.taxesPerTurn = MoneyCalculator.calculateTaxCostsForPlayer(
-      game,
-      player
-    );
-  }
 }

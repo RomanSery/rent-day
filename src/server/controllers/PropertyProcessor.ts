@@ -8,13 +8,13 @@ import {
 import { Bidder } from "../../core/types/Bidder";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { GameProcessor } from "./GameProcessor";
 import {
   doesOwnAllPropertiesInGroup,
   areHousesEven,
   doesGroupHaveAnyHouses,
 } from "./helpers";
 import { MoneyCalculator } from "./MoneyCalculator";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class PropertyProcessor {
   private squareId: number;
@@ -79,7 +79,7 @@ export class PropertyProcessor {
       this.player.money = this.player.money + this.state.mortgageValue;
     }
 
-    GameProcessor.updatePlayerCosts(this.game, this.player);
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
 
@@ -117,7 +117,7 @@ export class PropertyProcessor {
       this.player.money = this.player.money - redeemAmount;
     }
 
-    GameProcessor.updatePlayerCosts(this.game, this.player);
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
     return "";
@@ -178,7 +178,7 @@ export class PropertyProcessor {
       this.player.money -= houseCost;
     }
 
-    GameProcessor.updatePlayerCosts(this.game, this.player);
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
 
@@ -223,7 +223,7 @@ export class PropertyProcessor {
       this.player.money += MoneyCalculator.getSellPriceForHouse(this.state);
     }
 
-    GameProcessor.updatePlayerCosts(this.game, this.player);
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
 

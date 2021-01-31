@@ -12,7 +12,7 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { isolation_position, payToGetOutFee } from "../../core/constants";
-import { GameProcessor } from "./GameProcessor";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -244,7 +244,7 @@ export class RollProcessor {
 
     this.player.hasRolled = false;
 
-    GameProcessor.updatePlayerCosts(this.game, this.player);
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     this.game.save();
 

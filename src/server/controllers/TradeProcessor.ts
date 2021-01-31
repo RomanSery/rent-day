@@ -12,6 +12,7 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { areIdsEqual } from "./helpers";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class TradeProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -318,8 +319,8 @@ export class TradeProcessor {
       }
     });
 
-    GameProcessor.updatePlayerCosts(game, player1);
-    GameProcessor.updatePlayerCosts(game, player2);
+    PlayerCostsCalculator.updatePlayerCosts(game, player1);
+    PlayerCostsCalculator.updatePlayerCosts(game, player2);
 
     await game.save();
   }
