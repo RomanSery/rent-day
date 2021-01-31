@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Traits } from "traits/Traits";
+import { Traits } from "../traits/Traits";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import {

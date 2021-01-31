@@ -45,6 +45,7 @@
   display: flex;
   flex-direction: row;
   margin-top: 10px;
+  justify-content: space-around;
 }
 .lotto-container .lotto-option {
   flex-basis: 33%;
