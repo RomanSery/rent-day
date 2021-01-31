@@ -15,7 +15,8 @@ import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { PlayerClass } from "../../core/enums/PlayerClass";
-
+import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
+import { getPlayerClassDescription } from "../uiHelpers";
 
 interface Props {
   socketService: SocketService;
@@ -35,7 +36,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
-
+  const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
   const { register, handleSubmit } = useForm<Inputs>();
 
@@ -156,10 +157,13 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     return "Ping: 0ms";
   };
 
+  const handlePlayerClassChange = (event: React.ChangeEvent<{ name?: string; value: string }>) => {
+    setSelectedPlayerClass(event.target.value);
+  };
 
   return (
     <React.Fragment>
-      <Container maxWidth="xs">
+      <Container maxWidth="sm">
         <Typography component="h2" variant="h5">{gameState?.name}</Typography>
 
         <List dense={true} className="game-settings">
@@ -179,7 +183,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             <FormControl fullWidth >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
-              <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true} inputRef={register({ required: true })} >
+              <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true}
+                inputRef={register({ required: true })} >
+                <option aria-label="None" value="" />
                 <option value="Pawn">Pawn</option>
                 <option value="Hat">Hat</option>
                 <option value="Car">Car</option>
@@ -191,10 +197,12 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             <FormControl fullWidth >
               <InputLabel htmlFor="class-type">Class Type</InputLabel>
-              <NativeSelect id="class-type" name="playerClass" required={true} fullWidth={true} inputRef={register({ required: true })} >
-                <option value="Broker">Broker</option>
-                <option value="Conductor">Conductor</option>
+              <NativeSelect id="class-type" name="playerClass" required={true} fullWidth={true} inputRef={register({ required: true })} onChange={handlePlayerClassChange} >
+                <option aria-label="None" value="" />
                 <option value="Banker">Banker</option>
+                <option value="Conductor">Conductor</option>
+                <option value="Gambler">Gambler</option>
+                <option value="Governor">Governor</option>
               </NativeSelect>
             </FormControl>
 
@@ -209,6 +217,26 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             Leave Game
          </Button>
         }
+
+        <div className="player-class-description">
+          {getPlayerClassDescription(selectedPlayerClass)}
+        </div>
+
+        <div className="skill-descriptions">
+          <div className="skill">
+            <div className="header">Luck</div>
+            <div className="description">Each point <b>increases</b> your chance to win lotto prizes by <b>{luckAdjustment}</b>%</div>
+          </div>
+          <div className="skill">
+            <div className="header">Negotiation</div>
+            <div className="description">Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}</b>%</div>
+          </div>
+          <div className="skill">
+            <div className="header">Corruption</div>
+            <div className="description">Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}</b>%</div>
+          </div>
+        </div>
+
 
       </Container>
 

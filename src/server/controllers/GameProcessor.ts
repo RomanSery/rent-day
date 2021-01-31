@@ -19,7 +19,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { defaultElectricityCostPerHouse } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
-import { Traits } from "traits/Traits";
+import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
 
 export class GameProcessor {

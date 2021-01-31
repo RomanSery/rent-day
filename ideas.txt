@@ -24,18 +24,13 @@ player classes/abilities
 
 
 Gambler
-+ start with luck 5
 + lotto prize amounts are 25% higher
-- you are unemployed, only collect $75 on payday
 
 Conductor
 + rent from railroads you own is doubled
-+ start with negotiation 2
 
 Governer
 + If you own Governors Island, rent is doubled and you dont have to pay any taxes on it.
-+ Start with corruption 2
 
 Banker
 + Your taxes for each property you own are lowered by 50%
-+ You have a high paying job, collect $300 on payday

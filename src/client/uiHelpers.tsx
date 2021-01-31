@@ -10,6 +10,7 @@ import {
   luckAdjustment,
   negotiationAdjustment,
 } from "../core/constants";
+import { PlayerClass } from "../core/enums/PlayerClass";
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -62,3 +63,44 @@ const getSkillDescription = (type: SkillType): JSX.Element => {
     </React.Fragment>
   );
 };
+
+
+export const getPlayerClassDescription = (type: string | undefined): JSX.Element => {
+
+  if (type === PlayerClass.Gambler) {
+    return (
+      <ul>
+        <li>lotto prize amounts are 25% higher</li>
+        <li>start with luck 5</li>
+        <li>you are unemployed, only collect $75 on payday</li>
+      </ul>
+    );
+  } else if (type === PlayerClass.Conductor) {
+    return (
+      <ul>
+        <li>rent from railroads you own is doubled</li>
+        <li>start with negotiation 2</li>
+      </ul>
+    );
+  } else if (type === PlayerClass.Governor) {
+    return (
+      <ul>
+        <li>If you own Governors Island, rent is doubled and you dont have to pay any taxes on it.</li>
+        <li>Start with corruption 2</li>
+      </ul>
+    );
+  } else if (type === PlayerClass.Banker) {
+    return (
+      <ul>
+        <li>Your taxes for each property you own are lowered by 50%</li>
+        <li>You have a high paying job, collect $300 on payday</li>
+      </ul>
+    );
+  }
+
+  return (
+    <React.Fragment>
+    </React.Fragment>
+  );
+};
+

@@ -10,11 +10,11 @@ import {
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
 import { conEd_position, mta_position } from "../../core/constants";
-import { Traits } from "traits/Traits";
+import { Traits } from "../traits/Traits";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
-    player.money = player.money + Traits.getPaydaySalary(player);
+    player.money = player.money + Traits.getPaydaySalary(player.playerClass);
   }
 
   public static getMortgageValue(purchasePrice: number): number {
