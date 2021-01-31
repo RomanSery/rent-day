@@ -67,21 +67,25 @@ export class MoneyCalculator {
       squareData
     );
 
-    const adjustedRentToPay = Traits.modifyRentToPay(
+    const classAdjustedRentToPay = Traits.modifyRentToPay(
       squareData,
       player,
       owner,
       rentToPay
     );
 
-    if (adjustedRentToPay <= 0) {
+    const negotiationAdjustment = (player.negotiation * 3) / 100.0;
+    const substraction = classAdjustedRentToPay * negotiationAdjustment;
+    const finalRentToPay = classAdjustedRentToPay - substraction;
+
+    if (finalRentToPay <= 0) {
       return "";
     }
 
-    player.money -= adjustedRentToPay;
-    owner!.money += adjustedRentToPay;
+    player.money -= finalRentToPay;
+    owner!.money += finalRentToPay;
 
-    return "Payed " + owner!.name + " $" + adjustedRentToPay + " in rent";
+    return "Payed " + owner!.name + " $" + finalRentToPay + " in rent";
   }
 
   private static getRentToPay(
@@ -266,7 +270,12 @@ export class MoneyCalculator {
         total += adjustedTax;
       }
     });
-    return total;
+
+    const corruptionAdjustment = (player.corruption * 3) / 100.0;
+    const substraction = total * corruptionAdjustment;
+    const finalTotal = total - substraction;
+
+    return finalTotal;
   }
 
   private static doesPlayerOwnMTA(

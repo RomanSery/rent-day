@@ -11,7 +11,7 @@ export class Gambler {
   public static getInitialSkills(): SkillSettings {
     return {
       negotiation: 0,
-      luck: 5,
+      luck: 2,
       corruption: 0,
       numAbilityPoints: defaultStartSkillPoints,
     };

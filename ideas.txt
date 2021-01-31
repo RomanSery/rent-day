@@ -19,7 +19,3 @@ put purchase price and owner on utilities square viewer
 store total assets value in player
 dont pay more rent than the total assets the player has
 
-player classes/abilities
-- Luck - each point increases your chance to win lotto prizes by 2%
-- negotiation - each point lowers the rent you have to pay by 3%
-- corruption - each point lowers your taxes per turn by 3%

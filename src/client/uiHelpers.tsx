@@ -87,7 +87,7 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Start with luck 5" />
+          <ListItemText primary="Start with luck 2" />
         </ListItem>
         <ListItem>
           <ListItemIcon>

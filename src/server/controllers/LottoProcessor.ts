@@ -159,30 +159,31 @@ export class LottoProcessor {
   ): Promise<mongoose.Types.ObjectId> {
     //TODO modify this for luck attributes, etc
 
+    //Luck - each point increases your chance to win lotto prizes by 2%
+
+    const classType = player.playerClass;
+    const luckIncrease = player.luck * 2;
+
     const smallPrize = Math.floor(Math.random() * 250) + 100;
+    const smallPrizePercent = 50 + luckIncrease;
+
     const mediumPrize = Math.floor(Math.random() * 450) + 300;
+    const mediumPrizePercent = 20 + luckIncrease;
+
     const largePrize = Math.floor(Math.random() * 750) + 500;
+    const largePrizePercent = 10 + luckIncrease;
 
     const newObj: LottoDocument = new Lotto({
       gameId: gameId,
       playerId: player._id,
       playerName: player.name,
       playerColor: player.color,
-      option1Amount: Traits.modifyLottoPrizeAmount(
-        player.playerClass,
-        smallPrize
-      ),
-      option1Percent: 50,
-      option2Amount: Traits.modifyLottoPrizeAmount(
-        player.playerClass,
-        mediumPrize
-      ),
-      option2Percent: 20,
-      option3Amount: Traits.modifyLottoPrizeAmount(
-        player.playerClass,
-        largePrize
-      ),
-      option3Percent: 10,
+      option1Amount: Traits.modifyLottoPrizeAmount(classType, smallPrize),
+      option1Percent: smallPrizePercent,
+      option2Amount: Traits.modifyLottoPrizeAmount(classType, mediumPrize),
+      option2Percent: mediumPrizePercent,
+      option3Amount: Traits.modifyLottoPrizeAmount(classType, largePrize),
+      option3Percent: largePrizePercent,
     });
 
     await newObj.save();
