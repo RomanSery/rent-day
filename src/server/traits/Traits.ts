@@ -89,7 +89,7 @@ export class Traits {
     if (type === PlayerClass.Banker) {
       return Banker.modifyLottoPrizeAmount(prize);
     } else if (type === PlayerClass.Conductor) {
-      return Conductor.modifymodifyLottoPrizeAmountTaxAmount(prize);
+      return Conductor.modifyLottoPrizeAmount(prize);
     } else if (type === PlayerClass.Gambler) {
       return Gambler.modifyLottoPrizeAmount(prize);
     } else if (type === PlayerClass.Governor) {

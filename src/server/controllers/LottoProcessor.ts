@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Traits } from "traits/Traits";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import {
@@ -157,7 +158,6 @@ export class LottoProcessor {
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
     //TODO modify this for luck attributes, etc
-    //TODO make prize amounts random within the 3 ranges
 
     const smallPrize = Math.floor(Math.random() * 250) + 100;
     const mediumPrize = Math.floor(Math.random() * 450) + 300;
@@ -168,11 +168,20 @@ export class LottoProcessor {
       playerId: player._id,
       playerName: player.name,
       playerColor: player.color,
-      option1Amount: smallPrize,
+      option1Amount: Traits.modifyLottoPrizeAmount(
+        player.playerClass,
+        smallPrize
+      ),
       option1Percent: 50,
-      option2Amount: mediumPrize,
+      option2Amount: Traits.modifyLottoPrizeAmount(
+        player.playerClass,
+        mediumPrize
+      ),
       option2Percent: 20,
-      option3Amount: largePrize,
+      option3Amount: Traits.modifyLottoPrizeAmount(
+        player.playerClass,
+        largePrize
+      ),
       option3Percent: 10,
     });
 
