@@ -12,10 +12,12 @@ in property square view, when mortgaged show redeem cost instead of mortgage val
 add tooltips for explaining your tax per turn and electricty costs per turn
 should not be able to mortgage/reddem utilities
 The player to bid the highest wins and pays the 2nd highest bid 
-add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table
+add button to open modal with chart for all players listing money, tax, electricity, mortgagable value, redeemable value, other things in sortable table 
+(put trade optin here instead of in player display)
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
 put purchase price and owner on utilities square viewer
-
+store total assets value in player
+dont pay more rent than the total assets the player has
 
 player classes/abilities
 - Luck - each point increases your chance to win lotto prizes by 2%

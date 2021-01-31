@@ -11,6 +11,13 @@ import {
   negotiationAdjustment,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -69,32 +76,77 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
 
   if (type === PlayerClass.Gambler) {
     return (
-      <ul>
-        <li>lotto prize amounts are 25% higher</li>
-        <li>start with luck 5</li>
-        <li>you are unemployed, only collect $75 on payday</li>
-      </ul>
+      <List dense={true}>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Lotto prize amounts are 25% higher" />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Start with luck 5" />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsDown} size="2x" color="red" />
+          </ListItemIcon>
+          <ListItemText primary="You are unemployed. Only collect $75 on payday" />
+        </ListItem>
+      </List>
     );
   } else if (type === PlayerClass.Conductor) {
     return (
-      <ul>
-        <li>rent from railroads you own is doubled</li>
-        <li>start with negotiation 2</li>
-      </ul>
+      <List dense={true}>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Rent from railroads you own is doubled" />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Start with negotiation 2" />
+        </ListItem>
+      </List>
     );
   } else if (type === PlayerClass.Governor) {
     return (
-      <ul>
-        <li>If you own Governors Island, rent is doubled and you dont have to pay any taxes on it.</li>
-        <li>Start with corruption 2</li>
-      </ul>
+      <List dense={true}>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="If you own Governors Island, rent is doubled and you dont have to pay any taxes on it." />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Start with corruption 2" />
+        </ListItem>
+      </List>
     );
   } else if (type === PlayerClass.Banker) {
     return (
-      <ul>
-        <li>Your taxes for each property you own are lowered by 50%</li>
-        <li>You have a high paying job, collect $300 on payday</li>
-      </ul>
+      <List dense={true}>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Your taxes for each property you own are lowered by 50%" />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="You have a high paying job, collect $300 on payday" />
+        </ListItem>
+      </List>
     );
   }
 

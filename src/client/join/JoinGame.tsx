@@ -222,6 +222,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           {getPlayerClassDescription(selectedPlayerClass)}
         </div>
 
+        <hr />
+
         <div className="skill-descriptions">
           <div className="skill">
             <div className="header">Luck</div>
