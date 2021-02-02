@@ -13,7 +13,7 @@ add tooltips for explaining your tax per turn and electricty costs per turn
 should not be able to mortgage/reddem utilities
 The player to bid the highest wins and pays the 2nd highest bid 
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
-put purchase price and owner on utilities square viewer
-store total assets value in player
 dont pay more rent than the total assets the player has
+
+
 

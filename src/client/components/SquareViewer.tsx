@@ -412,8 +412,25 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
         <div className="utility-description">
           {getDescription()}
         </div>
-        <div className="actions">
-          {getPropertyActions()}
+        <div className="info-tables">
+          <TableContainer component={Paper} className="other-info">
+            <Table size="small" aria-label="a dense table">
+              <TableBody>
+                <TableRow key="propertyViewer13">
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Owner</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer13a">
+                  <TableCell style={getNameColorStyle()}>{getowner()}</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer14">
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">Purchase Price</TableCell>
+                </TableRow>
+                <TableRow key="propertyViewer14a">
+                  <TableCell>{getPurchasePrice()}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </React.Fragment>
     );

@@ -163,11 +163,13 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[0], 10, 256);
     GameProcessor.assignSquareTesting(game, game.players[0], 6, 328);
     GameProcessor.assignSquareTesting(game, game.players[0], 16, 180);
+    GameProcessor.assignSquareTesting(game, game.players[0], 18, 480);
 
     GameProcessor.assignSquareTesting(game, game.players[1], 5, 300);
     GameProcessor.assignSquareTesting(game, game.players[1], 17, 600);
     GameProcessor.assignSquareTesting(game, game.players[1], 19, 89);
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
+    GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
 
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
