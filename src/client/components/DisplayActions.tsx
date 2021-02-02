@@ -17,10 +17,11 @@ import { StatsDialog } from "../dialogs/StatsDialog";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
+  tradeWithPlayer: (player: Player) => void;
   onRollAction: () => void;
 }
 
-export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction }) => {
+export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, tradeWithPlayer }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -102,37 +103,39 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const getMyActions = () => {
+    if (isMyTurn()) {
+      return (
+        <React.Fragment>
+          {canRoll() ?
+            <div><Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button></div>
+            : null}
+
+          {canPayToGetOutOfIsolation() ?
+            <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
+            : null}
+
+          {hasAlreadyRolled() ?
+            <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
+            : null}
+
+          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
+          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
+        </React.Fragment>
+      );
+    }
+
     return (
       <React.Fragment>
-        {canRoll() ?
-          <div><Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button></div>
-          : null}
-
-        {canPayToGetOutOfIsolation() ?
-          <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
-          : null}
-
-        {hasAlreadyRolled() ?
-          <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
-          : null}
-
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-
-
-        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
-
-
       </React.Fragment>
     );
   }
 
-
-
   return (
     <React.Fragment>
-      {isMyTurn() ? getMyActions() : null}
+      {getMyActions()}
 
-      <StatsDialog socketService={socketService} gameInfo={gameInfo}
+      <StatsDialog tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo}
         open={statsViewOpen} onClose={() => setStatsViewOpen(false)}
       />
     </React.Fragment>

@@ -2,8 +2,8 @@ import React from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
-import { faBiohazard, faHandshake } from "@fortawesome/free-solid-svg-icons";
+import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
+import { faBiohazard } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
@@ -11,11 +11,10 @@ interface Props {
   player: Player;
   getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
-  tradeWithPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
 
-export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer, tradeWithPlayer }) => {
+export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer }) => {
 
   const getColorStyle = (): React.CSSProperties => {
     if (isPlayersTurn()) {
@@ -30,14 +29,6 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
 
   const isPlayersTurn = () => {
     return gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(player._id, gameInfo.nextPlayerToAct);
-  }
-
-  const canOfferTrade = () => {
-    const uid = getMyUserId();
-    if (areObjectIdsEqual(player._id, uid)) {
-      return false;
-    }
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
   }
 
 
@@ -65,8 +56,6 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
               {dollarFormatter.format(player.money)}
             </div>
           </div>
-          {canOfferTrade() ? <div className="trade" onClick={() => tradeWithPlayer(player)}><FontAwesomeIcon icon={faHandshake} /></div> : null}
-
         </div>
 
       </div>

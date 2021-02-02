@@ -21,6 +21,7 @@ import { defaultElectricityCostPerHouse } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class GameProcessor {
   public async createGame(
@@ -97,6 +98,9 @@ export class GameProcessor {
       name: playerName,
       position: 1,
       money: 0,
+      totalAssets: 0,
+      mortgageableValue: 0,
+      redeemableValue: 0,
       taxesPerTurn: 0,
       electricityCostsPerTurn: 0,
       color: "#f58a42",
@@ -164,6 +168,10 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 17, 600);
     GameProcessor.assignSquareTesting(game, game.players[1], 19, 89);
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
+
+    game.players.forEach(async (p, index) => {
+      PlayerCostsCalculator.updatePlayerCosts(game, p);
+    });
   }
 
   private static assignSquareTesting(

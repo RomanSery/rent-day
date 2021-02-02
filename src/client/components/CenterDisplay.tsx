@@ -136,7 +136,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
           </div>
 
           <div className="player-actions">
-            <DisplayActions gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
+            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
           </div>
 
           <div className="second-row">
@@ -151,7 +151,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
         </div>
 
-        <DisplayPlayers tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
+        <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />

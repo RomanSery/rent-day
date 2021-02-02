@@ -4,6 +4,7 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual } from "./helpers";
 import { conEd_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
+import { MoneyCalculator } from "./MoneyCalculator";
 
 export class PlayerCostsCalculator {
   public static updatePlayerCosts(
@@ -20,20 +21,23 @@ export class PlayerCostsCalculator {
       player
     );
 
-    player.totalAssets = PlayerCostsCalculator.calculateTotalAssetsForPlayer(
+    const mortgageableValue = PlayerCostsCalculator.calculateMortgageableValueForPlayer(
       game,
       player
+    );
+    const redeemableValue = PlayerCostsCalculator.calculateRedeemableValueForPlayer(
+      game,
+      player
+    );
+    const totalAssets = PlayerCostsCalculator.calculateTotalAssetsForPlayer(
+      game,
+      player,
+      mortgageableValue
     );
 
-    player.mortgageableValue = PlayerCostsCalculator.calculateMortgageableValueForPlayer(
-      game,
-      player
-    );
-
-    player.redeemableValue = PlayerCostsCalculator.calculateRedeemableValueForPlayer(
-      game,
-      player
-    );
+    player.mortgageableValue = mortgageableValue;
+    player.redeemableValue = redeemableValue;
+    player.totalAssets = totalAssets;
   }
 
   private static calculateElectrictyCostsForPlayer(
@@ -108,19 +112,37 @@ export class PlayerCostsCalculator {
 
   private static calculateTotalAssetsForPlayer(
     game: GameInstanceDocument,
-    player: Player
+    player: Player,
+    mortgageableValue: number
   ): number {
-    let total = 0;
+    const money = player.money;
+    const housesValue = PlayerCostsCalculator.calculateTotalSaleValueOfHouses(
+      game,
+      player
+    );
 
-    return total;
+    return money + mortgageableValue + housesValue;
   }
 
   private static calculateMortgageableValueForPlayer(
     game: GameInstanceDocument,
     player: Player
   ): number {
-    let total = 0;
+    const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, player._id) &&
+          !s.isMortgaged &&
+          s.mortgageValue
+        );
+      }
+    );
 
+    let total = 0;
+    playerOwnedSquares.forEach((squareState: SquareGameData) => {
+      total += squareState.mortgageValue!;
+    });
     return total;
   }
 
@@ -128,8 +150,46 @@ export class PlayerCostsCalculator {
     game: GameInstanceDocument,
     player: Player
   ): number {
+    const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, player._id) &&
+          s.isMortgaged &&
+          s.mortgageValue
+        );
+      }
+    );
+
+    let total = 0;
+    playerOwnedSquares.forEach((s: SquareGameData) => {
+      const redeemAmount = MoneyCalculator.getRedeemValue(s);
+      total += redeemAmount;
+    });
+    return total;
+  }
+
+  private static calculateTotalSaleValueOfHouses(
+    game: GameInstanceDocument,
+    player: Player
+  ): number {
+    const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, player._id) &&
+          s.numHouses > 0 &&
+          !s.isMortgaged
+        );
+      }
+    );
+
     let total = 0;
 
+    playerOwnedSquaresWithHouses.forEach((s: SquareGameData) => {
+      const housesValue = s.numHouses * MoneyCalculator.getSellPriceForHouse(s);
+      total += housesValue;
+    });
     return total;
   }
 
