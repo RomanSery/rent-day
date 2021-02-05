@@ -1,12 +1,10 @@
 user can click done withouth picking lotto option
-bcrypt user password
 switch auth token from localstorage to cookie
 encrypt localStorage.myGameId
 need to implement train travel
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
 dont allow mortgaging utilities
 user can click on roll button right after clicking on it, before animation finishes
-collect email address at sign up
 consider removing gameContext.userId
 in property square view, when mortgaged show redeem cost instead of mortgage value
 add tooltips for explaining your tax per turn and electricty costs per turn
@@ -14,6 +12,3 @@ should not be able to mortgage/reddem utilities
 The player to bid the highest wins and pays the 2nd highest bid 
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
 dont pay more rent than the total assets the player has
-
-
-

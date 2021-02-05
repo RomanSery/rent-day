@@ -11,8 +11,10 @@ interface Props {
 }
 
 type Inputs = {
+  email: string;
   username: string;
   password: string;
+  confirmPassword: string;
 };
 
 export const SignUpPage: React.FC<Props> = () => {
@@ -22,7 +24,7 @@ export const SignUpPage: React.FC<Props> = () => {
 
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    API.post("createAccount", { username: data.username, password: data.password })
+    API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email })
       .then(function (response) {
         history.push("/");
       })
@@ -46,11 +48,19 @@ export const SignUpPage: React.FC<Props> = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
+        <TextField label="Email" fullWidth={true} name="email" id="email" required={true}
+          inputRef={register({ required: true })} />
+
         <TextField label="User name" fullWidth={true} name="username" id="username" required={true}
           inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
 
         <TextField label="Password" type="password" fullWidth={true} name="password" id="password" required={true}
           inputRef={register({ required: true })} />
+
+        <TextField label="Confirm Password" type="password" fullWidth={true} name="confirmPassword" id="confirmPassword" required={true}
+          inputRef={register({ required: true })} />
+
+
 
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>

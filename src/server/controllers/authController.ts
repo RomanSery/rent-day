@@ -2,7 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import { check, validationResult } from "express-validator";
 import passport from "passport";
-import { UserDocument, UserInstance } from "../../core/schema/UserSchema";
+import { UserDocument } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
 
 export const createAccount = async (
@@ -10,12 +10,16 @@ export const createAccount = async (
   res: Response,
   next: NextFunction
 ) => {
+  await check("email", "Email is not valid").isEmail().run(req);
   await check("username", "Username missing")
     .notEmpty()
     .isLength({ min: 4, max: 10 })
     .isAlphanumeric()
     .run(req);
   await check("password", "Password missing").notEmpty().run(req);
+  await check("confirmPassword", "Passwords do not match")
+    .equals(req.body.password)
+    .run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -26,6 +30,7 @@ export const createAccount = async (
     if (err) {
       console.error("error: " + err);
     }
+
     if (info !== undefined) {
       res.status(403).send(info.message);
     } else {
@@ -41,11 +46,7 @@ export const login = async (
   res: Response,
   next: NextFunction
 ) => {
-  await check("username", "Username missing")
-    .notEmpty()
-    .isLength({ min: 4, max: 10 })
-    .isAlphanumeric()
-    .run(req);
+  await check("username", "Username missing").isEmail().run(req);
   await check("password", "Password missing").notEmpty().run(req);
 
   const errors = validationResult(req);
@@ -53,27 +54,23 @@ export const login = async (
     return res.status(400).send(errors);
   }
 
-  passport.authenticate("login", (err, users, info) => {
+  passport.authenticate("login", (err, user: UserDocument, info) => {
     if (err) {
       console.error(`error ${err}`);
     }
     if (info !== undefined) {
       return res.status(400).send("Invalid username/password");
     } else {
-      req.logIn(users, () => {
-        UserInstance.findOne({ username: req.body.username }).then(
-          (user: UserDocument) => {
-            const token = jwt.sign({ id: user.id }, "jwt-secret", {
-              expiresIn: 60 * 60,
-            });
-            res.status(200).send({
-              auth: true,
-              token,
-              username: req.body.username,
-              gameId: user.currGameId,
-            });
-          }
-        );
+      req.logIn(user, () => {
+        const token = jwt.sign({ id: user.id }, "jwt-secret", {
+          expiresIn: 60 * 60,
+        });
+        res.status(200).send({
+          auth: true,
+          token,
+          username: req.body.username,
+          gameId: user.currGameId,
+        });
       });
     }
   })(req, res, next);

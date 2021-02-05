@@ -1,6 +1,8 @@
 import passport from "passport";
 import passportLocal from "passport-local";
 import { UserDocument, UserInstance } from "../../core/schema/UserSchema";
+import bcrypt from "bcrypt-nodejs";
+import mongoose from "mongoose";
 
 export const initPassportConfig = () => {
   const LocalStrategy = passportLocal.Strategy;
@@ -14,27 +16,35 @@ export const initPassportConfig = () => {
         session: false,
       },
       (req, username, password, done) => {
-        try {
-          UserInstance.findOne({ username: username }).then(
-            (user: UserDocument) => {
-              if (user != null) {
-                console.log("username already taken");
-                return done(null, false, {
-                  message: "username already taken",
-                });
-              }
+        const email: string = req.body.email;
+        const modifiedEmail = email.toLocaleLowerCase().trim();
+        const modifiedUsername = username.toLocaleLowerCase().trim();
 
-              UserInstance.create({
-                username: username,
-                password: password,
-                wins: 0,
-                gamesPlayed: 0,
-              }).then((user) => {
-                console.log("user created");
-                return done(null, user);
+        try {
+          UserInstance.findOne({
+            $or: [
+              { modifiedUsername: modifiedUsername },
+              { email: modifiedEmail },
+            ],
+          }).exec(function (err: any, user: UserDocument) {
+            if (user) {
+              return done(null, false, {
+                message: "Username/Email already taken",
               });
             }
-          );
+
+            UserInstance.create({
+              email: modifiedEmail,
+              username: username.trim(),
+              modifiedUsername: modifiedUsername,
+              password: password,
+              wins: 0,
+              losses: 0,
+              gamesPlayed: 0,
+            }).then((user) => {
+              return done(null, user);
+            });
+          });
         } catch (err) {
           return done(err);
         }
@@ -52,21 +62,29 @@ export const initPassportConfig = () => {
       },
       (username, password, done) => {
         try {
-          UserInstance.findOne({ username: username }).then(
-            (user: UserDocument) => {
-              if (user === null) {
-                return done(null, false, { message: "bad username" });
-              }
-
-              if (password !== user.password) {
-                console.log("passwords do not match");
-                return done(null, false, { message: "passwords do not match" });
-              } else {
-                console.log("user found & authenticated");
-                return done(null, user);
-              }
+          UserInstance.findOne({
+            email: username.toLocaleLowerCase().trim(),
+          }).then((user: UserDocument) => {
+            if (user === null) {
+              return done(null, false, { message: "bad username" });
             }
-          );
+
+            bcrypt.compare(
+              password,
+              user.password,
+              (err: mongoose.Error, isMatch: boolean) => {
+                if (err) {
+                  return done(err);
+                }
+                if (isMatch) {
+                  return done(undefined, user);
+                }
+                return done(undefined, false, {
+                  message: "Invalid email or password.",
+                });
+              }
+            );
+          });
         } catch (err) {
           done(err);
         }

@@ -53,8 +53,8 @@ export const LoginPage: React.FC<Props> = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <TextField label="User name" fullWidth={true} name="username" id="username" required={true}
-          inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
+        <TextField label="Email" fullWidth={true} name="username" id="username" required={true}
+          inputRef={register({ required: true })} />
 
         <TextField label="Password" type="password" fullWidth={true} name="password" id="password" required={true}
           inputRef={register({ required: true })} />

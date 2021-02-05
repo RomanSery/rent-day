@@ -22,6 +22,7 @@
     "@types/react": "^16.14.2",
     "@types/react-dom": "^16.9.10",
     "axios": "^0.20.0",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -52,6 +53,7 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@types/bcrypt-nodejs": "0.0.31",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.9",
     "@types/errorhandler": "^1.5.0",
