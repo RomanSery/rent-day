@@ -70,6 +70,15 @@ export class PropertyProcessor {
     }
 
     const squareConfig = SquareConfigDataMap.get(this.squareId);
+
+    if (
+      squareConfig &&
+      squareConfig.type !== SquareType.Property &&
+      squareConfig.type !== SquareType.TrainStation
+    ) {
+      return "You can't mortgage this type of property";
+    }
+
     if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
       return "You have to sell all the houses in the group first";
     }
@@ -110,6 +119,16 @@ export class PropertyProcessor {
     const redeemAmount = MoneyCalculator.getRedeemValue(this.state);
     if (this.player.money < redeemAmount) {
       return "You don't have enought money to redeem";
+    }
+
+    const squareConfig = SquareConfigDataMap.get(this.squareId);
+
+    if (
+      squareConfig &&
+      squareConfig.type !== SquareType.Property &&
+      squareConfig.type !== SquareType.TrainStation
+    ) {
+      return "You can't redeem this type of property";
     }
 
     this.state.isMortgaged = false;

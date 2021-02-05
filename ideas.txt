@@ -3,7 +3,6 @@ switch auth token from localstorage to cookie
 encrypt localStorage.myGameId
 need to implement train travel
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
-dont allow mortgaging utilities
 user can click on roll button right after clicking on it, before animation finishes
 consider removing gameContext.userId
 in property square view, when mortgaged show redeem cost instead of mortgage value

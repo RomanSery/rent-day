@@ -107,7 +107,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       return (
         <React.Fragment>
           {canRoll() ?
-            <div><Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button></div>
+            <Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
             : null}
 
           {canPayToGetOutOfIsolation() ?
