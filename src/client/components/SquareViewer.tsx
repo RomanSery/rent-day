@@ -137,6 +137,14 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
     return "";
   };
 
+  const getRedeemCost = (): string => {
+    const data = getSquareGameData();
+    if (data && data.owner && data.mortgageValue) {
+      return dollarFormatter.format(Math.round(data.mortgageValue + data.mortgageValue * 0.1));
+    }
+    return "";
+  };
+
   const isMortgaged = (): boolean => {
     const data = getSquareGameData();
     return data && data.isMortgaged ? true : false;
@@ -312,10 +320,10 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                   <TableCell>{getPurchasePrice()}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer10">
-                  <TableCell component="th" className="square-viewer-header-row" scope="row">Mortgage Value</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">{isMortgaged() ? "Cost to Redeem" : "Mortgage Value"}</TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer10a">
-                  <TableCell>{getMortgageValue()}</TableCell>
+                  <TableCell>{isMortgaged() ? getRedeemCost() : getMortgageValue()}</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -366,30 +374,24 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                 <TableRow key="stationViewer6a">
                   <TableCell>{config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}</TableCell>
                 </TableRow>
-
                 <TableRow key="stationViewer7">
                   <TableCell component="th" className="square-viewer-header-row" scope="row">Owner</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer7a">
                   <TableCell style={getNameColorStyle()}>{getowner()}</TableCell>
                 </TableRow>
-
                 <TableRow key="stationViewer8">
                   <TableCell component="th" className="square-viewer-header-row" scope="row">Purchase Price</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer8a">
                   <TableCell>{getPurchasePrice()}</TableCell>
                 </TableRow>
-
                 <TableRow key="stationViewer5">
-                  <TableCell component="th" className="square-viewer-header-row" scope="row">Mortgage Value</TableCell>
+                  <TableCell component="th" className="square-viewer-header-row" scope="row">{isMortgaged() ? "Cost to Redeem" : "Mortgage Value"}</TableCell>
                 </TableRow>
                 <TableRow key="stationViewer5a">
-                  <TableCell>{getMortgageValue()}</TableCell>
+                  <TableCell>{isMortgaged() ? getRedeemCost() : getMortgageValue()}</TableCell>
                 </TableRow>
-
-
-
               </TableBody>
             </Table>
           </TableContainer>

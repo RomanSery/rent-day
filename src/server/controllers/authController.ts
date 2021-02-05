@@ -68,7 +68,7 @@ export const login = async (
         res.status(200).send({
           auth: true,
           token,
-          username: req.body.username,
+          username: user.username,
           gameId: user.currGameId,
         });
       });
