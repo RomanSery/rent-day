@@ -8,8 +8,12 @@ export interface Player {
   readonly name: string;
 
   money: number;
+
   taxesPerTurn: number;
   electricityCostsPerTurn: number;
+  taxTooltip: string;
+  electricityTooltip: string;
+
   totalAssets: number;
   mortgageableValue: number;
   redeemableValue: number;
@@ -26,6 +30,7 @@ export interface Player {
   corruption: number;
 
   hasRolled: boolean;
+  hasTraveled: boolean;
   rollHistory: Array<DiceRoll>;
   numTurnsInIsolation: number;
 }

@@ -17,17 +17,99 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Player } from "../core/types/Player";
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableRow from '@material-ui/core/TableRow';
+import Paper from '@material-ui/core/Paper';
+import { TableHead } from "@material-ui/core";
+import { GameState } from "../core/types/GameState";
 
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {
     backgroundColor: '#f5f5f9',
     color: 'rgba(0, 0, 0, 0.87)',
-    maxWidth: 220,
     fontSize: theme.typography.pxToRem(14),
     border: '1px solid #dadde9',
+    maxWidth: 'none'
   },
 }))(Tooltip);
+
+
+export const getElectricityTooltip = (player: Player | undefined, amount: string) => {
+  if (!player) {
+    return amount;
+  }
+  return (<HtmlTooltip
+    title={
+      <React.Fragment>
+        <Typography color="inherit"><strong>Electricity per Turn</strong></Typography>
+        {player.electricityTooltip}
+      </React.Fragment>
+    }
+  >
+    <span>{amount}</span>
+  </HtmlTooltip>);
+}
+
+export const getTaxTooltip = (game: GameState | undefined, player: Player | undefined, amount: string) => {
+  if (!player) {
+    return amount;
+  }
+  return (<HtmlTooltip
+    title={
+      <React.Fragment>
+        <Typography color="inherit"><strong>Tax per Turn</strong></Typography>
+        {getTaxBreakdownTable(game, player.taxTooltip)}
+      </React.Fragment>
+    }
+  >
+    <span>{amount}</span>
+  </HtmlTooltip>);
+}
+
+const getSquareId = (row: string): number => {
+  return parseInt(row.split(',')[0]);
+}
+
+const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): JSX.Element => {
+  if (taxTooltip.length === 0 || !game) {
+    return (
+      <React.Fragment>
+      </React.Fragment>
+    );
+  }
+
+  const rows = taxTooltip.split(';');
+
+  return (
+    <TableContainer component={Paper} className="other-info">
+      <Table size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell align="right">Tax</TableCell>
+            <TableCell align="right">Adjusted</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.split(',')[0]}>
+              <TableCell component="th" scope="row">
+                {game.theme[getSquareId(row)].name}
+              </TableCell>
+              <TableCell align="right">{row.split(',')[1]}</TableCell>
+              <TableCell align="right">{row.split(',')[2]}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 
 export const getSkillTypeTooltip = (skill: SkillType) => {

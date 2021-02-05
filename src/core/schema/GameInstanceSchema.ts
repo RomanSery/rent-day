@@ -10,8 +10,12 @@ const PlayerSchema = new mongoose.Schema({
   _id: { type: Schema.Types.ObjectId, required: true },
   name: { type: String, required: true },
   money: { type: Number, required: true },
+
   taxesPerTurn: { type: Number, required: true },
   electricityCostsPerTurn: { type: Number, required: true },
+  taxTooltip: { type: String },
+  electricityTooltip: { type: String },
+
   totalAssets: { type: Number, required: true },
   mortgageableValue: { type: Number, required: true },
   redeemableValue: { type: Number, required: true },
@@ -28,6 +32,7 @@ const PlayerSchema = new mongoose.Schema({
   corruption: { type: Number, required: true },
 
   hasRolled: { type: Boolean, required: true },
+  hasTraveled: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
   numTurnsInIsolation: { type: Number, required: true },
 });

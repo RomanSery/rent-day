@@ -103,6 +103,8 @@ export class GameProcessor {
       redeemableValue: 0,
       taxesPerTurn: 0,
       electricityCostsPerTurn: 0,
+      taxTooltip: "",
+      electricityTooltip: "",
       color: "#f58a42",
       type: selectedPiece,
       playerClass: selectedPlayerClass,
@@ -112,6 +114,7 @@ export class GameProcessor {
       luck: initialSkills.luck,
       corruption: initialSkills.corruption,
       hasRolled: false,
+      hasTraveled: false,
       rollHistory: [],
       numTurnsInIsolation: 0,
     };

@@ -7,6 +7,13 @@ import { Player } from "../../core/types/Player";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
+export const dollarFormatterServer = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+});
+
 export const getVerifiedUserId = (
   requestContext: any
 ): mongoose.Types.ObjectId | null => {

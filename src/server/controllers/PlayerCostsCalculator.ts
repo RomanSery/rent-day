@@ -1,7 +1,7 @@
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areIdsEqual } from "./helpers";
+import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { conEd_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 import { MoneyCalculator } from "./MoneyCalculator";
@@ -11,15 +11,9 @@ export class PlayerCostsCalculator {
     game: GameInstanceDocument,
     player: Player
   ): void {
-    player.electricityCostsPerTurn = PlayerCostsCalculator.calculateElectrictyCostsForPlayer(
-      game,
-      player
-    );
+    PlayerCostsCalculator.calculateElectrictyCostsForPlayer(game, player);
 
-    player.taxesPerTurn = PlayerCostsCalculator.calculateTaxCostsForPlayer(
-      game,
-      player
-    );
+    PlayerCostsCalculator.calculateTaxCostsForPlayer(game, player);
 
     const mortgageableValue = PlayerCostsCalculator.calculateMortgageableValueForPlayer(
       game,
@@ -43,9 +37,11 @@ export class PlayerCostsCalculator {
   private static calculateElectrictyCostsForPlayer(
     game: GameInstanceDocument,
     player: Player
-  ): number {
+  ): void {
     if (PlayerCostsCalculator.doesPlayerOwnConEd(game, player._id)) {
-      return 0;
+      player.electricityTooltip =
+        "You own ConEd, so you don't have to pay for electricity";
+      player.electricityCostsPerTurn = 0;
     }
 
     const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
@@ -60,19 +56,29 @@ export class PlayerCostsCalculator {
     );
 
     let total = 0;
+    let totalHouses = 0;
 
     playerOwnedSquaresWithHouses.forEach((squareState: SquareGameData) => {
       const cost =
         squareState.numHouses * game.settings.electricityCostPerHouse;
       total += cost;
+
+      totalHouses += squareState.numHouses;
     });
-    return total;
+
+    player.electricityTooltip =
+      totalHouses +
+      " houses X " +
+      dollarFormatterServer.format(game.settings.electricityCostPerHouse) +
+      " per house";
+
+    player.electricityCostsPerTurn = total;
   }
 
   private static calculateTaxCostsForPlayer(
     game: GameInstanceDocument,
     player: Player
-  ): number {
+  ): void {
     const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
       (s: SquareGameData) => {
         return (
@@ -88,6 +94,7 @@ export class PlayerCostsCalculator {
     );
 
     let total = 0;
+    const details: Array<string> = [];
 
     playerOwnedSquares.forEach((squareState: SquareGameData) => {
       if (squareState.purchasePrice && squareState.tax) {
@@ -100,6 +107,14 @@ export class PlayerCostsCalculator {
         );
 
         total += adjustedTax;
+
+        details.push(
+          squareState.squareId +
+            "," +
+            dollarFormatterServer.format(tax) +
+            "," +
+            dollarFormatterServer.format(adjustedTax)
+        );
       }
     });
 
@@ -107,7 +122,9 @@ export class PlayerCostsCalculator {
     const substraction = total * corruptionAdjustment;
     const finalTotal = total - substraction;
 
-    return finalTotal;
+    player.taxTooltip = details.join(";");
+
+    player.taxesPerTurn = finalTotal;
   }
 
   private static calculateTotalAssetsForPlayer(
