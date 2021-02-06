@@ -19,28 +19,28 @@ export const AnimatedDice: React.FC<Props> = () => {
 
         <motion.div
           animate={{
-            rotateZ: [0, 90, 180, 270, 360]
+            rotateY: [0, 90, 180, 270, 360]
           }}
           transition={{
             duration: 0.5,
             loop: 5,
             repeatDelay: 0
           }}
-          style={{ originX: 0.5 }}
+          style={{ transformOrigin: "center" }}
         >
           <div className="die-face">{pips}</div>
         </motion.div>
 
         <motion.div
           animate={{
-            rotateZ: [360, 270, 180, 90, 0]
+            rotateY: [360, 270, 180, 90, 0]
           }}
           transition={{
             duration: 0.5,
             loop: 5,
             repeatDelay: 0
           }}
-          style={{ originX: 0.5 }}
+          style={{ transformOrigin: "center" }}
         >
           <div className="die-face">{pips}</div>
         </motion.div>

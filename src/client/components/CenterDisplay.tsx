@@ -127,12 +127,11 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <div className="center-left-side">
           <div className="game-results">
             {getGameResultsDisplayComp()}
+          </div>
 
-            <div>
-              <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
-              <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
-            </div>
-
+          <div>
+            <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
+            <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
           </div>
 
           <div className="player-actions">
