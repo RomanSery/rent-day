@@ -113,7 +113,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const getMyPlayer = (): Player | undefined => {
     if (gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, context.userId));
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
     }
     return undefined;
   }
@@ -147,6 +147,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return (
       <React.Fragment>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
+        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
       </React.Fragment>
     );
   }

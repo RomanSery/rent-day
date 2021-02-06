@@ -341,5 +341,23 @@ export class GameProcessor {
     }
 
     game.save();
+
+    const ud: UserDocument = await UserInstance.findById(
+      userId,
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      if (status === GameStatus.ACTIVE) {
+        ud.losses++;
+      }
+      ud.currGameId = undefined;
+      ud.currGameName = undefined;
+      await ud.save();
+    }
   }
 }

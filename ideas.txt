@@ -1,6 +1,5 @@
 switch auth token from localstorage to cookie
 encrypt localStorage.myGameId
-consider removing gameContext.userId
 
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)

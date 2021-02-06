@@ -24,10 +24,9 @@ export const dollarFormatter = new Intl.NumberFormat("en-US", {
 
 export const getGameContextFromLocalStorage = (): GameContext => {
   const gid = getMyGameId();
-  const pid = getMyUserId();
   const token: any = getMyAuthToken();
 
-  return { gameId: gid, userId: pid, authToken: token };
+  return { gameId: gid, authToken: token };
 };
 
 export enum StorageConstants {
@@ -117,6 +116,7 @@ export const isLoggedIn = (): boolean => {
 
 export const logOut = (): void => {
   localStorage.removeItem(StorageConstants.JWT_TOKEN);
+  localStorage.removeItem(StorageConstants.PLAYER_NAME);
 };
 
 export const tryToRedirectToGame = async (
