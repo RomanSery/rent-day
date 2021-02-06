@@ -33,7 +33,7 @@ export const createGame = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -61,7 +61,7 @@ export const getGame = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  if (getVerifiedUserId(req.body.context) == null) {
+  if (getVerifiedUserId(req) == null) {
     return res.status(400).send("Invalid auth token");
   }
 
@@ -79,7 +79,7 @@ export const getAuction = async (req: Request, res: Response) => {
     return res.status(400).send("missing auctionId");
   }
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -89,7 +89,7 @@ export const getAuction = async (req: Request, res: Response) => {
 };
 
 export const getGamesToJoin = async (req: Request, res: Response) => {
-  if (getVerifiedUserId(req.body.context) == null) {
+  if (getVerifiedUserId(req) == null) {
     return res.status(400).send("Invalid auth token");
   }
 
@@ -98,7 +98,7 @@ export const getGamesToJoin = async (req: Request, res: Response) => {
 };
 
 export const getAllPlayers = async (req: Request, res: Response) => {
-  if (getVerifiedUserId(req.body.context) == null) {
+  if (getVerifiedUserId(req) == null) {
     return res.status(400).send("Invalid auth token");
   }
 
@@ -142,7 +142,7 @@ export const joinGame = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -180,7 +180,7 @@ export const leaveGame = async (req: Request, res: Response) => {
     return res.status(400).send(errors);
   }
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -201,7 +201,7 @@ export const getLotto = async (req: Request, res: Response) => {
     return res.status(400).send("missing lottoId");
   }
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }

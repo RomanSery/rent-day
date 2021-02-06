@@ -12,7 +12,7 @@ import { PlayerProcessor } from "./PlayerProcessor";
 import { SkillType } from "../../core/enums/SkillType";
 
 export const roll = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -36,7 +36,7 @@ export const roll = async (req: Request, res: Response) => {
 };
 
 export const completeTurn = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -57,7 +57,7 @@ export const completeTurn = async (req: Request, res: Response) => {
 export const bid = async (req: Request, res: Response) => {
   await check("bid", "Bid is not valid").notEmpty().isNumeric().run(req);
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -79,7 +79,7 @@ export const bid = async (req: Request, res: Response) => {
 export const pickLotto = async (req: Request, res: Response) => {
   await check("opt", "Opt is not valid").notEmpty().isNumeric().run(req);
 
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -99,7 +99,7 @@ export const pickLotto = async (req: Request, res: Response) => {
 };
 
 export const mortage = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -119,7 +119,7 @@ export const mortage = async (req: Request, res: Response) => {
 };
 
 export const redeem = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -139,7 +139,7 @@ export const redeem = async (req: Request, res: Response) => {
 };
 
 export const getOut = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -157,7 +157,7 @@ export const getOut = async (req: Request, res: Response) => {
 };
 
 export const buildHouse = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -177,7 +177,7 @@ export const buildHouse = async (req: Request, res: Response) => {
 };
 
 export const sellHouse = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -197,7 +197,7 @@ export const sellHouse = async (req: Request, res: Response) => {
 };
 
 export const offerTrade = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -233,7 +233,7 @@ export const offerTrade = async (req: Request, res: Response) => {
 };
 
 export const acceptTrade = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -254,7 +254,7 @@ export const acceptTrade = async (req: Request, res: Response) => {
 };
 
 export const declineTrade = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }
@@ -275,7 +275,7 @@ export const declineTrade = async (req: Request, res: Response) => {
 };
 
 export const upgradeSkill = async (req: Request, res: Response) => {
-  const userId = getVerifiedUserId(req.body.context);
+  const userId = getVerifiedUserId(req);
   if (userId == null) {
     return res.status(400).send("Invalid auth token");
   }

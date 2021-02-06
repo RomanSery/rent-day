@@ -7,6 +7,7 @@ import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { Request } from "express";
 
 export const dollarFormatterServer = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -16,11 +17,11 @@ export const dollarFormatterServer = new Intl.NumberFormat("en-US", {
 });
 
 export const getVerifiedUserId = (
-  requestContext: any
+  req: Request
 ): mongoose.Types.ObjectId | null => {
-  const authToken = requestContext.authToken;
-
   try {
+    const authToken = req.session!.rentDayToken;
+
     const verified: any = jwt.verify(authToken, JWT_SECRET, {
       ignoreExpiration: true,
     });

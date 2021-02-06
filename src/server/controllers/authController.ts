@@ -66,6 +66,9 @@ export const login = async (
         const token = jwt.sign({ id: user.id }, JWT_SECRET, {
           expiresIn: 60 * 60,
         });
+
+        req.session!.rentDayToken = token;
+
         res.status(200).send({
           auth: true,
           token,

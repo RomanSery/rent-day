@@ -24,9 +24,8 @@ export const dollarFormatter = new Intl.NumberFormat("en-US", {
 
 export const getGameContextFromLocalStorage = (): GameContext => {
   const gid = getMyGameId();
-  const token: any = getMyAuthToken();
 
-  return { gameId: gid, authToken: token };
+  return { gameId: gid };
 };
 
 export enum StorageConstants {

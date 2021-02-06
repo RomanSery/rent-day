@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import passport from "passport";
+import cookieSession from "cookie-session";
 
 // Controllers (route handlers)
 import * as actions from "./controllers/actions";
@@ -11,6 +12,7 @@ import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
+import { COOKIE_NAME } from "./util/secrets";
 
 // Create Express server
 const app = express();
@@ -43,6 +45,17 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 passportConfig.initPassportConfig();
+
+app.use(
+  cookieSession({
+    name: COOKIE_NAME,
+    secret: "rent-day-secret",
+    //secure: true,
+    httpOnly: true,
+    //domain: "localhost",
+    //sameSite: "strict",
+  })
+);
 
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
