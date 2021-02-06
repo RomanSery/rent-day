@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { Button } from "@material-ui/core";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
@@ -26,8 +27,18 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
   const [statsViewOpen, setStatsViewOpen] = React.useState(false);
+  const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
+
+
+
+  React.useEffect(() => {
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
+      setRollBtnHidden(false);
+    });
+  }, []);
 
   const onClickRoll = async () => {
+    setRollBtnHidden(true);
     onRollAction();
   };
 
@@ -115,7 +126,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     if (isMyTurn()) {
       return (
         <React.Fragment>
-          {canRoll() ?
+          {canRoll() && !rollBtnHidden ?
             <Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
             : null}
 
