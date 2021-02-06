@@ -142,13 +142,17 @@ export class PropertyProcessor {
     return "";
   }
 
-  public purchaseSquare(gameDoc: GameInstanceDocument, winner: Bidder): void {
+  public purchaseSquare(
+    gameDoc: GameInstanceDocument,
+    winner: Bidder,
+    priceToPay: number
+  ): void {
     const state: SquareGameData | undefined = gameDoc.squareState.find(
       (p: SquareGameData) => p.squareId === this.squareId
     );
     if (state) {
-      state.mortgageValue = MoneyCalculator.getMortgageValue(winner.bid!);
-      state.purchasePrice = winner.bid!;
+      state.mortgageValue = MoneyCalculator.getMortgageValue(priceToPay);
+      state.purchasePrice = priceToPay;
       state.color = winner.color!;
       state.owner = winner._id!;
     }

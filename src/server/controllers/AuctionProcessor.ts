@@ -116,18 +116,32 @@ export class AuctionProcessor {
         this.gameId,
         this.userId
       );
-      processor.purchaseSquare(this.game, winner);
+
+      const priceToPay: number = this.getPriceToPay();
+      processor.purchaseSquare(this.game, winner, priceToPay);
 
       const playerWinner = this.game.players.find(
         (p) =>
           p._id &&
           new mongoose.Types.ObjectId(p._id).equals(this.auction!.winnerId)
       );
-      if (playerWinner && winner.bid) {
-        playerWinner.money = playerWinner.money - winner.bid;
+      if (playerWinner && priceToPay) {
+        playerWinner.money = playerWinner.money - priceToPay;
         PlayerCostsCalculator.updatePlayerCosts(this.game, playerWinner);
       }
     }
+  }
+
+  private getPriceToPay(): number {
+    const bids: Array<number> = [];
+    this.auction!.bidders.forEach((b) => {
+      bids.push(b.bid!);
+    });
+
+    bids.sort((a, b) => (a > b ? -1 : 1));
+    console.log(bids);
+
+    return bids[1];
   }
 
   private isTie(winningBid: number): boolean {
