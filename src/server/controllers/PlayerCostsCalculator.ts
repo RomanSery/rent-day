@@ -1,5 +1,6 @@
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
+import { TaxSummaryRow } from "../../core/types/TaxSummaryRow";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { conEd_position } from "../../core/constants";
@@ -94,7 +95,7 @@ export class PlayerCostsCalculator {
     );
 
     let total = 0;
-    const details: Array<string> = [];
+    const summary: Array<TaxSummaryRow> = [];
 
     playerOwnedSquares.forEach((squareState: SquareGameData) => {
       if (squareState.purchasePrice && squareState.tax) {
@@ -108,21 +109,31 @@ export class PlayerCostsCalculator {
 
         total += adjustedTax;
 
-        details.push(
-          squareState.squareId +
-            "," +
-            dollarFormatterServer.format(tax) +
-            "," +
-            dollarFormatterServer.format(adjustedTax)
-        );
+        summary.push({
+          squareId: squareState.squareId,
+          tax: tax,
+          adjustedTax: adjustedTax,
+        });
       }
     });
+
+    summary.sort((a, b) => (a.adjustedTax! > b.adjustedTax! ? -1 : 1));
+
+    const details: Array<string> = [];
+    summary.forEach((s) => {
+      details.push(
+        s.squareId +
+          "," +
+          dollarFormatterServer.format(s.tax) +
+          "," +
+          dollarFormatterServer.format(s.adjustedTax)
+      );
+    });
+    player.taxTooltip = details.join(";");
 
     const corruptionAdjustment = (player.corruption * 3) / 100.0;
     const substraction = total * corruptionAdjustment;
     const finalTotal = total - substraction;
-
-    player.taxTooltip = details.join(";");
 
     player.taxesPerTurn = finalTotal;
   }

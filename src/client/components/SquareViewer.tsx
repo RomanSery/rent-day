@@ -473,7 +473,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
       <React.Fragment>
         <div className="utility-name square-color-bar">Central park</div>
         <div className="utility-description">
-          Enjoy a relaxing rent-free day strolling in the park!
+          Enjoy a relaxing rent-free day strolling around in the park!
         </div>
       </React.Fragment>
     );

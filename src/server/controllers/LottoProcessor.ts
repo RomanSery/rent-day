@@ -68,7 +68,7 @@ export class LottoProcessor {
       return "invalid picked option";
     }
 
-    const randomNum = Math.floor(Math.random() * 100) + 1;
+    const randomNum = LottoProcessor.getRandomIntInclusive(1, 100);
 
     this.lotto.optionPicked = this.optNum;
     this.lotto.randomNum = randomNum;
@@ -157,21 +157,24 @@ export class LottoProcessor {
     gameId: mongoose.Types.ObjectId,
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
-    //TODO modify this for luck attributes, etc
-
-    //Luck - each point increases your chance to win lotto prizes by 2%
-
     const classType = player.playerClass;
     const luckIncrease = player.luck * 2;
 
-    const smallPrize = Math.floor(Math.random() * 250) + 100;
+    const smallPrize = LottoProcessor.getRandomIntInclusive(100, 200);
     const smallPrizePercent = 50 + luckIncrease;
 
-    const mediumPrize = Math.floor(Math.random() * 450) + 300;
+    const mediumPrize = LottoProcessor.getRandomIntInclusive(230, 400);
     const mediumPrizePercent = 20 + luckIncrease;
 
-    const largePrize = Math.floor(Math.random() * 750) + 500;
+    const largePrize = LottoProcessor.getRandomIntInclusive(430, 600);
     const largePrizePercent = 10 + luckIncrease;
+
+    console.log(
+      "small: %s medium: %s large: %s",
+      smallPrize,
+      mediumPrize,
+      largePrize
+    );
 
     const newObj: LottoDocument = new Lotto({
       gameId: gameId,
@@ -186,8 +189,21 @@ export class LottoProcessor {
       option3Percent: largePrizePercent,
     });
 
+    console.log(
+      "AFTER small: %s medium: %s large: %s",
+      newObj.option1Amount,
+      newObj.option2Amount,
+      newObj.option3Amount
+    );
+
     await newObj.save();
     return new mongoose.Types.ObjectId(newObj._id);
+  }
+
+  private static getRandomIntInclusive(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 
   public static shouldCreateLotto(squareId: number): boolean {

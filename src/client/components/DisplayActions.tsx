@@ -62,9 +62,18 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
   }
 
-  const hasAlreadyRolled = (): boolean => {
-    const myPlayer = getMyPlayer();
-    return myPlayer && myPlayer.hasRolled ? true : false;
+  const canCompleteTurn = (): boolean => {
+    const p = getMyPlayer();
+    if (!p) {
+      return false;
+    }
+    if (!p.hasRolled) {
+      return false;
+    }
+    if (gameInfo && gameInfo.lottoId) {
+      return false;
+    }
+    return true;
   }
 
   const canRoll = (): boolean => {
@@ -114,7 +123,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
             <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
             : null}
 
-          {hasAlreadyRolled() ?
+          {canCompleteTurn() ?
             <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
             : null}
 

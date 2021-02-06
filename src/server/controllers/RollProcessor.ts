@@ -74,6 +74,7 @@ export class RollProcessor {
 
     if (this.playerPassedPayDay === true) {
       MoneyCalculator.collectSalary(this.player);
+      this.player.numAbilityPoints++;
     }
 
     if (AuctionProcessor.shouldCreateAuction(this.game, this.player.position)) {
@@ -235,6 +236,10 @@ export class RollProcessor {
 
     if (!this.player.hasRolled) {
       return "you didnt roll yet";
+    }
+
+    if (this.game.lottoId) {
+      return "There is an active lotto game, pick a prize first";
     }
 
     const nextPlayer: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();

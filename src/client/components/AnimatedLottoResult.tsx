@@ -21,16 +21,10 @@ export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, s
   const [showResult, setShowResult] = useState<boolean>(false);
 
   const getBufferValue = (): number => {
-    if (chanceToWin > 50) {
-      return chanceToWin;
-    }
     return 100 - chanceToWin;
   };
 
   const getTargetValue = (): number => {
-    if (chanceToWin > 50) {
-      return randomNum;
-    }
     return 100 - randomNum;
   };
 
