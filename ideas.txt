@@ -10,7 +10,6 @@ dont pay more rent than the total assets the player has
 need to implement train travel
 user can click done withouth picking lotto option
 user can click on roll button right after clicking on it, before animation finishes
-add tooltips for explaining your tax per turn and electricty costs per turn (add to stats table too)
 The player to bid the highest wins and pays the 2nd highest bid 
 add more details to roll results and move to the right of dice
 

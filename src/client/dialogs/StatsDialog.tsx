@@ -10,6 +10,7 @@ import { DataGrid, ColDef, RowsProp, RowModel, ValueFormatterParams } from '@mat
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
+import { getElectricityTooltip, getTaxTooltip } from "../uiHelpers";
 
 interface Props {
   open: boolean;
@@ -72,16 +73,22 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
       headerName: 'Tax',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      renderCell: (params: ValueFormatterParams) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {getTaxTooltip(gameInfo, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
+        </div>
+      ),
     },
     {
       field: 'electricityPerTurn',
       headerName: 'Electric',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      renderCell: (params: ValueFormatterParams) => (
+        <div style={{ textAlign: "right", width: "100%" }}>
+          {getElectricityTooltip(getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
+        </div>
+      ),
     },
     {
       field: 'totalAssets',
