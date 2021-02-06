@@ -2,6 +2,8 @@ switch auth token from localstorage to cookie
 encrypt localStorage.myGameId
 
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
+(need to sell all houses.  all owned properties have to be returned to the bank)
+
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
 dont pay more rent than the total assets the player has
 

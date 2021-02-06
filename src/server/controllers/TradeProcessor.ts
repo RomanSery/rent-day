@@ -159,7 +159,7 @@ export class TradeProcessor {
 
   public static async getTrade(
     tradeId: mongoose.Types.ObjectId
-  ): Promise<TradeDocument> {
+  ): Promise<TradeDocument | null> {
     return await Trade.findById(
       tradeId,
       (err: mongoose.CallbackError, existingTrade: TradeDocument) => {
@@ -176,7 +176,7 @@ export class TradeProcessor {
     tradeId: mongoose.Types.ObjectId,
     gameId: mongoose.Types.ObjectId
   ): Promise<string> {
-    const tradeDoc: TradeDocument = await this.getTrade(tradeId);
+    const tradeDoc: TradeDocument | null = await this.getTrade(tradeId);
     if (!tradeDoc) {
       return "Trade not found";
     }
@@ -200,7 +200,9 @@ export class TradeProcessor {
       return "You can't accept this trade";
     }
 
-    const game: GameInstanceDocument = await GameProcessor.getGame(gameId);
+    const game: GameInstanceDocument | null = await GameProcessor.getGame(
+      gameId
+    );
     if (!game) {
       return "Game not found";
     }
@@ -330,7 +332,7 @@ export class TradeProcessor {
     tradeId: mongoose.Types.ObjectId,
     gameId: mongoose.Types.ObjectId
   ): Promise<string> {
-    const tradeDoc: TradeDocument = await this.getTrade(tradeId);
+    const tradeDoc: TradeDocument | null = await this.getTrade(tradeId);
     if (!tradeDoc) {
       return "trade not found";
     }
@@ -354,7 +356,9 @@ export class TradeProcessor {
       return "You can't decline this trade";
     }
 
-    const game: GameInstanceDocument = await GameProcessor.getGame(gameId);
+    const game: GameInstanceDocument | null = await GameProcessor.getGame(
+      gameId
+    );
     if (!game) {
       return "Game not found";
     }

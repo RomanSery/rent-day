@@ -87,7 +87,10 @@ export class GameProcessor {
     }
 
     const playerName: string = await this.getUserName(userId);
-    let game: GameInstanceDocument = await GameInstance.findById(gameId);
+    let game: GameInstanceDocument | null = await GameInstance.findById(gameId);
+    if (!game) {
+      return null;
+    }
 
     const initialSkills: SkillSettings = Traits.getInitialSkills(
       selectedPlayerClass
@@ -201,7 +204,9 @@ export class GameProcessor {
     userId: mongoose.Types.ObjectId,
     selectedPiece: PieceType
   ): Promise<string> {
-    const game: GameInstanceDocument = await GameInstance.findById(gameId);
+    const game: GameInstanceDocument | null = await GameInstance.findById(
+      gameId
+    );
 
     if (game == null) {
       return "game not found";
@@ -224,7 +229,7 @@ export class GameProcessor {
 
   public static async getGame(
     gameId: mongoose.Types.ObjectId
-  ): Promise<GameInstanceDocument> {
+  ): Promise<GameInstanceDocument | null> {
     return await GameInstance.findById(
       gameId,
       (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
@@ -237,7 +242,7 @@ export class GameProcessor {
   }
 
   private async getUserName(userId: mongoose.Types.ObjectId): Promise<string> {
-    const ud: UserDocument = await UserInstance.findById(
+    const ud: UserDocument | null = await UserInstance.findById(
       userId,
       (err: mongoose.CallbackError, u: UserDocument) => {
         if (err) {
@@ -256,7 +261,7 @@ export class GameProcessor {
     p: Player,
     game: GameInstanceDocument
   ): Promise<void> {
-    const ud: UserDocument = await UserInstance.findById(
+    const ud: UserDocument | null = await UserInstance.findById(
       new mongoose.Types.ObjectId(p._id),
       (err: mongoose.CallbackError, u: UserDocument) => {
         if (err) {
@@ -318,7 +323,7 @@ export class GameProcessor {
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId
   ): Promise<void> {
-    let game: GameInstanceDocument = await GameInstance.findById(gameId);
+    let game: GameInstanceDocument | null = await GameInstance.findById(gameId);
     if (game == null) {
       return;
     }
@@ -342,7 +347,7 @@ export class GameProcessor {
 
     game.save();
 
-    const ud: UserDocument = await UserInstance.findById(
+    const ud: UserDocument | null = await UserInstance.findById(
       userId,
       (err: mongoose.CallbackError, u: UserDocument) => {
         if (err) {

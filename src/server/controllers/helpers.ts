@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { JWT_SECRET } from "../util/secrets";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
@@ -20,7 +21,7 @@ export const getVerifiedUserId = (
   const authToken = requestContext.authToken;
 
   try {
-    const verified: any = jwt.verify(authToken, "jwt-secret", {
+    const verified: any = jwt.verify(authToken, JWT_SECRET, {
       ignoreExpiration: true,
     });
 

@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import logger from "./logger";
-import dotenv from "dotenv";
-import fs from "fs";
+//import logger from "./logger";
+//import dotenv from "dotenv";
+//import fs from "fs";
 
+/*
 if (fs.existsSync(".env")) {
   logger.debug("Using .env file to supply config environment variables");
   dotenv.config({ path: ".env" });
@@ -30,4 +31,6 @@ if (!MONGODB_URI) {
     );
   }
   process.exit(1);
-}
+}*/
+
+export const JWT_SECRET: string = "fe@#!34mnz";

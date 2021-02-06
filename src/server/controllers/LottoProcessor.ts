@@ -141,7 +141,7 @@ export class LottoProcessor {
 
   public static async getLotto(
     lottoId: mongoose.Types.ObjectId
-  ): Promise<LottoDocument> {
+  ): Promise<LottoDocument | null> {
     return await Lotto.findById(
       lottoId,
       (err: mongoose.CallbackError, existing: LottoDocument) => {

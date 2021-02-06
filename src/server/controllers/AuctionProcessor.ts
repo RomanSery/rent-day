@@ -153,8 +153,8 @@ export class AuctionProcessor {
   public static async getAuction(
     auctionId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId
-  ): Promise<AuctionDocument> {
-    let found: AuctionDocument = await Auction.findById(
+  ): Promise<AuctionDocument | null> {
+    let found: AuctionDocument | null = await Auction.findById(
       auctionId,
       (err: mongoose.CallbackError, existingAuction: AuctionDocument) => {
         if (err) {

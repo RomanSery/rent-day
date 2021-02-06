@@ -69,7 +69,7 @@ export class GameServer {
 
   private updateGameState(socket: GameSocket): void {
     socket.on(GameEvent.UPDATE_GAME_STATE, async (gameId: string) => {
-      const gameState: GameInstanceDocument = await GameProcessor.getGame(
+      const gameState: GameInstanceDocument | null = await GameProcessor.getGame(
         new mongoose.Types.ObjectId(gameId)
       );
       this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE, gameState);
@@ -80,7 +80,7 @@ export class GameServer {
     socket.on(
       GameEvent.AUCTION_BID,
       async (gameId: string, auctionId: string) => {
-        const auction: AuctionDocument = await AuctionProcessor.getAuction(
+        const auction: AuctionDocument | null = await AuctionProcessor.getAuction(
           new mongoose.Types.ObjectId(auctionId),
           new mongoose.Types.ObjectId(socket.userId)
         );
@@ -92,23 +92,27 @@ export class GameServer {
 
   private tradeEvents(socket: GameSocket): void {
     socket.on(GameEvent.SEND_TRADE_OFFER, async (tradeId: string) => {
-      const tradeOffer: TradeDocument = await TradeProcessor.getTrade(
+      const tradeOffer: TradeDocument | null = await TradeProcessor.getTrade(
         new mongoose.Types.ObjectId(tradeId)
       );
 
-      this.io
-        .in(tradeOffer.gameId.toHexString())
-        .emit(GameEvent.SEND_TRADE_OFFER, tradeOffer);
+      if (tradeOffer) {
+        this.io
+          .in(tradeOffer.gameId.toHexString())
+          .emit(GameEvent.SEND_TRADE_OFFER, tradeOffer);
+      }
     });
 
     socket.on(GameEvent.TRADE_OFFER_REVIEWED, async (tradeId: string) => {
-      const tradeOffer: TradeDocument = await TradeProcessor.getTrade(
+      const tradeOffer: TradeDocument | null = await TradeProcessor.getTrade(
         new mongoose.Types.ObjectId(tradeId)
       );
 
-      this.io
-        .in(tradeOffer.gameId.toHexString())
-        .emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer);
+      if (tradeOffer) {
+        this.io
+          .in(tradeOffer.gameId.toHexString())
+          .emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer);
+      }
     });
   }
 
@@ -116,7 +120,7 @@ export class GameServer {
     socket.on(
       GameEvent.LOTTO_UPDATE,
       async (gameId: string, lottoId: string) => {
-        const lotto: LottoDocument = await LottoProcessor.getLotto(
+        const lotto: LottoDocument | null = await LottoProcessor.getLotto(
           new mongoose.Types.ObjectId(lottoId)
         );
 

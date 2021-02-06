@@ -4,6 +4,7 @@ import { check, validationResult } from "express-validator";
 import passport from "passport";
 import { UserDocument } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "../util/secrets";
 
 export const createAccount = async (
   req: Request,
@@ -62,7 +63,7 @@ export const login = async (
       return res.status(400).send("Invalid username/password");
     } else {
       req.logIn(user, () => {
-        const token = jwt.sign({ id: user.id }, "jwt-secret", {
+        const token = jwt.sign({ id: user.id }, JWT_SECRET, {
           expiresIn: 60 * 60,
         });
         res.status(200).send({

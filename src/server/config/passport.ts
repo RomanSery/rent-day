@@ -26,7 +26,7 @@ export const initPassportConfig = () => {
               { modifiedUsername: modifiedUsername },
               { email: modifiedEmail },
             ],
-          }).exec(function (err: any, user: UserDocument) {
+          }).exec(function (err: any, user: UserDocument | null) {
             if (user) {
               return done(null, false, {
                 message: "Username/Email already taken",
@@ -64,7 +64,7 @@ export const initPassportConfig = () => {
         try {
           UserInstance.findOne({
             email: username.toLocaleLowerCase().trim(),
-          }).then((user: UserDocument) => {
+          }).then((user: UserDocument | null) => {
             if (user === null) {
               return done(null, false, { message: "bad username" });
             }
