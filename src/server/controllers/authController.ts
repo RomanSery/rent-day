@@ -63,9 +63,13 @@ export const login = async (
       return res.status(400).send("Invalid username/password");
     } else {
       req.logIn(user, () => {
-        const token = jwt.sign({ id: user.id }, JWT_SECRET, {
-          expiresIn: 60 * 60,
-        });
+        const token = jwt.sign(
+          { id: user.id, userName: user.username, currGameId: user.currGameId },
+          JWT_SECRET,
+          {
+            expiresIn: 60 * 60,
+          }
+        );
 
         req.session!.rentDayToken = token;
 
@@ -78,4 +82,39 @@ export const login = async (
       });
     }
   })(req, res, next);
+};
+
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  req.session = null;
+  req.logOut();
+
+  res.status(200).send({});
+};
+
+export const getCurrentSession = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authToken: string = req.session!.rentDayToken;
+    if (authToken && authToken.length > 0) {
+      const verified: any = jwt.verify(authToken, JWT_SECRET, {
+        ignoreExpiration: true,
+      });
+
+      if (verified) {
+        res.status(200).send(verified);
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(401).send();
+  }
+
+  res.status(401).send();
 };

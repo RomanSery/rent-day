@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
+import { handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory
 } from "react-router-dom";
@@ -17,11 +17,19 @@ import { Button, Container, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { SignUpPage } from "./auth/SignUpPage";
 import { LoginPage } from "./auth/LoginPage";
-
+import API from "./api";
 
 export const App: React.FC = () => {
 
   const history = useHistory();
+
+  React.useEffect(() => {
+    API.post("current-session")
+      .then(function (response) {
+        console.log(response.data);
+      })
+      .catch(handleApiError);
+  }, []);
 
 
   const GameDisplay = () => {
@@ -45,7 +53,6 @@ export const App: React.FC = () => {
 
   const Home = () => {
 
-    //localStorage.setItem("debug", '*');
 
     tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {

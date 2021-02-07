@@ -54,6 +54,7 @@ export const getMyUserId = (): string | null => {
     return null;
   }
   const decoded = jwt.decode(getMyAuthToken()!, { json: true });
+
   if (decoded) {
     return decoded["id"];
   }
@@ -225,7 +226,9 @@ export const handleApiError = (error: any) => {
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
-    alert(error.response.data);
+    if (error.response.data) {
+      alert(error.response.data);
+    }
   } else if (error.request) {
     // The request was made but no response was received
     // `error.request` is an instance of XMLHttpRequest in the browser and an instance of

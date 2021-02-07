@@ -12,7 +12,7 @@ import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
-import { COOKIE_NAME } from "./util/secrets";
+import { COOKIE_NAME, COOKIE_SECRET } from "./util/secrets";
 
 // Create Express server
 const app = express();
@@ -49,7 +49,7 @@ passportConfig.initPassportConfig();
 app.use(
   cookieSession({
     name: COOKIE_NAME,
-    secret: "rent-day-secret",
+    secret: COOKIE_SECRET,
     //secure: true,
     httpOnly: true,
     //domain: "localhost",
@@ -59,6 +59,8 @@ app.use(
 
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
+app.post("/api/logout", authController.logout);
+app.post("/api/current-session", authController.getCurrentSession);
 
 app.post("/api/findGames", actions.getGamesToJoin);
 app.post("/api/findPlayers", actions.getAllPlayers);
