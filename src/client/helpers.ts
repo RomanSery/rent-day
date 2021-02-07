@@ -13,7 +13,6 @@ import { PageType } from "../core/enums/PageType";
 import { PieceType } from "../core/enums/PieceType";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
-import jwt from "jsonwebtoken";
 
 export const dollarFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -32,31 +31,24 @@ export enum StorageConstants {
   GAME_ID = "myGameId",
   JOINED_GAME = "hasJoinedGame",
   PLAYER_NAME = "myPlayerName",
-  JWT_TOKEN = "jwtAuthToken",
+  USER_ID = "myUserId",
 }
 
-export const getMyAuthToken = (): string | null => {
-  return localStorage.getItem(StorageConstants.JWT_TOKEN);
-};
 export const getMyGameId = (): string | null => {
-  const gameId = localStorage.getItem(StorageConstants.GAME_ID);
+  const gameId = sessionStorage.getItem(StorageConstants.GAME_ID);
   if (gameId) {
     return gameId;
   }
   return null;
 };
 export const getMyPlayerName = (): string | null => {
-  return localStorage.getItem(StorageConstants.PLAYER_NAME);
+  return sessionStorage.getItem(StorageConstants.PLAYER_NAME);
 };
 
 export const getMyUserId = (): string | null => {
-  if (!isLoggedIn()) {
-    return null;
-  }
-  const decoded = jwt.decode(getMyAuthToken()!, { json: true });
-
-  if (decoded) {
-    return decoded["id"];
+  const userId = sessionStorage.getItem(StorageConstants.USER_ID);
+  if (userId) {
+    return userId;
   }
   return null;
 };
@@ -65,7 +57,7 @@ export const hasJoinedGame = (): boolean => {
   const myGameId = getMyGameId();
   return (
     myGameId != null &&
-    localStorage.getItem(StorageConstants.JOINED_GAME) != null
+    sessionStorage.getItem(StorageConstants.JOINED_GAME) != null
   );
 };
 
@@ -89,34 +81,37 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
     .catch(handleApiError);
 };
 
+export const setCurrSessionInfo = (data: any): void => {
+  sessionStorage.setItem(StorageConstants.USER_ID, data.id);
+  sessionStorage.setItem(StorageConstants.PLAYER_NAME, data.userName);
+
+  const gameId: string = data.currGameId;
+  if (gameId && gameId.length > 0) {
+    sessionStorage.setItem(StorageConstants.GAME_ID, gameId);
+    sessionStorage.setItem(StorageConstants.JOINED_GAME, "true");
+  }
+};
+
 export const clearMyGameInfo = (): void => {
-  localStorage.removeItem(StorageConstants.GAME_ID);
-  localStorage.removeItem(StorageConstants.JOINED_GAME);
+  sessionStorage.removeItem(StorageConstants.GAME_ID);
+  sessionStorage.removeItem(StorageConstants.JOINED_GAME);
 };
 
 export const setJoinedGameStorage = (gameId: string): void => {
-  localStorage.setItem(
+  sessionStorage.setItem(
     StorageConstants.GAME_ID,
     getObjectIdAsHexString(gameId)
   );
-  localStorage.setItem(StorageConstants.JOINED_GAME, "true");
-};
-
-export const setAuthToken = (token: string): void => {
-  localStorage.setItem(StorageConstants.JWT_TOKEN, token);
-};
-
-export const setPlayerName = (username: string): void => {
-  localStorage.setItem(StorageConstants.PLAYER_NAME, username);
+  sessionStorage.setItem(StorageConstants.JOINED_GAME, "true");
 };
 
 export const isLoggedIn = (): boolean => {
-  return localStorage.getItem(StorageConstants.JWT_TOKEN) != null;
+  return sessionStorage.getItem(StorageConstants.USER_ID) != null;
 };
 
 export const logOut = (): void => {
-  localStorage.removeItem(StorageConstants.JWT_TOKEN);
-  localStorage.removeItem(StorageConstants.PLAYER_NAME);
+  sessionStorage.clear();
+  localStorage.clear();
 };
 
 export const tryToRedirectToGame = async (
@@ -135,7 +130,7 @@ export const tryToRedirectToGame = async (
   const gameStatus: GameStatus = await getGameStatus(myGameId);
   if (gameStatus == null) {
     clearMyGameInfo();
-    return callback("/");
+    return callback("/dashboard");
   }
 
   if (hasJoinedGame()) {
@@ -154,19 +149,19 @@ export const redirectToHomeIfGameNotFound = async (
 ) => {
   if (!isLoggedIn()) {
     clearMyGameInfo();
-    return callback("/");
+    return callback("/auth");
   }
 
   const myGameId = getMyGameId();
   if (myGameId === null || myGameId === undefined) {
     clearMyGameInfo();
-    return callback("/");
+    return callback("/dashboard");
   }
 
   const gameStatus: GameStatus = await getGameStatus(myGameId);
   if (gameStatus == null) {
     clearMyGameInfo();
-    return callback("/");
+    return callback("/dashboard");
   }
 
   return;

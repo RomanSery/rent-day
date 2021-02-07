@@ -54,6 +54,7 @@ app.use(
     httpOnly: true,
     //domain: "localhost",
     //sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
   })
 );
 

@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
+import { handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory
 } from "react-router-dom";
@@ -24,12 +24,27 @@ export const App: React.FC = () => {
   const history = useHistory();
 
   React.useEffect(() => {
-    API.post("current-session")
-      .then(function (response) {
-        console.log(response.data);
-      })
-      .catch(handleApiError);
+
+    if (!isLoggedIn()) {
+      API.post("current-session")
+        .then(function (response) {
+          setCurrSessionInfo(response.data);
+          history.push("/dashboard");
+        })
+        .catch(handleApiError);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const homeStyles = makeStyles({
+    opt: {
+      marginTop: 10,
+      marginBottom: 10
+    },
+  });
+
+  const classes = homeStyles();
 
 
   const GameDisplay = () => {
@@ -53,6 +68,22 @@ export const App: React.FC = () => {
 
   const Home = () => {
 
+    if (!isLoggedIn()) {
+      history.push("/auth");
+    } else {
+      history.push("/dashboard");
+    }
+
+    return null;
+  };
+
+
+  const DashboardDisplay = () => {
+
+    if (!isLoggedIn()) {
+      history.push("/auth");
+      return null;
+    }
 
     tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
@@ -60,34 +91,15 @@ export const App: React.FC = () => {
       }
     });
 
-    const homeStyles = makeStyles({
-      opt: {
-        marginTop: 10,
-        marginBottom: 10
-      },
-    });
+    const onLogout = async () => {
 
-    const getLoggedInButtons = () => {
-      return (
-        <React.Fragment>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { logOut(); history.push("/") }}> LOG OUT</Button>
-        </React.Fragment>
-      );
+      API.post("logout")
+        .then(function (response) {
+          logOut();
+          history.push("/auth");
+        })
+        .catch(handleApiError);
     };
-
-    const getLoggedOutButtons = () => {
-      return (
-        <React.Fragment>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
-          <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
-        </React.Fragment>
-      );
-    };
-
-    const classes = homeStyles();
 
     return (
       <React.Fragment>
@@ -95,7 +107,32 @@ export const App: React.FC = () => {
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
             <Typography component="h2" variant="h5">Rent Day</Typography>
-            {isLoggedIn() ? getLoggedInButtons() : getLoggedOutButtons()}
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
+          </Container>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
+
+  const AuthDisplay = () => {
+
+    if (isLoggedIn()) {
+      history.push("/dashboard");
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <Container maxWidth="xs" className="home-page-options">
+            <Typography component="h2" variant="h5">Rent Day</Typography>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
           </Container>
         </StaticBoard>
       </React.Fragment>
@@ -211,6 +248,9 @@ export const App: React.FC = () => {
   return (
     <Switch>
       <Route exact path="/" component={withRouter(Home)} />
+
+      <Route path="/auth" component={AuthDisplay} />
+      <Route path="/dashboard" component={DashboardDisplay} />
 
       <Route path="/gameinstance" component={GameDisplay} />
       <Route path="/join" component={DisplayJoinGamePage} />

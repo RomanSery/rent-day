@@ -128,7 +128,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     socketService.socket.emit(GameEvent.LEAVE_GAME, getMyGameId());
 
     leaveCurrentGameIfJoined(() => {
-      history.push("/");
+      history.push("/dashboard");
     });
   };
 

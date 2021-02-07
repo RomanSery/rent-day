@@ -37,7 +37,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
   const onJoinGame = (gameId: string) => {
 
     leaveCurrentGameIfJoined(() => {
-      localStorage.setItem(StorageConstants.GAME_ID, getObjectIdAsHexString(gameId));
+      sessionStorage.setItem(StorageConstants.GAME_ID, getObjectIdAsHexString(gameId));
       history.push("/join");
     });
   };

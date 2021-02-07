@@ -26,7 +26,7 @@ export const CreateGame: React.FC<Props> = () => {
   const onCreateGame: SubmitHandler<Inputs> = (data) => {
     API.post("createGame", { data, context: context })
       .then(function (response) {
-        localStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
+        sessionStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
         history.push("/join");
       })
       .catch(handleApiError);

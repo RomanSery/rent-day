@@ -63,22 +63,18 @@ export const login = async (
       return res.status(400).send("Invalid username/password");
     } else {
       req.logIn(user, () => {
-        const token = jwt.sign(
-          { id: user.id, userName: user.username, currGameId: user.currGameId },
-          JWT_SECRET,
-          {
-            expiresIn: 60 * 60,
-          }
-        );
+        const payload = {
+          id: user.id,
+          userName: user.username,
+          currGameId: user.currGameId,
+        };
+        const token = jwt.sign(payload, JWT_SECRET, {
+          expiresIn: 60 * 60,
+        });
 
         req.session!.rentDayToken = token;
 
-        res.status(200).send({
-          auth: true,
-          token,
-          username: user.username,
-          gameId: user.currGameId,
-        });
+        res.status(200).send(payload);
       });
     }
   })(req, res, next);

@@ -64,7 +64,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const onLeaveGame = async () => {
     leaveCurrentGameIfJoined(() => {
-      history.push("/");
+      history.push("/dashboard");
     });
   };
 

@@ -26,7 +26,7 @@ export const SignUpPage: React.FC<Props> = () => {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email })
       .then(function (response) {
-        history.push("/");
+        history.push("/dashboard");
       })
       .catch(handleApiError);
   };

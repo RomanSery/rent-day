@@ -1,5 +1,4 @@
 switch auth token from localstorage to cookie
-encrypt localStorage.myGameId
 
 when leaving game, have to bankrupt player and set him to inactive instead of removing from players list completely
 (need to sell all houses.  all owned properties have to be returned to the bank)
@@ -19,3 +18,18 @@ have to subtract tax & electricity per turn
 
 cant roll if have less than 0 dollars
 have to implement checking for when the game is over (only one player left)
+
+
+
+
+export const getMyUserId = (): string | null => {
+  if (!isLoggedIn()) {
+    return null;
+  }
+  const decoded = jwt.decode(getMyAuthToken()!, { json: true });
+
+  if (decoded) {
+    return decoded["id"];
+  }
+  return null;
+};
