@@ -62,6 +62,9 @@ export class RollProcessor {
     if (!this.player) {
       return "player not found";
     }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
 
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
       return "not your turn!";
@@ -236,6 +239,9 @@ export class RollProcessor {
     if (!this.player) {
       return "player not found";
     }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
 
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
       return "not your turn";
@@ -299,7 +305,10 @@ export class RollProcessor {
       return "Game is not active";
     }
     if (!this.player) {
-      return "player not owned";
+      return "player not found";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
     }
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
       return "not your turn!";

@@ -6,6 +6,7 @@ import {
 import { SkillType } from "../../core/enums/SkillType";
 import { Player } from "../../core/types/Player";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export class PlayerProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -42,6 +43,9 @@ export class PlayerProcessor {
     }
     if (!this.player) {
       return "player not owned";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
     }
     if (this.player.numAbilityPoints <= 0) {
       return "You dont have any available points";

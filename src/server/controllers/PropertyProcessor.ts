@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import {
   GameInstance,
@@ -61,6 +62,9 @@ export class PropertyProcessor {
     if (!this.player) {
       return "player not owned";
     }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
     if (!this.state) {
       return "property not owned";
     }
@@ -110,6 +114,9 @@ export class PropertyProcessor {
     }
     if (!this.player) {
       return "player not owned";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
     }
     if (!this.state) {
       return "property not owned";
@@ -175,8 +182,12 @@ export class PropertyProcessor {
       return "Game is not active";
     }
     if (!this.player) {
-      return "player not owned";
+      return "player not found";
     }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
+
     if (!this.state) {
       return "property not owned";
     }
@@ -229,6 +240,9 @@ export class PropertyProcessor {
     }
     if (!this.player) {
       return "player not owned";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
     }
     if (!this.state) {
       return "property not owned";

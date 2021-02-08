@@ -57,6 +57,9 @@ export class AuctionProcessor {
     if (playerToBid == null) {
       return "player not found!";
     }
+    if (playerToBid.state === PlayerState.BANKRUPT) {
+      return playerToBid.name + " is bankrupt";
+    }
 
     if (this.auction == null) {
       return "auction not found";

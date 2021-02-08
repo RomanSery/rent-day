@@ -9,6 +9,7 @@ import {
 import { Lotto, LottoDocument } from "../../core/schema/LottoSchema";
 import { Player } from "../../core/types/Player";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export class LottoProcessor {
   private optNum: number;
@@ -60,6 +61,9 @@ export class LottoProcessor {
     if (playerToPick == null) {
       return "player not found!";
     }
+    if (playerToPick.state === PlayerState.BANKRUPT) {
+      return playerToPick.name + " is bankrupt";
+    }
 
     if (this.lotto == null) {
       return "lotto not found";
@@ -79,21 +83,12 @@ export class LottoProcessor {
 
     const neededToWin = this.getChanceToWin();
 
-    console.log(
-      "randonNum: %s optionPicked: %s neededToWin: %s",
-      randomNum,
-      this.optNum,
-      neededToWin
-    );
-
     if (randomNum <= neededToWin) {
       this.lotto.prize = this.getPrizeAmount();
       if (this.player) {
-        console.log("won");
         this.player.money = this.player.money + this.lotto.prize;
       }
     } else {
-      console.log("lost");
       this.lotto.prize = 0;
     }
 
@@ -173,13 +168,6 @@ export class LottoProcessor {
     const largePrize = LottoProcessor.getRandomIntInclusive(430, 600);
     const largePrizePercent = 10 + luckIncrease;
 
-    console.log(
-      "small: %s medium: %s large: %s",
-      smallPrize,
-      mediumPrize,
-      largePrize
-    );
-
     const newObj: LottoDocument = new Lotto({
       gameId: gameId,
       playerId: player._id,
@@ -192,13 +180,6 @@ export class LottoProcessor {
       option3Amount: Traits.modifyLottoPrizeAmount(classType, largePrize),
       option3Percent: largePrizePercent,
     });
-
-    console.log(
-      "AFTER small: %s medium: %s large: %s",
-      newObj.option1Amount,
-      newObj.option2Amount,
-      newObj.option3Amount
-    );
 
     await newObj.save();
     return new mongoose.Types.ObjectId(newObj._id);
