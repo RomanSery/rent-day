@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareType } from "../../core/enums/SquareType";
 import {
   GameInstance,
@@ -54,6 +55,9 @@ export class PropertyProcessor {
     if (!this.game) {
       return "game not found";
     }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
     if (!this.player) {
       return "player not owned";
     }
@@ -100,6 +104,9 @@ export class PropertyProcessor {
 
     if (!this.game) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (!this.player) {
       return "player not owned";
@@ -164,6 +171,9 @@ export class PropertyProcessor {
     if (!this.game) {
       return "game not found";
     }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
     if (!this.player) {
       return "player not owned";
     }
@@ -213,6 +223,9 @@ export class PropertyProcessor {
 
     if (!this.game) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (!this.player) {
       return "player not owned";

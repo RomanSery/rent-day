@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import {
   areIdsEqual,
   doesOwnAllPropertiesInGroup,
+  dollarFormatterServer,
   howManyTrainStationsDoesPlayerOwn,
 } from "./helpers";
 import { mta_position } from "../../core/constants";
@@ -15,6 +16,11 @@ import { Traits } from "../traits/Traits";
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
     player.money = player.money + Traits.getPaydaySalary(player.playerClass);
+  }
+
+  public static subtractElectricityAndTaxes(player: Player): void {
+    const total = player.electricityCostsPerTurn + player.taxesPerTurn;
+    player.money -= total;
   }
 
   public static getMortgageValue(purchasePrice: number): number {
@@ -76,16 +82,28 @@ export class MoneyCalculator {
 
     const negotiationAdjustment = (player.negotiation * 3) / 100.0;
     const substraction = classAdjustedRentToPay * negotiationAdjustment;
-    const finalRentToPay = classAdjustedRentToPay - substraction;
+    const adjustedRentToPay = classAdjustedRentToPay - substraction;
 
-    if (finalRentToPay <= 0) {
+    if (adjustedRentToPay <= 0) {
       return "";
     }
+
+    //dont pay more rent than the total assets the player has
+    const finalRentToPay =
+      adjustedRentToPay > player.totalAssets
+        ? player.totalAssets
+        : adjustedRentToPay;
 
     player.money -= finalRentToPay;
     owner!.money += finalRentToPay;
 
-    return "Payed " + owner!.name + " $" + finalRentToPay + " in rent";
+    return (
+      "Payed " +
+      owner!.name +
+      " " +
+      dollarFormatterServer.format(finalRentToPay) +
+      " in rent"
+    );
   }
 
   private static getRentToPay(

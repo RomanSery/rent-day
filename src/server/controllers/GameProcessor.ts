@@ -337,12 +337,7 @@ export class GameProcessor {
         }
       }
     } else if (status === GameStatus.ACTIVE) {
-      //TODO do something else i think, not sure
-      for (let i = 0; i < game.players.length; i++) {
-        if (new mongoose.Types.ObjectId(game.players[i]._id).equals(userId)) {
-          game.players.splice(i, 1);
-        }
-      }
+      this.bankruptPlayer(game, userId);
     }
 
     game.save();
@@ -364,5 +359,35 @@ export class GameProcessor {
       ud.currGameName = undefined;
       await ud.save();
     }
+  }
+
+  private bankruptPlayer(
+    game: GameInstanceDocument,
+    userId: mongoose.Types.ObjectId
+  ): void {
+    const losser = game.players.find(
+      (p) =>
+        p._id &&
+        new mongoose.Types.ObjectId(p._id).equals(
+          new mongoose.Types.ObjectId(userId)
+        )
+    );
+
+    if (!losser) {
+      return;
+    }
+
+    losser.state = PlayerState.BANKRUPT;
+
+    game.squareState.forEach((s: SquareGameData) => {
+      if (s.owner && new mongoose.Types.ObjectId(s.owner).equals(userId)) {
+        s.numHouses = 0;
+        s.owner = undefined;
+        s.color = undefined;
+        s.purchasePrice = undefined;
+        s.mortgageValue = undefined;
+        s.isMortgaged = false;
+      }
+    });
   }
 }

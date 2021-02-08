@@ -62,8 +62,17 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       .catch(handleApiError);
   };
 
+  const getMyName = (): string => {
+    const player = gameInfo && gameInfo.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
+    if (player) {
+      return player.name;
+    }
+    return "";
+  };
+
   const onLeaveGame = async () => {
     leaveCurrentGameIfJoined(() => {
+      socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyName() + " has quit");
       history.push("/dashboard");
     });
   };
@@ -127,7 +136,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       return (
         <React.Fragment>
           {canRoll() && !rollBtnHidden ?
-            <Button variant="contained" color="primary" onClick={onClickRoll} startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
+            <Button variant="contained" color="primary" onClick={onClickRoll}
+              startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
             : null}
 
           {canPayToGetOutOfIsolation() ?
@@ -139,7 +149,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
             : null}
 
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
+          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
+            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Quit</Button>
         </React.Fragment>
       );
     }
@@ -147,7 +158,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return (
       <React.Fragment>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />} onClick={onLeaveGame}>Quit</Button>
+        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
+          onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Quit</Button>
       </React.Fragment>
     );
   }

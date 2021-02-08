@@ -5,6 +5,7 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { SkillType } from "../../core/enums/SkillType";
 import { Player } from "../../core/types/Player";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 export class PlayerProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -35,6 +36,9 @@ export class PlayerProcessor {
 
     if (!this.game) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (!this.player) {
       return "player not owned";

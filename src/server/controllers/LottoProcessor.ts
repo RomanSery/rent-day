@@ -8,6 +8,7 @@ import {
 } from "../../core/schema/GameInstanceSchema";
 import { Lotto, LottoDocument } from "../../core/schema/LottoSchema";
 import { Player } from "../../core/types/Player";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 export class LottoProcessor {
   private optNum: number;
@@ -45,6 +46,9 @@ export class LottoProcessor {
 
     if (this.game == null) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (this.game.lottoId == null) {
       return "no active lotto";

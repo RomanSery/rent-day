@@ -12,6 +12,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 export class AuctionProcessor {
   private bid: number;
@@ -42,6 +43,9 @@ export class AuctionProcessor {
 
     if (this.game == null) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (this.game.auctionId == null) {
       return "no active auction";
@@ -139,8 +143,9 @@ export class AuctionProcessor {
     });
 
     bids.sort((a, b) => (a > b ? -1 : 1));
-    console.log(bids);
-
+    if (bids.length === 1) {
+      return bids[0];
+    }
     return bids[1];
   }
 

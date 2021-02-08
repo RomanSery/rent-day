@@ -13,6 +13,7 @@ import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { isolation_position, payToGetOutFee } from "../../core/constants";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -54,6 +55,9 @@ export class RollProcessor {
 
     if (!this.game) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (!this.player) {
       return "player not found";
@@ -226,6 +230,9 @@ export class RollProcessor {
     if (!this.game) {
       return "game not found";
     }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
     if (!this.player) {
       return "player not found";
     }
@@ -242,13 +249,22 @@ export class RollProcessor {
       return "There is an active lotto game, pick a prize first";
     }
 
-    const nextPlayer: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();
+    const nextPlayerId: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();
+    if (nextPlayerId) {
+      this.game.nextPlayerToAct = nextPlayerId;
+    }
+
+    const nextPlayer =
+      nextPlayerId &&
+      this.game.players.find(
+        (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(nextPlayerId)
+      );
+
     if (nextPlayer) {
-      this.game.nextPlayerToAct = nextPlayer;
+      MoneyCalculator.subtractElectricityAndTaxes(nextPlayer);
     }
 
     this.player.hasRolled = false;
-
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     this.game.save();
@@ -260,11 +276,16 @@ export class RollProcessor {
     if (!this.game || !this.player) {
       return null;
     }
-    const index = this.game.players.indexOf(this.player);
+
+    const activePlayers = this.game.players.filter(
+      (p: Player) => p.state !== PlayerState.BANKRUPT
+    );
+
+    const index = activePlayers.indexOf(this.player);
     const nextPlayer =
-      index < this.game.players.length - 1
-        ? this.game.players[index + 1]
-        : this.game.players[0];
+      index < activePlayers.length - 1
+        ? activePlayers[index + 1]
+        : activePlayers[0];
     return new mongoose.Types.ObjectId(nextPlayer._id);
   }
 
@@ -273,6 +294,9 @@ export class RollProcessor {
 
     if (!this.game) {
       return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
     }
     if (!this.player) {
       return "player not owned";
