@@ -36,19 +36,18 @@ export class GameServer {
 
   public listen(): void {
     this.io.on(GameEvent.CONNECT, (socket: GameSocket) => {
-      console.log("Connected client on port %s", this.port);
-
       this.joinedGame(socket);
       this.joinGameRoom(socket);
       this.leaveGame(socket);
       this.getLatency(socket);
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
-        console.log(
-          "Player disconnected: %s reason: %s",
-          socket.playerName,
-          reason
-        );
+        socket
+          .to(socket.gameId)
+          .broadcast.emit(
+            GameEvent.SHOW_SNACK_MSG,
+            socket.playerName + " disconnected: " + reason
+          );
       });
 
       this.updateGameState(socket);
@@ -166,12 +165,18 @@ export class GameServer {
     socket.on(
       GameEvent.JOIN_GAME_ROOM,
       (gameId: string, userId: string, playerName: string) => {
-        console.log("joined game room %s", gameId);
         socket.playerName = playerName;
         socket.userId = userId;
         socket.gameId = gameId;
         socket.latency = 0;
         socket.join(gameId);
+
+        socket
+          .to(socket.gameId)
+          .broadcast.emit(
+            GameEvent.SHOW_SNACK_MSG,
+            socket.playerName + " re-connected"
+          );
       }
     );
   }

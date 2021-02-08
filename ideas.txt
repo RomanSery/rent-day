@@ -1,16 +1,14 @@
-have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
-
-need to implement train travel
 add more details to roll results
 
+need to implement train travel
 implement chance
 implement movement animation
 
 
 cant roll if have less than 0 dollars
+have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
 have to implement checking for when the game is over (only one player left)
 
-show snack msgs when players disconnect(leave), come back
-
-
 have to add more defensive checks in processors like in TradeProcessor (game not active, etc)
+
+use .env files
