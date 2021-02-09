@@ -74,6 +74,7 @@ app.post("/api/leaveGame", actions.leaveGame);
 app.post("/api/createGame", actions.createGame);
 
 app.post("/api/actions/roll", gameplay.roll);
+app.post("/api/actions/travel", gameplay.travel);
 app.post("/api/actions/bid", gameplay.bid);
 app.post("/api/actions/pickLotto", gameplay.pickLotto);
 app.post("/api/actions/completeTurn", gameplay.completeTurn);

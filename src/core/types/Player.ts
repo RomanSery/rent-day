@@ -31,6 +31,7 @@ export interface Player {
 
   hasRolled: boolean;
   hasTraveled: boolean;
+  canTravel: boolean;
   rollHistory: Array<DiceRoll>;
   numTurnsInIsolation: number;
 }

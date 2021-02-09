@@ -4,6 +4,8 @@ need to implement train travel
 implement chance
 implement movement animation
 
+have to handle case of player quitting when its their turn, in that case have to set next player to act
+
 
 cant roll if have less than 0 dollars
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
@@ -11,4 +13,4 @@ have to implement checking for when the game is over (only one player left)
 
 have to add more defensive checks in processors like in TradeProcessor (game not active, etc)
 
-use .env files
+use .env files extract url's, db connection, localhost, cookie settings

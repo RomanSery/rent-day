@@ -10,7 +10,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle, faChartBar } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 
@@ -20,14 +20,16 @@ interface Props {
   socketService: SocketService;
   tradeWithPlayer: (player: Player) => void;
   onRollAction: () => void;
+  onTravelAction: () => void;
 }
 
-export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, tradeWithPlayer }) => {
+export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, onTravelAction, tradeWithPlayer }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
   const [statsViewOpen, setStatsViewOpen] = React.useState(false);
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
+  const [travelBtnHidden, setTravelBtnHidden] = React.useState(false);
 
 
 
@@ -40,6 +42,11 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const onClickRoll = async () => {
     setRollBtnHidden(true);
     onRollAction();
+  };
+
+  const onClickTravel = async () => {
+    setTravelBtnHidden(true);
+    onTravelAction();
   };
 
   const onClickDone = async () => {
@@ -111,6 +118,21 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return false;
   }
 
+  const canTravel = (): boolean => {
+    const myPlayer = getMyPlayer();
+    if (myPlayer != null && myPlayer !== undefined) {
+      if (myPlayer.hasRolled) {
+        return false;
+      }
+      if (myPlayer.state === PlayerState.BANKRUPT) {
+        return false;
+      }
+      return myPlayer.canTravel;
+    }
+
+    return false;
+  }
+
   const canPayToGetOutOfIsolation = (): boolean => {
     const myPlayer = getMyPlayer();
     if (myPlayer != null && myPlayer !== undefined) {
@@ -138,6 +160,11 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
           {canRoll() && !rollBtnHidden ?
             <Button variant="contained" color="primary" onClick={onClickRoll}
               startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
+            : null}
+
+          {canTravel() && !travelBtnHidden ?
+            <Button variant="contained" color="primary" onClick={onClickTravel}
+              startIcon={<FontAwesomeIcon icon={faTrain} />}>Travel</Button>
             : null}
 
           {canPayToGetOutOfIsolation() ?

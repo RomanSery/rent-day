@@ -113,6 +113,42 @@ export class RollProcessor {
     return "";
   }
 
+  public async travel(): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+    if (!this.player) {
+      return "player not found";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
+
+    if (!this.userId.equals(this.game.nextPlayerToAct)) {
+      return "not your turn!";
+    }
+
+    if (this.player.hasRolled) {
+      return "You already rolled this turn";
+    }
+
+    if (this.player.hasTraveled) {
+      return "You already traveled this turn";
+    }
+
+    //TODO if negative $, cant roll
+
+    this.player.hasTraveled = true;
+
+    this.game.save();
+    return "";
+  }
+
   private updatePlayerPosition(): void {
     if (!this.player || !this.game) {
       return;
@@ -271,6 +307,7 @@ export class RollProcessor {
     }
 
     this.player.hasRolled = false;
+    this.player.hasTraveled = false;
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     this.game.save();

@@ -33,6 +33,7 @@ const PlayerSchema = new mongoose.Schema({
 
   hasRolled: { type: Boolean, required: true },
   hasTraveled: { type: Boolean, required: true },
+  canTravel: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
   numTurnsInIsolation: { type: Number, required: true },
 });

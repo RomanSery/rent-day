@@ -118,6 +118,7 @@ export class GameProcessor {
       corruption: initialSkills.corruption,
       hasRolled: false,
       hasTraveled: false,
+      canTravel: false,
       rollHistory: [],
       numTurnsInIsolation: 0,
     };
@@ -170,6 +171,8 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[0], 6, 328);
     GameProcessor.assignSquareTesting(game, game.players[0], 16, 180);
     GameProcessor.assignSquareTesting(game, game.players[0], 18, 480);
+    GameProcessor.assignSquareTesting(game, game.players[0], 26, 480);
+    GameProcessor.assignSquareTesting(game, game.players[0], 36, 480);
 
     GameProcessor.assignSquareTesting(game, game.players[1], 5, 300);
     GameProcessor.assignSquareTesting(game, game.players[1], 17, 600);

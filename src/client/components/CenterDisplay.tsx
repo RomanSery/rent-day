@@ -19,6 +19,7 @@ import { OfferTradeDialog } from "../dialogs/OfferTradeDialog";
 import { TradeOffer } from "../../core/types/TradeOffer";
 import { ReviewTradeDialog } from "../dialogs/ReviewTradeDialog";
 import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
+import { TravelDialog } from "../dialogs/TravelDialog";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -39,6 +40,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const [offerTradeOpen, setOfferTradeOpen] = useState(false);
   const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
   const [tradeReviewedOpen, setTradeReviewedOpen] = useState(false);
+  const [travelOpen, setTravelOpen] = useState(false);
 
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
   const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
@@ -73,6 +75,11 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         })
         .catch(handleApiError);
     }, 1200);
+
+  };
+
+  const onTravel = async () => {
+    setTravelOpen(true);
 
   };
 
@@ -135,7 +142,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
           </div>
 
           <div className="player-actions">
-            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} socketService={socketService} />
+            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel} socketService={socketService} />
           </div>
 
           <div className="second-row">
@@ -153,6 +160,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
+      <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} />
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
       <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
       <TradeOfferReviewedDialog gameInfo={gameInfo} open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />

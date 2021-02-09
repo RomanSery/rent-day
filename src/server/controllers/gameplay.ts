@@ -35,6 +35,24 @@ export const roll = async (req: Request, res: Response) => {
   });
 };
 
+export const travel = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+
+  const processor = new RollProcessor(gameId, userId, null, null);
+  const errMsg = await processor.travel();
+  if (errMsg && errMsg.length > 0) {
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({
+    status: "success",
+  });
+};
+
 export const completeTurn = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req);
   if (userId == null) {

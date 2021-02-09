@@ -81,6 +81,33 @@ export const doesOwnAllPropertiesInGroup = (
   return ownsAll;
 };
 
+export const canTravel = (
+  game: GameInstanceDocument,
+  player: Player
+): boolean => {
+  let numOwned = 0;
+  const playerId = new mongoose.Types.ObjectId(player._id);
+
+  SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+    if (d.type === SquareType.TrainStation) {
+      const squareData: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === key
+      );
+
+      if (
+        squareData &&
+        squareData.owner &&
+        !squareData.isMortgaged &&
+        new mongoose.Types.ObjectId(squareData.owner).equals(playerId)
+      ) {
+        numOwned++;
+      }
+    }
+  });
+
+  return numOwned > 1;
+};
+
 export const howManyTrainStationsDoesPlayerOwn = (
   game: GameInstanceDocument,
   player: Player

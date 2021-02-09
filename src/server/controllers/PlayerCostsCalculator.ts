@@ -2,7 +2,7 @@ import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
 import { TaxSummaryRow } from "../../core/types/TaxSummaryRow";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areIdsEqual, dollarFormatterServer } from "./helpers";
+import { areIdsEqual, canTravel, dollarFormatterServer } from "./helpers";
 import { conEd_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 import { MoneyCalculator } from "./MoneyCalculator";
@@ -33,6 +33,7 @@ export class PlayerCostsCalculator {
     player.mortgageableValue = mortgageableValue;
     player.redeemableValue = redeemableValue;
     player.totalAssets = totalAssets;
+    player.canTravel = canTravel(game, player);
   }
 
   private static calculateElectrictyCostsForPlayer(
