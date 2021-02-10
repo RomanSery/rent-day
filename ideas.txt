@@ -14,5 +14,3 @@ have to implement checking for when the game is over (only one player left)
 have to add more defensive checks in processors like in TradeProcessor (game not active, etc)
 
 use .env files extract url's, db connection, localhost, cookie settings
-
-paid Payed igor $800 in rent???? igor is conductor with 4 stations

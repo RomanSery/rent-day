@@ -110,7 +110,7 @@ export class RollProcessor {
     const lastRoll = this.getLastRoll()!;
     this.game.results = {
       roll: lastRoll,
-      description: this.player.name + "<br /> " + this.rollDesc,
+      description: "<b>" + this.player.name + "</b> " + this.rollDesc,
     };
 
     this.game.save();

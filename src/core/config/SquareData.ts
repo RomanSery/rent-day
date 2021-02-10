@@ -230,7 +230,7 @@ SquareConfigDataMap.set(17, {
 SquareConfigDataMap.set(18, {
   type: SquareType.Utility,
   section: BoardSection.Left,
-  description: "Doubles all rent for every train station you own",
+  description: "Doubles rent for train stations that you own",
 });
 SquareConfigDataMap.set(19, {
   type: SquareType.Property,
