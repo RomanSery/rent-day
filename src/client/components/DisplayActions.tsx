@@ -184,8 +184,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return (
       <React.Fragment>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-        <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
-          onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Quit</Button>
       </React.Fragment>
     );
   }
