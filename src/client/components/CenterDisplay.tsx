@@ -45,7 +45,6 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
   const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
 
-
   useEffect(() => {
 
     socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: TradeOffer) => {
@@ -128,6 +127,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     setOfferTradeOpen(true);
   };
 
+  const onCancelTravel = () => {
+    setTravelOpen(false);
+  };
+
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -142,7 +145,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
           </div>
 
           <div className="player-actions">
-            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel} socketService={socketService} />
+            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel} socketService={socketService}
+            />
           </div>
 
           <div className="second-row">
@@ -160,7 +164,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
-      <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} />
+      <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
       <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
       <TradeOfferReviewedDialog gameInfo={gameInfo} open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />

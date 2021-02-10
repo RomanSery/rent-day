@@ -29,9 +29,14 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const history = useHistory();
   const [statsViewOpen, setStatsViewOpen] = React.useState(false);
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
-  const [travelBtnHidden, setTravelBtnHidden] = React.useState(false);
 
 
+  const getMyPlayer = (): Player | undefined => {
+    if (gameInfo) {
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    }
+    return undefined;
+  }
 
   React.useEffect(() => {
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
@@ -45,7 +50,6 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const onClickTravel = async () => {
-    setTravelBtnHidden(true);
     onTravelAction();
   };
 
@@ -127,7 +131,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       if (myPlayer.state === PlayerState.BANKRUPT) {
         return false;
       }
-      return myPlayer.canTravel;
+      return myPlayer.canTravel && !myPlayer.hasTraveled;
     }
 
     return false;
@@ -142,12 +146,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return false;
   }
 
-  const getMyPlayer = (): Player | undefined => {
-    if (gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
-    }
-    return undefined;
-  }
+
 
   const onViewStats = async () => {
     setStatsViewOpen(true);
@@ -162,7 +161,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
               startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
             : null}
 
-          {canTravel() && !travelBtnHidden ?
+          {canTravel() ?
             <Button variant="contained" color="primary" onClick={onClickTravel}
               startIcon={<FontAwesomeIcon icon={faTrain} />}>Travel</Button>
             : null}

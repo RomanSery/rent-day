@@ -19,29 +19,38 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
+import { Player } from "../../core/types/Player";
 
 
 interface Props {
   open: boolean;
   gameInfo: GameState | undefined;
   onClose: () => void;
+  onCancel: () => void;
   socketService: SocketService;
 }
 
-export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, socketService }) => {
+export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCancel, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
 
   const onTravel = (squareId: number) => () => {
     API.post("actions/travel", { context, squareId: squareId })
       .then(function (response) {
-        if (socketService) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo?.id);
+        if (socketService && gameInfo) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
         onClose();
       })
       .catch(handleApiError);
   };
+
+  const getMyPlayer = (): Player | undefined => {
+    if (gameInfo) {
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    }
+    return undefined;
+  }
 
   const getPlayerTrainStations = (): number[] => {
 
@@ -49,10 +58,15 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, socketS
     if (!playerId || !gameInfo) {
       return [];
     }
+    const myPlayer = getMyPlayer();
+    if (!myPlayer) {
+      return [];
+    }
 
     const stations: SquareGameData[] = gameInfo.squareState.filter((s: SquareGameData) => {
       const config = SquareConfigDataMap.get(s.squareId);
-      return config && s.owner && areObjectIdsEqual(s.owner, playerId) && config.type === SquareType.TrainStation && !s.isMortgaged;
+      return config && s.owner && areObjectIdsEqual(s.owner, playerId)
+        && config.type === SquareType.TrainStation && !s.isMortgaged && s.squareId !== myPlayer.position;
     });
 
     return stations.map(function (p) {
@@ -62,7 +76,7 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, socketS
 
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="trade-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={onCancel} aria-labelledby="trade-dialog-title" open={open}>
       <DialogTitle id="trade-dialog-title">Select station to travel to</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
@@ -85,7 +99,7 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, socketS
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
+        <Button onClick={onCancel} color="primary">Cancel</Button>
       </DialogActions>
     </Dialog>
   );

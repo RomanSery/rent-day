@@ -41,9 +41,10 @@ export const travel = async (req: Request, res: Response) => {
     return res.status(400).send("Invalid auth token");
   }
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+  const squareId: number = parseInt(req.body.squareId);
 
   const processor = new RollProcessor(gameId, userId, null, null);
-  const errMsg = await processor.travel();
+  const errMsg = await processor.travel(squareId);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }

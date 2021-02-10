@@ -5,7 +5,7 @@ import { SquareGameData } from "./SquareGameData";
 import { SquareThemeData } from "./SquareThemeData";
 
 export interface GameState {
-  readonly id: string;
+  readonly _id: string;
   readonly name: string;
   readonly settings: Settings;
   readonly theme: Array<SquareThemeData>;

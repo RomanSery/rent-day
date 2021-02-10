@@ -25,14 +25,16 @@ export const App: React.FC = () => {
 
   React.useEffect(() => {
 
-    if (!isLoggedIn()) {
-      API.post("current-session")
-        .then(function (response) {
-          setCurrSessionInfo(response.data);
-          history.push("/dashboard");
-        })
-        .catch(handleApiError);
-    }
+    API.post("current-session")
+      .then(function (response) {
+        setCurrSessionInfo(response.data);
+        tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
+          if (redirectUrl && redirectUrl.length > 0) {
+            history.push(redirectUrl);
+          }
+        });
+      })
+      .catch(handleApiError);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

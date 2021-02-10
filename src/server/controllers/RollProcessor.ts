@@ -14,6 +14,10 @@ import { MoneyCalculator } from "./MoneyCalculator";
 import { isolation_position, payToGetOutFee } from "../../core/constants";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareType } from "../../core/enums/SquareType";
+import { SquareGameData } from "../../core/types/SquareGameData";
+import { areIdsEqual } from "./helpers";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -113,7 +117,7 @@ export class RollProcessor {
     return "";
   }
 
-  public async travel(): Promise<string> {
+  public async travel(squareId: number): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -141,9 +145,50 @@ export class RollProcessor {
       return "You already traveled this turn";
     }
 
-    //TODO if negative $, cant roll
+    if (squareId === this.player.position) {
+      return "cant travel there, you are already there";
+    }
+
+    const posConfig = SquareConfigDataMap.get(this.player.position);
+    if (!posConfig || posConfig.type !== SquareType.TrainStation) {
+      return "you cant travel from there";
+    }
+
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (!squareConfig) {
+      return "squareId not found";
+    }
+    if (squareConfig.type !== SquareType.TrainStation) {
+      return "not a train station";
+    }
+
+    const squareData: SquareGameData | undefined = this.game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+    if (!squareData) {
+      return "invalid square";
+    }
+    if (!squareData.owner || !areIdsEqual(squareData.owner, this.player._id)) {
+      return "not owned";
+    }
+    if (squareData.isMortgaged) {
+      return "cant travel, its mortgaged";
+    }
+
+    const posData: SquareGameData | undefined = this.game.squareState.find(
+      (p: SquareGameData) => p.squareId === this.player!.position
+    );
+    if (
+      !posData ||
+      !posData.owner ||
+      !areIdsEqual(posData.owner, this.player._id) ||
+      posData.isMortgaged
+    ) {
+      return "you cant travel from there (2)";
+    }
 
     this.player.hasTraveled = true;
+    this.player.position = squareId;
 
     this.game.save();
     return "";

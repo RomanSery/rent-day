@@ -105,7 +105,28 @@ export const canTravel = (
     }
   });
 
-  return numOwned > 1;
+  if (numOwned <= 1) {
+    return false;
+  }
+
+  const posConfig = SquareConfigDataMap.get(player.position);
+  if (!posConfig || posConfig.type !== SquareType.TrainStation) {
+    return false;
+  }
+
+  const posData: SquareGameData | undefined = game.squareState.find(
+    (p: SquareGameData) => p.squareId === player.position
+  );
+  if (
+    !posData ||
+    !posData.owner ||
+    !areIdsEqual(posData.owner, player._id) ||
+    posData.isMortgaged
+  ) {
+    return false;
+  }
+
+  return true;
 };
 
 export const howManyTrainStationsDoesPlayerOwn = (
