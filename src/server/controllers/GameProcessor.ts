@@ -22,6 +22,7 @@ import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { SquareType } from "../../core/enums/SquareType";
 
 export class GameProcessor {
   public async createGame(
@@ -180,6 +181,10 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
     GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
 
+    for (let id = 1; id <= 38; id++) {
+      GameProcessor.assignSquareTesting(game, game.players[1], id, 300);
+    }
+
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
     });
@@ -191,9 +196,23 @@ export class GameProcessor {
     squareId: number,
     purchasePrice: number
   ): void {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (
+      !squareConfig ||
+      (squareConfig.type !== SquareType.Property &&
+        squareConfig.type !== SquareType.TrainStation &&
+        squareConfig.type !== SquareType.Utility)
+    ) {
+      return;
+    }
+
     const state: SquareGameData | undefined = game.squareState.find(
       (p: SquareGameData) => p.squareId === squareId
     );
+    if (state && state.owner) {
+      return;
+    }
+
     if (state) {
       state.mortgageValue = MoneyCalculator.getMortgageValue(purchasePrice);
       state.purchasePrice = purchasePrice;
@@ -340,7 +359,7 @@ export class GameProcessor {
         }
       }
     } else if (status === GameStatus.ACTIVE) {
-      this.bankruptPlayer(game, userId);
+      GameProcessor.bankruptPlayer(game, userId);
     }
 
     game.save();
@@ -364,7 +383,7 @@ export class GameProcessor {
     }
   }
 
-  private bankruptPlayer(
+  public static bankruptPlayer(
     game: GameInstanceDocument,
     userId: mongoose.Types.ObjectId
   ): void {

@@ -7,6 +7,8 @@ export interface Player {
   _id: string;
   readonly name: string;
 
+  finishedRank?: number;
+
   money: number;
 
   taxesPerTurn: number;

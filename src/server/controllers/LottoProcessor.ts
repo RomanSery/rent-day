@@ -10,6 +10,7 @@ import { Lotto, LottoDocument } from "../../core/schema/LottoSchema";
 import { Player } from "../../core/types/Player";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class LottoProcessor {
   private optNum: number;
@@ -87,6 +88,7 @@ export class LottoProcessor {
       this.lotto.prize = this.getPrizeAmount();
       if (this.player) {
         this.player.money = this.player.money + this.lotto.prize;
+        PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
       }
     } else {
       this.lotto.prize = 0;

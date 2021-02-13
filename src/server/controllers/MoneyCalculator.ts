@@ -12,6 +12,8 @@ import {
 } from "./helpers";
 import { mta_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
+import { GameProcessor } from "./GameProcessor";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -88,14 +90,33 @@ export class MoneyCalculator {
       return "";
     }
 
+    const cantPay = adjustedRentToPay >= player.totalAssets;
+
     //dont pay more rent than the total assets the player has
     const finalRentToPay =
       adjustedRentToPay > player.totalAssets
         ? player.totalAssets
         : adjustedRentToPay;
 
+    console.log(
+      "finalRentToPay: %d adjustedRentToPay: %d totalAssets: %d",
+      finalRentToPay,
+      adjustedRentToPay,
+      player.totalAssets
+    );
+
     player.money -= finalRentToPay;
     owner!.money += finalRentToPay;
+
+    if (cantPay) {
+      GameProcessor.bankruptPlayer(
+        game,
+        new mongoose.Types.ObjectId(player._id)
+      );
+    }
+
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+    PlayerCostsCalculator.updatePlayerCosts(game, owner!);
 
     return (
       "Payed " +

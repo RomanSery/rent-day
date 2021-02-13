@@ -128,6 +128,7 @@ export const tryToRedirectToGame = async (
   }
 
   const gameStatus: GameStatus = await getGameStatus(myGameId);
+
   if (gameStatus == null) {
     clearMyGameInfo();
     return callback("/dashboard");

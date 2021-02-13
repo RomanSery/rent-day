@@ -349,6 +349,7 @@ export class RollProcessor {
 
     if (nextPlayer) {
       MoneyCalculator.subtractElectricityAndTaxes(nextPlayer);
+      PlayerCostsCalculator.updatePlayerCosts(this.game, nextPlayer);
     }
 
     this.player.hasRolled = false;
@@ -410,6 +411,9 @@ export class RollProcessor {
     this.player.money = this.player.money - payToGetOutFee;
     this.player.state = PlayerState.ACTIVE;
     this.player.rollHistory = [];
+
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
+
     await this.game.save();
     return "";
   }

@@ -11,6 +11,8 @@ const PlayerSchema = new mongoose.Schema({
   name: { type: String, required: true },
   money: { type: Number, required: true },
 
+  finishedRank: { type: Number },
+
   taxesPerTurn: { type: Number, required: true },
   electricityCostsPerTurn: { type: Number, required: true },
   taxTooltip: { type: String },
