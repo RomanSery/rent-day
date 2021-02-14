@@ -98,15 +98,19 @@ export class MoneyCalculator {
         ? player.totalAssets
         : adjustedRentToPay;
 
-    console.log(
-      "finalRentToPay: %d adjustedRentToPay: %d totalAssets: %d",
-      finalRentToPay,
-      adjustedRentToPay,
-      player.totalAssets
-    );
-
     player.money -= finalRentToPay;
     owner!.money += finalRentToPay;
+
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+    PlayerCostsCalculator.updatePlayerCosts(game, owner!);
+
+    console.log(
+      "finalRentToPay: %d adjustedRentToPay: %d totalAssets: %d cantPay: %s",
+      finalRentToPay,
+      adjustedRentToPay,
+      player.totalAssets,
+      cantPay
+    );
 
     if (cantPay) {
       GameProcessor.bankruptPlayer(
@@ -114,9 +118,6 @@ export class MoneyCalculator {
         new mongoose.Types.ObjectId(player._id)
       );
     }
-
-    PlayerCostsCalculator.updatePlayerCosts(game, player);
-    PlayerCostsCalculator.updatePlayerCosts(game, owner!);
 
     return (
       "Payed " +

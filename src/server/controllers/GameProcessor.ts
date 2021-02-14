@@ -400,6 +400,8 @@ export class GameProcessor {
     }
 
     losser.state = PlayerState.BANKRUPT;
+    losser.hasTraveled = true;
+    losser.hasRolled = true;
 
     game.squareState.forEach((s: SquareGameData) => {
       if (s.owner && new mongoose.Types.ObjectId(s.owner).equals(userId)) {

@@ -9,10 +9,12 @@ have to handle case of player quitting when its their turn, in that case have to
 
 cant roll if have less than 0 dollars
 have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
-have to implement checking for when the game is over (only one player left)
+have to implement checking for when the game is over and assign placings (only one player left)
 
 have to add more defensive checks in processors like in TradeProcessor (game not active, etc)
 
 use .env files extract url's, db connection, localhost, cookie settings
 
 dollar amounts in game document storing decimal places totalAssets 3957.1040000000003
+
+playerView numbers not updating

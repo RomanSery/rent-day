@@ -16,7 +16,7 @@ import { GameContext } from '../../core/types/GameContext';
 import API from '../api';
 import { SocketService } from '../sockets/SocketService';
 import { GameEvent } from '../../core/types/GameEvent';
-import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip } from '../uiHelpers';
+import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from '../uiHelpers';
 
 
 interface Props {
@@ -49,6 +49,14 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
     const p = getPlayer();
     if (p) {
       return dollarFormatter.format(p.money);
+    }
+    return "";
+  }
+
+  const getPlayerTotalAssets = () => {
+    const p = getPlayer();
+    if (p) {
+      return dollarFormatter.format(p.totalAssets);
     }
     return "";
   }
@@ -130,6 +138,10 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
               <TableRow key="playerViewer3">
                 <TableCell component="th" scope="row">{getElectricityTooltip(getPlayer(), "Electricity per Turn")}</TableCell>
                 <TableCell align="right">{getElectricityTooltip(getPlayer(), getPlayerElectricityCosts())}</TableCell>
+              </TableRow>
+              <TableRow key="playerViewer1">
+                <TableCell component="th" scope="row">{getTotalAssetsTooltip()}</TableCell>
+                <TableCell align="right">{getPlayerTotalAssets()}</TableCell>
               </TableRow>
             </TableBody>
           </Table>

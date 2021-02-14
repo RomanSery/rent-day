@@ -111,6 +111,18 @@ const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): 
   );
 };
 
+export const getTotalAssetsTooltip = () => {
+  return (<HtmlTooltip
+    title={
+      <React.Fragment>
+        <Typography color="inherit"><strong>Total Assets</strong></Typography>
+        Money + Total Mortgageable Value + value of all houses
+      </React.Fragment>
+    }
+  >
+    <span>Total Assets</span>
+  </HtmlTooltip>);
+}
 
 export const getSkillTypeTooltip = (skill: SkillType) => {
   return (<HtmlTooltip
