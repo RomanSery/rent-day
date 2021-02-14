@@ -32,7 +32,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const context: GameContext = getGameContextFromLocalStorage();
 
-  const [playerToView, setPlayerToView] = useState<Player | undefined>(undefined);
+  const [playerToView, setPlayerToView] = useState<String | undefined>(undefined);
 
   const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
   const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
@@ -83,14 +83,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   };
 
   const viewPlayer = (player: Player) => {
-    setPlayerToView(player);
+    setPlayerToView(player._id);
   };
   const clearPlayer = () => {
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
       if (myUserId) {
-        const myPlayer = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, myUserId));
-        setPlayerToView(myPlayer);
+        setPlayerToView(myUserId);
       }
 
     } else {
@@ -99,8 +98,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   };
 
   const getPlayerToView = (): Player | undefined => {
-    if (playerToView) {
-      return playerToView;
+    if (playerToView && gameInfo) {
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerToView));
     }
     if (gameInfo && gameInfo.players) {
       const myUserId = getMyUserId();
@@ -109,7 +108,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       }
       return undefined;
     }
-    return playerToView;
+    return undefined;
   }
 
   const getGameResultsDisplayComp = () => {

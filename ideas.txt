@@ -17,4 +17,3 @@ use .env files extract url's, db connection, localhost, cookie settings
 
 dollar amounts in game document storing decimal places totalAssets 3957.1040000000003
 
-playerView numbers not updating
