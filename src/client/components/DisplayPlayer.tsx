@@ -48,13 +48,13 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
             {player.state === PlayerState.IN_ISOLATION ? <FontAwesomeIcon icon={faBiohazard} size="2x" color="black" /> : null}
-            <div className="ping">{getPing(player._id)}</div>
+            {player.state !== PlayerState.BANKRUPT ? <div className="ping">{getPing(player._id)}</div> : null}
           </div>
           <div className="sub-name" style={getNameColorStyle()}>
             {player.name}
-            <div className="money">
-              {dollarFormatter.format(player.money)}
-            </div>
+            {player.state !== PlayerState.BANKRUPT ?
+              <div className="money">{dollarFormatter.format(player.money)}</div> :
+              <div className="money-bankrupt">BANKRUPT</div>}
           </div>
         </div>
 

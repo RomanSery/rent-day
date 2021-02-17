@@ -3,6 +3,7 @@ import { GameState } from "../../core/types/GameState";
 import { GamePiece } from "./GamePiece";
 import { Player } from "../../core/types/Player";
 import { getObjectIdAsHexString } from "../helpers";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
   id: number;
@@ -17,6 +18,9 @@ export const SquarePieces: React.FC<Props> = ({ id, gameInfo, cssName }) => {
     <React.Fragment>
       <div className={cssName}>
         {gameInfo?.players.map((p: Player, index) => {
+          if (p.state === PlayerState.BANKRUPT) {
+            return null;
+          }
           const pos: number = p.position;
           if (pos === id) {
             return (<GamePiece type={p.type} color={p.color} key={getObjectIdAsHexString(p._id)} />)

@@ -433,6 +433,11 @@ export class GameProcessor {
     losser.hasTraveled = true;
     losser.hasRolled = true;
 
+    if (!losser.finishedRank) {
+      //TODO
+      losser.finishedRank = 1;
+    }
+
     game.squareState.forEach((s: SquareGameData) => {
       if (s.owner && new mongoose.Types.ObjectId(s.owner).equals(userId)) {
         s.numHouses = 0;
@@ -443,6 +448,13 @@ export class GameProcessor {
         s.isMortgaged = false;
       }
     });
+
+    if (
+      game.nextPlayerToAct &&
+      game.nextPlayerToAct.equals(new mongoose.Types.ObjectId(losser._id))
+    ) {
+      return;
+    }
 
     const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
       game,
