@@ -27,7 +27,13 @@ export class MoneyCalculator {
     player.money -= total;
   }
 
-  public static getMortgageValue(purchasePrice: number): number {
+  public static getMortgageValue(
+    purchasePrice: number,
+    type: SquareType
+  ): number {
+    if (type !== SquareType.Property && type !== SquareType.TrainStation) {
+      return 0;
+    }
     return Math.round(purchasePrice * 0.3);
   }
 

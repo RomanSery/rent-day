@@ -166,8 +166,16 @@ export class PropertyProcessor {
     const state: SquareGameData | undefined = gameDoc.squareState.find(
       (p: SquareGameData) => p.squareId === this.squareId
     );
+
+    const squareConfig = SquareConfigDataMap.get(this.squareId);
+
     if (state) {
-      state.mortgageValue = MoneyCalculator.getMortgageValue(priceToPay);
+      if (squareConfig) {
+        state.mortgageValue = MoneyCalculator.getMortgageValue(
+          priceToPay,
+          squareConfig.type
+        );
+      }
       state.purchasePrice = priceToPay;
       state.color = winner.color!;
       state.owner = winner._id!;

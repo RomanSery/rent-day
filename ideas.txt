@@ -1,18 +1,19 @@
 add more details to roll results
 
-
 implement chance
 implement movement animation
 
-have to handle case of player quitting when its their turn, in that case have to set next player to act
+use .env files extract url's, db connection, localhost, cookie settings
+increse base rent for properties to offset the tax per turn.  and change tax rates for different properties
 
 
-cant roll if have less than 0 dollars
-have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)
+
+
 have to implement checking for when the game is over and assign placings (only one player left)
+have to handle case of player quitting when its their turn, in that case have to set next player to act
+when player is bankrupted, need to auto end turn and set next player to act
+show bankrupt status in players list
+
 
 have to add more defensive checks in processors like in TradeProcessor (game not active, etc)
-
-use .env files extract url's, db connection, localhost, cookie settings
-
-dollar amounts in game document storing decimal places totalAssets 3957.1040000000003
+have to make sure players that loose (go bankrupt) can still watch the game (even after refresh)

@@ -214,7 +214,10 @@ export class GameProcessor {
     }
 
     if (state) {
-      state.mortgageValue = MoneyCalculator.getMortgageValue(purchasePrice);
+      state.mortgageValue = MoneyCalculator.getMortgageValue(
+        purchasePrice,
+        squareConfig.type
+      );
       state.purchasePrice = purchasePrice;
       state.color = owner.color!;
       state.owner = owner._id!;

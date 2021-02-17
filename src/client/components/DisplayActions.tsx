@@ -103,6 +103,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     if (!p.hasRolled) {
       return false;
     }
+    if (p.money < 0) {
+      return false;
+    }
     if (gameInfo && gameInfo.lottoId) {
       return false;
     }
@@ -118,6 +121,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       if (myPlayer.state === PlayerState.BANKRUPT) {
         return false;
       }
+      if (myPlayer.money < 0) {
+        return false;
+      }
       return true;
     }
 
@@ -131,6 +137,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
         return false;
       }
       if (myPlayer.state === PlayerState.BANKRUPT) {
+        return false;
+      }
+      if (myPlayer.money < 0) {
         return false;
       }
       return myPlayer.canTravel && !myPlayer.hasTraveled;
@@ -178,7 +187,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
           <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
-            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Quit</Button>
+            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
         </React.Fragment>
       );
     }
