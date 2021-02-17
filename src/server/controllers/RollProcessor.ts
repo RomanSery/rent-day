@@ -342,7 +342,10 @@ export class RollProcessor {
       return "There is an active lotto game, pick a prize first";
     }
 
-    const nextPlayerId: mongoose.Types.ObjectId | null = this.getNextPlayerToAct();
+    const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
+      this.game,
+      this.player
+    );
     if (nextPlayerId) {
       this.game.nextPlayerToAct = nextPlayerId;
     }
@@ -367,16 +370,19 @@ export class RollProcessor {
     return "";
   }
 
-  private getNextPlayerToAct(): mongoose.Types.ObjectId | null {
-    if (!this.game || !this.player) {
+  public static getNextPlayerToAct(
+    game: GameInstanceDocument,
+    player: Player
+  ): mongoose.Types.ObjectId | null {
+    if (!game || !player) {
       return null;
     }
 
-    const activePlayers = this.game.players.filter(
+    const activePlayers = game.players.filter(
       (p: Player) => p.state !== PlayerState.BANKRUPT
     );
 
-    const index = activePlayers.indexOf(this.player);
+    const index = activePlayers.indexOf(player);
     const nextPlayer =
       index < activePlayers.length - 1
         ? activePlayers[index + 1]

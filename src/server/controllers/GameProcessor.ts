@@ -23,6 +23,7 @@ import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { SquareType } from "../../core/enums/SquareType";
+import { RollProcessor } from "./RollProcessor";
 
 export class GameProcessor {
   public async createGame(
@@ -442,5 +443,24 @@ export class GameProcessor {
         s.isMortgaged = false;
       }
     });
+
+    const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
+      game,
+      losser
+    );
+    if (nextPlayerId) {
+      game.nextPlayerToAct = nextPlayerId;
+    }
+
+    const nextPlayer =
+      nextPlayerId &&
+      game.players.find(
+        (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(nextPlayerId)
+      );
+
+    if (nextPlayer) {
+      MoneyCalculator.subtractElectricityAndTaxes(nextPlayer);
+      PlayerCostsCalculator.updatePlayerCosts(game, nextPlayer);
+    }
   }
 }
