@@ -17,7 +17,9 @@ import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
-    player.money = player.money + Traits.getPaydaySalary(player.playerClass);
+    player.money = Math.round(
+      player.money + Traits.getPaydaySalary(player.playerClass)
+    );
   }
 
   public static subtractElectricityAndTaxes(player: Player): void {
@@ -84,7 +86,7 @@ export class MoneyCalculator {
 
     const negotiationAdjustment = (player.negotiation * 3) / 100.0;
     const substraction = classAdjustedRentToPay * negotiationAdjustment;
-    const adjustedRentToPay = classAdjustedRentToPay - substraction;
+    const adjustedRentToPay = Math.round(classAdjustedRentToPay - substraction);
 
     if (adjustedRentToPay <= 0) {
       return "";
@@ -98,8 +100,8 @@ export class MoneyCalculator {
         ? player.totalAssets
         : adjustedRentToPay;
 
-    player.money -= finalRentToPay;
-    owner!.money += finalRentToPay;
+    player.money -= Math.round(finalRentToPay);
+    owner!.money += Math.round(finalRentToPay);
 
     PlayerCostsCalculator.updatePlayerCosts(game, player);
     PlayerCostsCalculator.updatePlayerCosts(game, owner!);

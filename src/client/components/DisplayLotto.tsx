@@ -144,7 +144,7 @@ export const DisplayLotto: React.FC<Props> = ({ gameInfo, socketService }) => {
   const getLottoResults = () => {
     if (lottoState && isLottoFinished()) {
       return (
-        <AnimatedLottoResult socketService={socketService} lottoState={lottoState}
+        <AnimatedLottoResult gameInfo={gameInfo} socketService={socketService} lottoState={lottoState}
           randomNum={lottoState.randomNum} chanceToWin={getPrizeChance(lottoState.optionPicked)} />
       );
     }

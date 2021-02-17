@@ -129,9 +129,13 @@ export const getGameStatus = async (req: Request, res: Response) => {
     return res.status(400).send("missing gameId");
   }
 
+  const userId = getVerifiedUserId(req);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
   const gameId = req.body.gameId;
-  const process = new GameProcessor();
-  res.json({ status: await process.getGameStatus(gameId) });
+  res.json({ status: await GameProcessor.getGameStatus(gameId, userId) });
 };
 
 export const joinGame = async (req: Request, res: Response) => {

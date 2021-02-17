@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import API from '../api';
-import { getGameContextFromLocalStorage, handleApiError, areObjectIdsEqual, getIconProp, getMyGameId, dollarFormatter } from "../helpers";
+import { getGameContextFromLocalStorage, handleApiError, areObjectIdsEqual, getIconProp, dollarFormatter } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
@@ -41,9 +41,9 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
     API.post("actions/acceptTrade", { context, tradeId: tradeOffer._id })
       .then(function (response) {
-        if (socketService) {
+        if (socketService && gameInfo) {
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
         onClose();
       })
@@ -57,9 +57,9 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
     API.post("actions/declineTrade", { context, tradeId: tradeOffer._id })
       .then(function (response) {
-        if (socketService) {
+        if (socketService && gameInfo) {
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
         onClose();
       })

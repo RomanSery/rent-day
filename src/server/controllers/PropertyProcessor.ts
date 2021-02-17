@@ -93,7 +93,9 @@ export class PropertyProcessor {
 
     this.state.isMortgaged = true;
     if (this.state.mortgageValue) {
-      this.player.money = this.player.money + this.state.mortgageValue;
+      this.player.money = Math.round(
+        this.player.money + this.state.mortgageValue
+      );
     }
 
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
@@ -147,7 +149,7 @@ export class PropertyProcessor {
 
     this.state.isMortgaged = false;
     if (this.state.mortgageValue) {
-      this.player.money = this.player.money - redeemAmount;
+      this.player.money = Math.round(this.player.money - redeemAmount);
     }
 
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);

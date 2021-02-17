@@ -16,4 +16,3 @@ have to add more defensive checks in processors like in TradeProcessor (game not
 use .env files extract url's, db connection, localhost, cookie settings
 
 dollar amounts in game document storing decimal places totalAssets 3957.1040000000003
-

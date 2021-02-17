@@ -5,6 +5,9 @@ import passport from "passport";
 import { UserDocument } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../util/secrets";
+import { PlayerProcessor } from "./PlayerProcessor";
+import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
+import mongoose from "mongoose";
 
 export const createAccount = async (
   req: Request,
@@ -104,6 +107,13 @@ export const getCurrentSession = async (
       });
 
       if (verified) {
+        const currGame = await PlayerProcessor.getUserGame(
+          new mongoose.Types.ObjectId(verified.id)
+        );
+        if (currGame) {
+          verified.currGameId = currGame.id;
+        }
+
         res.status(200).send(verified);
       }
     }

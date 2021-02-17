@@ -133,7 +133,7 @@ export class AuctionProcessor {
           new mongoose.Types.ObjectId(p._id).equals(this.auction!.winnerId)
       );
       if (playerWinner && priceToPay) {
-        playerWinner.money = playerWinner.money - priceToPay;
+        playerWinner.money = Math.round(playerWinner.money - priceToPay);
         PlayerCostsCalculator.updatePlayerCosts(this.game, playerWinner);
       }
     }

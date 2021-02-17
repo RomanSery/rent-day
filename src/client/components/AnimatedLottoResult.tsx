@@ -3,18 +3,20 @@ import { animate, useMotionValue } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import { GameEvent } from "../../core/types/GameEvent";
-import { dollarFormatter, getMyGameId } from "../helpers";
+import { dollarFormatter } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import { LottoState } from "../../core/types/LottoState";
+import { GameState } from "../../core/types/GameState";
 
 interface Props {
+  gameInfo: GameState | undefined;
   chanceToWin: number;
   randomNum: number;
   socketService: SocketService;
   lottoState: LottoState;
 }
 
-export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, socketService, lottoState }) => {
+export const AnimatedLottoResult: React.FC<Props> = ({ gameInfo, chanceToWin, randomNum, socketService, lottoState }) => {
 
   const x = useMotionValue<number>(0);
   const [animValue, setAnimValue] = useState<number>(0);
@@ -49,8 +51,8 @@ export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, s
         setShowResult(true);
 
         setTimeout(() => {
-          if (socketService) {
-            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          if (socketService && gameInfo) {
+            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
           }
         }, 3000);
       }

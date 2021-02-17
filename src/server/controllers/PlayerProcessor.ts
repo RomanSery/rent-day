@@ -7,6 +7,7 @@ import { SkillType } from "../../core/enums/SkillType";
 import { Player } from "../../core/types/Player";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { UserInstance, UserDocument } from "../../core/schema/UserSchema";
 
 export class PlayerProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -30,6 +31,34 @@ export class PlayerProcessor {
           p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
       );
     }
+  }
+
+  public static async getUserGame(
+    userId: mongoose.Types.ObjectId
+  ): Promise<GameInstanceDocument | null> {
+    const foundUser = await UserInstance.findById(
+      userId,
+      (err: mongoose.CallbackError, existingUser: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return existingUser;
+      }
+    );
+
+    if (!foundUser || !foundUser.currGameId) {
+      return null;
+    }
+
+    return await GameInstance.findById(
+      foundUser.currGameId,
+      (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return existingGame;
+      }
+    );
   }
 
   public async upgradeSkill(skillType: SkillType): Promise<string> {

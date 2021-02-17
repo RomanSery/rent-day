@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { Button } from "@material-ui/core";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
 import API from '../api';
@@ -56,8 +56,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const onClickDone = async () => {
     API.post("actions/completeTurn", { context })
       .then(function (response) {
-        if (socketService) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        if (socketService && gameInfo) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
       })
       .catch(handleApiError);
@@ -66,8 +66,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const onGetOut = async () => {
     API.post("actions/getOut", { context })
       .then(function (response) {
-        if (socketService) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        if (socketService && gameInfo) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
       })
       .catch(handleApiError);
@@ -83,7 +83,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const onLeaveGame = async () => {
     leaveCurrentGameIfJoined(() => {
-      socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, getMyGameId(), getMyName() + " has quit");
+      if (gameInfo) {
+        socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " has quit");
+      }
       history.push("/dashboard");
     });
   };

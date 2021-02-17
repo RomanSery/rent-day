@@ -87,7 +87,7 @@ export class LottoProcessor {
     if (randomNum <= neededToWin) {
       this.lotto.prize = this.getPrizeAmount();
       if (this.player) {
-        this.player.money = this.player.money + this.lotto.prize;
+        this.player.money = Math.round(this.player.money + this.lotto.prize);
         PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
       }
     } else {

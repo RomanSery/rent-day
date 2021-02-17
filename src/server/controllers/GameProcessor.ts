@@ -151,7 +151,7 @@ export class GameProcessor {
     ];
 
     game.players.forEach(async (p, index) => {
-      p.money = game.settings.initialMoney;
+      p.money = Math.round(game.settings.initialMoney);
       p.position = 1;
       p.color = colors[index];
       p.state = PlayerState.ACTIVE;
@@ -300,8 +300,9 @@ export class GameProcessor {
     }
   }
 
-  public async getGameStatus(
-    gameId: mongoose.Types.ObjectId
+  public static async getGameStatus(
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
   ): Promise<GameStatus | null> {
     const found = await GameInstance.findById(
       gameId,
@@ -314,6 +315,31 @@ export class GameProcessor {
     );
 
     const status: GameStatus | null = found != null ? found.status : null;
+    if (!found || !status || status === GameStatus.FINISHED) {
+      const foundUser = await UserInstance.findById(
+        userId,
+        (err: mongoose.CallbackError, existingUser: UserDocument) => {
+          if (err) {
+            return console.log(err);
+          }
+          return existingUser;
+        }
+      );
+
+      if (
+        gameId &&
+        foundUser &&
+        foundUser.currGameId &&
+        new mongoose.Types.ObjectId(gameId).equals(
+          new mongoose.Types.ObjectId(foundUser.currGameId)
+        )
+      ) {
+        foundUser.currGameId = undefined;
+        foundUser.currGameName = undefined;
+        await foundUser.save();
+      }
+    }
+
     return status;
   }
 

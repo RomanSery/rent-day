@@ -74,7 +74,7 @@ export class PlayerCostsCalculator {
       dollarFormatterServer.format(game.settings.electricityCostPerHouse) +
       " per house";
 
-    player.electricityCostsPerTurn = total;
+    player.electricityCostsPerTurn = Math.round(total);
   }
 
   private static calculateTaxCostsForPlayer(
@@ -136,7 +136,7 @@ export class PlayerCostsCalculator {
     const substraction = total * corruptionAdjustment;
     const finalTotal = total - substraction;
 
-    player.taxesPerTurn = finalTotal;
+    player.taxesPerTurn = Math.round(finalTotal);
   }
 
   private static calculateTotalAssetsForPlayer(
@@ -150,7 +150,7 @@ export class PlayerCostsCalculator {
       player
     );
 
-    return money + mortgageableValue + housesValue;
+    return Math.round(money + mortgageableValue + housesValue);
   }
 
   private static calculateMortgageableValueForPlayer(
@@ -172,7 +172,7 @@ export class PlayerCostsCalculator {
     playerOwnedSquares.forEach((squareState: SquareGameData) => {
       total += squareState.mortgageValue!;
     });
-    return total;
+    return Math.round(total);
   }
 
   private static calculateRedeemableValueForPlayer(
@@ -195,7 +195,7 @@ export class PlayerCostsCalculator {
       const redeemAmount = MoneyCalculator.getRedeemValue(s);
       total += redeemAmount;
     });
-    return total;
+    return Math.round(total);
   }
 
   private static calculateTotalSaleValueOfHouses(
@@ -219,7 +219,7 @@ export class PlayerCostsCalculator {
       const housesValue = s.numHouses * MoneyCalculator.getSellPriceForHouse(s);
       total += housesValue;
     });
-    return total;
+    return Math.round(total);
   }
 
   private static doesPlayerOwnConEd(

@@ -78,7 +78,9 @@ export class RollProcessor {
       return "You already rolled this turn";
     }
 
-    //TODO if negative $, cant roll
+    if (this.player.money < 0) {
+      return "you cant roll with negative money;";
+    }
 
     this.updateRollHistory();
     this.updatePlayerPosition();
@@ -324,6 +326,10 @@ export class RollProcessor {
       return this.player.name + " is bankrupt";
     }
 
+    if (this.player.money < 0) {
+      return "you cant complete your turn with negative money;";
+    }
+
     if (!this.userId.equals(this.game.nextPlayerToAct)) {
       return "not your turn";
     }
@@ -408,7 +414,7 @@ export class RollProcessor {
     }
 
     this.player.numTurnsInIsolation = 0;
-    this.player.money = this.player.money - payToGetOutFee;
+    this.player.money = Math.round(this.player.money - payToGetOutFee);
     this.player.state = PlayerState.ACTIVE;
     this.player.rollHistory = [];
 

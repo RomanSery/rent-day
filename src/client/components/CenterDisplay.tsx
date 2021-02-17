@@ -9,7 +9,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
@@ -61,15 +61,15 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   }, []);
 
   const onRollDice = async () => {
-    if (socketService) {
-      socketService.socket.emit(GameEvent.ROLL_DICE, getMyGameId());
+    if (socketService && gameInfo) {
+      socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
     }
 
     setTimeout(() => {
       API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
-          if (socketService) {
-            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+          if (socketService && gameInfo) {
+            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
           }
         })
         .catch(handleApiError);

@@ -9,7 +9,7 @@ import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { SkillType } from "../../core/enums/SkillType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
-import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyGameId, getMyUserId, handleApiError } from '../helpers';
+import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from '../helpers';
 import { faPlusSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GameContext } from '../../core/types/GameContext';
@@ -107,8 +107,8 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
   const upgradeSkill = async (skillType: SkillType) => {
     API.post("actions/upgradeSkill", { skillType: skillType, context })
       .then(function (response) {
-        if (socketService) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+        if (socketService && gameInfo) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         }
       })
       .catch(handleApiError);
