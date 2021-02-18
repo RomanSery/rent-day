@@ -25,9 +25,9 @@ SquareConfigDataMap.set(2, {
   groupId: 1,
 
   houseCost: 50,
-  tax: 1.2,
+  tax: 0.5,
   rent: new Map<number, number>([
-    [0, 5],
+    [0, 10],
     [1, 18],
     [2, 30],
     [3, 90],
@@ -45,9 +45,9 @@ SquareConfigDataMap.set(4, {
   groupId: 1,
 
   houseCost: 50,
-  tax: 1.3,
+  tax: 0.5,
   rent: new Map<number, number>([
-    [0, 10],
+    [0, 15],
     [1, 30],
     [2, 60],
     [3, 180],
@@ -61,7 +61,7 @@ SquareConfigDataMap.set(5, {
   groupId: 15,
 
   houseCost: 100,
-  tax: 1.3,
+  tax: 2.0,
   rent: new Map<number, number>([
     [0, 22],
     [1, 44],
@@ -77,7 +77,7 @@ SquareConfigDataMap.set(6, {
   section: BoardSection.Bottom,
   groupId: 10,
 
-  tax: 1.5,
+  tax: 1.8,
   rent: new Map<number, number>([
     [0, 25],
     [1, 50],
@@ -92,9 +92,9 @@ SquareConfigDataMap.set(7, {
   groupId: 2,
 
   houseCost: 50,
-  tax: 1.3,
+  tax: 1.0,
   rent: new Map<number, number>([
-    [0, 10],
+    [0, 15],
     [1, 40],
     [2, 90],
     [3, 270],
@@ -112,9 +112,9 @@ SquareConfigDataMap.set(9, {
   groupId: 2,
 
   houseCost: 50,
-  tax: 1.3,
+  tax: 1.0,
   rent: new Map<number, number>([
-    [0, 10],
+    [0, 15],
     [1, 40],
     [2, 90],
     [3, 270],
@@ -128,9 +128,9 @@ SquareConfigDataMap.set(10, {
   groupId: 2,
 
   houseCost: 50,
-  tax: 1.3,
+  tax: 1.0,
   rent: new Map<number, number>([
-    [0, 16],
+    [0, 20],
     [1, 50],
     [2, 100],
     [3, 300],
@@ -152,7 +152,7 @@ SquareConfigDataMap.set(12, {
   houseCost: 100,
   tax: 1.3,
   rent: new Map<number, number>([
-    [0, 16],
+    [0, 20],
     [1, 50],
     [2, 150],
     [3, 450],
@@ -172,7 +172,7 @@ SquareConfigDataMap.set(14, {
   houseCost: 100,
   tax: 1.3,
   rent: new Map<number, number>([
-    [0, 16],
+    [0, 20],
     [1, 50],
     [2, 150],
     [3, 450],
@@ -188,7 +188,7 @@ SquareConfigDataMap.set(15, {
   houseCost: 100,
   tax: 1.3,
   rent: new Map<number, number>([
-    [0, 20],
+    [0, 25],
     [1, 60],
     [2, 180],
     [3, 500],
@@ -202,7 +202,7 @@ SquareConfigDataMap.set(16, {
   section: BoardSection.Left,
   groupId: 10,
 
-  tax: 1.5,
+  tax: 1.8,
   rent: new Map<number, number>([
     [0, 25],
     [1, 50],
@@ -217,9 +217,9 @@ SquareConfigDataMap.set(17, {
   groupId: 4,
 
   houseCost: 100,
-  tax: 1.3,
+  tax: 1.5,
   rent: new Map<number, number>([
-    [0, 20],
+    [0, 25],
     [1, 70],
     [2, 200],
     [3, 550],
@@ -238,9 +238,9 @@ SquareConfigDataMap.set(19, {
   groupId: 4,
 
   houseCost: 100,
-  tax: 1.3,
+  tax: 1.5,
   rent: new Map<number, number>([
-    [0, 20],
+    [0, 25],
     [1, 70],
     [2, 200],
     [3, 550],
@@ -254,9 +254,9 @@ SquareConfigDataMap.set(20, {
   groupId: 4,
 
   houseCost: 100,
-  tax: 1.3,
+  tax: 1.5,
   rent: new Map<number, number>([
-    [0, 30],
+    [0, 35],
     [1, 80],
     [2, 220],
     [3, 600],
@@ -276,9 +276,9 @@ SquareConfigDataMap.set(22, {
   groupId: 5,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.7,
   rent: new Map<number, number>([
-    [0, 30],
+    [0, 35],
     [1, 90],
     [2, 250],
     [3, 700],
@@ -296,9 +296,9 @@ SquareConfigDataMap.set(24, {
   groupId: 5,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.7,
   rent: new Map<number, number>([
-    [0, 30],
+    [0, 35],
     [1, 90],
     [2, 250],
     [3, 700],
@@ -312,7 +312,7 @@ SquareConfigDataMap.set(25, {
   groupId: 5,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.7,
   rent: new Map<number, number>([
     [0, 40],
     [1, 100],
@@ -328,7 +328,7 @@ SquareConfigDataMap.set(26, {
   section: BoardSection.Top,
   groupId: 10,
 
-  tax: 1.5,
+  tax: 1.8,
   rent: new Map<number, number>([
     [0, 25],
     [1, 50],
@@ -343,7 +343,7 @@ SquareConfigDataMap.set(27, {
   groupId: 6,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.9,
   rent: new Map<number, number>([
     [0, 40],
     [1, 110],
@@ -363,7 +363,7 @@ SquareConfigDataMap.set(29, {
   groupId: 6,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.9,
   rent: new Map<number, number>([
     [0, 40],
     [1, 110],
@@ -379,7 +379,7 @@ SquareConfigDataMap.set(30, {
   groupId: 6,
 
   houseCost: 150,
-  tax: 1.3,
+  tax: 1.9,
   rent: new Map<number, number>([
     [0, 50],
     [1, 120],
@@ -401,7 +401,7 @@ SquareConfigDataMap.set(32, {
   groupId: 7,
 
   houseCost: 200,
-  tax: 1.3,
+  tax: 2.2,
   rent: new Map<number, number>([
     [0, 50],
     [1, 130],
@@ -421,7 +421,7 @@ SquareConfigDataMap.set(34, {
   groupId: 7,
 
   houseCost: 200,
-  tax: 1.3,
+  tax: 2.2,
   rent: new Map<number, number>([
     [0, 50],
     [1, 130],
@@ -437,7 +437,7 @@ SquareConfigDataMap.set(35, {
   groupId: 7,
 
   houseCost: 200,
-  tax: 1.3,
+  tax: 2.2,
   rent: new Map<number, number>([
     [0, 60],
     [1, 150],
@@ -453,7 +453,7 @@ SquareConfigDataMap.set(36, {
   section: BoardSection.Right,
   groupId: 10,
 
-  tax: 1.5,
+  tax: 1.8,
   rent: new Map<number, number>([
     [0, 25],
     [1, 50],
@@ -474,7 +474,7 @@ SquareConfigDataMap.set(38, {
   groupId: 8,
 
   houseCost: 200,
-  tax: 1.3,
+  tax: 2.5,
   rent: new Map<number, number>([
     [0, 60],
     [1, 175],
@@ -494,7 +494,7 @@ SquareConfigDataMap.set(40, {
   groupId: 8,
 
   houseCost: 200,
-  tax: 1.3,
+  tax: 2.5,
   rent: new Map<number, number>([
     [0, 80],
     [1, 200],

@@ -232,7 +232,7 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Your taxes for each property you own are lowered by 50%" />
+          <ListItemText primary="Your taxes for every property you own are lowered by 50%" />
         </ListItem>
         <ListItem>
           <ListItemIcon>

@@ -77,6 +77,10 @@ export class LottoProcessor {
       return "invalid picked option";
     }
 
+    if (!this.lotto.playerId.equals(this.userId)) {
+      return "Not your lotto game";
+    }
+
     const randomNum = LottoProcessor.getRandomIntInclusive(1, 100);
 
     this.lotto.optionPicked = this.optNum;
