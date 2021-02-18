@@ -9,7 +9,7 @@ import { PlayerViewer } from "./PlayerViewer";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
 import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
@@ -22,6 +22,7 @@ import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
 import { TravelDialog } from "../dialogs/TravelDialog";
 import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { useHistory } from "react-router-dom";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -33,6 +34,7 @@ interface Props {
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
+  const history = useHistory();
 
   const [playerToView, setPlayerToView] = useState<String | undefined>(undefined);
 
@@ -136,6 +138,12 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     return gameInfo && gameInfo.status === GameStatus.FINISHED ? true : false;
   }
 
+  const onLeaveGame = () => {
+    leaveCurrentGameIfJoined(() => {
+      history.push("/dashboard");
+    });
+  };
+
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -169,7 +177,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
-      <GameOverDialog gameInfo={gameInfo} open={showGameOver()} />
+      <GameOverDialog gameInfo={gameInfo} open={showGameOver()} onLeaveGame={onLeaveGame} />
       <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
       <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />

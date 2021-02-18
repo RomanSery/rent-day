@@ -7,10 +7,6 @@ use .env files extract url's, db connection, localhost, cookie settings
 increse base rent for properties to offset the tax per turn.  and change tax rates for different properties
 
 
-
-
-have to implement checking for when the game is over and assign placings (only one player left) 
-show game over dialog
 have to handle case of player quitting when its their turn, in that case have to set next player to act
 
 

@@ -14,9 +14,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 interface Props {
   open: boolean;
   gameInfo: GameState | undefined;
+  onLeaveGame: () => void;
 }
 
-export const GameOverDialog: React.FC<Props> = ({ open, gameInfo }) => {
+export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame }) => {
 
   const getPlayerById = (params: ValueFormatterParams) => {
     if (gameInfo) {
@@ -80,12 +81,6 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo }) => {
     return rows;
   }
 
-  const onLeaveGame = () => {
-
-
-
-  };
-
   return (
     <Dialog fullWidth={true} maxWidth="xl" disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="stats-dialog-title" open={open}>
       <DialogTitle id="trade-dialog-title">Game Over</DialogTitle>
@@ -98,7 +93,7 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo }) => {
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onLeaveGame} color="primary">LEAVE</Button>
+        <Button onClick={onLeaveGame} color="primary" variant="contained">LEAVE</Button>
       </DialogActions>
     </Dialog>
   );
