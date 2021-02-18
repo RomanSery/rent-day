@@ -20,6 +20,8 @@ import { TradeOffer } from "../../core/types/TradeOffer";
 import { ReviewTradeDialog } from "../dialogs/ReviewTradeDialog";
 import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
 import { TravelDialog } from "../dialogs/TravelDialog";
+import { GameOverDialog } from "../dialogs/GameOverDialog";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -130,6 +132,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     setTravelOpen(false);
   };
 
+  const showGameOver = () => {
+    return gameInfo && gameInfo.status === GameStatus.FINISHED ? true : false;
+  }
+
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -163,6 +169,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
+      <GameOverDialog gameInfo={gameInfo} open={showGameOver()} />
       <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
       <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
       <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />

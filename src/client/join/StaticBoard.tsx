@@ -3,6 +3,7 @@ import { GameState } from "../../core/types/GameState";
 import { GameSquare } from "../components/GameSquare";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
+import { GameStatus } from "../../core/enums/GameStatus";
 
 interface Props {
 
@@ -26,7 +27,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
     }
     return {
       _id: '', auctionId: '', auctionSquareId: 0, lottoId: '',
-      theme: themeArray, players: [],
+      theme: themeArray, players: [], status: GameStatus.FINISHED,
       nextPlayerToAct: '',
       name: 'static',
       settings: {

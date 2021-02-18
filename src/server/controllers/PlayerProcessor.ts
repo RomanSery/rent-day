@@ -96,4 +96,69 @@ export class PlayerProcessor {
 
     return "";
   }
+
+  public static async updateLossesAndLeaveGame(
+    game: GameInstanceDocument,
+    userId: mongoose.Types.ObjectId
+  ): Promise<void> {
+    const ud: UserDocument | null = await UserInstance.findById(
+      userId,
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      if (game.status === GameStatus.ACTIVE) {
+        ud.losses++;
+      }
+      ud.currGameId = undefined;
+      ud.currGameName = undefined;
+      await ud.save();
+    }
+  }
+
+  public static async updateLosses(
+    game: GameInstanceDocument,
+    userId: mongoose.Types.ObjectId
+  ): Promise<void> {
+    const ud: UserDocument | null = await UserInstance.findById(
+      userId,
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      if (game.status === GameStatus.ACTIVE) {
+        ud.losses++;
+      }
+      await ud.save();
+    }
+  }
+
+  public static async updateWins(
+    game: GameInstanceDocument,
+    userId: mongoose.Types.ObjectId
+  ): Promise<void> {
+    const ud: UserDocument | null = await UserInstance.findById(
+      userId,
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      if (game.status === GameStatus.ACTIVE) {
+        ud.losses++;
+      }
+      await ud.save();
+    }
+  }
 }

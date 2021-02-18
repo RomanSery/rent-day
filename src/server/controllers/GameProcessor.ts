@@ -24,6 +24,7 @@ import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { SquareType } from "../../core/enums/SquareType";
 import { RollProcessor } from "./RollProcessor";
+import { PlayerProcessor } from "./PlayerProcessor";
 
 export class GameProcessor {
   public async createGame(
@@ -183,7 +184,7 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
 
     for (let id = 1; id <= 38; id++) {
-      GameProcessor.assignSquareTesting(game, game.players[1], id, 300);
+      GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
     }
 
     game.players.forEach(async (p, index) => {
@@ -389,34 +390,22 @@ export class GameProcessor {
         }
       }
     } else if (status === GameStatus.ACTIVE) {
-      GameProcessor.bankruptPlayer(game, userId);
+      await GameProcessor.bankruptPlayer(game, userId);
     }
 
     game.save();
 
-    const ud: UserDocument | null = await UserInstance.findById(
-      userId,
-      (err: mongoose.CallbackError, u: UserDocument) => {
-        if (err) {
-          return console.log(err);
-        }
-        return u;
-      }
-    );
-    if (ud) {
-      if (status === GameStatus.ACTIVE) {
-        ud.losses++;
-      }
-      ud.currGameId = undefined;
-      ud.currGameName = undefined;
-      await ud.save();
-    }
+    await PlayerProcessor.updateLossesAndLeaveGame(game, userId);
   }
 
-  public static bankruptPlayer(
+  public static async bankruptPlayer(
     game: GameInstanceDocument,
     userId: mongoose.Types.ObjectId
-  ): void {
+  ): Promise<void> {
+    const numPlayersStillInIt = game.players.filter(
+      (p) => p.state !== PlayerState.BANKRUPT
+    ).length;
+
     const losser = game.players.find(
       (p) =>
         p._id &&
@@ -434,8 +423,8 @@ export class GameProcessor {
     losser.hasRolled = true;
 
     if (!losser.finishedRank) {
-      //TODO
-      losser.finishedRank = 1;
+      losser.finishedRank = numPlayersStillInIt;
+      await PlayerProcessor.updateLosses(game, userId);
     }
 
     game.squareState.forEach((s: SquareGameData) => {
@@ -449,9 +438,25 @@ export class GameProcessor {
       }
     });
 
+    const isGameOver =
+      game.players.filter((p) => p.state !== PlayerState.BANKRUPT).length === 1;
+    if (isGameOver) {
+      game.status = GameStatus.FINISHED;
+      const winner = game.players.filter(
+        (p) => p.state !== PlayerState.BANKRUPT
+      )[0];
+      if (winner) {
+        winner.finishedRank = 1;
+        await PlayerProcessor.updateWins(
+          game,
+          new mongoose.Types.ObjectId(winner._id)
+        );
+      }
+    }
+
     if (
       game.nextPlayerToAct &&
-      game.nextPlayerToAct.equals(new mongoose.Types.ObjectId(losser._id))
+      !game.nextPlayerToAct.equals(new mongoose.Types.ObjectId(losser._id))
     ) {
       return;
     }

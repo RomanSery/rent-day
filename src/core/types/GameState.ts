@@ -1,3 +1,4 @@
+import { GameStatus } from "../enums/GameStatus";
 import { LastResult } from "./LastResult";
 import { Player } from "./Player";
 import { Settings } from "./Settings";
@@ -16,4 +17,5 @@ export interface GameState {
   readonly auctionSquareId: number;
   readonly lottoId: string;
   readonly results: LastResult;
+  readonly status: GameStatus;
 }

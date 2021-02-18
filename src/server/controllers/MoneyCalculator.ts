@@ -58,7 +58,10 @@ export class MoneyCalculator {
     return 0;
   }
 
-  public static payRent(game: GameInstanceDocument, player: Player): string {
+  public static async payRent(
+    game: GameInstanceDocument,
+    player: Player
+  ): Promise<string> {
     if (!this.shouldPayRent(game, player)) {
       return "";
     }
@@ -112,16 +115,8 @@ export class MoneyCalculator {
     PlayerCostsCalculator.updatePlayerCosts(game, player);
     PlayerCostsCalculator.updatePlayerCosts(game, owner!);
 
-    console.log(
-      "finalRentToPay: %d adjustedRentToPay: %d totalAssets: %d cantPay: %s",
-      finalRentToPay,
-      adjustedRentToPay,
-      player.totalAssets,
-      cantPay
-    );
-
     if (cantPay) {
-      GameProcessor.bankruptPlayer(
+      await GameProcessor.bankruptPlayer(
         game,
         new mongoose.Types.ObjectId(player._id)
       );
