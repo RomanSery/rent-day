@@ -22,6 +22,8 @@ import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { SquareConfigData } from "../../core/types/SquareConfigData";
 
 
 interface Props {
@@ -56,7 +58,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
 
   };
 
-  const getPlayerProperties = (mine: boolean): number[] => {
+  const getPlayerTradeableProperties = (mine: boolean): number[] => {
 
     const playerId = mine ? getMyUserId() : tradingWithPlayerId;
     if (!playerId || !gameInfo) {
@@ -64,7 +66,9 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
     }
 
     const properties: SquareGameData[] = gameInfo.squareState.filter((s: SquareGameData) => {
-      return s.owner && areObjectIdsEqual(s.owner, playerId);
+      const squareConfig = SquareConfigDataMap.get(s.squareId);
+      return s.owner && areObjectIdsEqual(s.owner, playerId) && s.numHouses === 0 &&
+        squareConfig && squareConfig.groupId && !doesGroupHaveAnyHouses(squareConfig.groupId);
     });
 
     return properties.map(function (p) {
@@ -72,6 +76,27 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
     });
   };
 
+
+  const doesGroupHaveAnyHouses = (groupId: number): boolean => {
+    if (!gameInfo) {
+      return false;
+    }
+    let hasHouses = false;
+    SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+      if (d.groupId && d.groupId === groupId) {
+        const squareData: SquareGameData | undefined = gameInfo.squareState.find(
+          (p: SquareGameData) => p.squareId === key
+        );
+
+        if (squareData && squareData.numHouses > 0) {
+          hasHouses = true;
+          return;
+        }
+      }
+    });
+
+    return hasHouses;
+  };
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
     if (!gameInfo) {
@@ -113,7 +138,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
   };
 
   const propertyList = (mine: boolean) => {
-    const items: number[] = getPlayerProperties(mine);
+    const items: number[] = getPlayerTradeableProperties(mine);
 
     return (
       <Paper>

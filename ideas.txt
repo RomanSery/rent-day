@@ -1,7 +1,7 @@
-have to handle case of player quitting when its their turn, in that case have to set next player to act
-if qutting and leaving 1 player active, need to finish game and show game over dialog
+look at forEach statements, maybe replce with for..of loop because returning from inside forEach doesnt return the main function
 
-  
+player doesnt have enough $ to get out of jail
+
 use .env files extract url's, db connection, localhost, cookie settings
 look for url's, uri's and places in .env file, ws:localhost
 
@@ -9,6 +9,3 @@ add more details to roll results
 
 implement chance
 implement movement animation
-
-need to be able to trade properties with houses on them
-player doesnt have enough $ to get out of jail

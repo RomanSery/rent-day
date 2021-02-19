@@ -11,8 +11,9 @@ import { GameProcessor } from "./GameProcessor";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { areIdsEqual } from "./helpers";
+import { areIdsEqual, doesGroupHaveAnyHouses } from "./helpers";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { SquareConfigDataMap } from "../../core/config/SquareData";
 
 export class TradeProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -104,7 +105,7 @@ export class TradeProcessor {
       return "You must get something in return";
     }
 
-    this.mines.forEach((squareId) => {
+    for (const squareId of this.mines) {
       const state: SquareGameData | undefined = this.game!.squareState.find(
         (p: SquareGameData) => p.squareId === squareId
       );
@@ -114,9 +115,18 @@ export class TradeProcessor {
       if (!areIdsEqual(state.owner, this.me!._id)) {
         return "You dont own some of the properties you are trying to trade.";
       }
-    });
 
-    this.theirs.forEach((squareId) => {
+      if (state.numHouses > 0) {
+        return "You cant trade properties with houses on them. Sell them first";
+      }
+
+      const squareConfig = SquareConfigDataMap.get(squareId);
+      if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
+        return "You cant trade a property that belongs to a group with houses. Sell them first";
+      }
+    }
+
+    for (const squareId of this.theirs) {
       const state: SquareGameData | undefined = this.game!.squareState.find(
         (p: SquareGameData) => p.squareId === squareId
       );
@@ -126,7 +136,16 @@ export class TradeProcessor {
       if (!areIdsEqual(state.owner, this.otherPlayer!._id)) {
         return "They dont own some of the properties you are trying to trade.";
       }
-    });
+
+      if (state.numHouses > 0) {
+        return "They cant trade properties with houses on them. Sell them first";
+      }
+
+      const squareConfig = SquareConfigDataMap.get(squareId);
+      if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
+        return "They cant trade a property that belongs to a group with houses. Sell them first";
+      }
+    }
 
     const me: TradeParticipant = {
       playerId: this.userId.toHexString(),
@@ -240,7 +259,7 @@ export class TradeProcessor {
       return "Can't get more than they have";
     }
 
-    tradeDoc.participant1.squaresGiven.forEach((squareId) => {
+    for (const squareId of tradeDoc.participant1.squaresGiven) {
       const state: SquareGameData | undefined = game.squareState.find(
         (p: SquareGameData) => p.squareId === squareId
       );
@@ -250,9 +269,17 @@ export class TradeProcessor {
       if (!areIdsEqual(state.owner, tradeDoc.participant1.playerId)) {
         return "You dont own some of the properties you are trying to trade.";
       }
-    });
+      if (state.numHouses > 0) {
+        return "You cant trade properties with houses on them. Sell them first";
+      }
 
-    tradeDoc.participant2.squaresGiven.forEach((squareId) => {
+      const squareConfig = SquareConfigDataMap.get(squareId);
+      if (doesGroupHaveAnyHouses(game, squareConfig!.groupId!)) {
+        return "You cant trade a property that belongs to a group with houses. Sell them first";
+      }
+    }
+
+    for (const squareId of tradeDoc.participant2.squaresGiven) {
       const state: SquareGameData | undefined = game.squareState.find(
         (p: SquareGameData) => p.squareId === squareId
       );
@@ -262,9 +289,15 @@ export class TradeProcessor {
       if (!areIdsEqual(state.owner, tradeDoc.participant2.playerId)) {
         return "They dont own some of the properties you are trying to trade.";
       }
-    });
+      if (state.numHouses > 0) {
+        return "They cant trade properties with houses on them. Sell them first";
+      }
 
-    //TODO cant trade properties with houses on them
+      const squareConfig = SquareConfigDataMap.get(squareId);
+      if (doesGroupHaveAnyHouses(game, squareConfig!.groupId!)) {
+        return "They cant trade a property that belongs to a group with houses. Sell them first";
+      }
+    }
 
     tradeDoc.status = TradeStatus.ACCEPTED;
     await tradeDoc.save();
