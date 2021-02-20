@@ -60,13 +60,13 @@ export class PlayerCostsCalculator {
     let total = 0;
     let totalHouses = 0;
 
-    playerOwnedSquaresWithHouses.forEach((squareState: SquareGameData) => {
+    for (const squareState of playerOwnedSquaresWithHouses) {
       const cost =
         squareState.numHouses * game.settings.electricityCostPerHouse;
       total += cost;
 
       totalHouses += squareState.numHouses;
-    });
+    }
 
     player.electricityTooltip =
       totalHouses +
@@ -214,11 +214,10 @@ export class PlayerCostsCalculator {
     );
 
     let total = 0;
-
-    playerOwnedSquaresWithHouses.forEach((s: SquareGameData) => {
+    for (const s of playerOwnedSquaresWithHouses) {
       const housesValue = s.numHouses * MoneyCalculator.getSellPriceForHouse(s);
       total += housesValue;
-    });
+    }
     return Math.round(total);
   }
 
