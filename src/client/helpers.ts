@@ -128,7 +128,6 @@ export const tryToRedirectToGame = async (
   }
 
   const gameStatus: GameStatus = await getGameStatus(myGameId);
-  console.log(gameStatus);
 
   if (gameStatus == null) {
     clearMyGameInfo();

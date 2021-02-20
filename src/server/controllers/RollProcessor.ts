@@ -33,7 +33,7 @@ export class RollProcessor {
   constructor(
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
-    forceDie1: number | null,
+    forceDie1: number | null, //TODO remove or just disable
     forceDie2: number | null
   ) {
     this.gameId = gameId;

@@ -160,6 +160,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     );
   }
 
+  const getPieceId = (p: Player) => {
+    return "player-" + p._id;
+  }
+
   const displayPiecesForSquare = (squareId: number) => {
     return (
       <React.Fragment>
@@ -173,7 +177,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           const right = rect.right;
 
           return (
-            <div className="single-piece" key={getObjectIdAsHexString(p._id)}
+            <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
               style={{ top: getTopPosition(rect, section), left: getLeftPosition(rect, section, numOnSquare, index), bottom: bottom, right: right }}>
               <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
             </div>);
