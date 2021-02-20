@@ -139,7 +139,7 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
                 <TableCell component="th" scope="row">{getElectricityTooltip(getPlayer(), "Electricity per Turn")}</TableCell>
                 <TableCell align="right">{getElectricityTooltip(getPlayer(), getPlayerElectricityCosts())}</TableCell>
               </TableRow>
-              <TableRow key="playerViewer1">
+              <TableRow key="playerViewer4">
                 <TableCell component="th" scope="row">{getTotalAssetsTooltip()}</TableCell>
                 <TableCell align="right">{getPlayerTotalAssets()}</TableCell>
               </TableRow>

@@ -74,6 +74,34 @@ export class GameProcessor {
     });
 
     await newGame.save();
+
+    //TODO just for testing
+    /*
+    this.joinGame(
+      new mongoose.Types.ObjectId(newGame._id),
+      new mongoose.Types.ObjectId("60313a409a646b2808c7a059"),
+      PieceType.Hat,
+      PlayerClass.Banker
+    );
+    this.joinGame(
+      new mongoose.Types.ObjectId(newGame._id),
+      new mongoose.Types.ObjectId("60313a539a646b2808c7a05a"),
+      PieceType.Dog,
+      PlayerClass.Banker
+    );
+    this.joinGame(
+      new mongoose.Types.ObjectId(newGame._id),
+      new mongoose.Types.ObjectId("60313a5d9a646b2808c7a05b"),
+      PieceType.Cat,
+      PlayerClass.Banker
+    );
+    this.joinGame(
+      new mongoose.Types.ObjectId(newGame._id),
+      new mongoose.Types.ObjectId("603166629a646b2808c7a05c"),
+      PieceType.Pawn,
+      PlayerClass.Banker
+    );
+*/
     return newGame.id;
   }
 
@@ -144,12 +172,12 @@ export class GameProcessor {
     game.players = _.shuffle(game.players);
 
     const colors = [
-      "#3d4feb",
-      "#0ea706",
-      "#42f5e3",
-      "#f542b3",
-      "#c8f542",
-      "#f58a42",
+      "#0014f3", //blue
+      "#138005", //green
+      "#17cbc9", //violat
+      "#bd0aef", //purple
+      "#c50c0c", //red
+      "#d47205", //orange
     ];
 
     game.players.forEach(async (p, index) => {

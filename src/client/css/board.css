@@ -339,6 +339,7 @@
   background-image: url("../images/central_park.jpg");
   background-repeat: no-repeat;
   background-size: cover;
+  opacity: 0.5;
 }
 .square.central-park .square-name {
   flex-basis: 10%;

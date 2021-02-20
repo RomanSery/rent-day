@@ -1,3 +1,4 @@
+problems joining game.  refresh page while in the join screen
 player doesnt have enough $ to get out of jail
 
 use .env files extract url's, db connection, localhost, cookie settings

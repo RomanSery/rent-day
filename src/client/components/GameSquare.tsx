@@ -4,7 +4,6 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
-import { SquarePieces } from "./SquarePieces";
 import { SquareGameData } from "../../core/types/SquareGameData";
 
 interface Props {
@@ -33,9 +32,6 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
     return "container container-" + sectionMap.get(section);
   };
 
-  const getPiecesClassName = () => {
-    return "pieces " + sectionMap.get(section);
-  };
 
   const getSquareClassName = () => {
     return "square " + squareTypeClass.get(squareType) + (isMortgaged() ? " mortgaged" : "");
@@ -68,7 +64,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   return (
     <React.Fragment>
       <div className={getSquareClassName()} id={getSquareId()} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
-        <SquarePieces gameInfo={gameInfo} cssName={getPiecesClassName()} id={id} />
+
         <div className={getContainerClassName()}>
           <SquareInfo id={id} gameInfo={gameInfo} />
 
