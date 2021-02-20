@@ -30,6 +30,9 @@ export class RollProcessor {
   private forceDie2: number | null;
   private rollDesc: string;
 
+  private origPosition: number | undefined;
+  private newPosition: number | undefined;
+
   constructor(
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
@@ -51,7 +54,18 @@ export class RollProcessor {
         (p: Player) =>
           p._id && new mongoose.Types.ObjectId(p._id).equals(this.userId)
       );
+
+      if (this.player) {
+        this.origPosition = this.player.position;
+      }
     }
+  }
+
+  public getOrigPosition(): number {
+    return this.origPosition!;
+  }
+  public getNewPosition(): number {
+    return this.newPosition!;
   }
 
   public async roll(): Promise<string> {
@@ -114,6 +128,8 @@ export class RollProcessor {
       roll: lastRoll,
       description: "<b>" + this.player.name + "</b> " + this.rollDesc,
     };
+
+    this.newPosition = this.player.position;
 
     this.game.save();
     return "";

@@ -32,6 +32,9 @@ export const roll = async (req: Request, res: Response) => {
 
   res.json({
     status: "success",
+    origPos: processor.getOrigPosition(),
+    newPos: processor.getNewPosition(),
+    playerId: userId,
   });
 };
 

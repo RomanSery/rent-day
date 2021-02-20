@@ -12,8 +12,9 @@ import { LatencyInfoMsg } from "../../core/types/messages";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { BoardSection } from "../../core/enums/BoardSection";
+import { PiecePosition } from "../../core/types/PiecePosition";
+import { getPiecePosition } from "../uiHelpers";
+import { animate } from "framer-motion";
 
 interface Props {
   socketService: SocketService;
@@ -27,6 +28,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
+  const [pieceToMovePos, setPieceToMovePos] = useState<DOMRect | null>(null);
+
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
@@ -107,32 +110,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     //setSquareToView(undefined);
   };
 
-  const getTopPosition = (rect: DOMRect, section: BoardSection) => {
-    if (section === BoardSection.Bottom) {
-      return rect.top + (rect.height / 2);
-    }
-    if (section === BoardSection.Top) {
-      return (rect.height / 4);
-    }
-
-    return rect.top;
-  }
-
-  const getLeftPosition = (rect: DOMRect, section: BoardSection, numOnSquare: number, index: number) => {
-    let offset = 0;
-    if (numOnSquare > 1 && index > 0) {
-      const multiplier = numOnSquare === 2 ? 3 : (numOnSquare >= 4 ? 8 : 4);
-      const divisionFactor = numOnSquare * multiplier;
-      offset = (index * numOnSquare * (rect.width / divisionFactor));
-    }
-
-
-    if (section === BoardSection.Right) {
-      return rect.left + (rect.width / 8) + offset;
-    }
-
-    return rect.left + offset;
-  }
 
   const getNumPlayersOnSquare = (squareId: number) => {
     if (!gameState) {
@@ -169,22 +146,41 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       <React.Fragment>
         {gameState!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
 
-          const numOnSquare = getNumPlayersOnSquare(squareId);
-          const section: BoardSection = SquareConfigDataMap.get(squareId)?.section!;
-          const square = document.getElementById('game-square-' + squareId);
-          const rect: DOMRect = square!.getBoundingClientRect();
-          const bottom = rect.bottom;
-          const right = rect.right;
-
+          const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
           return (
             <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-              style={{ top: getTopPosition(rect, section), left: getLeftPosition(rect, section, numOnSquare, index), bottom: bottom, right: right }}>
+              style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
               <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
             </div>);
 
         })}
       </React.Fragment>
     );
+  }
+
+  const showMovementAnimation = (origPos: number, newPos: number, playerId: string) => {
+    const from: PiecePosition = getPiecePosition(gameState!, origPos, 0);
+    const to: PiecePosition = getPiecePosition(gameState!, newPos, 0);
+
+    //console.log("from = " + from + ", to = " + to);
+
+    /*
+        const controls = animate(from, to, {
+          type: "tween",
+          duration: 8,
+          onUpdate: (value: number) => {
+            setAnimValue(Math.round(value))
+          },
+          onComplete: () => {
+            setShowResult(true);
+    
+            setTimeout(() => {
+              if (socketService && gameInfo) {
+                socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+              }
+            }, 3000);
+          }
+        });*/
   }
 
   return (
@@ -201,7 +197,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} />
+        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
 
 

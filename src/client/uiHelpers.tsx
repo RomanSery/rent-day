@@ -26,6 +26,10 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { TableHead } from "@material-ui/core";
 import { GameState } from "../core/types/GameState";
+import { SquareConfigDataMap } from "../core/config/SquareData";
+import { BoardSection } from "../core/enums/BoardSection";
+import { PlayerState } from "../core/enums/PlayerState";
+import { PiecePosition } from "../core/types/PiecePosition";
 
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
@@ -249,4 +253,53 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
     </React.Fragment>
   );
 };
+
+
+const getNumPlayersOnSquare = (gameState: GameState, squareId: number) => {
+  return gameState.players.filter((p) => p.position === squareId && p.state !== PlayerState.BANKRUPT).length;
+}
+
+const getTopPosition = (rect: DOMRect, section: BoardSection) => {
+  if (section === BoardSection.Bottom) {
+    return rect.top + (rect.height / 2);
+  }
+  if (section === BoardSection.Top) {
+    return (rect.height / 4);
+  }
+
+  return rect.top;
+}
+
+const getLeftPosition = (rect: DOMRect, section: BoardSection, numOnSquare: number, index: number) => {
+  let offset = 0;
+  if (numOnSquare > 1 && index > 0) {
+    const multiplier = numOnSquare === 2 ? 3 : (numOnSquare >= 4 ? 8 : 4);
+    const divisionFactor = numOnSquare * multiplier;
+    offset = (index * numOnSquare * (rect.width / divisionFactor));
+  }
+
+
+  if (section === BoardSection.Right) {
+    return rect.left + (rect.width / 8) + offset;
+  }
+
+  return rect.left + offset;
+}
+
+export const getPiecePosition = (gameState: GameState, squareId: number, index: number): PiecePosition => {
+  const numOnSquare = getNumPlayersOnSquare(gameState, squareId);
+  const section: BoardSection = SquareConfigDataMap.get(squareId)?.section!;
+  const square = document.getElementById('game-square-' + squareId);
+  const rect: DOMRect = square!.getBoundingClientRect();
+
+
+  const bottom = rect.bottom;
+  const right = rect.right;
+
+  return {
+    top: getTopPosition(rect, section), left: getLeftPosition(rect, section, numOnSquare, index), bottom: bottom, right: right
+  };
+}
+
+
 

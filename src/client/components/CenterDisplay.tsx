@@ -29,9 +29,10 @@ interface Props {
   socketService: SocketService;
   getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
+  showMovementAnimation: (origPos: number, newPos: number, playerId: string) => void;
 }
 
-export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId }) => {
+export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId, showMovementAnimation }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -74,6 +75,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         .then(function (response) {
           if (socketService && gameInfo) {
             socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+            showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId);
           }
         })
         .catch(handleApiError);
