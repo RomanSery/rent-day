@@ -255,7 +255,7 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
 };
 
 
-const getNumPlayersOnSquare = (gameState: GameState, squareId: number) => {
+export const getNumPlayersOnSquare = (gameState: GameState, squareId: number) => {
   return gameState.players.filter((p) => p.position === squareId && p.state !== PlayerState.BANKRUPT).length;
 }
 

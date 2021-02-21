@@ -1,3 +1,5 @@
+export const last_pos = 40;
+
 export const isolation_position: number = 11;
 export const mta_position: number = 18;
 export const conEd_position: number = 37;

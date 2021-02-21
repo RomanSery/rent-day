@@ -1,10 +1,9 @@
 problems joining game.  refresh page while in the join screen
 player doesnt have enough $ to get out of jail
+not sure landing on 'go to jail' works
 
 use .env files extract url's, db connection, localhost, cookie settings
 look for url's, uri's and places in .env file, ws:localhost
-
-add more details to roll results
 
 implement chance
 implement movement animation

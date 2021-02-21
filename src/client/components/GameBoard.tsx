@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
@@ -13,8 +14,10 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PiecePosition } from "../../core/types/PiecePosition";
-import { getPiecePosition } from "../uiHelpers";
-import { animate } from "framer-motion";
+import { getNumPlayersOnSquare, getPiecePosition } from "../uiHelpers";
+import { motion } from "framer-motion";
+import { DiceRollResult } from "../../core/types/DiceRollResult";
+import { last_pos } from "../../core/constants";
 
 interface Props {
   socketService: SocketService;
@@ -28,7 +31,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [pieceToMovePos, setPieceToMovePos] = useState<DOMRect | null>(null);
 
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
@@ -37,7 +39,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   useEffect(() => {
     getGameState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -70,7 +71,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         socketService.disconnect();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -111,14 +111,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   };
 
 
-  const getNumPlayersOnSquare = (squareId: number) => {
-    if (!gameState) {
-      return 0;
-    }
-
-    return gameState.players.filter((p) => p.position === squareId && p.state !== PlayerState.BANKRUPT).length;
-  }
-
   const displayGamePieces = () => {
     if (!gameState) {
       return null;
@@ -127,7 +119,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       <React.Fragment>
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          const numOnSquare = getNumPlayersOnSquare(id);
+          const numOnSquare = getNumPlayersOnSquare(gameState, id);
           if (numOnSquare > 0) {
             return displayPiecesForSquare(id);
           }
@@ -141,12 +133,66 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     return "player-" + p._id;
   }
 
+  const onFinishPieceMovement = () => {
+    setPlayerIdToMove("");
+    setOrigPos(0);
+    setNewPos(0);
+
+    if (socketService && gameState) {
+      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
+    }
+  }
+
+
+  const [playerIdToMove, setPlayerIdToMove] = useState<string>("");
+  const [origPos, setOrigPos] = useState<number>(0);
+  const [newPos, setNewPos] = useState<number>(0);
+
   const displayPiecesForSquare = (squareId: number) => {
     return (
       <React.Fragment>
         {gameState!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
 
           const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
+          const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
+          if (animate && newPos > 0 && origPos > 0) {
+
+            const frames: Array<PiecePosition> = [];
+
+
+            if (origPos > newPos) {
+              for (let i = origPos; i <= last_pos; i++) {
+                frames.push(getPiecePosition(gameState!, i, 0));
+              }
+              for (let i = 1; i <= newPos; i++) {
+                frames.push(getPiecePosition(gameState!, i, 0));
+              }
+            } else {
+              for (let i = origPos; i <= newPos; i++) {
+                frames.push(getPiecePosition(gameState!, i, 0));
+              }
+            }
+
+            const topFrames: Array<number> = frames.map((p) => p.top);
+            const leftFrames: Array<number> = frames.map((p) => p.left);
+            const bottomFrames: Array<number> = frames.map((p) => p.bottom);
+            const rightFrames: Array<number> = frames.map((p) => p.right);
+
+
+            return (
+              <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
+                style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
+                animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
+                transition={{
+                  duration: 3, repeat: 0
+                }}
+                onAnimationComplete={onFinishPieceMovement}
+              >
+                <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
+              </motion.div>);
+          }
+
+
           return (
             <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
               style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
@@ -158,38 +204,20 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     );
   }
 
-  const showMovementAnimation = (origPos: number, newPos: number, playerId: string) => {
-    const from: PiecePosition = getPiecePosition(gameState!, origPos, 0);
-    const to: PiecePosition = getPiecePosition(gameState!, newPos, 0);
+  const showMovementAnimation = (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult) => {
 
-    //console.log("from = " + from + ", to = " + to);
-
-    /*
-        const controls = animate(from, to, {
-          type: "tween",
-          duration: 8,
-          onUpdate: (value: number) => {
-            setAnimValue(Math.round(value))
-          },
-          onComplete: () => {
-            setShowResult(true);
-    
-            setTimeout(() => {
-              if (socketService && gameInfo) {
-                socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-              }
-            }, 3000);
-          }
-        });*/
+    //const to: PiecePosition = getPiecePosition(gameState!, newPos, 0);
+    // setMovePos(to);
+    setPlayerIdToMove(playerId);
+    setOrigPos(origPos);
+    setNewPos(newPos);
   }
 
   return (
     <React.Fragment>
       <div className="board">
-
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-
           return (<GameSquare gameInfo={gameState}
             id={id}
             key={id}
@@ -199,7 +227,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
         <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
-
 
       {displayGamePieces()}
 

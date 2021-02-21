@@ -35,6 +35,7 @@ export const roll = async (req: Request, res: Response) => {
     origPos: processor.getOrigPosition(),
     newPos: processor.getNewPosition(),
     playerId: userId,
+    diceRoll: processor.getLastDiceRoll(),
   });
 };
 

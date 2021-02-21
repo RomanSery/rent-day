@@ -23,13 +23,14 @@ import { TravelDialog } from "../dialogs/TravelDialog";
 import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
+import { DiceRollResult } from "../../core/types/DiceRollResult";
 
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
   getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
-  showMovementAnimation: (origPos: number, newPos: number, playerId: string) => void;
+  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult) => void;
 }
 
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId, showMovementAnimation }) => {
@@ -66,6 +67,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   }, []);
 
   const onRollDice = async () => {
+
     if (socketService && gameInfo) {
       socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
     }
@@ -74,8 +76,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
           if (socketService && gameInfo) {
-            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-            showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId);
+            showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId, response.data.diceRoll);
           }
         })
         .catch(handleApiError);

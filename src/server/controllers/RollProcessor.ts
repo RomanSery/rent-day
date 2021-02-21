@@ -11,7 +11,11 @@ import { AuctionProcessor } from "./AuctionProcessor";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
-import { isolation_position, payToGetOutFee } from "../../core/constants";
+import {
+  isolation_position,
+  last_pos,
+  payToGetOutFee,
+} from "../../core/constants";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
@@ -32,6 +36,7 @@ export class RollProcessor {
 
   private origPosition: number | undefined;
   private newPosition: number | undefined;
+  private lastDiceRoll: DiceRoll | undefined;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -66,6 +71,9 @@ export class RollProcessor {
   }
   public getNewPosition(): number {
     return this.newPosition!;
+  }
+  public getLastDiceRoll(): DiceRoll {
+    return this.lastDiceRoll!;
   }
 
   public async roll(): Promise<string> {
@@ -254,8 +262,8 @@ export class RollProcessor {
 
     if (updatePosition) {
       let newPosition = this.player.position + lastRoll.sum();
-      if (newPosition > 39) {
-        newPosition = newPosition - 39;
+      if (newPosition > last_pos) {
+        newPosition = newPosition - last_pos;
         this.playerPassedPayDay = true;
         this.rollDesc += " <br /> Payday, collect your salary!";
       } else {
@@ -290,6 +298,7 @@ export class RollProcessor {
 
     //insert latest roll into the beginning of array
     this.player.rollHistory.unshift(newRoll);
+    this.lastDiceRoll = newRoll;
 
     if (this.player.rollHistory.length > 3) {
       this.player.rollHistory.pop();
