@@ -7,6 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import { SkillType } from "../core/enums/SkillType";
 import {
   corruptionAdjustment,
+  goToIsolationPosition,
+  isolation_position,
+  last_pos,
   luckAdjustment,
   negotiationAdjustment,
 } from "../core/constants";
@@ -299,6 +302,31 @@ export const getPiecePosition = (gameState: GameState, squareId: number, index: 
   return {
     top: getTopPosition(rect, section), left: getLeftPosition(rect, section, numOnSquare, index), bottom: bottom, right: right
   };
+}
+
+export const getMovementKeyFrames = (gameState: GameState, landedOnGoToIsolation: boolean, origPos: number, newPos: number): Array<PiecePosition> => {
+  const frames: Array<PiecePosition> = [];
+
+  if (landedOnGoToIsolation) {
+    for (let i = origPos; i <= goToIsolationPosition; i++) {
+      frames.push(getPiecePosition(gameState, i, 0));
+    }
+    for (let x = goToIsolationPosition - 1; x >= isolation_position; x--) {
+      frames.push(getPiecePosition(gameState, x, 0));
+    }
+  } else if (origPos > newPos) {
+    for (let i = origPos; i <= last_pos; i++) {
+      frames.push(getPiecePosition(gameState, i, 0));
+    }
+    for (let i = 1; i <= newPos; i++) {
+      frames.push(getPiecePosition(gameState, i, 0));
+    }
+  } else {
+    for (let i = origPos; i <= newPos; i++) {
+      frames.push(getPiecePosition(gameState, i, 0));
+    }
+  }
+  return frames;
 }
 
 

@@ -14,10 +14,9 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PiecePosition } from "../../core/types/PiecePosition";
-import { getNumPlayersOnSquare, getPiecePosition } from "../uiHelpers";
+import { getMovementKeyFrames, getNumPlayersOnSquare, getPiecePosition } from "../uiHelpers";
 import { motion } from "framer-motion";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
-import { last_pos } from "../../core/constants";
 
 interface Props {
   socketService: SocketService;
@@ -147,6 +146,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [playerIdToMove, setPlayerIdToMove] = useState<string>("");
   const [origPos, setOrigPos] = useState<number>(0);
   const [newPos, setNewPos] = useState<number>(0);
+  const [landedOnGoToIsolation, setLandedOnGoToIsolation] = useState<boolean>(false);
+
 
   const displayPiecesForSquare = (squareId: number) => {
     return (
@@ -155,36 +156,20 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
           const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
           const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
-          if (animate && newPos > 0 && origPos > 0) {
+          if (gameState && animate && newPos > 0 && origPos > 0) {
 
-            const frames: Array<PiecePosition> = [];
-
-
-            if (origPos > newPos) {
-              for (let i = origPos; i <= last_pos; i++) {
-                frames.push(getPiecePosition(gameState!, i, 0));
-              }
-              for (let i = 1; i <= newPos; i++) {
-                frames.push(getPiecePosition(gameState!, i, 0));
-              }
-            } else {
-              for (let i = origPos; i <= newPos; i++) {
-                frames.push(getPiecePosition(gameState!, i, 0));
-              }
-            }
-
+            const frames = getMovementKeyFrames(gameState, landedOnGoToIsolation, origPos, newPos);
             const topFrames: Array<number> = frames.map((p) => p.top);
             const leftFrames: Array<number> = frames.map((p) => p.left);
             const bottomFrames: Array<number> = frames.map((p) => p.bottom);
             const rightFrames: Array<number> = frames.map((p) => p.right);
-
 
             return (
               <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
                 style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
                 animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
                 transition={{
-                  duration: 3, repeat: 0
+                  duration: 3, repeat: 0, type: "keyframes"
                 }}
                 onAnimationComplete={onFinishPieceMovement}
               >
@@ -204,11 +189,12 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     );
   }
 
-  const showMovementAnimation = (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult) => {
+  const showMovementAnimation = (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean) => {
 
     setPlayerIdToMove(playerId);
     setOrigPos(origPos);
     setNewPos(newPos);
+    setLandedOnGoToIsolation(landedOnGoToIsolation);
   }
 
   return (

@@ -12,6 +12,7 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
 import {
+  goToIsolationPosition,
   isolation_position,
   last_pos,
   payToGetOutFee,
@@ -37,6 +38,7 @@ export class RollProcessor {
   private origPosition: number | undefined;
   private newPosition: number | undefined;
   private lastDiceRoll: DiceRoll | undefined;
+  private landedOnGoToIsolation: boolean;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -50,6 +52,7 @@ export class RollProcessor {
     this.forceDie1 = forceDie1;
     this.forceDie2 = forceDie2;
     this.rollDesc = "";
+    this.landedOnGoToIsolation = false;
   }
 
   private async init(): Promise<void> {
@@ -74,6 +77,9 @@ export class RollProcessor {
   }
   public getLastDiceRoll(): DiceRoll {
     return this.lastDiceRoll!;
+  }
+  public getLandedOnGoToIsolation(): boolean {
+    return this.landedOnGoToIsolation;
   }
 
   public async roll(): Promise<string> {
@@ -231,6 +237,7 @@ export class RollProcessor {
 
     let gotOutOfIsolation = false;
     let updatePosition = false;
+    let newPosition = this.player.position + lastRoll.sum();
 
     if (this.player.state === PlayerState.IN_ISOLATION) {
       if (lastRoll.isDouble() || this.player.numTurnsInIsolation >= 2) {
@@ -249,19 +256,22 @@ export class RollProcessor {
           this.player.numTurnsInIsolation;
       }
       this.player.hasRolled = true;
-    } else if (this.hasRolledThreeConsecutiveDoubles()) {
+    } else if (
+      this.hasRolledThreeConsecutiveDoubles() ||
+      newPosition === goToIsolationPosition
+    ) {
       this.playerPassedPayDay = false;
       this.player.state = PlayerState.IN_ISOLATION;
       this.player.position = isolation_position;
       this.player.hasRolled = true;
       this.rollDesc += " <br /> caught speeding and put into quarantine";
       this.player.rollHistory = [lastRoll];
+      this.landedOnGoToIsolation = newPosition === goToIsolationPosition;
     } else {
       updatePosition = true;
     }
 
     if (updatePosition) {
-      let newPosition = this.player.position + lastRoll.sum();
       if (newPosition > last_pos) {
         newPosition = newPosition - last_pos;
         this.playerPassedPayDay = true;
