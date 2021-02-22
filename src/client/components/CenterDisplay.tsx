@@ -76,11 +76,12 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
           if (socketService && gameInfo) {
+            socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.diceRoll);
             showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId, response.data.diceRoll);
           }
         })
         .catch(handleApiError);
-    }, 1200);
+    }, 1500);
 
   };
 

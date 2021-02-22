@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { GameSocket } from "../../core/types/GameSocket";
+import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { AuctionProcessor } from "../controllers/AuctionProcessor";
 import { AuctionDocument } from "../../core/schema/AuctionSchema";
 import { GameProcessor } from "../controllers/GameProcessor";
@@ -55,6 +56,12 @@ export class GameServer {
       socket.on(GameEvent.ROLL_DICE, (gameId: string) => {
         this.io.in(gameId).emit(GameEvent.ANIMATE_DICE);
       });
+      socket.on(
+        GameEvent.STOP_ANIMATE_DICE,
+        (gameId: string, diceRoll: DiceRollResult) => {
+          this.io.in(gameId).emit(GameEvent.STOP_ANIMATE_DICE, diceRoll);
+        }
+      );
 
       this.auctionEvents(socket);
       this.tradeEvents(socket);

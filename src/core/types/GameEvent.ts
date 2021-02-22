@@ -8,6 +8,7 @@ export enum GameEvent {
   UPDATE_GAME_STATE = "updateGameState",
   ROLL_DICE = "rollDiceEvent",
   ANIMATE_DICE = "animateDice",
+  STOP_ANIMATE_DICE = "stopAnimateDice",
 
   AUCTION_BID = "auctionBid",
   AUCTION_UPDATE = "auctionUpdate",

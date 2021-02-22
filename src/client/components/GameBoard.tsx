@@ -206,8 +206,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   const showMovementAnimation = (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult) => {
 
-    //const to: PiecePosition = getPiecePosition(gameState!, newPos, 0);
-    // setMovePos(to);
     setPlayerIdToMove(playerId);
     setOrigPos(origPos);
     setNewPos(newPos);
