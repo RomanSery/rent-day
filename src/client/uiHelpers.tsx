@@ -304,7 +304,8 @@ export const getPiecePosition = (gameState: GameState, squareId: number, index: 
   };
 }
 
-export const getMovementKeyFrames = (gameState: GameState, landedOnGoToIsolation: boolean, origPos: number, newPos: number): Array<PiecePosition> => {
+export const getMovementKeyFrames = (gameState: GameState, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean,
+  origPos: number, newPos: number): Array<PiecePosition> => {
   const frames: Array<PiecePosition> = [];
 
   if (landedOnGoToIsolation) {
@@ -314,6 +315,11 @@ export const getMovementKeyFrames = (gameState: GameState, landedOnGoToIsolation
     for (let x = goToIsolationPosition - 1; x >= isolation_position; x--) {
       frames.push(getPiecePosition(gameState, x, 0));
     }
+  } else if (rolledThreeDouibles) {
+    for (let x = origPos - 1; x >= isolation_position; x--) {
+      frames.push(getPiecePosition(gameState, x, 0));
+    }
+
   } else if (origPos > newPos) {
     for (let i = origPos; i <= last_pos; i++) {
       frames.push(getPiecePosition(gameState, i, 0));

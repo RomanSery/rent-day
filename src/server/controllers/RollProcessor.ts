@@ -39,6 +39,7 @@ export class RollProcessor {
   private newPosition: number | undefined;
   private lastDiceRoll: DiceRoll | undefined;
   private landedOnGoToIsolation: boolean;
+  private rolledThreeDouibles: boolean;
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -53,6 +54,7 @@ export class RollProcessor {
     this.forceDie2 = forceDie2;
     this.rollDesc = "";
     this.landedOnGoToIsolation = false;
+    this.rolledThreeDouibles = false;
   }
 
   private async init(): Promise<void> {
@@ -80,6 +82,9 @@ export class RollProcessor {
   }
   public getLandedOnGoToIsolation(): boolean {
     return this.landedOnGoToIsolation;
+  }
+  public getRolledThreeDouibles(): boolean {
+    return this.rolledThreeDouibles;
   }
 
   public async roll(): Promise<string> {
@@ -265,8 +270,14 @@ export class RollProcessor {
       this.player.position = isolation_position;
       this.player.hasRolled = true;
       this.rollDesc += " <br /> caught speeding and put into quarantine";
+
+      if (this.hasRolledThreeConsecutiveDoubles()) {
+        this.rolledThreeDouibles = true;
+      } else {
+        this.landedOnGoToIsolation = newPosition === goToIsolationPosition;
+      }
+
       this.player.rollHistory = [lastRoll];
-      this.landedOnGoToIsolation = newPosition === goToIsolationPosition;
     } else {
       updatePosition = true;
     }

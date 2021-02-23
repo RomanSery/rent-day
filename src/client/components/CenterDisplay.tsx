@@ -30,7 +30,7 @@ interface Props {
   socketService: SocketService;
   getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
-  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean) => void;
+  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => void;
 }
 
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId, showMovementAnimation }) => {
@@ -77,7 +77,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
         .then(function (response) {
           if (socketService && gameInfo) {
             socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.diceRoll);
-            showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId, response.data.diceRoll, response.data.landedOnGoToIsolation);
+            showMovementAnimation(response.data.origPos, response.data.newPos, response.data.playerId,
+              response.data.diceRoll, response.data.landedOnGoToIsolation, response.data.rolledThreeDouibles);
           }
         })
         .catch(handleApiError);
