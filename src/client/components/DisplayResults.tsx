@@ -16,6 +16,8 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
   const [animDiceRollResult, setAnimDiceRollResult] = React.useState<DiceRollResult | undefined>(undefined);
+  const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameInfo?.results.description);
+
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
@@ -24,14 +26,16 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
     }
     socketService.listenForEvent(GameEvent.ANIMATE_DICE, () => {
       setShowDiceAnimation(true);
+      setResultsDesc("");
     });
     socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (diceRoll: DiceRollResult) => {
       setAnimDiceRollResult(diceRoll);
       setShowDiceAnimation(false);
     });
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       setShowDiceAnimation(false);
+      setResultsDesc(data.results.description);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -59,7 +63,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
           <Die key={2} value={result.die2} />
         </div>
 
-        <div className="description" dangerouslySetInnerHTML={{ __html: gameInfo?.results.description ? gameInfo?.results.description : "" }}>
+        <div className="description" dangerouslySetInnerHTML={{ __html: resultsDesc ? resultsDesc : "" }}>
         </div>
 
       </React.Fragment>
