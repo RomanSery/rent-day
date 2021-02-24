@@ -6,7 +6,6 @@ import { UserDocument } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../util/secrets";
 import { PlayerProcessor } from "./PlayerProcessor";
-import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import mongoose from "mongoose";
 
 export const createAccount = async (

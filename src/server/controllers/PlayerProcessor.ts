@@ -50,7 +50,7 @@ export class PlayerProcessor {
       return null;
     }
 
-    return await GameInstance.findById(
+    const game = await GameInstance.findById(
       foundUser.currGameId,
       (err: mongoose.CallbackError, existingGame: GameInstanceDocument) => {
         if (err) {
@@ -59,6 +59,15 @@ export class PlayerProcessor {
         return existingGame;
       }
     );
+
+    const status: GameStatus | null = game != null ? game.status : null;
+    if (!game || !status || status === GameStatus.FINISHED) {
+      foundUser.currGameId = undefined;
+      foundUser.currGameName = undefined;
+      await foundUser.save();
+    }
+
+    return game;
   }
 
   public async upgradeSkill(skillType: SkillType): Promise<string> {
