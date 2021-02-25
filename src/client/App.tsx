@@ -2,9 +2,9 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
-  Switch, Route, withRouter, useHistory
+  Switch, Route, withRouter, useHistory, useLocation
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
@@ -18,17 +18,30 @@ import { makeStyles } from "@material-ui/styles";
 import { SignUpPage } from "./auth/SignUpPage";
 import { LoginPage } from "./auth/LoginPage";
 import API from "./api";
+import queryString from "query-string";
 
 export const App: React.FC = () => {
 
   const history = useHistory();
+  const location = useLocation();
+
+  const getGameId = () => {
+    if (location.search) {
+      const parsed = queryString.parse(location.search);
+      if (parsed && parsed.gid) {
+        return parsed.gid as string;
+      }
+    }
+    return getMyGameId();
+  };
+
 
   React.useEffect(() => {
 
     API.post("current-session")
       .then(function (response) {
         setCurrSessionInfo(response.data);
-        tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
+        tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
           if (redirectUrl && redirectUrl.length > 0) {
             history.push(redirectUrl);
           }
@@ -57,7 +70,7 @@ export const App: React.FC = () => {
       }
     });
 
-    const socket = new SocketService(PageType.Game);
+    const socket = new SocketService(PageType.Game, getMyGameId());
 
     return (
       <React.Fragment>
@@ -87,7 +100,7 @@ export const App: React.FC = () => {
       return null;
     }
 
-    tryToRedirectToGame(PageType.Home, (redirectUrl: string) => {
+    tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }
@@ -143,13 +156,7 @@ export const App: React.FC = () => {
 
   const DisplayJoinGamePage = () => {
 
-    const socket = new SocketService(PageType.Join);
-    tryToRedirectToGame(PageType.Join, (redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
-      }
-    });
-
+    const socket = new SocketService(PageType.Join, getGameId());
 
     return (
       <React.Fragment>
@@ -163,7 +170,7 @@ export const App: React.FC = () => {
 
   const DisplayPlayersPage = () => {
 
-    tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
+    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }
@@ -182,7 +189,7 @@ export const App: React.FC = () => {
 
   const FindGamesPage = () => {
 
-    tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
+    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }
@@ -200,7 +207,7 @@ export const App: React.FC = () => {
 
   const CreateGamePage = () => {
 
-    tryToRedirectToGame(PageType.Find, (redirectUrl: string) => {
+    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
       }

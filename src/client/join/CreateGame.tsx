@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import API from '../api';
-import { getGameContextFromLocalStorage, handleApiError, StorageConstants } from "../helpers";
+import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
 interface Props {
@@ -26,8 +26,7 @@ export const CreateGame: React.FC<Props> = () => {
   const onCreateGame: SubmitHandler<Inputs> = (data) => {
     API.post("createGame", { data, context: context })
       .then(function (response) {
-        sessionStorage.setItem(StorageConstants.GAME_ID, response.data.gameId);
-        history.push("/join");
+        history.push("/join?gid=" + response.data.gameId);
       })
       .catch(handleApiError);
   };

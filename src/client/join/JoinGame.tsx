@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 
-import { useHistory } from "react-router-dom";
-import { GameContext } from "../../core/types/GameContext";
+import { useHistory, useLocation } from "react-router-dom";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyGameId, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { areObjectIdsEqual, getIconProp, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -17,6 +16,7 @@ import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { PlayerClass } from "../../core/enums/PlayerClass";
 import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
 import { getPlayerClassDescription } from "../uiHelpers";
+import queryString from "query-string";
 
 interface Props {
   socketService: SocketService;
@@ -30,7 +30,14 @@ type Inputs = {
 export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const history = useHistory();
-  const context: GameContext = getGameContextFromLocalStorage();
+  const location = useLocation();
+
+  const getGameIdFromUrl = () => {
+    const parsed = queryString.parse(location.search);
+    return parsed.gid as string;
+  };
+
+  const gameToJoinId: string | null = getGameIdFromUrl();
 
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
@@ -39,6 +46,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
   const { register, handleSubmit } = useForm<Inputs>();
+
 
 
   useEffect(() => {
@@ -84,7 +92,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
 
   const getGameState = () => {
-    API.post("getGame", { gameId: context.gameId, context })
+    API.post("getGame", { gameId: gameToJoinId })
       .then(function (response) {
         setGameState(response.data.game);
       })
@@ -94,19 +102,19 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
-    API.post("joinGame", { gameId: context.gameId, piece: data.piece, playerClass: data.playerClass, context })
+    API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass })
       .then(function (response) {
         if (socketService) {
           socketService.socket.emit(GameEvent.JOINED_GAME, {
             playerName: response.data.playerName,
             userId: response.data.userId,
             allJoined: response.data.allJoined,
-            gameId: context.gameId
+            gameId: gameToJoinId
           });
         }
 
-        if (context.gameId) {
-          setJoinedGameStorage(context.gameId);
+        if (gameToJoinId) {
+          setJoinedGameStorage(gameToJoinId);
         }
         getGameState();
 
@@ -125,7 +133,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
-    socketService.socket.emit(GameEvent.LEAVE_GAME, getMyGameId());
+    socketService.socket.emit(GameEvent.LEAVE_GAME, gameToJoinId);
 
     leaveCurrentGameIfJoined(() => {
       history.push("/dashboard");

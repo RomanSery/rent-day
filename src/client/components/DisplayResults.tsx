@@ -16,7 +16,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
   const [animDiceRollResult, setAnimDiceRollResult] = React.useState<DiceRollResult | undefined>(undefined);
-  const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameInfo?.results.description);
+  const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameInfo && gameInfo.results ? gameInfo.results.description : undefined);
 
   const isMountedRef = useIsMountedRef();
 

@@ -116,13 +116,13 @@ export const logOut = (): void => {
 
 export const tryToRedirectToGame = async (
   pageType: PageType,
+  myGameId: string | null,
   callback: (redirectUrl: string) => void
 ) => {
   if (!isLoggedIn()) {
     return;
   }
 
-  const myGameId = getMyGameId();
   if (myGameId === null || myGameId === undefined) {
     return;
   }
@@ -137,7 +137,9 @@ export const tryToRedirectToGame = async (
   if (hasJoinedGame()) {
     if (pageType === PageType.Home || pageType === PageType.Find) {
       return callback(
-        gameStatus === GameStatus.JOINING ? "/join" : "/gameinstance"
+        gameStatus === GameStatus.JOINING
+          ? "/join?gid=" + myGameId
+          : "/gameinstance"
       );
     } else if (pageType === PageType.Join && gameStatus === GameStatus.ACTIVE) {
       return callback("/gameinstance");

@@ -65,6 +65,7 @@ export class PlayerProcessor {
       foundUser.currGameId = undefined;
       foundUser.currGameName = undefined;
       await foundUser.save();
+      return null;
     }
 
     return game;

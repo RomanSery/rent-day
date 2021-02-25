@@ -2,14 +2,15 @@ import React from "react";
 import { motion, Transition } from "framer-motion";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { getMyGameId } from "../helpers";
+import { GameState } from "../../core/types/GameState";
 
 
 interface Props {
   socketService: SocketService;
+  gameInfo: GameState | undefined;
 }
 
-export const CircleLoader: React.FC<Props> = ({ socketService }) => {
+export const CircleLoader: React.FC<Props> = ({ socketService, gameInfo }) => {
 
   const containerStyle: React.CSSProperties = {
     width: "3rem",
@@ -36,8 +37,8 @@ export const CircleLoader: React.FC<Props> = ({ socketService }) => {
   };
 
   const onFinishAnimation = () => {
-    if (socketService) {
-      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, getMyGameId());
+    if (socketService && gameInfo) {
+      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
     }
   };
 

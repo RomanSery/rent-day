@@ -174,7 +174,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
         {alreadySubmittedBid() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
 
-        {isAuctionFinished() ? <CircleLoader socketService={socketService} /> : null}
+        {isAuctionFinished() ? <CircleLoader gameInfo={gameInfo} socketService={socketService} /> : null}
       </Container>
 
     </React.Fragment>

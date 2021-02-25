@@ -1,12 +1,7 @@
 import { Manager, Socket } from "socket.io-client";
 import { PageType } from "../../core/enums/PageType";
 import { GameEvent } from "../../core/types/GameEvent";
-import {
-  getMyGameId,
-  getMyPlayerName,
-  getMyUserId,
-  hasJoinedGame,
-} from "../helpers";
+import { getMyPlayerName, getMyUserId, hasJoinedGame } from "../helpers";
 
 interface GameClientSocket extends Socket {
   playerName?: string;
@@ -20,8 +15,11 @@ export class SocketService {
   private manager: Manager;
   public socket: GameClientSocket;
 
-  constructor(type: PageType) {
+  private gameId: string | null;
+
+  constructor(type: PageType, gameId: string | null) {
     console.log("initiating socket service");
+    this.gameId = gameId;
 
     this.manager = new Manager("ws://localhost:8080");
     this.socket = this.manager.socket("/");
@@ -36,16 +34,16 @@ export class SocketService {
         this.socket.emit(GameEvent.JOINED_GAME, {
           playerName: getMyPlayerName()!,
           userId: getMyUserId()!,
-          gameId: getMyGameId()!,
+          gameId: this.gameId,
           allJoined: false,
         });
       }
     }
 
-    if (getMyGameId() !== null) {
+    if (this.gameId && this.gameId !== null) {
       this.socket.emit(
         GameEvent.JOIN_GAME_ROOM,
-        getMyGameId(),
+        this.gameId,
         getMyUserId(),
         getMyPlayerName()
       );
@@ -58,11 +56,7 @@ export class SocketService {
 
   public sendPingToServer(): void {
     setInterval(() => {
-      this.socket.volatile.emit(
-        GameEvent.GET_LATENCY,
-        Date.now(),
-        getMyGameId()
-      );
+      this.socket.volatile.emit(GameEvent.GET_LATENCY, Date.now(), this.gameId);
     }, 10000);
   }
 
