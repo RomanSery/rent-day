@@ -1,18 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-//import logger from "./logger";
-//import dotenv from "dotenv";
-//import fs from "fs";
+import logger from "./logger";
+import dotenv from "dotenv";
+import fs from "fs";
 
-/*
-if (fs.existsSync(".env")) {
+if (fs.existsSync("src/server/.env")) {
   logger.debug("Using .env file to supply config environment variables");
-  dotenv.config({ path: ".env" });
-} else {
-  logger.debug(
-    "Using .env.example file to supply config environment variables"
-  );
-  dotenv.config({ path: ".env.example" }); // you can delete this after you create your own .env file!
+  dotenv.config({
+    path: "src/server/.env",
+    debug: true,
+  });
 }
+
 export const ENVIRONMENT = process.env.NODE_ENV;
 const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 
@@ -31,7 +29,7 @@ if (!MONGODB_URI) {
     );
   }
   process.exit(1);
-}*/
+}
 
 export const JWT_SECRET: string = "fe@#!34mnz";
 export const COOKIE_NAME: string = "rent-day-session";

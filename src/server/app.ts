@@ -12,13 +12,13 @@ import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
-import { COOKIE_NAME, COOKIE_SECRET } from "./util/secrets";
+import { COOKIE_NAME, COOKIE_SECRET, MONGODB_URI } from "./util/secrets";
 
 // Create Express server
 const app = express();
 
 // Connect to MongoDB
-const mongoUrl: string = "mongodb://localhost:27017/monopoly"; //MONGODB_URI;
+const mongoUrl: string = MONGODB_URI;
 
 mongoose
   .connect(mongoUrl, {
@@ -37,7 +37,7 @@ mongoose
   });
 
 // Express configuration
-app.set("port", process.env.PORT || 4000);
+app.set("port", process.env.PORT || 3000);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());

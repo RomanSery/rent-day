@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /dist
+src/server/.env
+debug.log
