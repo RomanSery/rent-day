@@ -1,5 +1,3 @@
-problems joining game.  refresh page while in the join screen
-
 use .env files extract url's, db connection, localhost, cookie settings
 look for url's, uri's and places in .env file, ws:localhost
 

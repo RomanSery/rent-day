@@ -29,7 +29,6 @@ export const getGameContextFromLocalStorage = (): GameContext => {
 
 export enum StorageConstants {
   GAME_ID = "myGameId",
-  JOINED_GAME = "hasJoinedGame",
   PLAYER_NAME = "myPlayerName",
   USER_ID = "myUserId",
 }
@@ -54,11 +53,7 @@ export const getMyUserId = (): string | null => {
 };
 
 export const hasJoinedGame = (): boolean => {
-  const myGameId = getMyGameId();
-  return (
-    myGameId != null &&
-    sessionStorage.getItem(StorageConstants.JOINED_GAME) != null
-  );
+  return sessionStorage.getItem(StorageConstants.GAME_ID) != null;
 };
 
 export const leaveCurrentGameIfJoined = async (callback: () => void) => {
@@ -88,13 +83,11 @@ export const setCurrSessionInfo = (data: any): void => {
   const gameId: string = data.currGameId;
   if (gameId && gameId.length > 0) {
     sessionStorage.setItem(StorageConstants.GAME_ID, gameId);
-    sessionStorage.setItem(StorageConstants.JOINED_GAME, "true");
   }
 };
 
 export const clearMyGameInfo = (): void => {
   sessionStorage.removeItem(StorageConstants.GAME_ID);
-  sessionStorage.removeItem(StorageConstants.JOINED_GAME);
 };
 
 export const setJoinedGameStorage = (gameId: string): void => {
@@ -102,7 +95,6 @@ export const setJoinedGameStorage = (gameId: string): void => {
     StorageConstants.GAME_ID,
     getObjectIdAsHexString(gameId)
   );
-  sessionStorage.setItem(StorageConstants.JOINED_GAME, "true");
 };
 
 export const isLoggedIn = (): boolean => {
