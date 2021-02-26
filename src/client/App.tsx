@@ -36,21 +36,21 @@ export const App: React.FC = () => {
   };
 
 
-  React.useEffect(() => {
-
-    API.post("current-session")
-      .then(function (response) {
-        setCurrSessionInfo(response.data);
-        tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
-          if (redirectUrl && redirectUrl.length > 0) {
-            history.push(redirectUrl);
-          }
-        });
-      })
-      .catch(handleApiError);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //TODO put back
+  /*
+React.useEffect(() => {    
+  API.post("current-session")
+    .then(function (response) {
+      setCurrSessionInfo(response.data);
+      tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
+        if (redirectUrl && redirectUrl.length > 0) {
+          history.push(redirectUrl);
+        }
+      });
+    })
+    .catch(handleApiError);     
+}, []);
+*/
 
   const homeStyles = makeStyles({
     opt: {
