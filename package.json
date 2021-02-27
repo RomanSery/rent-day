@@ -52,7 +52,9 @@
     "wait-on": "^5.2.1",
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^2.5.2",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "ts-loader": "^8.0.17",
+    "concurrently": "^5.3.0"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "0.0.31",
@@ -67,9 +69,7 @@
     "@types/node": "^12.19.16",
     "@types/react-router-dom": "^5.1.7",
     "@types/winston": "^2.4.4",
-    "concurrently": "^5.3.0",
     "nodemon": "^2.0.7",
-    "ts-loader": "^8.0.17",
     "ts-node": "^9.1.1",
     "typescript": "^3.9.7"
   },
