@@ -3,3 +3,5 @@ look for url's, uri's and places in .env file, ws:localhost
 
 implement chance
 when resize browser, update piece positions
+
+get rid of tax tooltip and put into modal like stats modal

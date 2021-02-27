@@ -80,7 +80,8 @@
     "dev:server:webpack": "webpack --config webpack.config.server.js --watch",
     "dev:server:nodemon": "wait-on -l build/server.js && nodemon build/server.js",
     "build:client": "react-scripts build",
-    "build:server": "webpack --config webpack.config.server.js"
+    "build:server": "webpack --config webpack.config.server.js",
+    "start": "webpack --config webpack.config.server.js"
   },
   "eslintConfig": {
     "extends": "react-app"
