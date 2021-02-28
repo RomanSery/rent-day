@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import mongoose from "mongoose";
+//import mongoose from "mongoose";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import passport from "passport";
@@ -12,14 +12,14 @@ import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
-import { COOKIE_NAME, COOKIE_SECRET, MONGODB_URI } from "./util/secrets";
+//import { COOKIE_NAME, COOKIE_SECRET, MONGODB_URI } from "./util/secrets";
 
 // Create Express server
 const app = express();
 
 // Connect to MongoDB
-const mongoUrl: string = MONGODB_URI;
-
+//const mongoUrl: string = MONGODB_URI;
+/*
 mongoose
   .connect(mongoUrl, {
     useNewUrlParser: true,
@@ -35,6 +35,7 @@ mongoose
     );
     process.exit();
   });
+  */
 
 // Express configuration
 app.set("port", process.env.PORT || 3000);
@@ -48,8 +49,8 @@ passportConfig.initPassportConfig();
 
 app.use(
   cookieSession({
-    name: COOKIE_NAME,
-    secret: COOKIE_SECRET,
+    name: "rent-day-session", //COOKIE_NAME,
+    secret: "rent-day-secret", //COOKIE_SECRET,
     //secure: true,
     httpOnly: true,
     //domain: "localhost",

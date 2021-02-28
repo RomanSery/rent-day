@@ -81,7 +81,8 @@
     "dev:server:nodemon": "wait-on -l build/server.js && nodemon build/server.js",
     "build:client": "react-scripts build",
     "build:server": "webpack --config webpack.config.server.js",
-    "start": "node build/server.js"
+    "serve": "node build/server.js",
+    "start": "npm run build:server && npm run serve"
   },
   "eslintConfig": {
     "extends": "react-app"
