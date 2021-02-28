@@ -4,7 +4,7 @@ import { check, validationResult } from "express-validator";
 import passport from "passport";
 import { UserDocument } from "../../core/schema/UserSchema";
 import jwt from "jsonwebtoken";
-import { JWT_SECRET } from "../util/secrets";
+import { JWT_SECRET } from "../util/secretConstants";
 import { PlayerProcessor } from "./PlayerProcessor";
 import mongoose from "mongoose";
 

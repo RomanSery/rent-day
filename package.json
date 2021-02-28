@@ -11,14 +11,10 @@
     "@material-ui/core": "^4.11.3",
     "@material-ui/data-grid": "^4.0.0-alpha.19",
     "@material-ui/styles": "^4.11.3",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
     "@types/cookie-parser": "^1.4.2",
     "@types/cookie-session": "^2.0.42",
     "@types/jest": "^24.9.1",
     "@types/jsonwebtoken": "^8.5.0",
-    "@types/passport": "^1.0.5",
     "@types/passport-local": "^1.0.33",
     "@types/react": "^16.14.3",
     "@types/react-dom": "^16.9.10",
@@ -52,9 +48,7 @@
     "wait-on": "^5.2.1",
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^2.5.2",
-    "winston": "^3.3.3",
-    "ts-loader": "^8.0.17",
-    "concurrently": "^5.3.0"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "0.0.31",
@@ -67,9 +61,12 @@
     "@types/material-ui": "^0.21.8",
     "@types/mongoose": "^5.10.3",
     "@types/node": "^12.19.16",
+    "@types/passport": "^1.0.6",
     "@types/react-router-dom": "^5.1.7",
     "@types/winston": "^2.4.4",
+    "concurrently": "^5.3.0",
     "nodemon": "^2.0.7",
+    "ts-loader": "^8.0.17",
     "ts-node": "^9.1.1",
     "typescript": "^3.9.7"
   },

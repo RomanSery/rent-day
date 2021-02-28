@@ -12,7 +12,8 @@ import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
-//import { COOKIE_NAME, COOKIE_SECRET, MONGODB_URI } from "./util/secrets";
+//import { MONGODB_URI } from "./util/secrets";
+import { COOKIE_NAME, COOKIE_SECRET } from "./util/secretConstants";
 
 // Create Express server
 const app = express();
@@ -35,7 +36,7 @@ mongoose
     );
     process.exit();
   });
-  */
+*/
 
 // Express configuration
 app.set("port", process.env.PORT || 3000);
@@ -49,8 +50,8 @@ passportConfig.initPassportConfig();
 
 app.use(
   cookieSession({
-    name: "rent-day-session", //COOKIE_NAME,
-    secret: "rent-day-secret", //COOKIE_SECRET,
+    name: COOKIE_NAME,
+    secret: COOKIE_SECRET,
     //secure: true,
     httpOnly: true,
     //domain: "localhost",
