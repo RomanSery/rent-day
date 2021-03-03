@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: "https://rentday.coderdreams.com/api",
+      target: "https://rentday.coderdreams.com/api/",
       changeOrigin: true,      
     })
   );
