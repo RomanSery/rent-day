@@ -1,8 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
+import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory, useLocation
 } from "react-router-dom";
@@ -35,22 +36,19 @@ export const App: React.FC = () => {
     return getMyGameId();
   };
 
+  React.useEffect(() => {
+    API.post("current-session")
+      .then(function (response) {
+        setCurrSessionInfo(response.data);
+        tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
+          if (redirectUrl && redirectUrl.length > 0) {
+            history.push(redirectUrl);
+          }
+        });
+      })
+      .catch(handleApiError);
+  }, []);
 
-  //TODO put back
-  /*
-React.useEffect(() => {    
-  API.post("current-session")
-    .then(function (response) {
-      setCurrSessionInfo(response.data);
-      tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
-        if (redirectUrl && redirectUrl.length > 0) {
-          history.push(redirectUrl);
-        }
-      });
-    })
-    .catch(handleApiError);     
-}, []);
-*/
 
   const homeStyles = makeStyles({
     opt: {

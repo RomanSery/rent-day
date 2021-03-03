@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
-import { DataGrid, ColDef, RowsProp, RowModel, ValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
@@ -46,7 +46,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
     return {};
   };
 
-  const columns: ColDef[] = [
+  const columns: GridColDef[] = [
     { field: 'id', hide: true },
     {
       field: 'playerName', headerName: 'Player', type: 'string', flex: 1,
@@ -127,13 +127,13 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
   ];
 
 
-  const getDataRows = (): RowsProp => {
+  const getDataRows = (): GridRowsProp => {
     if (!gameInfo) {
       return [];
     }
 
 
-    const rows: Array<RowModel> = [];
+    const rows: Array<GridRowModel> = [];
     gameInfo.players.forEach((p: Player, key: number) => {
       rows.push({
         id: p._id,
@@ -156,7 +156,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"
-            showToolbar={false} disableColumnMenu={true} disableColumnSelector={true}
+            disableColumnMenu={true} disableColumnSelector={true}
             disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
         </div>
 

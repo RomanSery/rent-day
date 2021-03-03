@@ -75,7 +75,7 @@
     "dev:client": "react-scripts start",
     "dev:server": "concurrently -p name -c \"yellow,magenta\" -n \"webpack-server,nodemon-server\" \"npm run-script dev:server:webpack\" \"npm run-script dev:server:nodemon\"",
     "dev:server:webpack": "webpack --config webpack.config.server.js --watch",
-    "dev:server:nodemon": "wait-on -l build/server.js && nodemon build/server.js",
+    "dev:server:nodemon": "set NODE_ENV=development && wait-on -l build/server.js && nodemon build/server.js",
     "build:client": "react-scripts build",
     "build:server": "webpack --config webpack.config.server.js",
     "serve": "node build/server.js",

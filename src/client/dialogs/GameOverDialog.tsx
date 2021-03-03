@@ -6,7 +6,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { areObjectIdsEqual, getIconProp } from "../helpers";
-import { DataGrid, ColDef, RowsProp, RowModel, ValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -35,7 +35,7 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
     return {};
   };
 
-  const columns: ColDef[] = [
+  const columns: GridColDef[] = [
     { field: 'id', hide: true },
     {
       field: 'playerName', headerName: 'Player', type: 'string', sortable: false,
@@ -58,12 +58,12 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
   ];
 
 
-  const getDataRows = (): RowsProp => {
+  const getDataRows = (): GridRowsProp => {
     if (!gameInfo) {
       return [];
     }
 
-    const rows: Array<RowModel> = [];
+    const rows: Array<GridRowModel> = [];
 
     const players: Player[] = gameInfo.players;
     players.sort(function (a: Player, b: Player) {
@@ -87,7 +87,7 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"
-            showToolbar={false} disableColumnMenu={true} disableColumnSelector={true}
+            disableColumnMenu={true} disableColumnSelector={true}
             disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
         </div>
 

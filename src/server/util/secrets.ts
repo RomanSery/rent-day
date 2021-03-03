@@ -2,9 +2,9 @@
 import logger from "./logger";
 import dotenv from "dotenv";
 
-logger.info("environment: %s", process.env.ENV);
+logger.info("environment: " + process.env.NODE_ENV);
 
-if (process.env.ENV === "development") {
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   logger.debug("Using .env file to supply config environment variables");
   dotenv.config({
     path: "src/server/.env",
@@ -12,7 +12,6 @@ if (process.env.ENV === "development") {
   });
 }
 
-export const ENVIRONMENT = process.env.NODE_ENV;
 export const MONGO_URL: string = process.env.MONGO_URL!;
 
 if (!MONGO_URL) {
