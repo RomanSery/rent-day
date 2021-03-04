@@ -53,7 +53,7 @@ export const App: React.FC = () => {
   */
 
   React.useEffect(() => {
-    API.post("hello")
+    API.get("hello")
       .then(function (response) {
         console.log(response.data);
       })
