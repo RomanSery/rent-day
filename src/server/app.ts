@@ -53,7 +53,7 @@ app.use(
     secret: COOKIE_SECRET,
     secure: true,
     httpOnly: true,
-    sameSite: "strict",
+    //sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 );
