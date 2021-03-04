@@ -130,6 +130,6 @@ export const sayHello = async (
   next: NextFunction
 ) => {
   res.json({
-    status: "hello",
+    status: new Date().toDateString(),
   });
 };

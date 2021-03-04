@@ -59,7 +59,6 @@ app.use(
   })
 );
 
-app.get("/hello", authController.sayHello);
 app.get("/api/hello", authController.sayHello);
 
 app.post("/api/createAccount", authController.createAccount);
