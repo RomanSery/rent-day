@@ -5,3 +5,5 @@ implement chance
 when resize browser, update piece positions
 
 get rid of tax tooltip and put into modal like stats modal
+
+creating game with name "test game" doesnt work
