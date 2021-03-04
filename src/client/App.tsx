@@ -25,6 +25,8 @@ export const App: React.FC = () => {
 
   const history = useHistory();
   const location = useLocation();
+  //const wsUri = "ws://localhost:8080";
+  const wsUri = "ws://rentdaygame.coderdreams.com:8080";
 
   const getGameId = () => {
     if (location.search) {
@@ -70,7 +72,7 @@ export const App: React.FC = () => {
       }
     });
 
-    const socket = new SocketService(PageType.Game, getMyGameId());
+    const socket = new SocketService(PageType.Game, getMyGameId(), wsUri);
 
     return (
       <React.Fragment>
@@ -156,7 +158,7 @@ export const App: React.FC = () => {
 
   const DisplayJoinGamePage = () => {
 
-    const socket = new SocketService(PageType.Join, getGameId());
+    const socket = new SocketService(PageType.Join, getGameId(), wsUri);
 
     return (
       <React.Fragment>

@@ -17,11 +17,11 @@ export class SocketService {
 
   private gameId: string | null;
 
-  constructor(type: PageType, gameId: string | null) {
+  constructor(type: PageType, gameId: string | null, uri: string) {
     console.log("initiating socket service");
     this.gameId = gameId;
 
-    this.manager = new Manager("ws://localhost:8080");
+    this.manager = new Manager(uri);
     this.socket = this.manager.socket("/");
     this.pageType = type;
 
