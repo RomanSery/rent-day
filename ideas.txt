@@ -1,5 +1,5 @@
-use .env files extract url's, db connection, localhost, cookie settings
-look for url's, uri's and places in .env file, ws:localhost
+use .env files extract url's, db connection, cookie settings
+look for url's, uri's and places in .env file, ws:
 
 implement chance
 when resize browser, update piece positions

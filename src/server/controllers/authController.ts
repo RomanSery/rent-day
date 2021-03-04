@@ -123,13 +123,3 @@ export const getCurrentSession = async (
 
   res.status(401).send();
 };
-
-export const sayHello = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  res.json({
-    status: new Date().toISOString(),
-  });
-};

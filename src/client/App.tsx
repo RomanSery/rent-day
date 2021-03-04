@@ -36,8 +36,6 @@ export const App: React.FC = () => {
     return getMyGameId();
   };
 
-  //TODO put back
-
   React.useEffect(() => {
     API.post("current-session")
       .then(function (response) {

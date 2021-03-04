@@ -51,15 +51,12 @@ app.use(
   cookieSession({
     name: COOKIE_NAME,
     secret: COOKIE_SECRET,
-    //secure: true,
+    secure: true,
     httpOnly: true,
-    //domain: "localhost",
-    //sameSite: "strict",
+    sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 );
-
-app.get("/api/hello", authController.sayHello);
 
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
