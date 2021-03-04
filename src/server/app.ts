@@ -56,7 +56,7 @@ app.use(
     secure: true,
     httpOnly: true,
     domain: "coderdreams.com",
-    //sameSite: "strict",
+    sameSite: "strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   })
 );
