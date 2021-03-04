@@ -36,6 +36,8 @@ export const App: React.FC = () => {
     return getMyGameId();
   };
 
+  //TODO put back
+  /*
   React.useEffect(() => {
     API.post("current-session")
       .then(function (response) {
@@ -45,6 +47,15 @@ export const App: React.FC = () => {
             history.push(redirectUrl);
           }
         });
+      })
+      .catch(handleApiError);
+  }, []);
+  */
+
+  React.useEffect(() => {
+    API.post("hello")
+      .then(function (response) {
+        console.log(response.data);
       })
       .catch(handleApiError);
   }, []);
