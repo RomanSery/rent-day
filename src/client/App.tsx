@@ -3,7 +3,7 @@ import React from "react";
 
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, tryToRedirectToGame } from './helpers';
 import {
   Switch, Route, withRouter, useHistory, useLocation
 } from "react-router-dom";
