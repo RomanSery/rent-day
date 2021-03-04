@@ -39,6 +39,8 @@ mongoose
 
 // Express configuration
 app.set("port", process.env.PORT || 5000);
+app.set("trust proxy", 1);
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
@@ -51,7 +53,7 @@ app.use(
   cookieSession({
     name: COOKIE_NAME,
     secret: COOKIE_SECRET,
-    //secure: true,
+    secure: true,
     httpOnly: true,
     domain: "coderdreams.com",
     //sameSite: "strict",
