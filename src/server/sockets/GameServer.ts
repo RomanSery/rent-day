@@ -14,14 +14,17 @@ import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
 
 export class GameServer {
-  public static readonly PORT: number = 8080;
+  public static readonly DEFAULT_WS_PORT: number = 8080;
 
   private io: Server;
   private port: number;
 
   constructor() {
-    //this.port = process.env.PORT || GameServer.PORT;
-    this.port = GameServer.PORT;
+    if (process.env.WS_PORT) {
+      this.port = parseInt(process.env.WS_PORT);
+    } else {
+      this.port = GameServer.DEFAULT_WS_PORT;
+    }
 
     const options = {
       pingTimeout: 5000,
