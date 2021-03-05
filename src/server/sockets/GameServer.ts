@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import * as http from "http";
 import mongoose from "mongoose";
 import { GameEvent } from "../../core/types/GameEvent";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
@@ -14,18 +15,9 @@ import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
 
 export class GameServer {
-  public static readonly DEFAULT_WS_PORT: number = 5001;
-
   private io: Server;
-  private port: number;
 
-  constructor() {
-    if (process.env.WS_PORT) {
-      this.port = parseInt(process.env.WS_PORT);
-    } else {
-      this.port = GameServer.DEFAULT_WS_PORT;
-    }
-
+  constructor(server: http.Server) {
     const options = {
       pingTimeout: 5000,
       pingInterval: 10000,
@@ -35,8 +27,8 @@ export class GameServer {
         //credentials: true,
       },
     };
-    this.io = new Server(this.port, options);
-    console.log("GameServer listening on port: " + this.port);
+    this.io = new Server(server, options);
+    console.log("GameServer listening");
   }
 
   public listen(): void {

@@ -1,4 +1,6 @@
 import errorHandler from "errorhandler";
+import * as http from "http";
+import { GameServer } from "./sockets/GameServer";
 
 import app from "./app";
 
@@ -10,7 +12,7 @@ app.use(errorHandler());
 /**
  * Start Express server.
  */
-const server = app.listen(app.get("port"), () => {
+const server: http.Server = app.listen(app.get("port"), () => {
   console.log(
     "  App is running at http://localhost:%d in %s mode",
     app.get("port"),
@@ -18,5 +20,8 @@ const server = app.listen(app.get("port"), () => {
   );
   console.log("  Press CTRL-C to stop\n");
 });
+
+const gameServer = new GameServer(server);
+gameServer.listen();
 
 export default server;

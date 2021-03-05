@@ -10,7 +10,6 @@ import cookieSession from "cookie-session";
 import * as actions from "./controllers/actions";
 import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
-import { GameServer } from "./sockets/GameServer";
 import * as passportConfig from "./config/passport";
 import { MONGO_URL } from "./util/secrets";
 import { COOKIE_NAME, COOKIE_SECRET } from "./util/secretConstants";
@@ -95,8 +94,5 @@ app.post("/api/actions/acceptTrade", gameplay.acceptTrade);
 app.post("/api/actions/declineTrade", gameplay.declineTrade);
 
 app.post("/api/actions/upgradeSkill", gameplay.upgradeSkill);
-
-const gameServer = new GameServer();
-gameServer.listen();
 
 export default app;
