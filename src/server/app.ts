@@ -61,6 +61,8 @@ app.use(
   })
 );
 
+app.post("/api/hello", authController.sayHello);
+
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
 app.post("/api/logout", authController.logout);
