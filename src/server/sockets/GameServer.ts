@@ -14,7 +14,7 @@ import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
 
 export class GameServer {
-  public static readonly DEFAULT_WS_PORT: number = 5000;
+  public static readonly DEFAULT_WS_PORT: number = 5001;
 
   private io: Server;
   private port: number;
