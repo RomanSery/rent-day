@@ -22,9 +22,9 @@ export class GameServer {
       pingTimeout: 5000,
       pingInterval: 10000,
       cors: {
-        origin: true,
+        origin: ["http://localhost:3000", /\.coderdreams\.com$/],
         methods: ["GET", "POST"],
-        //credentials: true,
+        credentials: true,
       },
     };
     this.io = new Server(server, options);

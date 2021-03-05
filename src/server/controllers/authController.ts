@@ -123,7 +123,3 @@ export const getCurrentSession = async (
 
   res.status(401).send();
 };
-
-export const sayHello = async (req: Request, res: Response) => {
-  res.status(401).send({ msg: "Hello" });
-};
