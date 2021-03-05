@@ -32,7 +32,7 @@ export class GameServer {
       cors: {
         origin: "*",
         methods: ["GET", "POST"],
-        credentials: true,
+        //credentials: true,
       },
     };
     this.io = new Server(this.port, options);
