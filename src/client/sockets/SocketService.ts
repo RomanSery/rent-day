@@ -18,10 +18,10 @@ export class SocketService {
   private gameId: string | null;
 
   constructor(type: PageType, gameId: string | null, uri: string) {
-    console.log("initiating socket service");
+    console.log("initiating socket service: " + uri);
     this.gameId = gameId;
 
-    this.manager = new Manager(uri);
+    this.manager = new Manager(uri, { withCredentials: true });
     this.socket = this.manager.socket("/");
     this.pageType = type;
 

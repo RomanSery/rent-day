@@ -41,6 +41,7 @@ export class GameServer {
       },
     };
     this.io = new Server(this.port, options);
+    console.log("GameServer listening on port: " + this.port);
   }
 
   public listen(): void {
