@@ -67,6 +67,8 @@ export const App: React.FC = () => {
 
   const GameDisplay = () => {
 
+    localStorage.setItem("debug", '*');
+
     redirectToHomeIfGameNotFound((redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         history.push(redirectUrl);
