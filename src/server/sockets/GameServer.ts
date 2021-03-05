@@ -30,7 +30,7 @@ export class GameServer {
       pingTimeout: 5000,
       pingInterval: 10000,
       cors: {
-        origin: "*",
+        origin: true,
         methods: ["GET", "POST"],
         //credentials: true,
       },
