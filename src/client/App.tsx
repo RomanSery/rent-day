@@ -27,7 +27,7 @@ export const App: React.FC = () => {
   const location = useLocation();
   //const wsUri = "ws://localhost:8080";
   //const wsUri = "wss://rentdaygame.coderdreams.com:8080";
-  const wsUri = "wss://rentday.coderdreams.com:8080";
+  const wsUri = "wss://rentday.coderdreams.com:5000";
 
   const getGameId = () => {
     if (location.search) {

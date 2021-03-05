@@ -14,7 +14,7 @@ import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
 
 export class GameServer {
-  public static readonly DEFAULT_WS_PORT: number = 8080;
+  public static readonly DEFAULT_WS_PORT: number = 5000;
 
   private io: Server;
   private port: number;
@@ -34,7 +34,6 @@ export class GameServer {
           "http://localhost:3000",
           "http://localhost:8000",
           "https://rentdaygame.coderdreams.com",
-          "https://rentdaygame.coderdreams.com:5000",
         ],
         methods: ["GET", "POST"],
         credentials: true,
