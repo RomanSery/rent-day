@@ -76,8 +76,8 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
 
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onCancel} aria-labelledby="trade-dialog-title" open={open}>
-      <DialogTitle id="trade-dialog-title">Select station to travel to</DialogTitle>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={onCancel} aria-labelledby="travel-dialog-title" open={open}>
+      <DialogTitle id="travel-dialog-title">Select station to travel to</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
           <Grid className="trade-left" item>

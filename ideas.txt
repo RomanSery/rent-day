@@ -1,4 +1,6 @@
 implement chance
 when resize browser, update piece positions
 
-get rid of tax tooltip and put into modal like stats modal
+
+
+remove set die results fields

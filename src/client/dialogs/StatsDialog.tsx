@@ -152,7 +152,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
 
   return (
     <Dialog fullWidth={true} maxWidth="xl" onClose={onClose} aria-labelledby="stats-dialog-title" open={open}>
-      <DialogTitle id="trade-dialog-title">Stats</DialogTitle>
+      <DialogTitle id="stats-dialog-title">Stats</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"

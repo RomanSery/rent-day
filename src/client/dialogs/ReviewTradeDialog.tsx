@@ -119,8 +119,8 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="trade-dialog-title" open={open}>
-      <DialogTitle id="trade-dialog-title">Accept/Decline Trade Offer</DialogTitle>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="reivew-trade-dialog-title" open={open}>
+      <DialogTitle id="review-trade-dialog-title">Accept/Decline Trade Offer</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
           <Grid className="trade-left" item>{propertyList(true)}</Grid>

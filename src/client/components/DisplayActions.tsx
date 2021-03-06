@@ -10,9 +10,10 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain, faPercentage } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
+import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 
 
 interface Props {
@@ -28,6 +29,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
   const [statsViewOpen, setStatsViewOpen] = React.useState(false);
+  const [taxesViewOpen, setTaxesViewOpen] = React.useState(false);
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
 
 
@@ -164,6 +166,10 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     setStatsViewOpen(true);
   };
 
+  const onViewTaxes = async () => {
+    setTaxesViewOpen(true);
+  };
+
   const getMyActions = () => {
     if (isMyTurn()) {
       return (
@@ -187,6 +193,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
             : null}
 
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
+          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
           <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
             onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
         </React.Fragment>
@@ -196,6 +203,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return (
       <React.Fragment>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
+        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
       </React.Fragment>
     );
   }
@@ -206,6 +214,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
       <StatsDialog tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo}
         open={statsViewOpen} onClose={() => setStatsViewOpen(false)}
+      />
+      <MyTaxesDialog gameInfo={gameInfo}
+        open={taxesViewOpen} onClose={() => setTaxesViewOpen(false)}
       />
     </React.Fragment>
   );

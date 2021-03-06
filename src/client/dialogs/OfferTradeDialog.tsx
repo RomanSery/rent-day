@@ -168,8 +168,8 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="trade-dialog-title" open={open}>
-      <DialogTitle id="trade-dialog-title">Trade</DialogTitle>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="offer-trade-dialog-title" open={open}>
+      <DialogTitle id="offer-trade-dialog-title">Trade</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
           <Grid className="trade-left" item>{propertyList(true)}</Grid>
