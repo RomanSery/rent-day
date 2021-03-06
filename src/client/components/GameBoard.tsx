@@ -12,6 +12,7 @@ import { Snackbar } from "@material-ui/core";
 import { LatencyInfoMsg } from "../../core/types/messages";
 import { GamePieces } from "./GamePieces";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
+import _ from "lodash";
 
 interface Props {
   socketService: SocketService;
@@ -35,6 +36,21 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [newPos, setNewPos] = React.useState<number>(0);
   const [landedOnGoToIsolation, setLandedOnGoToIsolation] = React.useState<boolean>(false);
   const [rolledThreeDouibles, setRolledThreeDouibles] = React.useState<boolean>(false);
+
+
+
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [size, setSize] = useState([0, 0]);
+  useEffect(() => {
+    function updateSize() {
+      setSize([window.innerWidth, window.innerHeight]);
+    }
+    window.addEventListener('resize', _.debounce(updateSize, 200));
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
 
 
   useEffect(() => {
