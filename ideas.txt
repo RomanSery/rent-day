@@ -1,6 +1,6 @@
 implement chance
 when resize browser, update piece positions
 
-
-
 remove set die results fields
+
+add help page

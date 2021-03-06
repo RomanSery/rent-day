@@ -35,11 +35,26 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
+  /*
+  const [dimensions, setDimensions] = React.useState({
+    height: window.innerHeight,
+    width: window.innerWidth
+  });*/
 
   useEffect(() => {
     getGameState();
   }, []);
 
+
+  /*
+  const handleResize = () => {
+    setDimensions({
+      height: window.innerHeight,
+      width: window.innerWidth
+    })
+  };
+  window.addEventListener('resize', handleResize);
+*/
 
   useEffect(() => {
 
@@ -155,41 +170,48 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     return (
       <React.Fragment>
         {gameState!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
-
-          const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
-          const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
-          if (gameState && animate && newPos > 0 && origPos > 0) {
-
-            const frames = getMovementKeyFrames(gameState, landedOnGoToIsolation, rolledThreeDouibles, origPos, newPos);
-            const topFrames: Array<number> = frames.map((p) => p.top);
-            const leftFrames: Array<number> = frames.map((p) => p.left);
-            const bottomFrames: Array<number> = frames.map((p) => p.bottom);
-            const rightFrames: Array<number> = frames.map((p) => p.right);
-
-            return (
-              <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-                style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
-                animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
-                transition={{
-                  duration: 3, repeat: 0, type: "keyframes"
-                }}
-                onAnimationComplete={onFinishPieceMovement}
-              >
-                <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
-              </motion.div>);
-          }
-
-
-          return (
-            <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-              style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
-              <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
-            </div>);
-
+          return getPieceDisplay(squareId, p, index);
         })}
       </React.Fragment>
     );
   }
+
+
+
+  const getPieceDisplay = (squareId: number, p: Player, index: number) => {
+
+    const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
+    const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
+
+    if (gameState && animate && newPos > 0 && origPos > 0) {
+
+      const frames = getMovementKeyFrames(gameState, landedOnGoToIsolation, rolledThreeDouibles, origPos, newPos);
+      const topFrames: Array<number> = frames.map((p) => p.top);
+      const leftFrames: Array<number> = frames.map((p) => p.left);
+      const bottomFrames: Array<number> = frames.map((p) => p.bottom);
+      const rightFrames: Array<number> = frames.map((p) => p.right);
+
+      return (
+        <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
+          style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
+          animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
+          transition={{
+            duration: 3, repeat: 0, type: "keyframes"
+          }}
+          onAnimationComplete={onFinishPieceMovement}
+        >
+          <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
+        </motion.div>);
+    }
+
+    return (
+      <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
+        style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
+        <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
+      </div>);
+  }
+
+
 
   const showMovementAnimation = (origPos: number, newPos: number, playerId: string,
     diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => {
