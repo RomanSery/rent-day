@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getObjectIdAsHexString, handleApiError } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
@@ -10,12 +10,7 @@ import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
 import { LatencyInfoMsg } from "../../core/types/messages";
-import { PlayerState } from "../../core/enums/PlayerState";
-import { Player } from "../../core/types/Player";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { PiecePosition } from "../../core/types/PiecePosition";
-import { getMovementKeyFrames, getNumPlayersOnSquare, getPiecePosition } from "../uiHelpers";
-import { motion } from "framer-motion";
+import { GamePieces } from "./GamePieces";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
 
 interface Props {
@@ -35,26 +30,17 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
-  /*
-  const [dimensions, setDimensions] = React.useState({
-    height: window.innerHeight,
-    width: window.innerWidth
-  });*/
+  const [playerIdToMove, setPlayerIdToMove] = React.useState<string>("");
+  const [origPos, setOrigPos] = React.useState<number>(0);
+  const [newPos, setNewPos] = React.useState<number>(0);
+  const [landedOnGoToIsolation, setLandedOnGoToIsolation] = React.useState<boolean>(false);
+  const [rolledThreeDouibles, setRolledThreeDouibles] = React.useState<boolean>(false);
+
 
   useEffect(() => {
     getGameState();
   }, []);
 
-
-  /*
-  const handleResize = () => {
-    setDimensions({
-      height: window.innerHeight,
-      width: window.innerWidth
-    })
-  };
-  window.addEventListener('resize', handleResize);
-*/
 
   useEffect(() => {
 
@@ -124,95 +110,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     //setSquareToView(undefined);
   };
 
-
-  const displayGamePieces = () => {
-    if (!gameState) {
-      return null;
-    }
-    return (
-      <React.Fragment>
-        {num_squares.map((n, index) => {
-          const id: number = index + 1;
-          const numOnSquare = getNumPlayersOnSquare(gameState, id);
-          if (numOnSquare > 0) {
-            return displayPiecesForSquare(id);
-          }
-          return null;
-        })}
-      </React.Fragment>
-    );
-  }
-
-  const getPieceId = (p: Player) => {
-    return "player-" + p._id;
-  }
-
-  const onFinishPieceMovement = () => {
-    setPlayerIdToMove("");
-    setOrigPos(0);
-    setNewPos(0);
-
-    if (socketService && gameState) {
-      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
-    }
-  }
-
-
-  const [playerIdToMove, setPlayerIdToMove] = useState<string>("");
-  const [origPos, setOrigPos] = useState<number>(0);
-  const [newPos, setNewPos] = useState<number>(0);
-  const [landedOnGoToIsolation, setLandedOnGoToIsolation] = useState<boolean>(false);
-  const [rolledThreeDouibles, setRolledThreeDouibles] = useState<boolean>(false);
-
-
-
-  const displayPiecesForSquare = (squareId: number) => {
-    return (
-      <React.Fragment>
-        {gameState!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
-          return getPieceDisplay(squareId, p, index);
-        })}
-      </React.Fragment>
-    );
-  }
-
-
-
-  const getPieceDisplay = (squareId: number, p: Player, index: number) => {
-
-    const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
-    const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
-
-    if (gameState && animate && newPos > 0 && origPos > 0) {
-
-      const frames = getMovementKeyFrames(gameState, landedOnGoToIsolation, rolledThreeDouibles, origPos, newPos);
-      const topFrames: Array<number> = frames.map((p) => p.top);
-      const leftFrames: Array<number> = frames.map((p) => p.left);
-      const bottomFrames: Array<number> = frames.map((p) => p.bottom);
-      const rightFrames: Array<number> = frames.map((p) => p.right);
-
-      return (
-        <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-          style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
-          animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
-          transition={{
-            duration: 3, repeat: 0, type: "keyframes"
-          }}
-          onAnimationComplete={onFinishPieceMovement}
-        >
-          <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
-        </motion.div>);
-    }
-
-    return (
-      <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-        style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
-        <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
-      </div>);
-  }
-
-
-
   const showMovementAnimation = (origPos: number, newPos: number, playerId: string,
     diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => {
 
@@ -222,6 +119,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setLandedOnGoToIsolation(landedOnGoToIsolation);
     setRolledThreeDouibles(rolledThreeDouibles);
   }
+
 
   return (
     <React.Fragment>
@@ -238,7 +136,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
 
-      {displayGamePieces()}
+      <GamePieces gameInfo={gameState} socketService={socketService} setPlayerIdToMove={setPlayerIdToMove} setOrigPos={setOrigPos} setNewPos={setNewPos}
+        getPlayerIdToMove={playerIdToMove} origPos={origPos} newPos={newPos} landedOnGoToIsolation={landedOnGoToIsolation} rolledThreeDoubles={rolledThreeDouibles} />
 
       <Snackbar
         anchorOrigin={{
