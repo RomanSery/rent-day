@@ -71,7 +71,7 @@ if (IS_DEV) {
   );
 }
 
-app.post("/api/health", authController.getHealth);
+app.get("/api/health", authController.getHealth);
 
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);

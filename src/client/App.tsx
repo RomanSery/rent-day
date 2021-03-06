@@ -26,7 +26,7 @@ export const App: React.FC = () => {
   const history = useHistory();
   const location = useLocation();
   const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-  const wsUri = isDev ? "ws://localhost:8080" : "https://rentday.coderdreams.com";
+  const wsUri = isDev ? "ws://localhost:4000" : "https://rentday.coderdreams.com";
 
 
   const getGameId = () => {

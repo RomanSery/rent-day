@@ -213,6 +213,3 @@ export const getLotto = async (req: Request, res: Response) => {
   const lottoId = new mongoose.Types.ObjectId(req.body.lottoId);
   res.json({ lotto: await LottoProcessor.getLotto(lottoId) });
 };
-function locale(locale: any, arg1: string) {
-  throw new Error("Function not implemented.");
-}

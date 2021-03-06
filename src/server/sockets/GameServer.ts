@@ -18,20 +18,37 @@ export class GameServer {
   private io: Server;
 
   constructor(server: http.Server) {
-    const options = {
-      pingTimeout: 5000,
-      pingInterval: 10000,
-      cors: {
-        origin: [
-          "http://localhost:3000",
-          "http://localhost:8000",
-          /\.coderdreams\.com$/,
-        ],
-        methods: ["GET", "POST"],
-        credentials: true,
-      },
-    };
-    this.io = new Server(server, options);
+    const IS_DEV: boolean =
+      !process.env.NODE_ENV || process.env.NODE_ENV === "development";
+
+    if (IS_DEV) {
+      const options = {
+        pingTimeout: 5000,
+        pingInterval: 10000,
+        cors: {
+          origin: [
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://localhost:4000",
+          ],
+          methods: ["GET", "POST"],
+          credentials: true,
+        },
+      };
+      this.io = new Server(server, options);
+    } else {
+      const options = {
+        pingTimeout: 5000,
+        pingInterval: 10000,
+        cors: {
+          origin: [/\.coderdreams\.com$/],
+          methods: ["GET", "POST"],
+          credentials: true,
+        },
+      };
+      this.io = new Server(server, options);
+    }
+
     console.log("GameServer listening");
   }
 

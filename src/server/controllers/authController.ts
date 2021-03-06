@@ -125,5 +125,10 @@ export const getCurrentSession = async (
 };
 
 export const getHealth = async (req: Request, res: Response) => {
-  res.status(401).send({ status: "UP" });
+  res
+    .status(401)
+    .send({
+      status: "UP",
+      dbState: mongoose.STATES[mongoose.connection.readyState],
+    });
 };
