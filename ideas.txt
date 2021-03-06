@@ -7,3 +7,7 @@ when resize browser, update piece positions
 get rid of tax tooltip and put into modal like stats modal
 
 creating game with name "test game" doesnt work
+
+make ping text smaller
+
+health check endpoint, try to hit db

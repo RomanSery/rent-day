@@ -13,6 +13,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 }
 
 export const MONGO_URL: string = process.env.MONGO_URL!;
+export const IS_DEV: boolean =
+  !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
 if (!MONGO_URL) {
   logger.error(

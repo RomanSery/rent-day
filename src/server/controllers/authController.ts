@@ -123,3 +123,7 @@ export const getCurrentSession = async (
 
   res.status(401).send();
 };
+
+export const getHealth = async (req: Request, res: Response) => {
+  res.status(401).send({ status: "UP" });
+};

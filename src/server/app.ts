@@ -11,7 +11,7 @@ import * as actions from "./controllers/actions";
 import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import * as passportConfig from "./config/passport";
-import { MONGO_URL } from "./util/secrets";
+import { IS_DEV, MONGO_URL } from "./util/secrets";
 import { COOKIE_NAME, COOKIE_SECRET } from "./util/secretConstants";
 
 // Create Express server
@@ -48,17 +48,30 @@ app.use(passport.initialize());
 
 passportConfig.initPassportConfig();
 
-app.use(
-  cookieSession({
-    name: COOKIE_NAME,
-    secret: COOKIE_SECRET,
-    secure: true,
-    httpOnly: true,
-    domain: "coderdreams.com",
-    sameSite: "strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  })
-);
+if (IS_DEV) {
+  app.use(
+    cookieSession({
+      name: COOKIE_NAME,
+      secret: COOKIE_SECRET,
+      httpOnly: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    })
+  );
+} else {
+  app.use(
+    cookieSession({
+      name: COOKIE_NAME,
+      secret: COOKIE_SECRET,
+      secure: true,
+      httpOnly: true,
+      domain: "coderdreams.com",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    })
+  );
+}
+
+app.post("/api/health", authController.getHealth);
 
 app.post("/api/createAccount", authController.createAccount);
 app.post("/api/login", authController.login);
