@@ -75,8 +75,26 @@ export class GameServer {
       });
       socket.on(
         GameEvent.STOP_ANIMATE_DICE,
-        (gameId: string, diceRoll: DiceRollResult) => {
-          this.io.in(gameId).emit(GameEvent.STOP_ANIMATE_DICE, diceRoll);
+        (
+          gameId: string,
+          diceRoll: DiceRollResult,
+          origPos: number,
+          newPos: number,
+          playerId: string,
+          landedOnGoToIsolation: boolean,
+          rolledThreeDouibles: boolean
+        ) => {
+          this.io
+            .in(gameId)
+            .emit(
+              GameEvent.STOP_ANIMATE_DICE,
+              diceRoll,
+              origPos,
+              newPos,
+              playerId,
+              landedOnGoToIsolation,
+              rolledThreeDouibles
+            );
         }
       );
 

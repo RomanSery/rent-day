@@ -10,9 +10,10 @@ import { useIsMountedRef } from "./useIsMountedRef";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
+  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => void;
 }
 
-export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => {
+export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showMovementAnimation }) => {
 
   const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
   const [animDiceRollResult, setAnimDiceRollResult] = React.useState<DiceRollResult | undefined>(undefined);
@@ -28,9 +29,16 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService }) => 
       setShowDiceAnimation(true);
       setResultsDesc("");
     });
-    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (diceRoll: DiceRollResult) => {
+    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (diceRoll: DiceRollResult, origPos: number,
+      newPos: number,
+      playerId: string,
+      landedOnGoToIsolation: boolean,
+      rolledThreeDouibles: boolean) => {
       setAnimDiceRollResult(diceRoll);
       setShowDiceAnimation(false);
+
+      showMovementAnimation(origPos, newPos, playerId,
+        diceRoll, landedOnGoToIsolation, rolledThreeDouibles);
     });
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
