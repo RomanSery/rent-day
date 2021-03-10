@@ -27,7 +27,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [chanceOpen, setChanceOpen] = useState(false);
+  const [chanceOpen, setChanceOpen] = useState(true);
 
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 

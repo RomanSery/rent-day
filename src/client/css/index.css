@@ -30,3 +30,17 @@ body {
 .skill-descriptions .description {
   padding-left: 10px;
 }
+
+.chance-event-info {
+  display: flex;
+  justify-content: center;
+}
+
+.chance-event-info .headline {
+  font-weight: bold;
+  font-size: 120%;
+}
+
+.chance-event-info .chance-txt {
+  padding-left: 20px;
+}

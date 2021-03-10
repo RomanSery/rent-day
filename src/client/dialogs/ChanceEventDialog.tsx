@@ -5,6 +5,8 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSmile, faFrownOpen } from "@fortawesome/free-regular-svg-icons";
 
 interface Props {
   open: boolean;
@@ -20,11 +22,15 @@ export const ChanceEventDialog: React.FC<Props> = ({ open, gameInfo, onClose }) 
     }
 
     return (
-      <React.Fragment>
-        type: {gameInfo.results.chance.isGood}
-        header: {gameInfo.results.chance.headline}
-        subline: {gameInfo.results.chance.subLine}
-      </React.Fragment>
+      <div className="chance-event-info">
+        <div className="type">
+          <FontAwesomeIcon icon={gameInfo.results.chance.isGood ? faSmile : faFrownOpen} size="3x" />
+        </div>
+        <div className="chance-txt">
+          <div className="headline">{gameInfo.results.chance.headline}</div>
+          <div className="sub-line">{gameInfo.results.chance.subLine}</div>
+        </div>
+      </div>
     );
   };
 
