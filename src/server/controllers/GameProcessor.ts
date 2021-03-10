@@ -194,6 +194,7 @@ export class GameProcessor {
     game.status = GameStatus.ACTIVE;
 
     //TODO just for testing
+    /*
     GameProcessor.assignSquareTesting(game, game.players[0], 2, 150);
     GameProcessor.assignSquareTesting(game, game.players[0], 4, 200);
     GameProcessor.assignSquareTesting(game, game.players[0], 7, 500);
@@ -217,7 +218,7 @@ export class GameProcessor {
 
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
-    });
+    });*/
   }
 
   private static assignSquareTesting(

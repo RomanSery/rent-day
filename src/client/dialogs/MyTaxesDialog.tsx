@@ -53,6 +53,10 @@ export const MyTaxesDialog: React.FC<Props> = ({ open, gameInfo, onClose }) => {
       return [];
     }
 
+    if (!myPlayer.taxTooltip || myPlayer.taxTooltip.length === 0) {
+      return [];
+    }
+
     const taxBreakdown = myPlayer.taxTooltip.split(';');
 
     const rows: Array<GridRowModel> = [];

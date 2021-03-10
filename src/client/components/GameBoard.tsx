@@ -27,7 +27,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [chanceOpen, setChanceOpen] = useState(true);
+  const [chanceOpen, setChanceOpen] = useState(false);
 
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
@@ -81,7 +81,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
-      //TODO show chance modal here
       if (data.results && data.results.chance) {
         setChanceOpen(true);
       }

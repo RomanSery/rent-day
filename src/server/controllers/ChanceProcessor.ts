@@ -1,37 +1,37 @@
+import _ from "lodash";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { GameStatus } from "../../core/enums/GameStatus";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
-import { ChanceEvent } from "../../core/types/ChanceEvent";
 import { Player } from "../../core/types/Player";
+import { ServerChanceEvent } from "./ServerChanceEvent";
 
 export class ChanceProcessor {
   private game?: GameInstanceDocument | null;
   private player?: Player | null;
+  private events: Array<ServerChanceEvent>;
 
   constructor(game: GameInstanceDocument, player: Player) {
     this.game = game;
     this.player = player;
+
+    this.events = [];
+    this.initChanceEvents();
   }
 
-  public async createChanceEvent(): Promise<ChanceEvent | null> {
+  public async createChanceEvent(): Promise<ServerChanceEvent | null> {
     if (this.game == null) {
       return null;
     }
-    if (this.game.status !== GameStatus.ACTIVE) {
-      return null;
-    }
 
-    return this.getRandomEvent();
+    const randomEvent = this.getRandomEvent();
+    if (randomEvent) {
+      return randomEvent;
+    }
+    return null;
   }
 
-  private getRandomEvent(): ChanceEvent {
-    return {
-      isGood: false,
-      headline: "Got a toothace",
-      subLine: "Pay dentist $50",
-      chanceId: 1,
-    };
+  private getRandomEvent(): ServerChanceEvent | undefined {
+    return _.sample(this.events);
   }
 
   public static shouldCreateChance(squareId: number): boolean {
@@ -41,5 +41,27 @@ export class ChanceProcessor {
     }
 
     return squareConfig.type === SquareType.Chance;
+  }
+
+  private initChanceEvents() {
+    this.events.push({
+      isGood: false,
+      headline: "Got a toothace",
+      subLine: "Pay dentist $50",
+      chanceId: 1,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        player.money -= 50;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Sell stocks",
+      subLine: "Get $75",
+      chanceId: 2,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        player.money += 75;
+      },
+    });
   }
 }
