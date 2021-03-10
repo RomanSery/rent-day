@@ -13,6 +13,7 @@ import { LatencyInfoMsg } from "../../core/types/messages";
 import { GamePieces } from "./GamePieces";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
 import _ from "lodash";
+import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
 
 interface Props {
   socketService: SocketService;
@@ -26,6 +27,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
+  const [chanceOpen, setChanceOpen] = useState(false);
 
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
@@ -79,6 +81,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
+      //TODO show chance modal here
+      if (data.results && data.results.chance) {
+        setChanceOpen(true);
+      }
       setGameState(data);
     });
 
@@ -154,6 +160,9 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
       <GamePieces gameInfo={gameState} socketService={socketService} setPlayerIdToMove={setPlayerIdToMove} setOrigPos={setOrigPos} setNewPos={setNewPos}
         getPlayerIdToMove={playerIdToMove} origPos={origPos} newPos={newPos} landedOnGoToIsolation={landedOnGoToIsolation} rolledThreeDoubles={rolledThreeDouibles} />
+
+
+      <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
 
       <Snackbar
         anchorOrigin={{

@@ -23,6 +23,8 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual } from "./helpers";
+import { ChanceProcessor } from "./ChanceProcessor";
+import { ChanceEvent } from "../../core/types/ChanceEvent";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -123,7 +125,13 @@ export class RollProcessor {
       this.player.numAbilityPoints++;
     }
 
-    if (AuctionProcessor.shouldCreateAuction(this.game, this.player.position)) {
+    let chance: ChanceEvent | null = null;
+    if (ChanceProcessor.shouldCreateChance(this.player.position)) {
+      const processor = new ChanceProcessor(this.game, this.player);
+      chance = await processor.createChanceEvent();
+    } else if (
+      AuctionProcessor.shouldCreateAuction(this.game, this.player.position)
+    ) {
       const newAuction: AuctionDocument = await AuctionProcessor.createAuction(
         this.game,
         this.player
@@ -146,6 +154,7 @@ export class RollProcessor {
     this.game.results = {
       roll: lastRoll,
       description: "<b>" + this.player.name + "</b> " + this.rollDesc,
+      chance: chance,
     };
 
     this.newPosition = this.player.position;
