@@ -24,6 +24,7 @@ import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
+import { useIsMountedRef } from "./useIsMountedRef";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -50,6 +51,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
   const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
+
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
 
@@ -121,6 +124,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
   }
 
   const getGameResultsDisplayComp = () => {
+    if (!isMountedRef.current) {
+      return null;
+    }
     if (gameInfo?.auctionId) {
       return (<DisplayAuction gameInfo={gameInfo} socketService={socketService} />);
     }
