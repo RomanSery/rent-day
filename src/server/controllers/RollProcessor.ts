@@ -128,7 +128,7 @@ export class RollProcessor {
     let chance: ServerChanceEvent | null = null;
 
     if (ChanceProcessor.shouldCreateChance(this.player.position)) {
-      const processor = new ChanceProcessor(this.game, this.player);
+      const processor = new ChanceProcessor(this.game);
       chance = await processor.createChanceEvent();
       if (chance) {
         chance.makeItHappen(this.game, this.player);

@@ -1,18 +1,20 @@
 import _ from "lodash";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { Player } from "../../core/types/Player";
+import { SquareGameData } from "../../core/types/SquareGameData";
+import { areIdsEqual } from "./helpers";
+import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { ServerChanceEvent } from "./ServerChanceEvent";
 
 export class ChanceProcessor {
   private game?: GameInstanceDocument | null;
-  private player?: Player | null;
   private events: Array<ServerChanceEvent>;
 
-  constructor(game: GameInstanceDocument, player: Player) {
+  constructor(game: GameInstanceDocument) {
     this.game = game;
-    this.player = player;
 
     this.events = [];
     this.initChanceEvents();
@@ -61,6 +63,82 @@ export class ChanceProcessor {
       chanceId: 2,
       makeItHappen(game: GameInstanceDocument, player: Player): void {
         player.money += 75;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "It's your birthday!",
+      subLine: "Every active player gives you a $30 gift card",
+      chanceId: 3,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        const activePlayers = game.players.filter(
+          (p) =>
+            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
+        );
+
+        let total = 0;
+        for (const p of activePlayers) {
+          p.money -= 30;
+          total += 30;
+
+          PlayerCostsCalculator.updatePlayerCosts(game, p);
+        }
+
+        player.money += Math.round(total);
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
+      },
+    });
+
+    this.events.push({
+      isGood: false,
+      headline: "Pay off your debts",
+      subLine: "Pay each active player $30",
+      chanceId: 4,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        const activePlayers = game.players.filter(
+          (p) =>
+            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
+        );
+
+        let total = 0;
+        for (const p of activePlayers) {
+          p.money += 30;
+          total += 30;
+
+          PlayerCostsCalculator.updatePlayerCosts(game, p);
+        }
+
+        player.money -= Math.round(total);
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
+      },
+    });
+
+    this.events.push({
+      isGood: false,
+      headline: "Building repairs",
+      subLine:
+        "Your buildings have fallen into disrepair.  Pay $40 per building",
+      chanceId: 5,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
+          (s: SquareGameData) => {
+            return (
+              s.owner &&
+              areIdsEqual(s.owner, player._id) &&
+              s.numHouses > 0 &&
+              !s.isMortgaged
+            );
+          }
+        );
+
+        let totalHouses = 0;
+        for (const squareState of playerOwnedSquaresWithHouses) {
+          totalHouses += squareState.numHouses;
+        }
+
+        player.money -= totalHouses * 40;
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
       },
     });
   }
