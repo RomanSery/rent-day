@@ -41,7 +41,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayer
     setNewPos(0);
 
     if (socketService && gameInfo) {
-      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);
     }
   }
 

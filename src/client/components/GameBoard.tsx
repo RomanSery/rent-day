@@ -80,9 +80,9 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     socketService.sendPingToServer();
 
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState, showChance?: boolean) => {
       setGameState(data);
-      if (data.results && data.results.chance) {
+      if (showChance && data.results && data.results.chance) {
         setChanceOpen(true);
       }
     });
