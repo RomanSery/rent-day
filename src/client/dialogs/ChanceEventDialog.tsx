@@ -28,7 +28,7 @@ export const ChanceEventDialog: React.FC<Props> = ({ open, gameInfo, onClose }) 
         </div>
         <div className="chance-txt">
           <div className="headline">{gameInfo.results.chance.headline}</div>
-          <div className="sub-line">{gameInfo.results.chance.subLine}</div>
+          <div className="sub-line" dangerouslySetInnerHTML={{ __html: gameInfo.results.chance.subLine }}></div>
         </div>
       </div>
     );

@@ -141,5 +141,36 @@ export class ChanceProcessor {
         PlayerCostsCalculator.updatePlayerCosts(game, player);
       },
     });
+
+    this.events.push({
+      isGood: true,
+      headline: "Tax refund!",
+      subLine:
+        "The city has made an error and your properties have been overtaxed.  <br> Get a refund of $45 for each unmortgaged taxable property you own",
+      chanceId: 6,
+      makeItHappen(game: GameInstanceDocument, player: Player): void {
+        const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
+          (s: SquareGameData) => {
+            return (
+              s.owner &&
+              areIdsEqual(s.owner, player._id) &&
+              !s.isMortgaged &&
+              s.tax &&
+              s.tax > 0 &&
+              s.purchasePrice &&
+              s.purchasePrice > 0
+            );
+          }
+        );
+
+        let total = 0;
+        playerOwnedSquares.forEach(() => {
+          total += 45;
+        });
+
+        player.money += total;
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
+      },
+    });
   }
 }
