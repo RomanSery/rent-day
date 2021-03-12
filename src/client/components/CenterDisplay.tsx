@@ -79,9 +79,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
       API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
           if (socketService && gameInfo) {
-            socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.diceRoll,
-              response.data.origPos, response.data.newPos, response.data.playerId,
-              response.data.landedOnGoToIsolation, response.data.rolledThreeDouibles);
+            if (response.data.origPos === response.data.newPos) {
+              socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+            } else {
+              socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.diceRoll,
+                response.data.origPos, response.data.newPos, response.data.playerId,
+                response.data.landedOnGoToIsolation, response.data.rolledThreeDouibles);
+            }
           }
         })
         .catch(handleApiError);

@@ -81,10 +81,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
+      setGameState(data);
       if (data.results && data.results.chance) {
         setChanceOpen(true);
       }
-      setGameState(data);
     });
 
     return function cleanup() {

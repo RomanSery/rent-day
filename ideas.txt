@@ -1,4 +1,3 @@
-if you are in jail, and roll without getting a double, no done button.  and incorrectly still shows 'pay to get out'
 implement chance
 add help page
 
