@@ -38,6 +38,7 @@ export const roll = async (req: Request, res: Response) => {
     diceRoll: processor.getLastDiceRoll(),
     landedOnGoToIsolation: processor.getLandedOnGoToIsolation(),
     rolledThreeDouibles: processor.getRolledThreeDouibles(),
+    frames: processor.getMovementKeyFrames(),
   });
 };
 

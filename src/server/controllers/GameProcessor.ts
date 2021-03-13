@@ -212,13 +212,14 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
     GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
 
+    */
     for (let id = 1; id <= 38; id++) {
       GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
     }
 
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
-    });*/
+    });
   }
 
   private static assignSquareTesting(

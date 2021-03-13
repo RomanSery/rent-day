@@ -42,6 +42,7 @@ export class RollProcessor {
   private lastDiceRoll: DiceRoll | undefined;
   private landedOnGoToIsolation: boolean;
   private rolledThreeDouibles: boolean;
+  private movementKeyframes: Array<number> = [];
 
   constructor(
     gameId: mongoose.Types.ObjectId,
@@ -73,6 +74,9 @@ export class RollProcessor {
     }
   }
 
+  public getMovementKeyFrames(): Array<number> {
+    return this.movementKeyframes;
+  }
   public getOrigPosition(): number {
     return this.origPosition!;
   }
@@ -160,8 +164,6 @@ export class RollProcessor {
       description: "<b>" + this.player.name + "</b> " + this.rollDesc,
       chance: chance,
     };
-
-    this.newPosition = this.player.position;
 
     this.game.save();
     return "";
@@ -305,6 +307,7 @@ export class RollProcessor {
       }
 
       this.player.position = newPosition;
+      this.newPosition = this.player.position;
 
       this.rollDesc +=
         " <br /> landed on " +
@@ -317,7 +320,41 @@ export class RollProcessor {
         this.rollDesc += " <br /> rolled a double so go again";
       }
     }
+
+    this.setMovementKeyFrames();
   }
+
+  private setMovementKeyFrames = () => {
+    this.movementKeyframes = [];
+
+    if (!this.origPosition || !this.newPosition) {
+      return;
+    }
+
+    if (this.landedOnGoToIsolation) {
+      for (let i = this.origPosition; i <= goToIsolationPosition; i++) {
+        this.movementKeyframes.push(i);
+      }
+      for (let x = goToIsolationPosition - 1; x >= isolation_position; x--) {
+        this.movementKeyframes.push(x);
+      }
+    } else if (this.rolledThreeDouibles) {
+      for (let x = this.origPosition - 1; x >= isolation_position; x--) {
+        this.movementKeyframes.push(x);
+      }
+    } else if (this.origPosition > this.newPosition) {
+      for (let i = this.origPosition; i <= last_pos; i++) {
+        this.movementKeyframes.push(i);
+      }
+      for (let i = 1; i <= this.newPosition; i++) {
+        this.movementKeyframes.push(i);
+      }
+    } else {
+      for (let i = this.origPosition; i <= this.newPosition; i++) {
+        this.movementKeyframes.push(i);
+      }
+    }
+  };
 
   private updateRollHistory(): void {
     if (!this.player) {
