@@ -44,3 +44,8 @@ body {
 .chance-event-info .chance-txt {
   padding-left: 20px;
 }
+
+.help-page-cont {
+  overflow: scroll;
+  height: 100%;
+}

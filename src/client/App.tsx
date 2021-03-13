@@ -20,6 +20,7 @@ import { SignUpPage } from "./auth/SignUpPage";
 import { LoginPage } from "./auth/LoginPage";
 import API from "./api";
 import queryString from "query-string";
+import { HelpPageContent } from "./HelpPageContent";
 
 export const App: React.FC = () => {
 
@@ -128,6 +129,7 @@ export const App: React.FC = () => {
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
           </Container>
         </StaticBoard>
@@ -256,6 +258,20 @@ export const App: React.FC = () => {
     );
   };
 
+  const HelpPage = () => {
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <Container maxWidth="lg">
+            <HelpPageContent />
+          </Container>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
 
   return (
     <Switch>
@@ -269,6 +285,7 @@ export const App: React.FC = () => {
       <Route path="/players" component={DisplayPlayersPage} />
       <Route path="/find" component={FindGamesPage} />
       <Route path="/create" component={CreateGamePage} />
+      <Route path="/help" component={HelpPage} />
 
       <Route path="/newuser" component={SignUp} />
       <Route path="/login" component={LogIn} />

@@ -1,4 +1,3 @@
-implement chance
 add help page
 
 remove set die results fields
