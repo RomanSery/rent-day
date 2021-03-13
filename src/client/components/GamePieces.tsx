@@ -13,13 +13,13 @@ import { SocketService } from "../sockets/SocketService";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  setPlayerIdToMove: (playerId: string) => void;
+  clearMovement: () => void;
 
   getPlayerIdToMove: string;
   frames: Array<number>;
 }
 
-export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayerIdToMove, getPlayerIdToMove, frames }) => {
+export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayerIdToMove, frames, clearMovement }) => {
 
   const num_squares: Array<number> = Array.from(Array(40));
 
@@ -29,7 +29,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayer
   }
 
   const onFinishPieceMovement = () => {
-    setPlayerIdToMove("");
+    clearMovement();
 
     if (socketService && gameInfo) {
       socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);

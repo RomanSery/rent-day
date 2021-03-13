@@ -30,10 +30,14 @@ export const roll = async (req: Request, res: Response) => {
     return res.status(400).send(errMsg);
   }
 
+  const needToAnimate =
+    processor.getOrigPosition() !== processor.getNewPosition() &&
+    processor.getMovementKeyFrames() &&
+    processor.getMovementKeyFrames().length > 0;
+
   res.json({
     status: "success",
-    origPos: processor.getOrigPosition(),
-    newPos: processor.getNewPosition(),
+    needToAnimate: needToAnimate,
     playerId: userId,
     diceRoll: processor.getLastDiceRoll(),
     frames: processor.getMovementKeyFrames(),

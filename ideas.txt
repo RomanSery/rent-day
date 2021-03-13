@@ -1,5 +1,3 @@
 add help page
 
 remove set die results fields
-
-when you do roll or travel, return movement keyframes squareId,squareId,squareId,etc

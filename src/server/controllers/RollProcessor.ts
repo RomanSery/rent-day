@@ -40,8 +40,6 @@ export class RollProcessor {
   private origPosition: number | undefined;
   private newPosition: number | undefined;
   private lastDiceRoll: DiceRoll | undefined;
-  private landedOnGoToIsolation: boolean;
-  private rolledThreeDouibles: boolean;
   private movementKeyframes: Array<number> = [];
 
   constructor(
@@ -56,8 +54,6 @@ export class RollProcessor {
     this.forceDie1 = forceDie1;
     this.forceDie2 = forceDie2;
     this.rollDesc = "";
-    this.landedOnGoToIsolation = false;
-    this.rolledThreeDouibles = false;
   }
 
   private async init(): Promise<void> {
@@ -252,6 +248,8 @@ export class RollProcessor {
     let gotOutOfIsolation = false;
     let updatePosition = false;
     let newPosition = this.player.position + lastRoll.sum();
+    let landedOnGoToIsolation: boolean = false;
+    let rolledThreeDouibles: boolean = false;
 
     if (this.player.state === PlayerState.IN_ISOLATION) {
       if (lastRoll.isDouble() || this.player.numTurnsInIsolation >= 2) {
@@ -282,9 +280,9 @@ export class RollProcessor {
         " <br /> caught violating social distancing and put into quarantine";
 
       if (this.hasRolledThreeConsecutiveDoubles()) {
-        this.rolledThreeDouibles = true;
+        rolledThreeDouibles = true;
       } else {
-        this.landedOnGoToIsolation = newPosition === goToIsolationPosition;
+        landedOnGoToIsolation = newPosition === goToIsolationPosition;
       }
 
       this.player.rollHistory = [lastRoll];
@@ -316,24 +314,27 @@ export class RollProcessor {
       }
     }
 
-    this.setMovementKeyFrames();
+    this.setMovementKeyFrames(landedOnGoToIsolation, rolledThreeDouibles);
   }
 
-  private setMovementKeyFrames = () => {
+  private setMovementKeyFrames = (
+    landedOnGoToIsolation: boolean,
+    rolledThreeDouibles: boolean
+  ) => {
     this.movementKeyframes = [];
 
     if (!this.origPosition) {
       return;
     }
 
-    if (this.landedOnGoToIsolation) {
+    if (landedOnGoToIsolation) {
       for (let i = this.origPosition; i <= goToIsolationPosition; i++) {
         this.movementKeyframes.push(i);
       }
       for (let x = goToIsolationPosition - 1; x >= isolation_position; x--) {
         this.movementKeyframes.push(x);
       }
-    } else if (this.rolledThreeDouibles) {
+    } else if (rolledThreeDouibles) {
       for (let x = this.origPosition - 1; x >= isolation_position; x--) {
         this.movementKeyframes.push(x);
       }

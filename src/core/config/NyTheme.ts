@@ -1,7 +1,7 @@
 import { SquareThemeData } from "../types/SquareThemeData";
 
 export const NyThemeData = new Map<number, SquareThemeData>();
-NyThemeData.set(1, { name: "<- Go" });
+NyThemeData.set(1, { name: "Pay Day" });
 NyThemeData.set(2, { name: "Coney Island" });
 NyThemeData.set(4, { name: "Sheepshead bay" });
 

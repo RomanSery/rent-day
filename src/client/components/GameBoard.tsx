@@ -133,6 +133,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setPlayerIdToMove(playerId);
   }
 
+  const clearMovement = () => {
+    setPlayerIdToMove("");
+    setFrames([]);
+  }
 
   return (
     <React.Fragment>
@@ -149,8 +153,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
 
-      <GamePieces gameInfo={gameState} socketService={socketService} setPlayerIdToMove={setPlayerIdToMove}
-        getPlayerIdToMove={playerIdToMove} frames={frames} />
+      <GamePieces gameInfo={gameState} socketService={socketService}
+        getPlayerIdToMove={playerIdToMove} frames={frames} clearMovement={clearMovement} />
 
 
       <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
