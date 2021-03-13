@@ -77,24 +77,13 @@ export class GameServer {
         GameEvent.STOP_ANIMATE_DICE,
         (
           gameId: string,
-          diceRoll: DiceRollResult,
-          origPos: number,
-          newPos: number,
           playerId: string,
-          landedOnGoToIsolation: boolean,
-          rolledThreeDouibles: boolean
+          diceRoll: DiceRollResult,
+          frames: Array<number>
         ) => {
           this.io
             .in(gameId)
-            .emit(
-              GameEvent.STOP_ANIMATE_DICE,
-              diceRoll,
-              origPos,
-              newPos,
-              playerId,
-              landedOnGoToIsolation,
-              rolledThreeDouibles
-            );
+            .emit(GameEvent.STOP_ANIMATE_DICE, playerId, diceRoll, frames);
         }
       );
 

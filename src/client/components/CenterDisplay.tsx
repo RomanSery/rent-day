@@ -23,7 +23,6 @@ import { TravelDialog } from "../dialogs/TravelDialog";
 import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
-import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { useIsMountedRef } from "./useIsMountedRef";
 
 interface Props {
@@ -31,7 +30,7 @@ interface Props {
   socketService: SocketService;
   getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
-  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => void;
+  showMovementAnimation: (playerId: string, frames: Array<number>) => void;
 }
 
 export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId, showMovementAnimation }) => {
@@ -82,9 +81,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
             if (response.data.origPos === response.data.newPos) {
               socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
             } else {
-              socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.diceRoll,
-                response.data.origPos, response.data.newPos, response.data.playerId,
-                response.data.landedOnGoToIsolation, response.data.rolledThreeDouibles);
+              socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
             }
           }
         })

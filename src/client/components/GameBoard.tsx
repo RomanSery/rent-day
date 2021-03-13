@@ -11,7 +11,6 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
 import { LatencyInfoMsg } from "../../core/types/messages";
 import { GamePieces } from "./GamePieces";
-import { DiceRollResult } from "../../core/types/DiceRollResult";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
 
@@ -34,10 +33,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
   const [playerIdToMove, setPlayerIdToMove] = React.useState<string>("");
-  const [origPos, setOrigPos] = React.useState<number>(0);
-  const [newPos, setNewPos] = React.useState<number>(0);
-  const [landedOnGoToIsolation, setLandedOnGoToIsolation] = React.useState<boolean>(false);
-  const [rolledThreeDouibles, setRolledThreeDouibles] = React.useState<boolean>(false);
+  const [frames, setFrames] = React.useState<Array<number>>([]);
+
 
 
 
@@ -131,14 +128,9 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     //setSquareToView(undefined);
   };
 
-  const showMovementAnimation = (origPos: number, newPos: number, playerId: string,
-    diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => {
-
+  const showMovementAnimation = (playerId: string, frames: Array<number>) => {
+    setFrames(frames);
     setPlayerIdToMove(playerId);
-    setOrigPos(origPos);
-    setNewPos(newPos);
-    setLandedOnGoToIsolation(landedOnGoToIsolation);
-    setRolledThreeDouibles(rolledThreeDouibles);
   }
 
 
@@ -157,8 +149,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
 
-      <GamePieces gameInfo={gameState} socketService={socketService} setPlayerIdToMove={setPlayerIdToMove} setOrigPos={setOrigPos} setNewPos={setNewPos}
-        getPlayerIdToMove={playerIdToMove} origPos={origPos} newPos={newPos} landedOnGoToIsolation={landedOnGoToIsolation} rolledThreeDoubles={rolledThreeDouibles} />
+      <GamePieces gameInfo={gameState} socketService={socketService} setPlayerIdToMove={setPlayerIdToMove}
+        getPlayerIdToMove={playerIdToMove} frames={frames} />
 
 
       <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />

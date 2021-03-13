@@ -36,8 +36,6 @@ export const roll = async (req: Request, res: Response) => {
     newPos: processor.getNewPosition(),
     playerId: userId,
     diceRoll: processor.getLastDiceRoll(),
-    landedOnGoToIsolation: processor.getLandedOnGoToIsolation(),
-    rolledThreeDouibles: processor.getRolledThreeDouibles(),
     frames: processor.getMovementKeyFrames(),
   });
 };

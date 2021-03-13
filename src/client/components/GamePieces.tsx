@@ -14,19 +14,12 @@ interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
   setPlayerIdToMove: (playerId: string) => void;
-  setOrigPos: (pos: number) => void;
-  setNewPos: (pos: number) => void;
 
   getPlayerIdToMove: string;
-  origPos: number;
-  newPos: number;
-
-  landedOnGoToIsolation: boolean;
-  rolledThreeDoubles: boolean;
+  frames: Array<number>;
 }
 
-export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayerIdToMove, setOrigPos, setNewPos,
-  getPlayerIdToMove, origPos, newPos, landedOnGoToIsolation, rolledThreeDoubles }) => {
+export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayerIdToMove, getPlayerIdToMove, frames }) => {
 
   const num_squares: Array<number> = Array.from(Array(40));
 
@@ -37,8 +30,6 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayer
 
   const onFinishPieceMovement = () => {
     setPlayerIdToMove("");
-    setOrigPos(0);
-    setNewPos(0);
 
     if (socketService && gameInfo) {
       socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);
@@ -78,13 +69,13 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, setPlayer
     const pos: PiecePosition = getPiecePosition(gameInfo!, squareId, index);
     const animate = getPlayerIdToMove.length > 0 && getPlayerIdToMove === p._id;
 
-    if (gameInfo && animate && newPos > 0 && origPos > 0) {
+    if (gameInfo && animate) {
 
-      const frames = getMovementKeyFrames(gameInfo, landedOnGoToIsolation, rolledThreeDoubles, origPos, newPos);
-      const topFrames: Array<number> = frames.map((p) => p.top);
-      const leftFrames: Array<number> = frames.map((p) => p.left);
-      const bottomFrames: Array<number> = frames.map((p) => p.bottom);
-      const rightFrames: Array<number> = frames.map((p) => p.right);
+      const myFrames = getMovementKeyFrames(gameInfo, frames);
+      const topFrames: Array<number> = myFrames.map((p) => p.top);
+      const leftFrames: Array<number> = myFrames.map((p) => p.left);
+      const bottomFrames: Array<number> = myFrames.map((p) => p.bottom);
+      const rightFrames: Array<number> = myFrames.map((p) => p.right);
 
       return (
         <motion.div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}

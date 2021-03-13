@@ -86,12 +86,6 @@ export class RollProcessor {
   public getLastDiceRoll(): DiceRoll {
     return this.lastDiceRoll!;
   }
-  public getLandedOnGoToIsolation(): boolean {
-    return this.landedOnGoToIsolation;
-  }
-  public getRolledThreeDouibles(): boolean {
-    return this.rolledThreeDouibles;
-  }
 
   public async roll(): Promise<string> {
     await this.init();
@@ -284,7 +278,8 @@ export class RollProcessor {
       this.player.state = PlayerState.IN_ISOLATION;
       this.player.position = isolation_position;
       this.player.hasRolled = true;
-      this.rollDesc += " <br /> caught speeding and put into quarantine";
+      this.rollDesc +=
+        " <br /> caught violating social distancing and put into quarantine";
 
       if (this.hasRolledThreeConsecutiveDoubles()) {
         this.rolledThreeDouibles = true;
@@ -327,7 +322,7 @@ export class RollProcessor {
   private setMovementKeyFrames = () => {
     this.movementKeyframes = [];
 
-    if (!this.origPosition || !this.newPosition) {
+    if (!this.origPosition) {
       return;
     }
 
@@ -342,14 +337,14 @@ export class RollProcessor {
       for (let x = this.origPosition - 1; x >= isolation_position; x--) {
         this.movementKeyframes.push(x);
       }
-    } else if (this.origPosition > this.newPosition) {
+    } else if (this.newPosition && this.origPosition > this.newPosition) {
       for (let i = this.origPosition; i <= last_pos; i++) {
         this.movementKeyframes.push(i);
       }
       for (let i = 1; i <= this.newPosition; i++) {
         this.movementKeyframes.push(i);
       }
-    } else {
+    } else if (this.newPosition) {
       for (let i = this.origPosition; i <= this.newPosition; i++) {
         this.movementKeyframes.push(i);
       }

@@ -10,7 +10,7 @@ import { useIsMountedRef } from "./useIsMountedRef";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  showMovementAnimation: (origPos: number, newPos: number, playerId: string, diceRoll: DiceRollResult, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean) => void;
+  showMovementAnimation: (playerId: string, frames: Array<number>) => void;
 }
 
 export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showMovementAnimation }) => {
@@ -29,16 +29,12 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
       setShowDiceAnimation(true);
       setResultsDesc("");
     });
-    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (diceRoll: DiceRollResult, origPos: number,
-      newPos: number,
-      playerId: string,
-      landedOnGoToIsolation: boolean,
-      rolledThreeDouibles: boolean) => {
+    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (playerId: string, diceRoll: DiceRollResult, frames: Array<number>) => {
       setAnimDiceRollResult(diceRoll);
       setShowDiceAnimation(false);
 
-      showMovementAnimation(origPos, newPos, playerId,
-        diceRoll, landedOnGoToIsolation, rolledThreeDouibles);
+
+      showMovementAnimation(playerId, frames);
     });
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {

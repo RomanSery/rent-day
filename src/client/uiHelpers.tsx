@@ -7,9 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import { SkillType } from "../core/enums/SkillType";
 import {
   corruptionAdjustment,
-  goToIsolationPosition,
-  isolation_position,
-  last_pos,
   luckAdjustment,
   negotiationAdjustment,
 } from "../core/constants";
@@ -304,34 +301,14 @@ export const getPiecePosition = (gameState: GameState, squareId: number, index: 
   };
 }
 
-export const getMovementKeyFrames = (gameState: GameState, landedOnGoToIsolation: boolean, rolledThreeDouibles: boolean,
-  origPos: number, newPos: number): Array<PiecePosition> => {
+export const getMovementKeyFrames = (gameState: GameState, moves: Array<number>): Array<PiecePosition> => {
   const frames: Array<PiecePosition> = [];
 
-  if (landedOnGoToIsolation) {
-    for (let i = origPos; i <= goToIsolationPosition; i++) {
-      frames.push(getPiecePosition(gameState, i, 0));
-    }
-    for (let x = goToIsolationPosition - 1; x >= isolation_position; x--) {
-      frames.push(getPiecePosition(gameState, x, 0));
-    }
-  } else if (rolledThreeDouibles) {
-    for (let x = origPos - 1; x >= isolation_position; x--) {
-      frames.push(getPiecePosition(gameState, x, 0));
-    }
-
-  } else if (origPos > newPos) {
-    for (let i = origPos; i <= last_pos; i++) {
-      frames.push(getPiecePosition(gameState, i, 0));
-    }
-    for (let i = 1; i <= newPos; i++) {
-      frames.push(getPiecePosition(gameState, i, 0));
-    }
-  } else {
-    for (let i = origPos; i <= newPos; i++) {
-      frames.push(getPiecePosition(gameState, i, 0));
-    }
+  for (let i = 0; i < moves.length; i++) {
+    const squareId = moves[i];
+    frames.push(getPiecePosition(gameState, squareId, 0));
   }
+
   return frames;
 }
 
