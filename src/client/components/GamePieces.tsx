@@ -15,7 +15,7 @@ interface Props {
   socketService: SocketService;
   clearMovement: () => void;
 
-  getPlayerIdToMove: string;
+  getPlayerIdToMove: () => string;
   frames: Array<number>;
 }
 
@@ -67,7 +67,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
   const getPieceDisplay = (squareId: number, p: Player, index: number) => {
 
     const pos: PiecePosition = getPiecePosition(gameInfo!, squareId, index);
-    const animate = getPlayerIdToMove.length > 0 && getPlayerIdToMove === p._id;
+    const animate = getPlayerIdToMove().length > 0 && getPlayerIdToMove() === p._id;
 
     if (gameInfo && animate) {
 
@@ -82,7 +82,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
           style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}
           animate={{ top: topFrames, left: leftFrames, bottom: bottomFrames, right: rightFrames }}
           transition={{
-            duration: 3, repeat: 0, type: "keyframes"
+            duration: 5, type: "tween", ease: "easeInOut"
           }}
           onAnimationComplete={onFinishPieceMovement}
         >

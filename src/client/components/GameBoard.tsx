@@ -78,6 +78,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState, showChance?: boolean) => {
+      clearMovement();
       setGameState(data);
       if (showChance && data.results && data.results.chance) {
         setChanceOpen(true);
@@ -138,6 +139,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setFrames([]);
   }
 
+  const getPlayerIdToMove = () => {
+    return playerIdToMove;
+  }
+
   return (
     <React.Fragment>
       <div className="board">
@@ -154,7 +159,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       </div>
 
       <GamePieces gameInfo={gameState} socketService={socketService}
-        getPlayerIdToMove={playerIdToMove} frames={frames} clearMovement={clearMovement} />
+        getPlayerIdToMove={getPlayerIdToMove} frames={frames} clearMovement={clearMovement} />
 
 
       <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
