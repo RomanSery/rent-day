@@ -51,8 +51,9 @@ export class ChanceProcessor {
       headline: "Got a toothace",
       subLine: "Pay dentist $50",
       chanceId: 1,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money -= 50;
+        return false;
       },
     });
 
@@ -61,8 +62,9 @@ export class ChanceProcessor {
       headline: "Sell stocks",
       subLine: "Get $75",
       chanceId: 2,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money += 75;
+        return false;
       },
     });
 
@@ -71,7 +73,7 @@ export class ChanceProcessor {
       headline: "It's your birthday!",
       subLine: "Every active player gives you a $30 gift card",
       chanceId: 3,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const activePlayers = game.players.filter(
           (p) =>
             p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
@@ -87,6 +89,7 @@ export class ChanceProcessor {
 
         player.money += Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
       },
     });
 
@@ -95,7 +98,7 @@ export class ChanceProcessor {
       headline: "Pay off your debts",
       subLine: "Pay each active player $30",
       chanceId: 4,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const activePlayers = game.players.filter(
           (p) =>
             p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
@@ -111,6 +114,7 @@ export class ChanceProcessor {
 
         player.money -= Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
       },
     });
 
@@ -120,7 +124,7 @@ export class ChanceProcessor {
       subLine:
         "Your buildings have fallen into disrepair.  Pay $40 per building",
       chanceId: 5,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
             return (
@@ -139,6 +143,7 @@ export class ChanceProcessor {
 
         player.money -= totalHouses * 40;
         PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
       },
     });
 
@@ -148,7 +153,7 @@ export class ChanceProcessor {
       subLine:
         "The city has made an error and your properties have been overtaxed.  <br> Get a refund of $45 for each unmortgaged taxable property you own",
       chanceId: 6,
-      makeItHappen(game: GameInstanceDocument, player: Player): void {
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
             return (
@@ -170,6 +175,7 @@ export class ChanceProcessor {
 
         player.money += total;
         PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
       },
     });
   }
