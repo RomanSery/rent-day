@@ -41,6 +41,12 @@ export const App: React.FC = () => {
   };
 
   React.useEffect(() => {
+
+    if (location && location.pathname === "/help") {
+      return;
+    }
+
+
     API.post("current-session")
       .then(function (response) {
         setCurrSessionInfo(response.data);

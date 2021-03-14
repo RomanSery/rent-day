@@ -1,3 +1,4 @@
-finish help content
-remove set die results fields
+do test with 3 players to see what happens when one is eliminated
+
 look for //TODO and remove
+remove set die results fields
