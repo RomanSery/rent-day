@@ -1,3 +1,2 @@
 finish help content
-remove set die results fields
 look for //TODO and remove
