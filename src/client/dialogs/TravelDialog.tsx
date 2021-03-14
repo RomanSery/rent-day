@@ -38,7 +38,8 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
     API.post("actions/travel", { context, squareId: squareId })
       .then(function (response) {
         if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          //socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
         }
         onClose();
       })

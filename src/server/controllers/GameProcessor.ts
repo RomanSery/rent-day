@@ -194,7 +194,7 @@ export class GameProcessor {
     game.status = GameStatus.ACTIVE;
 
     //TODO just for testing
-    /*
+
     GameProcessor.assignSquareTesting(game, game.players[0], 2, 150);
     GameProcessor.assignSquareTesting(game, game.players[0], 4, 200);
     GameProcessor.assignSquareTesting(game, game.players[0], 7, 500);
@@ -212,14 +212,14 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
     GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
 
-    */
+    /*
     for (let id = 1; id <= 38; id++) {
       GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
     }
 
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
-    });
+    });*/
   }
 
   private static assignSquareTesting(

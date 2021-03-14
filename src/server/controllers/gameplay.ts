@@ -60,6 +60,10 @@ export const travel = async (req: Request, res: Response) => {
 
   res.json({
     status: "success",
+    needToAnimate: true,
+    playerId: userId,
+    diceRoll: processor.getLastDiceRoll(),
+    frames: processor.getMovementKeyFrames(),
   });
 };
 

@@ -231,6 +231,9 @@ export class RollProcessor {
 
     this.player.hasTraveled = true;
     this.player.position = squareId;
+    this.newPosition = squareId;
+
+    this.setMovementKeyFrames(false, false);
 
     this.game.save();
     return "";

@@ -1,10 +1,7 @@
-add help page
-
-remove set die results fields
-
-test train travel animation
 finish help content
 add some more chance events (peacful protest destroys 2 houses)
 problem with double move animation
-look for //TODO and remove
 smooth out move animation
+
+remove set die results fields
+look for //TODO and remove
