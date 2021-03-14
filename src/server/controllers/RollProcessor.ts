@@ -33,8 +33,8 @@ export class RollProcessor {
   private player?: Player | null;
   private playerPassedPayDay: boolean;
 
-  private forceDie1: number | null;
-  private forceDie2: number | null;
+  //private forceDie1: number | null;
+  //private forceDie2: number | null;
   private rollDesc: string;
 
   private origPosition: number | undefined;
@@ -44,15 +44,15 @@ export class RollProcessor {
 
   constructor(
     gameId: mongoose.Types.ObjectId,
-    userId: mongoose.Types.ObjectId,
-    forceDie1: number | null, //TODO remove or just disable
-    forceDie2: number | null
+    userId: mongoose.Types.ObjectId
+    //forceDie1: number | null,
+    //forceDie2: number | null
   ) {
     this.gameId = gameId;
     this.userId = userId;
     this.playerPassedPayDay = false;
-    this.forceDie1 = forceDie1;
-    this.forceDie2 = forceDie2;
+    //this.forceDie1 = forceDie1;
+    //this.forceDie2 = forceDie2;
     this.rollDesc = "";
   }
 
@@ -361,10 +361,11 @@ export class RollProcessor {
     }
 
     const newRoll = new DiceRoll();
+    /*
     if (this.forceDie1 && this.forceDie2) {
       newRoll.die1 = this.forceDie1;
       newRoll.die2 = this.forceDie2;
-    }
+    }*/
 
     //insert latest roll into the beginning of array
     this.player.rollHistory.unshift(newRoll);

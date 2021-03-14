@@ -1,4 +1,4 @@
-do test with 3 players to see what happens when one is eliminated
-
 look for //TODO and remove
-remove set die results fields
+
+think of a better way to highlight on the board who owns what
+use dev.io article to try to handle tablet view

@@ -14,7 +14,6 @@ import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
-import { TextField } from "@material-ui/core";
 import { OfferTradeDialog } from "../dialogs/OfferTradeDialog";
 import { TradeOffer } from "../../core/types/TradeOffer";
 import { ReviewTradeDialog } from "../dialogs/ReviewTradeDialog";
@@ -40,8 +39,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [playerToView, setPlayerToView] = useState<String | undefined>(undefined);
 
-  const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
-  const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
+  //const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
+  //const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
 
   const [offerTradeOpen, setOfferTradeOpen] = useState(false);
   const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
@@ -75,7 +74,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     }
 
     setTimeout(() => {
-      API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
+      API.post("actions/roll", { context })
         .then(function (response) {
           if (socketService && gameInfo) {
             if (response.data.needToAnimate) {
@@ -164,10 +163,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
             {getGameResultsDisplayComp()}
           </div>
 
-          <div>
+          {/*
+<div>
             <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
             <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
           </div>
+ */}
+
 
           <div className="player-actions">
             <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel} socketService={socketService}

@@ -20,9 +20,9 @@ export const roll = async (req: Request, res: Response) => {
 
   const processor = new RollProcessor(
     gameId,
-    userId,
-    req.body.forceDie1,
-    req.body.forceDie2
+    userId
+    //req.body.forceDie1,
+    //req.body.forceDie2
   );
 
   const errMsg = await processor.roll();
@@ -52,7 +52,7 @@ export const travel = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const squareId: number = parseInt(req.body.squareId);
 
-  const processor = new RollProcessor(gameId, userId, null, null);
+  const processor = new RollProcessor(gameId, userId);
   const errMsg = await processor.travel(squareId);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
@@ -74,7 +74,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   }
 
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
-  const processor = new RollProcessor(gameId, userId, null, null);
+  const processor = new RollProcessor(gameId, userId);
 
   const errMsg = await processor.completeMyTurn();
   if (errMsg && errMsg.length > 0) {
@@ -177,7 +177,7 @@ export const getOut = async (req: Request, res: Response) => {
   }
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
 
-  const processor = new RollProcessor(gameId, userId, null, null);
+  const processor = new RollProcessor(gameId, userId);
   const errMsg = await processor.payToGetOut();
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);

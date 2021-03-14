@@ -166,7 +166,7 @@ export class PlayerProcessor {
     );
     if (ud) {
       if (game.status === GameStatus.ACTIVE) {
-        ud.losses++;
+        ud.wins++;
       }
       await ud.save();
     }
