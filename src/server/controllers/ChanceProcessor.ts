@@ -48,47 +48,22 @@ export class ChanceProcessor {
   private initChanceEvents() {
     this.events.push({
       isGood: false,
-      headline: "Got a toothace",
-      subLine: "Pay dentist $50",
+      headline: "Dentist appointment",
+      subLine: "You don't have insurance, pay dentist <b>$150</b>",
       chanceId: 1,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
-        player.money -= 50;
+        player.money -= 150;
         return false;
       },
     });
 
     this.events.push({
-      isGood: true,
-      headline: "Sell stocks",
-      subLine: "Get $75",
+      isGood: false,
+      headline: "Flat tire",
+      subLine: "You hit a pothole. Pay <b>$120</b> to have tire replaced",
       chanceId: 2,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
-        player.money += 75;
-        return false;
-      },
-    });
-
-    this.events.push({
-      isGood: true,
-      headline: "It's your birthday!",
-      subLine: "Every active player gives you a $30 gift card",
-      chanceId: 3,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
-        const activePlayers = game.players.filter(
-          (p) =>
-            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
-        );
-
-        let total = 0;
-        for (const p of activePlayers) {
-          p.money -= 30;
-          total += 30;
-
-          PlayerCostsCalculator.updatePlayerCosts(game, p);
-        }
-
-        player.money += Math.round(total);
-        PlayerCostsCalculator.updatePlayerCosts(game, player);
+        player.money -= 120;
         return false;
       },
     });
@@ -96,8 +71,8 @@ export class ChanceProcessor {
     this.events.push({
       isGood: false,
       headline: "Pay off your debts",
-      subLine: "Pay each active player $30",
-      chanceId: 4,
+      subLine: "Pay each active player <b>$30</b>",
+      chanceId: 3,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const activePlayers = game.players.filter(
           (p) =>
@@ -122,8 +97,8 @@ export class ChanceProcessor {
       isGood: false,
       headline: "Building repairs",
       subLine:
-        "Your buildings have fallen into disrepair.  Pay $40 per building",
-      chanceId: 5,
+        "Your buildings have fallen into disrepair.  Pay <b>$40 per building</b>",
+      chanceId: 4,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
@@ -148,11 +123,61 @@ export class ChanceProcessor {
     });
 
     this.events.push({
+      isGood: false,
+      headline: "Late credit card payment",
+      subLine: "Pay the bank <b>10% of your money</b> in interest",
+      chanceId: 5,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        const subtraction = Math.round(player.money * 0.1);
+        player.money -= subtraction;
+        return false;
+      },
+    });
+
+    //GOOD ONES
+
+    this.events.push({
+      isGood: true,
+      headline: "Options trading",
+      subLine: "You shorted the market and made <b>$100</b> profit",
+      chanceId: 20,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        player.money += 100;
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "It's your birthday!",
+      subLine: "Every active player gives you a $30 gift card",
+      chanceId: 21,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        const activePlayers = game.players.filter(
+          (p) =>
+            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
+        );
+
+        let total = 0;
+        for (const p of activePlayers) {
+          p.money -= 30;
+          total += 30;
+
+          PlayerCostsCalculator.updatePlayerCosts(game, p);
+        }
+
+        player.money += Math.round(total);
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
+      },
+    });
+
+    this.events.push({
       isGood: true,
       headline: "Tax refund!",
       subLine:
         "The city has made an error and your properties have been overtaxed.  <br> Get a refund of $45 for each unmortgaged taxable property you own",
-      chanceId: 6,
+      chanceId: 22,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
@@ -175,6 +200,28 @@ export class ChanceProcessor {
 
         player.money += total;
         PlayerCostsCalculator.updatePlayerCosts(game, player);
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Take a college course",
+      subLine: "Gain a skill point",
+      chanceId: 23,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        player.numAbilityPoints += 1;
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Stimulus check",
+      subLine: "Recieve a $200 handout",
+      chanceId: 24,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        player.money += 200;
         return false;
       },
     });
