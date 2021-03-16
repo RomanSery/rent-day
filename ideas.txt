@@ -1,4 +1,41 @@
-look for //TODO and remove
-
-think of a better way to highlight on the board who owns what
 use dev.io article to try to handle tablet view
+
+POST LAUNCH
+add password option to games
+turn timer, autction timer, lotto timer
+
+
+
+  private static assignSquareTesting(
+    game: GameInstanceDocument,
+    owner: Player,
+    squareId: number,
+    purchasePrice: number
+  ): void {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (
+      !squareConfig ||
+      (squareConfig.type !== SquareType.Property &&
+        squareConfig.type !== SquareType.TrainStation &&
+        squareConfig.type !== SquareType.Utility)
+    ) {
+      return;
+    }
+
+    const state: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+    if (state && state.owner) {
+      return;
+    }
+
+    if (state) {
+      state.mortgageValue = MoneyCalculator.getMortgageValue(
+        purchasePrice,
+        squareConfig.type
+      );
+      state.purchasePrice = purchasePrice;
+      state.color = owner.color!;
+      state.owner = owner._id!;
+    }
+  }

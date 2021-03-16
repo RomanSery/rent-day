@@ -14,3 +14,21 @@ export const payToGetOutFee: number = 100;
 export const luckAdjustment: number = 2;
 export const negotiationAdjustment: number = 3;
 export const corruptionAdjustment: number = 3;
+
+export const player_colors = [
+  "#0014f3", //blue
+  "#138005", //green
+  "#17cbc9", //violat
+  "#bd0aef", //purple
+  "#c50c0c", //red
+  "#d47205", //orange
+];
+
+export const player_colors_to_rgb = new Map<string, string>([
+  ["#0014f3", "rgba(0, 20, 243, 0.4)"],
+  ["#138005", "rgba(19, 128, 5, 0.4)"],
+  ["#17cbc9", "rgba(23, 203, 201, 0.4)"],
+  ["#bd0aef", "rgba(189, 10, 239, 0.4)"],
+  ["#c50c0c", "rgba(197, 12, 12, 0.4)"],
+  ["#d47205", "rgba(212, 114, 5, 0.4)"],
+]);

@@ -5,6 +5,8 @@ import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { areObjectIdsEqual } from "../helpers";
+import { player_colors_to_rgb } from "../../core/constants";
 
 interface Props {
   id: number;
@@ -34,7 +36,11 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
 
 
   const getSquareClassName = () => {
-    return "square " + squareTypeClass.get(squareType) + (isMortgaged() ? " mortgaged" : "");
+    const css = "square " + squareTypeClass.get(squareType);
+    if (isMortgaged()) {
+      return css + " mortgaged";
+    }
+    return css;
   };
 
   const getSquareId = () => {
@@ -60,10 +66,29 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
     return data && data.isMortgaged ? true : false;
   };
 
+  const isOwned = (): boolean => {
+    const data = getSquareGameData();
+    return data && data.owner ? true : false;
+  };
+
+  const getOwnedStyle = (): React.CSSProperties => {
+    if (isOwned() && gameInfo) {
+      const data = getSquareGameData();
+      if (data) {
+        const owner = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+        if (owner) {
+          const fromColor = player_colors_to_rgb.get(owner.color);
+          return { background: "linear-gradient(to bottom, " + fromColor + ", rgba(255, 0, 0, 0))" };
+        }
+
+      }
+    }
+    return {};
+  };
 
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} id={getSquareId()} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
+      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
 
         <div className={getContainerClassName()}>
           <SquareInfo id={id} gameInfo={gameInfo} />

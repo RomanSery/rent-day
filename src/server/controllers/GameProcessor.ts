@@ -17,12 +17,14 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
-import { defaultElectricityCostPerHouse } from "../../core/constants";
+import {
+  defaultElectricityCostPerHouse,
+  player_colors,
+} from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
-import { SquareType } from "../../core/enums/SquareType";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
 
@@ -75,33 +77,6 @@ export class GameProcessor {
 
     await newGame.save();
 
-    //TODO just for testing
-    /*
-    this.joinGame(
-      new mongoose.Types.ObjectId(newGame._id),
-      new mongoose.Types.ObjectId("60313a409a646b2808c7a059"),
-      PieceType.Hat,
-      PlayerClass.Banker
-    );
-    this.joinGame(
-      new mongoose.Types.ObjectId(newGame._id),
-      new mongoose.Types.ObjectId("60313a539a646b2808c7a05a"),
-      PieceType.Dog,
-      PlayerClass.Banker
-    );
-    this.joinGame(
-      new mongoose.Types.ObjectId(newGame._id),
-      new mongoose.Types.ObjectId("60313a5d9a646b2808c7a05b"),
-      PieceType.Cat,
-      PlayerClass.Banker
-    );
-    this.joinGame(
-      new mongoose.Types.ObjectId(newGame._id),
-      new mongoose.Types.ObjectId("603166629a646b2808c7a05c"),
-      PieceType.Pawn,
-      PlayerClass.Banker
-    );
-*/
     return newGame.id;
   }
 
@@ -171,19 +146,10 @@ export class GameProcessor {
   private initGame(game: GameInstanceDocument): void {
     game.players = _.shuffle(game.players);
 
-    const colors = [
-      "#0014f3", //blue
-      "#138005", //green
-      "#17cbc9", //violat
-      "#bd0aef", //purple
-      "#c50c0c", //red
-      "#d47205", //orange
-    ];
-
     game.players.forEach(async (p, index) => {
       p.money = Math.round(game.settings.initialMoney);
       p.position = 1;
-      p.color = colors[index];
+      p.color = player_colors[index];
       p.state = PlayerState.ACTIVE;
       p.hasRolled = false;
 
@@ -192,68 +158,6 @@ export class GameProcessor {
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
-
-    //TODO just for testing
-    /*
-    GameProcessor.assignSquareTesting(game, game.players[0], 2, 150);
-    GameProcessor.assignSquareTesting(game, game.players[0], 4, 200);
-    GameProcessor.assignSquareTesting(game, game.players[0], 7, 500);
-    GameProcessor.assignSquareTesting(game, game.players[0], 9, 400);
-    GameProcessor.assignSquareTesting(game, game.players[0], 10, 256);
-    GameProcessor.assignSquareTesting(game, game.players[0], 6, 328);
-    GameProcessor.assignSquareTesting(game, game.players[0], 16, 180);
-    GameProcessor.assignSquareTesting(game, game.players[0], 18, 480);
-    GameProcessor.assignSquareTesting(game, game.players[0], 26, 480);
-    GameProcessor.assignSquareTesting(game, game.players[0], 36, 480);
-
-    GameProcessor.assignSquareTesting(game, game.players[1], 5, 300);
-    GameProcessor.assignSquareTesting(game, game.players[1], 17, 600);
-    GameProcessor.assignSquareTesting(game, game.players[1], 19, 89);
-    GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
-    GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
-*/
-
-    for (let id = 1; id <= 38; id++) {
-      GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
-    }
-
-    game.players.forEach(async (p, index) => {
-      PlayerCostsCalculator.updatePlayerCosts(game, p);
-    });
-  }
-
-  private static assignSquareTesting(
-    game: GameInstanceDocument,
-    owner: Player,
-    squareId: number,
-    purchasePrice: number
-  ): void {
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    if (
-      !squareConfig ||
-      (squareConfig.type !== SquareType.Property &&
-        squareConfig.type !== SquareType.TrainStation &&
-        squareConfig.type !== SquareType.Utility)
-    ) {
-      return;
-    }
-
-    const state: SquareGameData | undefined = game.squareState.find(
-      (p: SquareGameData) => p.squareId === squareId
-    );
-    if (state && state.owner) {
-      return;
-    }
-
-    if (state) {
-      state.mortgageValue = MoneyCalculator.getMortgageValue(
-        purchasePrice,
-        squareConfig.type
-      );
-      state.purchasePrice = purchasePrice;
-      state.color = owner.color!;
-      state.owner = owner._id!;
-    }
   }
 
   public async getJoinGameErrMsg(
