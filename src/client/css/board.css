@@ -1,10 +1,17 @@
+
+
 .board {
   display: grid;
   justify-content: center;
   align-content: center;
+  height: 100%;
 
   grid-template-columns: 11vw repeat(9, 8.5vw) 11vw;
   grid-template-rows: 11vh repeat(9, 8.5vh) 11vh;
+}
+
+#root {  
+  height: 100%;
 }
 
 .square {
