@@ -1,10 +1,23 @@
-use dev.io article to try to handle tablet view
+make done button animate and pulsate to emphasize
+in game board, show modal for help text for player classes
+i have con ed, and built houses, but it still says i have electricity costs per turn. (maybe just a display bug)
+i cant trade coned, maybe mTA too
+
+
+maybe if you are in jail, you dont have to pay taxes & electricity
+game over modal takes up whole screen so cant see what happened
+my win count didnt update
+
+on the create user page, cient-side validations dont show.  (more than 10 character username for example)
+
+
 
 POST LAUNCH
 add password option to games
 turn timer, autction timer, lotto timer
 
 
+git push dokku prod
 
   private static assignSquareTesting(
     game: GameInstanceDocument,
