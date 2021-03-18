@@ -44,6 +44,7 @@ export class PlayerCostsCalculator {
       player.electricityTooltip =
         "You own ConEd, so you don't have to pay for electricity";
       player.electricityCostsPerTurn = 0;
+      return;
     }
 
     const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(

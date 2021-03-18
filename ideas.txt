@@ -1,5 +1,4 @@
 in game board, show modal for help text for player classes
-i have con ed, and built houses, but it still says i have electricity costs per turn. (maybe just a display bug)
 
 maybe if you are in jail, you dont have to pay taxes & electricity
 game over modal takes up whole screen so cant see what happened
