@@ -24,6 +24,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
+import { SquareType } from "../../core/enums/SquareType";
 
 
 interface Props {
@@ -67,8 +68,20 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
 
     const properties: SquareGameData[] = gameInfo.squareState.filter((s: SquareGameData) => {
       const squareConfig = SquareConfigDataMap.get(s.squareId);
-      return s.owner && areObjectIdsEqual(s.owner, playerId) && s.numHouses === 0 &&
-        squareConfig && squareConfig.groupId && !doesGroupHaveAnyHouses(squareConfig.groupId);
+      if (squareConfig) {
+        const type = squareConfig.type;
+        const isTradeable = type === SquareType.Property || type === SquareType.TrainStation || type === SquareType.Utility;
+        if (!isTradeable) {
+          return false;
+        }
+
+        if (squareConfig.groupId) {
+          return s.owner && areObjectIdsEqual(s.owner, playerId) && s.numHouses === 0 && squareConfig.groupId && !doesGroupHaveAnyHouses(squareConfig.groupId);
+        } else {
+          return s.owner && areObjectIdsEqual(s.owner, playerId);
+        }
+      }
+      return false;
     });
 
     return properties.map(function (p) {

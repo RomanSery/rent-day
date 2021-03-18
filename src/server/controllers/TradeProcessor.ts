@@ -121,7 +121,11 @@ export class TradeProcessor {
       }
 
       const squareConfig = SquareConfigDataMap.get(squareId);
-      if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
+      if (
+        squareConfig &&
+        squareConfig.groupId &&
+        doesGroupHaveAnyHouses(this.game, squareConfig.groupId)
+      ) {
         return "You cant trade a property that belongs to a group with houses. Sell them first";
       }
     }
@@ -142,7 +146,11 @@ export class TradeProcessor {
       }
 
       const squareConfig = SquareConfigDataMap.get(squareId);
-      if (doesGroupHaveAnyHouses(this.game, squareConfig!.groupId!)) {
+      if (
+        squareConfig &&
+        squareConfig.groupId &&
+        doesGroupHaveAnyHouses(this.game, squareConfig.groupId)
+      ) {
         return "They cant trade a property that belongs to a group with houses. Sell them first";
       }
     }
@@ -274,7 +282,11 @@ export class TradeProcessor {
       }
 
       const squareConfig = SquareConfigDataMap.get(squareId);
-      if (doesGroupHaveAnyHouses(game, squareConfig!.groupId!)) {
+      if (
+        squareConfig &&
+        squareConfig.groupId &&
+        doesGroupHaveAnyHouses(game, squareConfig.groupId)
+      ) {
         return "You cant trade a property that belongs to a group with houses. Sell them first";
       }
     }
@@ -294,7 +306,11 @@ export class TradeProcessor {
       }
 
       const squareConfig = SquareConfigDataMap.get(squareId);
-      if (doesGroupHaveAnyHouses(game, squareConfig!.groupId!)) {
+      if (
+        squareConfig &&
+        squareConfig.groupId &&
+        doesGroupHaveAnyHouses(game, squareConfig.groupId)
+      ) {
         return "They cant trade a property that belongs to a group with houses. Sell them first";
       }
     }
