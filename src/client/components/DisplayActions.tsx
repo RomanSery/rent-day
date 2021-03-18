@@ -14,6 +14,7 @@ import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain, faPercentage
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
+import { motion } from "framer-motion";
 
 
 interface Props {
@@ -170,14 +171,42 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     setTaxesViewOpen(true);
   };
 
+  const getRollBtn = () => {
+    if (canRoll() && !rollBtnHidden) {
+      return (
+        <motion.div animate={{ scale: 1.1 }} transition={{
+          duration: 1.0,
+          loop: Infinity,
+          repeatDelay: 0
+        }}>
+          <Button variant="contained" color="primary" onClick={onClickRoll}
+            startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
+        </motion.div>
+      );
+    }
+    return null;
+  };
+
+  const getCompleteTurnBtn = () => {
+    if (canCompleteTurn()) {
+      return (
+        <motion.div animate={{ scale: 1.1 }} transition={{
+          duration: 1.0,
+          loop: Infinity,
+          repeatDelay: 0
+        }}>
+          <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
+        </motion.div>
+      );
+    }
+    return null;
+  };
+
   const getMyActions = () => {
     if (isMyTurn()) {
       return (
         <React.Fragment>
-          {canRoll() && !rollBtnHidden ?
-            <Button variant="contained" color="primary" onClick={onClickRoll}
-              startIcon={<FontAwesomeIcon icon={faDice} />}>Roll</Button>
-            : null}
+          {getRollBtn()}
 
           {canTravel() ?
             <Button variant="contained" color="primary" onClick={onClickTravel}
@@ -188,9 +217,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
             <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
             : null}
 
-          {canCompleteTurn() ?
-            <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>
-            : null}
+          {getCompleteTurnBtn()}
 
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>

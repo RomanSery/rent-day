@@ -1,4 +1,3 @@
-make done button animate and pulsate to emphasize
 in game board, show modal for help text for player classes
 i have con ed, and built houses, but it still says i have electricity costs per turn. (maybe just a display bug)
 i cant trade coned, maybe mTA too
