@@ -14,15 +14,14 @@ import { UserInstance } from "../../core/schema/UserSchema";
 import { PlayerInfo } from "../../core/types/PlayerInfo";
 
 export const createGame = async (req: Request, res: Response) => {
-  await check("data.gameName", "Name missing")
+  await check("data.gameName", "Game name is missing/invalid")
     .notEmpty()
-    .isAlpha("en-US", { ignore: " " })
     .run(req);
   await check("data.maxPlayers", "# of players missing")
     .notEmpty()
     .isNumeric()
     .run(req);
-  await check("data.initialMoney", "InitialMoney is not valid")
+  await check("data.initialMoney", "Starting amount is not valid")
     .notEmpty()
     .isNumeric()
     .run(req);

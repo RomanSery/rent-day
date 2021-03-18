@@ -217,7 +217,11 @@ export const handleApiError = (error: any) => {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
     if (error.response.data) {
-      alert(error.response.data);
+      if (error.response.data.errors && error.response.data.errors.length > 0) {
+        alert(error.response.data.errors[0].msg);
+      } else {
+        alert(error.response.data);
+      }
     }
   } else if (error.request) {
     // The request was made but no response was received

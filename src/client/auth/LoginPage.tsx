@@ -4,7 +4,7 @@ import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import { useHistory } from "react-router-dom";
 import { handleApiError, setCurrSessionInfo } from "../helpers";
-
+import _ from "lodash/fp";
 
 interface Props {
 
@@ -18,7 +18,7 @@ type Inputs = {
 export const LoginPage: React.FC<Props> = () => {
 
   const history = useHistory();
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, errors } = useForm<Inputs>();
 
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -49,9 +49,15 @@ export const LoginPage: React.FC<Props> = () => {
 
         <TextField label="Email" fullWidth={true} name="username" id="username" required={true}
           inputRef={register({ required: true })} />
+        {_.get("username.type", errors) === "required" && (
+          <p className="field-error">Email is required</p>
+        )}
 
         <TextField label="Password" type="password" fullWidth={true} name="password" id="password" required={true}
           inputRef={register({ required: true })} />
+        {_.get("password.type", errors) === "required" && (
+          <p className="field-error">Password is required</p>
+        )}
 
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Log In</Button>

@@ -17,6 +17,7 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
 import { getPlayerClassDescription } from "../uiHelpers";
 import queryString from "query-string";
+import _ from "lodash/fp";
 
 interface Props {
   socketService: SocketService;
@@ -45,7 +46,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [pings, setPings] = useState<LatencyInfoMsg[]>();
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
-  const { register, handleSubmit } = useForm<Inputs>();
+  const { register, handleSubmit, errors } = useForm<Inputs>();
 
 
 
@@ -202,6 +203,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                 <option value="Dog">Dog</option>
               </NativeSelect>
             </FormControl>
+            {_.get("piece.type", errors) === "required" && (
+              <p className="field-error">Piece Type is required</p>
+            )}
 
             <FormControl fullWidth >
               <InputLabel htmlFor="class-type">Class Type</InputLabel>
@@ -213,6 +217,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                 <option value="Governor">Governor</option>
               </NativeSelect>
             </FormControl>
+            {_.get("playerClass.type", errors) === "required" && (
+              <p className="field-error">Class Type is required</p>
+            )}
 
             <br />
 

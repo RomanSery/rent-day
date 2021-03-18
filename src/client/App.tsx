@@ -45,6 +45,12 @@ export const App: React.FC = () => {
     if (location && location.pathname === "/help") {
       return;
     }
+    if (location && location.pathname === "/newuser") {
+      return;
+    }
+    if (location && location.pathname === "/login") {
+      return;
+    }
 
 
     API.post("current-session")
