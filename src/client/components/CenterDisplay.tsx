@@ -76,7 +76,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
     }
 
     setTimeout(() => {
-      API.post("actions/roll", { context })
+      API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
           if (socketService && gameInfo) {
             if (response.data.needToAnimate) {

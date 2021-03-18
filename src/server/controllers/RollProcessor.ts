@@ -45,7 +45,7 @@ export class RollProcessor {
 
   constructor(
     gameId: mongoose.Types.ObjectId,
-    userId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId,
     forceDie1: number | null,
     forceDie2: number | null
   ) {
@@ -362,7 +362,7 @@ export class RollProcessor {
     }
 
     const newRoll = new DiceRoll();
-    
+
     if (this.forceDie1 && this.forceDie2) {
       newRoll.die1 = this.forceDie1;
       newRoll.die2 = this.forceDie2;
