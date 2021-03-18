@@ -23,6 +23,8 @@ import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
+import { TextField } from "@material-ui/core";
+
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -39,8 +41,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
   const [playerToView, setPlayerToView] = useState<String | undefined>(undefined);
 
-  //const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
-  //const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
+  const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
+  const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
 
   const [offerTradeOpen, setOfferTradeOpen] = useState(false);
   const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
@@ -163,12 +165,12 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
             {getGameResultsDisplayComp()}
           </div>
 
-          {/*
-<div>
+
+          <div>
             <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
             <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
           </div>
- */}
+
 
 
           <div className="player-actions">

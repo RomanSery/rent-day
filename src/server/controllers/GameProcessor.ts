@@ -27,6 +27,7 @@ import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
+import { SquareType } from "../../core/enums/SquareType";
 
 export class GameProcessor {
   public async createGame(
@@ -158,6 +159,68 @@ export class GameProcessor {
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
+
+    //TODO just for testing
+    /*
+    GameProcessor.assignSquareTesting(game, game.players[0], 2, 150);
+    GameProcessor.assignSquareTesting(game, game.players[0], 4, 200);
+    GameProcessor.assignSquareTesting(game, game.players[0], 7, 500);
+    GameProcessor.assignSquareTesting(game, game.players[0], 9, 400);
+    GameProcessor.assignSquareTesting(game, game.players[0], 10, 256);
+    GameProcessor.assignSquareTesting(game, game.players[0], 6, 328);
+    GameProcessor.assignSquareTesting(game, game.players[0], 16, 180);
+    GameProcessor.assignSquareTesting(game, game.players[0], 18, 480);
+    GameProcessor.assignSquareTesting(game, game.players[0], 26, 480);
+    GameProcessor.assignSquareTesting(game, game.players[0], 36, 480);
+
+    GameProcessor.assignSquareTesting(game, game.players[1], 5, 300);
+    GameProcessor.assignSquareTesting(game, game.players[1], 17, 600);
+    GameProcessor.assignSquareTesting(game, game.players[1], 19, 89);
+    GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
+    GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
+*/
+
+    for (let id = 1; id <= 38; id++) {
+      GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+    }
+
+    game.players.forEach(async (p, index) => {
+      PlayerCostsCalculator.updatePlayerCosts(game, p);
+    });
+  }
+
+  private static assignSquareTesting(
+    game: GameInstanceDocument,
+    owner: Player,
+    squareId: number,
+    purchasePrice: number
+  ): void {
+    const squareConfig = SquareConfigDataMap.get(squareId);
+    if (
+      !squareConfig ||
+      (squareConfig.type !== SquareType.Property &&
+        squareConfig.type !== SquareType.TrainStation &&
+        squareConfig.type !== SquareType.Utility)
+    ) {
+      return;
+    }
+
+    const state: SquareGameData | undefined = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+    if (state && state.owner) {
+      return;
+    }
+
+    if (state) {
+      state.mortgageValue = MoneyCalculator.getMortgageValue(
+        purchasePrice,
+        squareConfig.type
+      );
+      state.purchasePrice = purchasePrice;
+      state.color = owner.color!;
+      state.owner = owner._id!;
+    }
   }
 
   public async getJoinGameErrMsg(

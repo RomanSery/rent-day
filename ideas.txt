@@ -3,7 +3,6 @@ in game board, show modal for help text for player classes
 i have con ed, and built houses, but it still says i have electricity costs per turn. (maybe just a display bug)
 i cant trade coned, maybe mTA too
 
-
 maybe if you are in jail, you dont have to pay taxes & electricity
 game over modal takes up whole screen so cant see what happened
 my win count didnt update
@@ -12,7 +11,7 @@ my win count didnt update
 POST LAUNCH
 add password option to games
 turn timer, autction timer, lotto timer
-add sanitize input checks
+add sanitize input checks https://express-validator.github.io/docs/sanitization.html
 
 
 git push dokku prod
