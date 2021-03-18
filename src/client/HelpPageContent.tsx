@@ -77,6 +77,8 @@ export const HelpPageContent: React.FC<Props> = () => {
       <p>
         The amount of tax due is calculated as the <b>purchase price * the tax rate.</b>  Player
         classes and skills can effect the amount of taxes you owe.
+        <br />
+        <b>Property taxes are collected at the start of your turn.</b>
       </p>
       <p>
         Pay special attention to the purchase price of properties, if you later acquire a property thru trade, you might be stuck with a hefty tax bill.
@@ -89,6 +91,8 @@ export const HelpPageContent: React.FC<Props> = () => {
         In addition to property taxes, if you've built any houses on your properties you must pay electricity costs.
         <br />
         This is calculated at a constant <b>$2 per house per turn</b>.
+        <br />
+        <b>Electricity costs are collected at the start of your turn.</b>
       </p>
 
       <hr />
