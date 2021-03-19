@@ -367,9 +367,14 @@ export class RollProcessor {
 
     const newRoll = new DiceRoll();
 
+    /*
     if (this.forceDie1 && this.forceDie2) {
       newRoll.die1 = this.forceDie1;
       newRoll.die2 = this.forceDie2;
+    }
+    */
+    if (this.forceDie1 || this.forceDie2) {
+      console.log("WARNING: using forceDie");
     }
 
     //insert latest roll into the beginning of array
