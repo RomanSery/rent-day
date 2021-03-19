@@ -8,4 +8,4 @@ turn timer, autction timer, lotto timer
 add sanitize input checks https://express-validator.github.io/docs/sanitization.html
 
 
-git push dokku prod
+git push dokku master
