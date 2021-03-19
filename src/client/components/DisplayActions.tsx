@@ -10,11 +10,12 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain, faPercentage } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain, faPercentage, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { motion } from "framer-motion";
+import { HelpDialog } from "../dialogs/HelpDialog";
 
 
 interface Props {
@@ -31,6 +32,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const history = useHistory();
   const [statsViewOpen, setStatsViewOpen] = React.useState(false);
   const [taxesViewOpen, setTaxesViewOpen] = React.useState(false);
+  const [helpOpen, setHelpOpen] = React.useState(false);
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
 
 
@@ -171,6 +173,10 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     setTaxesViewOpen(true);
   };
 
+  const onViewHelp = async () => {
+    setHelpOpen(true);
+  };
+
   const getRollBtn = () => {
     if (canRoll() && !rollBtnHidden) {
       return (
@@ -221,6 +227,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
           <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
+          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faQuestion} />} onClick={onViewHelp}></Button>
           <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
             onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
         </React.Fragment>
@@ -231,6 +238,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       <React.Fragment>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
         <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
+        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faQuestion} />} onClick={onViewHelp}></Button>
       </React.Fragment>
     );
   }
@@ -238,6 +246,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   return (
     <React.Fragment>
       {getMyActions()}
+
+      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)}
+      />
 
       <StatsDialog tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo}
         open={statsViewOpen} onClose={() => setStatsViewOpen(false)}

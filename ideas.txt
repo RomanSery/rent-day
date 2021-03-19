@@ -1,4 +1,3 @@
-in game board, show modal for help text for player classes
 when landing on train station and rolling a double, cant travel
 
 maybe if you are in jail, you dont have to pay taxes & electricity
