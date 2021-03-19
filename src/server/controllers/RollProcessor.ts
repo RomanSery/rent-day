@@ -316,6 +316,10 @@ export class RollProcessor {
       } else if (!gotOutOfIsolation) {
         this.rollDesc += " <br /> rolled a double so go again";
       }
+
+      if (lastRoll.isDouble()) {
+        this.player.hasTraveled = false;
+      }
     }
 
     this.setMovementKeyFrames(landedOnGoToIsolation, rolledThreeDouibles);

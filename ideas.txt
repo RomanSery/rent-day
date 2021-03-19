@@ -1,6 +1,3 @@
-when landing on train station and rolling a double, cant travel
-
-
 POST LAUNCH
 add password option to games
 make electricity costs per group
