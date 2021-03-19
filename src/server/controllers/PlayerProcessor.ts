@@ -152,7 +152,6 @@ export class PlayerProcessor {
   }
 
   public static async updateWins(
-    game: GameInstanceDocument,
     userId: mongoose.Types.ObjectId
   ): Promise<void> {
     const ud: UserDocument | null = await UserInstance.findById(
@@ -165,9 +164,7 @@ export class PlayerProcessor {
       }
     );
     if (ud) {
-      if (game.status === GameStatus.ACTIVE) {
-        ud.wins++;
-      }
+      ud.wins++;
       await ud.save();
     }
   }

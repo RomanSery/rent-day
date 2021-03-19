@@ -1,9 +1,5 @@
 when landing on train station and rolling a double, cant travel
 
-maybe if you are in jail, you dont have to pay taxes & electricity
-game over modal takes up whole screen so cant see what happened
-my win count didnt update
-
 
 POST LAUNCH
 add password option to games

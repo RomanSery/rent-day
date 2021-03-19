@@ -405,6 +405,8 @@ export const getHelpContent = (): JSX.Element => {
             classes and skills can effect the amount of taxes you owe.
             <br />
         <b>Property taxes are collected at the start of your turn.</b>
+        <br />
+        <b>You don't have to pay while you are in quarantine.</b>
       </p>
       <p>
         Pay special attention to the purchase price of properties, if you later acquire a property thru trade, you might be stuck with a hefty tax bill.
@@ -419,6 +421,8 @@ export const getHelpContent = (): JSX.Element => {
             This is calculated at a constant <b>$2 per house per turn</b>.
             <br />
         <b>Electricity costs are collected at the start of your turn.</b>
+        <br />
+        <b>You don't have to pay while you are in quarantine.</b>
       </p>
 
       <hr />
