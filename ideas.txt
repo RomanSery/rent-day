@@ -3,6 +3,7 @@ when landing on train station and rolling a double, cant travel
 
 POST LAUNCH
 add password option to games
+make electricity costs per group
 turn timer, autction timer, lotto timer
 add sanitize input checks https://express-validator.github.io/docs/sanitization.html
 
