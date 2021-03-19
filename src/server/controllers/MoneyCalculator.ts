@@ -14,6 +14,7 @@ import { mta_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 import { GameProcessor } from "./GameProcessor";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -23,8 +24,10 @@ export class MoneyCalculator {
   }
 
   public static subtractElectricityAndTaxes(player: Player): void {
-    const total = player.electricityCostsPerTurn + player.taxesPerTurn;
-    player.money -= total;
+    if (player.state === PlayerState.ACTIVE) {
+      const total = player.electricityCostsPerTurn + player.taxesPerTurn;
+      player.money -= total;
+    }
   }
 
   public static getMortgageValue(

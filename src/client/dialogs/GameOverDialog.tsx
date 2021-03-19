@@ -82,7 +82,7 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
   }
 
   return (
-    <Dialog fullWidth={true} maxWidth="xl" disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="game-over-dialog-title" open={open}>
+    <Dialog maxWidth="md" disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="game-over-dialog-title" open={open}>
       <DialogTitle id="game-over-dialog-title">Game Over</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>

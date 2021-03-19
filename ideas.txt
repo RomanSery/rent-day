@@ -12,37 +12,3 @@ add sanitize input checks https://express-validator.github.io/docs/sanitization.
 
 
 git push dokku prod
-
-  private static assignSquareTesting(
-    game: GameInstanceDocument,
-    owner: Player,
-    squareId: number,
-    purchasePrice: number
-  ): void {
-    const squareConfig = SquareConfigDataMap.get(squareId);
-    if (
-      !squareConfig ||
-      (squareConfig.type !== SquareType.Property &&
-        squareConfig.type !== SquareType.TrainStation &&
-        squareConfig.type !== SquareType.Utility)
-    ) {
-      return;
-    }
-
-    const state: SquareGameData | undefined = game.squareState.find(
-      (p: SquareGameData) => p.squareId === squareId
-    );
-    if (state && state.owner) {
-      return;
-    }
-
-    if (state) {
-      state.mortgageValue = MoneyCalculator.getMortgageValue(
-        purchasePrice,
-        squareConfig.type
-      );
-      state.purchasePrice = purchasePrice;
-      state.color = owner.color!;
-      state.owner = owner._id!;
-    }
-  }
