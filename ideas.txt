@@ -1,5 +1,4 @@
 POST LAUNCH
-add password option to games
 somehow delete games you created that are still in joining phase
 make electricity costs per group
 turn timer, autction timer, lotto timer

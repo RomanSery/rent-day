@@ -27,6 +27,7 @@ import { SkillSettings } from "../../core/types/SkillSettings";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
+import bcrypt from "bcrypt-nodejs";
 //import { SquareType } from "../../core/enums/SquareType";
 
 export class GameProcessor {
@@ -78,6 +79,14 @@ export class GameProcessor {
       createdBy: userId,
     });
 
+    if (password && password.length > 0) {
+      bcrypt.genSalt(2, (err, salt) => {
+        bcrypt.hash(password, salt, null, (err: mongoose.Error, hash) => {
+          newGame.settings.password = hash;
+        });
+      });
+    }
+
     await newGame.save();
 
     return newGame.id;
@@ -87,9 +96,15 @@ export class GameProcessor {
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
     selectedPiece: PieceType,
-    selectedPlayerClass: PlayerClass
+    selectedPlayerClass: PlayerClass,
+    gamePwd: string | null
   ): Promise<JoinResult | null> {
-    const errMsg = await this.getJoinGameErrMsg(gameId, userId, selectedPiece);
+    const errMsg = await this.getJoinGameErrMsg(
+      gameId,
+      userId,
+      selectedPiece,
+      gamePwd
+    );
     if (errMsg) {
       console.log("join error - %s", errMsg);
       return null;
@@ -231,7 +246,8 @@ export class GameProcessor {
   public async getJoinGameErrMsg(
     gameId: mongoose.Types.ObjectId,
     userId: mongoose.Types.ObjectId,
-    selectedPiece: PieceType
+    selectedPiece: PieceType,
+    gamePwd: string | null
   ): Promise<string> {
     const game: GameInstanceDocument | null = await GameInstance.findById(
       gameId
@@ -251,6 +267,17 @@ export class GameProcessor {
 
     if (_.some(game.players, { _id: userId })) {
       return "This user has already joined this game";
+    }
+
+    if (game.settings.password && game.settings.password.length > 0) {
+      if (!gamePwd || gamePwd.length === 0) {
+        return "Invalid Password";
+      }
+
+      const isMatch = bcrypt.compareSync(gamePwd, game.settings.password);
+      if (!isMatch) {
+        return "Invalid Password";
+      }
     }
 
     return "";

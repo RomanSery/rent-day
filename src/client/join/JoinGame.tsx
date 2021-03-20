@@ -9,7 +9,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { Button, Chip, Container, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@material-ui/core";
+import { Button, Chip, Container, TextField, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@material-ui/core";
 import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
@@ -26,6 +26,7 @@ interface Props {
 type Inputs = {
   piece: PieceType;
   playerClass: PlayerClass;
+  gamePwd: string | null;
 };
 
 export const JoinGame: React.FC<Props> = ({ socketService }) => {
@@ -103,7 +104,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
-    API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass })
+    API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass, gamePwd: data.gamePwd })
       .then(function (response) {
         if (socketService) {
           socketService.socket.emit(GameEvent.JOINED_GAME, {
@@ -220,6 +221,15 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             {_.get("playerClass.type", errors) === "required" && (
               <p className="field-error">Class Type is required</p>
             )}
+
+            {gameState && gameState.settings && gameState.settings.password &&
+              <FormControl fullWidth >
+                <TextField id="gamePwd" name="gamePwd" required={true} fullWidth={true} label="Password"
+                  inputRef={register({ required: true })} />
+
+              </FormControl>
+            }
+
 
             <br />
 

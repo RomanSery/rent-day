@@ -160,9 +160,15 @@ export const joinGame = async (req: Request, res: Response) => {
   const selectedPlayerClass: PlayerClass = _.trim(
     req.body.playerClass
   ) as PlayerClass;
+  const gamePwd = req.body.gamePwd;
 
   const join = new GameProcessor();
-  const errMsg = await join.getJoinGameErrMsg(gameId, userId, selectedPiece);
+  const errMsg = await join.getJoinGameErrMsg(
+    gameId,
+    userId,
+    selectedPiece,
+    gamePwd
+  );
   if (errMsg) {
     return res.status(400).send(errMsg);
   }
@@ -171,7 +177,8 @@ export const joinGame = async (req: Request, res: Response) => {
     gameId,
     userId,
     selectedPiece,
-    selectedPlayerClass
+    selectedPlayerClass,
+    gamePwd
   );
   if (result) {
     res.json(result);
