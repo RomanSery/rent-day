@@ -3,5 +3,7 @@ somehow delete games you created that are still in joining phase
 make electricity costs per group
 turn timer, autction timer, lotto timer
 
+problem when going to join game and you have already joined!!!
+
 
 git push dokku master
