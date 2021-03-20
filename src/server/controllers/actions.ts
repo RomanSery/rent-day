@@ -49,7 +49,8 @@ export const createGame = async (req: Request, res: Response) => {
     gameName,
     maxPlayers,
     initialMoney,
-    userId
+    userId,
+    req.body.data.gamePwd
   );
 
   return res.json({ gameId: newGameId });

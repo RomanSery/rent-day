@@ -63,6 +63,7 @@ const SettingsSchema = new mongoose.Schema({
   initialMoney: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
   electricityCostPerHouse: { type: Number, required: true },
+  password: { type: String, required: false },
 });
 
 export type GameInstanceDocument = mongoose.Document & {

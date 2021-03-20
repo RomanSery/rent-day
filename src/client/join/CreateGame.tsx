@@ -15,6 +15,7 @@ type Inputs = {
   gameName: string;
   maxPlayers: number;
   initialMoney: number;
+  gamePwd: string;
 };
 
 export const CreateGame: React.FC<Props> = () => {
@@ -83,6 +84,9 @@ export const CreateGame: React.FC<Props> = () => {
         {_.get("initialMoney.type", errors) === "max" && (
           <p className="field-error">Starting amount must be no more than $5000</p>
         )}
+
+        <TextField label="Optional password" fullWidth={true} id="gamePwd" name="gamePwd" inputRef={register({ required: false })} />
+
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
       </form>

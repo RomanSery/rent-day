@@ -34,7 +34,8 @@ export class GameProcessor {
     gameName: string,
     maxPlayers: number,
     initialMoney: number,
-    userId: mongoose.Types.ObjectId
+    userId: mongoose.Types.ObjectId,
+    password: string | null
   ): Promise<number> {
     const themeData = new Map<string, SquareThemeData>();
     NyThemeData.forEach((value: SquareThemeData, key: number) => {
@@ -70,6 +71,7 @@ export class GameProcessor {
         initialMoney: initialMoney,
         maxPlayers: maxPlayers,
         electricityCostPerHouse: defaultElectricityCostPerHouse,
+        password: password,
       },
       players: [],
       status: GameStatus.JOINING,
