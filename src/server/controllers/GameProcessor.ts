@@ -155,6 +155,8 @@ export class GameProcessor {
     }
     game.save();
 
+    await PlayerProcessor.onJoinGame(userId.toHexString(), game);
+
     return {
       allJoined: game.allJoined,
       playerName: playerName,
@@ -171,7 +173,7 @@ export class GameProcessor {
       p.state = PlayerState.ACTIVE;
       p.hasRolled = false;
 
-      await this.assignUserToGame(p, game);
+      await PlayerProcessor.assignUserToGame(p._id, game);
     });
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
@@ -311,27 +313,6 @@ export class GameProcessor {
       return ud.username;
     }
     return "";
-  }
-
-  private async assignUserToGame(
-    p: Player,
-    game: GameInstanceDocument
-  ): Promise<void> {
-    const ud: UserDocument | null = await UserInstance.findById(
-      new mongoose.Types.ObjectId(p._id),
-      (err: mongoose.CallbackError, u: UserDocument) => {
-        if (err) {
-          return console.log(err);
-        }
-        return u;
-      }
-    );
-    if (ud) {
-      ud.gamesPlayed++;
-      ud.currGameId = game.id;
-      ud.currGameName = game.name;
-      await ud.save();
-    }
   }
 
   public static async getGameStatus(

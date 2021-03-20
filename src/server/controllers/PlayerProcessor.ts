@@ -33,6 +33,47 @@ export class PlayerProcessor {
     }
   }
 
+  public static async assignUserToGame(
+    userId: string,
+    game: GameInstanceDocument
+  ): Promise<void> {
+    const ud: UserDocument | null = await UserInstance.findById(
+      new mongoose.Types.ObjectId(userId),
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      ud.gamesPlayed++;
+      ud.currGameId = game.id;
+      ud.currGameName = game.name;
+      await ud.save();
+    }
+  }
+
+  public static async onJoinGame(
+    userId: string,
+    game: GameInstanceDocument
+  ): Promise<void> {
+    const ud: UserDocument | null = await UserInstance.findById(
+      new mongoose.Types.ObjectId(userId),
+      (err: mongoose.CallbackError, u: UserDocument) => {
+        if (err) {
+          return console.log(err);
+        }
+        return u;
+      }
+    );
+    if (ud) {
+      ud.currGameId = game.id;
+      ud.currGameName = game.name;
+      await ud.save();
+    }
+  }
+
   public static async getUserGame(
     userId: mongoose.Types.ObjectId
   ): Promise<GameInstanceDocument | null> {

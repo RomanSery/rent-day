@@ -39,7 +39,9 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       setShowDiceAnimation(false);
-      setResultsDesc(data.results.description);
+      if (data && data.results) {
+        setResultsDesc(data.results.description);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
