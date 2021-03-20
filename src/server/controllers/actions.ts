@@ -16,6 +16,9 @@ import { PlayerInfo } from "../../core/types/PlayerInfo";
 export const createGame = async (req: Request, res: Response) => {
   await check("data.gameName", "Game name is missing/invalid")
     .notEmpty()
+    .trim()
+    .escape()
+    .stripLow()
     .run(req);
   await check("data.maxPlayers", "# of players missing")
     .notEmpty()

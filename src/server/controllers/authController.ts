@@ -18,6 +18,9 @@ export const createAccount = async (
     .notEmpty()
     .isLength({ min: 4, max: 10 })
     .isAlphanumeric()
+    .trim()
+    .escape()
+    .stripLow()
     .run(req);
   await check("password", "Password missing").notEmpty().run(req);
   await check("confirmPassword", "Passwords do not match")
@@ -125,10 +128,8 @@ export const getCurrentSession = async (
 };
 
 export const getHealth = async (req: Request, res: Response) => {
-  res
-    .status(401)
-    .send({
-      status: "UP",
-      dbState: mongoose.STATES[mongoose.connection.readyState],
-    });
+  res.status(401).send({
+    status: "UP",
+    dbState: mongoose.STATES[mongoose.connection.readyState],
+  });
 };
