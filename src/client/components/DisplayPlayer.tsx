@@ -1,4 +1,4 @@
-import React from "react";
+import React, { TouchEvent } from "react";
 import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -37,13 +37,18 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
       viewPlayer(player);
     }
   };
+  const setPlayerToView2 = (event: TouchEvent<HTMLDivElement>) => {
+    if (player && player._id) {
+      viewPlayer(player);
+    }
+  };
   const leavePlayer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     clearPlayer();
   };
 
   return (
     <React.Fragment>
-      <div className="player-info" style={getColorStyle()} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
+      <div className="player-info" style={getColorStyle()} onTouchStart={setPlayerToView2} onClick={setPlayerToView} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
         <div className="container">
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />

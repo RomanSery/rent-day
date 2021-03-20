@@ -1,4 +1,4 @@
-import React from "react";
+import React, { TouchEvent } from "react";
 import { BoardSection } from "../../core/enums/BoardSection";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
@@ -50,6 +50,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const setSquareToView = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     viewSquare(id);
   };
+  const setSquareToView2 = (event: TouchEvent<HTMLDivElement>) => {
+    viewSquare(id);
+  };
   const leaveSquare = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     clearSquare();
   };
@@ -88,7 +91,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
 
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
+      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onTouchStart={setSquareToView2} onClick={setSquareToView} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
 
         <div className={getContainerClassName()}>
           <SquareInfo id={id} gameInfo={gameInfo} />
