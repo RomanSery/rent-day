@@ -31,6 +31,7 @@ export enum StorageConstants {
   GAME_ID = "myGameId",
   PLAYER_NAME = "myPlayerName",
   USER_ID = "myUserId",
+  LOGGED_IN = "isLoggedIn",
 }
 
 export const getMyGameId = (): string | null => {
@@ -79,6 +80,7 @@ export const leaveCurrentGameIfJoined = async (callback: () => void) => {
 export const setCurrSessionInfo = (data: any): void => {
   sessionStorage.setItem(StorageConstants.USER_ID, data.id);
   sessionStorage.setItem(StorageConstants.PLAYER_NAME, data.userName);
+  localStorage.setItem(StorageConstants.LOGGED_IN, "1");
 
   const gameId: string = data.currGameId;
   if (gameId && gameId.length > 0) {
@@ -98,7 +100,7 @@ export const setJoinedGameStorage = (gameId: string): void => {
 };
 
 export const isLoggedIn = (): boolean => {
-  return sessionStorage.getItem(StorageConstants.USER_ID) != null;
+  return localStorage.getItem(StorageConstants.LOGGED_IN) != null;
 };
 
 export const logOut = (): void => {
