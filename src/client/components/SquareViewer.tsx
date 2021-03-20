@@ -272,28 +272,36 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
             <Table size="small" aria-label="a dense table">
               <TableBody>
                 <TableRow key="propertyViewer1">
-                  <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent0 ? dollarFormatter.format(config.rent0) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">Base</div> {config.rent0 ? dollarFormatter.format(config.rent0) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer2">
-                  <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent1 ? dollarFormatter.format(config.rent1) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /></div> {config.rent1 ? dollarFormatter.format(config.rent1) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer3">
-                  <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent2 ? dollarFormatter.format(config.rent2) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent2 ? dollarFormatter.format(config.rent2) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer4">
-                  <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent3 ? dollarFormatter.format(config.rent3) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent3 ? dollarFormatter.format(config.rent3) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer5">
-                  <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></TableCell>
-                  <TableCell align="right">{config.rent4 ? dollarFormatter.format(config.rent4) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div>
+                    {config.rent4 ? dollarFormatter.format(config.rent4) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer6">
-                  <TableCell component="th" scope="row"><FontAwesomeIcon icon={faHotel} /></TableCell>
-                  <TableCell align="right">{config.rent5 ? dollarFormatter.format(config.rent5) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name"><FontAwesomeIcon icon={faHotel} /></div>
+                    {config.rent5 ? dollarFormatter.format(config.rent5) : ""}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -351,20 +359,24 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
             <Table size="small" aria-label="a dense table">
               <TableBody>
                 <TableRow key="stationViewer1">
-                  <TableCell component="th" scope="row">Base</TableCell>
-                  <TableCell align="right">{config.rent0 ? dollarFormatter.format(config.rent0) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">Base</div> {config.rent0 ? dollarFormatter.format(config.rent0) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="stationViewer2">
-                  <TableCell component="th" scope="row">2 stations</TableCell>
-                  <TableCell align="right">{config.rent1 ? dollarFormatter.format(config.rent1) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">2 Stations</div> {config.rent1 ? dollarFormatter.format(config.rent1) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="stationViewer3">
-                  <TableCell component="th" scope="row">3 stations</TableCell>
-                  <TableCell align="right">{config.rent2 ? dollarFormatter.format(config.rent2) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">3 Stations</div> {config.rent2 ? dollarFormatter.format(config.rent2) : ""}
+                  </TableCell>
                 </TableRow>
                 <TableRow key="stationViewer4">
-                  <TableCell component="th" scope="row">All 4 stations</TableCell>
-                  <TableCell align="right">{config.rent3 ? dollarFormatter.format(config.rent3) : ""}</TableCell>
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">All 4 stations</div> {config.rent3 ? dollarFormatter.format(config.rent3) : ""}
+                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
