@@ -53,6 +53,7 @@ body {
 .help-page-cont {
   overflow: scroll;
   height: 100%;
+  text-align: left;
 }
 
 .field-error {

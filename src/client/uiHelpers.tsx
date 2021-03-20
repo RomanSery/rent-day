@@ -356,9 +356,9 @@ export const getHelpContent = (): JSX.Element => {
       <p>
         Each player starts with <b>5</b> skill points that can be distributed among the three skills:
             <ul>
-          <li>Negotiation</li>
-          <li>Luck</li>
-          <li>Corruption</li>
+          <li>Negotiation - {getSkillDescription(SkillType.Negotiation)}</li>
+          <li>Luck - {getSkillDescription(SkillType.Luck)}</li>
+          <li>Corruption - {getSkillDescription(SkillType.Corruption)}</li>
         </ul>
       </p>
       <p>
