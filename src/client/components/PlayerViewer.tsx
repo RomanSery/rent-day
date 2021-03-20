@@ -128,20 +128,29 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
           <Table size="small" aria-label="a dense table">
             <TableBody>
               <TableRow key="playerViewer1">
-                <TableCell component="th" scope="row">Money</TableCell>
-                <TableCell align="right">{getPlayerMoney()}</TableCell>
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">Money</div> {getPlayerMoney()}
+                </TableCell>
               </TableRow>
               <TableRow key="playerViewer2">
-                <TableCell component="th" scope="row">{getTaxTooltip(gameInfo, getPlayer(), "Tax per Turn")}</TableCell>
-                <TableCell align="right">{getTaxTooltip(gameInfo, getPlayer(), getPlayerTaxes())}</TableCell>
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getTaxTooltip(gameInfo, getPlayer(), "Tax per Turn")}</div>
+                  {getTaxTooltip(gameInfo, getPlayer(), getPlayerTaxes())}
+                </TableCell>
+
               </TableRow>
               <TableRow key="playerViewer3">
-                <TableCell component="th" scope="row">{getElectricityTooltip(getPlayer(), "Electricity per Turn")}</TableCell>
-                <TableCell align="right">{getElectricityTooltip(getPlayer(), getPlayerElectricityCosts())}</TableCell>
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getElectricityTooltip(getPlayer(), "Electricity per Turn")}</div>
+                  {getElectricityTooltip(getPlayer(), getPlayerElectricityCosts())}
+                </TableCell>
               </TableRow>
               <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row">{getTotalAssetsTooltip()}</TableCell>
-                <TableCell align="right">{getPlayerTotalAssets()}</TableCell>
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getTotalAssetsTooltip()}</div>
+                  {getPlayerTotalAssets()}
+                </TableCell>
+
               </TableRow>
             </TableBody>
           </Table>
