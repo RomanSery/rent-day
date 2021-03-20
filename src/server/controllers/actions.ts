@@ -109,6 +109,7 @@ export const getAllPlayers = async (req: Request, res: Response) => {
 
     for (let u of users) {
       players.push({
+        playerId: u.id,
         name: u.username,
         wins: u.wins,
         gamesPlayed: u.gamesPlayed,

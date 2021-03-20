@@ -63,3 +63,7 @@ body {
   display: inline;
   content: "⚠ ";
 }
+
+.game-grid-header {
+  background-color: rgb(209, 206, 206);
+}
