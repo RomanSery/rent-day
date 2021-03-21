@@ -1,10 +1,7 @@
-somehow delete games you created that are still in joining phase
 make electricity costs per group
 turn timer, autction timer, lotto timer
 when rolling a double and landing on train, travel doesnt work
 
-
-when i'm bankrupt, i see the submit bid btn
 
 
 netlify form for questions/feedback/bug report

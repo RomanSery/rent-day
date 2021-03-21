@@ -30,6 +30,7 @@ import { PlayerProcessor } from "./PlayerProcessor";
 import bcrypt from "bcrypt-nodejs";
 import { SquareType } from "../../core/enums/SquareType";
 import { IS_DEV } from "../util/secrets";
+import { differenceInDays } from "date-fns";
 
 export class GameProcessor {
   public async createGame(
@@ -349,7 +350,13 @@ export class GameProcessor {
           return console.log(err);
         }
 
+        const now = new Date();
+
         for (let game of docs) {
+          if (differenceInDays(now, game._id.getTimestamp()) > 1) {
+            continue;
+          }
+
           gamesToJoin.push({
             gameId: game._id,
             name: game.name,
