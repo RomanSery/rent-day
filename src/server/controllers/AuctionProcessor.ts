@@ -81,7 +81,7 @@ export class AuctionProcessor {
     if (this.bid < 0) {
       return "bid cant be less than 0";
     }
-    if (this.bid > playerToBid.money) {
+    if (this.bid > 0 && this.bid > playerToBid.money) {
       return "bid cant be more than what you have";
     }
 

@@ -18,6 +18,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GameEvent } from "../../core/types/GameEvent";
 import { CircleLoader } from "./CircleLoader";
 import { useIsMountedRef } from "./useIsMountedRef";
+import { Player } from "../../core/types/Player";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 
 interface Props {
@@ -46,6 +48,13 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const getMyPlayer = (): Player | undefined => {
+    if (gameInfo) {
+      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    }
+    return undefined;
+  }
+
   const getAuctionState = () => {
     if (!isMountedRef.current) {
       return;
@@ -67,6 +76,15 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   }
 
   const alreadySubmittedBid = () => {
+    const myPlayer = getMyPlayer();
+    if (!myPlayer) {
+      return true;
+    }
+    if (myPlayer.state === PlayerState.BANKRUPT) {
+      return true;
+    }
+
+
     const uid = getMyUserId();
     if (uid) {
       const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
