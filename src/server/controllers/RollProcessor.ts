@@ -25,6 +25,7 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual } from "./helpers";
 import { ChanceProcessor } from "./ChanceProcessor";
 import { ServerChanceEvent } from "./ServerChanceEvent";
+import { IS_DEV } from "../util/secrets";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -33,7 +34,6 @@ export class RollProcessor {
   private player?: Player | null;
   private playerPassedPayDay: boolean;
 
-  //TODO comment out
   private forceDie1: number | null;
   private forceDie2: number | null;
   private rollDesc: string;
@@ -367,13 +367,12 @@ export class RollProcessor {
 
     const newRoll = new DiceRoll();
 
-    /*
-    if (this.forceDie1 && this.forceDie2) {
-      newRoll.die1 = this.forceDie1;
-      newRoll.die2 = this.forceDie2;
-    }
-    */
-    if (this.forceDie1 || this.forceDie2) {
+    if (IS_DEV) {
+      if (this.forceDie1 && this.forceDie2) {
+        newRoll.die1 = this.forceDie1;
+        newRoll.die2 = this.forceDie2;
+      }
+    } else if (this.forceDie1 || this.forceDie2) {
       console.log("WARNING: using forceDie");
     }
 

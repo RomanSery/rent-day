@@ -362,7 +362,7 @@ export const getHelpContent = (): JSX.Element => {
         </ul>
       </p>
       <p>
-        Some skills are much more benefical for certain player classes than others,
+        Some skills are much more beneficial for certain player classes than others,
         so distribute your points carefully.  For example, the gambler greatly benefits from Luck.
           </p>
       <p>
@@ -374,7 +374,7 @@ export const getHelpContent = (): JSX.Element => {
       <h4>AUCTIONS</h4>
       <p>
         Whenever a player lands on an unowned property, it immediately goes to auction.
-            Each player places a bid and the highest bid wins the autction.  <b>The winner purchases the property for
+            Each player places a bid and the highest bid wins the auction.  <b>The winner purchases the property for
             the amount of the 2nd highest bid.</b>
       </p>
       <p>
