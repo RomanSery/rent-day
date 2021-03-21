@@ -29,6 +29,7 @@ import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
 import bcrypt from "bcrypt-nodejs";
 import { SquareType } from "../../core/enums/SquareType";
+import { IS_DEV } from "../util/secrets";
 
 export class GameProcessor {
   public async createGame(
@@ -180,11 +181,11 @@ export class GameProcessor {
     game.status = GameStatus.ACTIVE;
 
     //TODO just for testing
-    /*     
-    for (let id = 1; id <= 38; id++) {
-      GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+    if (IS_DEV) {
+      for (let id = 1; id <= 38; id++) {
+        GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+      }
     }
-    */
 
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
