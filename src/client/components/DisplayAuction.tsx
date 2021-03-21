@@ -32,6 +32,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   const context: GameContext = getGameContextFromLocalStorage();
   const [auctionState, setAuctionState] = useState<AuctionState>();
   const [myBid, setMyBid] = useState<number>();
+  const [mySubmittedBid, setMySubmittedBid] = useState<number | undefined>(undefined);
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
@@ -88,8 +89,15 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     const uid = getMyUserId();
     if (uid) {
       const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
-      return myBid && myBid.bid;
+      if (myBid && myBid.bid) {
+        return true;
+      }
     }
+
+    if (mySubmittedBid) {
+      return true;
+    }
+
     return false;
   }
 
@@ -113,6 +121,9 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getInputField = () => {
     if (alreadySubmittedBid()) {
+      if (mySubmittedBid) {
+        return dollarFormatter.format(mySubmittedBid);
+      }
       const uid = getMyUserId();
       if (uid) {
         const myBid = auctionState?.bidders.find(b => areObjectIdsEqual(b._id, uid));
@@ -153,6 +164,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const onSubmitBid = async () => {
+    setMySubmittedBid(myBid);
     API.post("actions/bid", { bid: myBid, context })
       .then(function (response) {
         if (socketService) {

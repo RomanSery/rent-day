@@ -1,14 +1,13 @@
 somehow delete games you created that are still in joining phase
 make electricity costs per group
 turn timer, autction timer, lotto timer
-in auction mode, after i submit my bid and other bids come back, text box comes back
 when rolling a double and landing on train, travel doesnt work
 
 
-have to do update player costs when someone is bankrupted to the player that lost, to make their numbers make sense
 when i'm bankrupt, i see the submit bid btn
 
 
+netlify form for questions/feedback/bug report
 
 DEPLOYMENT
 git push dokku master
