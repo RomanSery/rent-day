@@ -302,6 +302,8 @@ export class PropertyProcessor {
       return "Visiting Quarantine";
     } else if (squareConfig && squareConfig.type === SquareType.Lotto) {
       return "Lotto";
+    } else if (squareConfig && squareConfig.type === SquareType.CentralPark) {
+      return "Central Park";
     } else {
       const squareTheme = gameDoc.theme.get(squareId.toString());
       return squareTheme ? squareTheme.name : "";

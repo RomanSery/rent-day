@@ -307,14 +307,14 @@ export class RollProcessor {
       this.newPosition = this.player.position;
 
       this.rollDesc +=
-        " <br /> landed on " +
+        " <br /> Landed on " +
         PropertyProcessor.getSquareName(this.game, this.player.position);
 
       if (!lastRoll.isDouble()) {
         this.player.hasRolled = true;
         this.player.rollHistory = [lastRoll];
       } else if (!gotOutOfIsolation) {
-        this.rollDesc += " <br /> rolled a double so go again";
+        this.rollDesc += " <br /> Rolled a double so go again";
       }
 
       if (lastRoll.isDouble()) {

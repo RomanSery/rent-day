@@ -126,7 +126,7 @@ export class MoneyCalculator {
     }
 
     return (
-      "Payed " +
+      "Paid " +
       owner!.name +
       " " +
       dollarFormatterServer.format(finalRentToPay) +

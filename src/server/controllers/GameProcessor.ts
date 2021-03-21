@@ -448,6 +448,8 @@ export class GameProcessor {
       }
     });
 
+    PlayerCostsCalculator.updatePlayerCosts(game, losser);
+
     const isGameOver =
       game.players.filter((p) => p.state !== PlayerState.BANKRUPT).length === 1;
     if (isGameOver) {
