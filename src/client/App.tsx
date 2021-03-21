@@ -21,6 +21,7 @@ import { LoginPage } from "./auth/LoginPage";
 import API from "./api";
 import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
+import { ContactUsPage } from "./ContactUsPage";
 
 export const App: React.FC = () => {
 
@@ -49,6 +50,9 @@ export const App: React.FC = () => {
       return;
     }
     if (location && location.pathname === "/login") {
+      return;
+    }
+    if (location && location.pathname === "/contact") {
       return;
     }
 
@@ -142,6 +146,7 @@ export const App: React.FC = () => {
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
           </Container>
         </StaticBoard>
@@ -165,6 +170,7 @@ export const App: React.FC = () => {
             <Typography component="h2" variant="h5">Rent Day</Typography>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
           </Container>
         </StaticBoard>
       </React.Fragment>
@@ -284,6 +290,20 @@ export const App: React.FC = () => {
     );
   };
 
+  const ContactPage = () => {
+
+    return (
+      <React.Fragment>
+        <CssBaseline />
+        <StaticBoard>
+          <Container maxWidth="md">
+            <ContactUsPage />
+          </Container>
+        </StaticBoard>
+      </React.Fragment>
+    );
+  };
+
 
   return (
     <Switch>
@@ -298,6 +318,7 @@ export const App: React.FC = () => {
       <Route path="/find" component={FindGamesPage} />
       <Route path="/create" component={CreateGamePage} />
       <Route path="/help" component={HelpPage} />
+      <Route path="/contact" component={ContactPage} />
 
       <Route path="/newuser" component={SignUp} />
       <Route path="/login" component={LogIn} />

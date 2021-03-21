@@ -3,8 +3,5 @@ turn timer, autction timer, lotto timer
 when rolling a double and landing on train, travel doesnt work
 
 
-
-netlify form for questions/feedback/bug report
-
 DEPLOYMENT
 git push dokku master
