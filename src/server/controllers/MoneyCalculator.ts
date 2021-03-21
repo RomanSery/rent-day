@@ -251,6 +251,21 @@ export class MoneyCalculator {
       return false;
     }
 
+    const owner = game.players.find(
+      (p) =>
+        p._id &&
+        new mongoose.Types.ObjectId(p._id).equals(
+          new mongoose.Types.ObjectId(squareData!.owner)
+        )
+    );
+    if (
+      owner &&
+      (owner.state === PlayerState.IN_ISOLATION ||
+        owner.state === PlayerState.BANKRUPT)
+    ) {
+      return false;
+    }
+
     return true;
   }
 

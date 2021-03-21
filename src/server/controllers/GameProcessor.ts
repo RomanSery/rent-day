@@ -28,7 +28,7 @@ import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
 import bcrypt from "bcrypt-nodejs";
-//import { SquareType } from "../../core/enums/SquareType";
+import { SquareType } from "../../core/enums/SquareType";
 
 export class GameProcessor {
   public async createGame(
@@ -197,7 +197,7 @@ export class GameProcessor {
     GameProcessor.assignSquareTesting(game, game.players[1], 19, 89);
     GameProcessor.assignSquareTesting(game, game.players[1], 20, 170);
     GameProcessor.assignSquareTesting(game, game.players[1], 37, 580);
-
+  */
 
     for (let id = 1; id <= 38; id++) {
       GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
@@ -206,10 +206,8 @@ export class GameProcessor {
     game.players.forEach(async (p, index) => {
       PlayerCostsCalculator.updatePlayerCosts(game, p);
     });
-    */
   }
 
-  /*
   private static assignSquareTesting(
     game: GameInstanceDocument,
     owner: Player,
@@ -243,7 +241,6 @@ export class GameProcessor {
       state.owner = owner._id!;
     }
   }
-*/
 
   public async getJoinGameErrMsg(
     gameId: mongoose.Types.ObjectId,
