@@ -9,12 +9,24 @@ interface Props {
 
 export const ContactUsPage: React.FC<Props> = () => {
 
+  const [success, setSuccess] = React.useState(false);
+
+  React.useEffect(() => {
+    if (window.location.search.includes('success=true')) {
+      setSuccess(true);
+    }
+  }, []);
+
   return (
     <React.Fragment>
 
       <Typography component="h2" variant="h5">Contact Us</Typography>
 
-      <form name="contact-us" method="POST" data-netlify="true">
+      {success && (
+        <p>Thanks for your message! We will get back to you soon.</p>
+      )}
+
+      <form name="contact-us" method="POST" data-netlify="true" action="/contact/?success=true">
         <input type="hidden" name="form-name" value="contact-us" />
         <TextField label="Your Email" fullWidth={true} name="youremail" required={true} />
 
