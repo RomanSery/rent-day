@@ -87,6 +87,20 @@
     <title>Rent Day</title>
   </head>
   <body>
+    <!-- A little help for the Netlify post-processing bots -->
+    <form
+      name="contact-us"
+      netlify
+      netlify-honeypot="bot-field"
+      action="/"
+      hidden
+    >
+      <input type="text" name="yourname" />
+      <input type="email" name="youremail" />
+      <select name="subject"></select>
+      <textarea name="msg"></textarea>
+    </form>
+
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>

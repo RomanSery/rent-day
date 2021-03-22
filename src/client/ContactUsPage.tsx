@@ -15,7 +15,7 @@ export const ContactUsPage: React.FC<Props> = () => {
       <Typography component="h2" variant="h5">Contact Us</Typography>
 
       <form name="contact-us" method="POST" data-netlify="true">
-
+        <input type="hidden" name="form-name" value="contact-us" />
         <TextField label="Your Email" fullWidth={true} name="youremail" required={true} />
 
         <TextField label="Your Name" fullWidth={true} name="yourname" />
