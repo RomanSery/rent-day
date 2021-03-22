@@ -37,7 +37,7 @@ export class MoneyCalculator {
     if (type !== SquareType.Property && type !== SquareType.TrainStation) {
       return 0;
     }
-    return Math.round(purchasePrice * 0.3);
+    return Math.round(purchasePrice * 0.4);
   }
 
   public static getRedeemValue(state: SquareGameData): number {

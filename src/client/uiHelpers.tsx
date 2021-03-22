@@ -179,7 +179,7 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Lotto prize amounts are 25% higher" />
+          <ListItemText primary="Lotto prize amounts are 40% higher" />
         </ListItem>
         <ListItem>
           <ListItemIcon>
@@ -191,7 +191,7 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsDown} size="2x" color="red" />
           </ListItemIcon>
-          <ListItemText primary="You are unemployed. Only collect $75 on payday" />
+          <ListItemText primary="You are unemployed. Only collect $100 on payday" />
         </ListItem>
       </List>
     );
@@ -385,7 +385,7 @@ export const getHelpContent = (): JSX.Element => {
 
       <h4>PROPERTY</h4>
       <p>
-        The purchase price of a property is important, it will determine the mortgage amount which is <b>30% of the purchase price</b>.
+        The purchase price of a property is important, it will determine the mortgage amount which is <b>40% of the purchase price</b>.
           </p>
       <p>
         If you want to redeem the property in the future, it will cost you the <b>mortgage amount plus an additional 10%</b>.
