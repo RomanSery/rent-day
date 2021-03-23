@@ -418,7 +418,7 @@ export const getHelpContent = (): JSX.Element => {
       <p>
         In addition to property taxes, if you've built any houses on your properties you must pay electricity costs.
             <br />
-            This is calculated at a constant <b>$2 per house per turn</b>.
+            Each property has an electricity cost that you must pay<b> per house per turn</b>.
             <br />
         <b>Electricity costs are collected at the start of your turn.</b>
         <br />

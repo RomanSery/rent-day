@@ -50,6 +50,7 @@ const SquareGameDataSchema = new mongoose.Schema({
   mortgageValue: { type: Number },
 
   houseCost: { type: Number },
+  electricityCost: { type: Number },
   tax: { type: Number },
   rent0: { type: Number },
   rent1: { type: Number },
@@ -62,7 +63,6 @@ const SquareGameDataSchema = new mongoose.Schema({
 const SettingsSchema = new mongoose.Schema({
   initialMoney: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
-  electricityCostPerHouse: { type: Number, required: true },
   password: { type: String, required: false },
 });
 

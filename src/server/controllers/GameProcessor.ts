@@ -17,10 +17,7 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
-import {
-  defaultElectricityCostPerHouse,
-  player_colors,
-} from "../../core/constants";
+import { player_colors } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
@@ -53,6 +50,7 @@ export class GameProcessor {
         isMortgaged: false,
         houseCost: d.houseCost ? d.houseCost : 0,
         tax: d.tax ? d.tax : 0,
+        electricityCost: d.electricityCost ? d.electricityCost : 0,
         rent0: d.rent && d.rent.has(0) ? d.rent.get(0) : undefined,
         rent1: d.rent && d.rent.has(1) ? d.rent.get(1) : undefined,
         rent2: d.rent && d.rent.has(2) ? d.rent.get(2) : undefined,
@@ -73,7 +71,6 @@ export class GameProcessor {
       settings: {
         initialMoney: initialMoney,
         maxPlayers: maxPlayers,
-        electricityCostPerHouse: defaultElectricityCostPerHouse,
         password: password,
       },
       players: [],

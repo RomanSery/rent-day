@@ -23,7 +23,7 @@ export const ContactUsPage: React.FC<Props> = () => {
       <Typography component="h2" variant="h5">Contact Us</Typography>
 
       {success && (
-        <p>Thanks for your message! We will get back to you soon.</p>
+        <p><strong>Thanks for your message! We will get back to you soon.</strong></p>
       )}
 
       <form name="contact-us" method="POST" data-netlify="true" action="/contact/?success=true">

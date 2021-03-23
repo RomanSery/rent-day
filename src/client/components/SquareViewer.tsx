@@ -315,6 +315,11 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
                     <div className="row-small-name">House Cost</div> {config.houseCost ? dollarFormatter.format(config.houseCost) : ""}
                   </TableCell>
                 </TableRow>
+                <TableRow key="propertyViewer11ele">
+                  <TableCell component="th" scope="row" colSpan={2}>
+                    <div className="row-small-name">Electricity Cost per House</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
+                  </TableCell>
+                </TableRow>
                 <TableRow key="propertyViewer12">
                   <TableCell component="th" scope="row" colSpan={2}>
                     <div className="row-small-name">Tax</div> {config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}

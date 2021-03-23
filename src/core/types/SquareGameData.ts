@@ -9,6 +9,7 @@ export interface SquareGameData {
   mortgageValue?: number;
 
   houseCost?: number;
+  electricityCost?: number;
   tax?: number;
   rent0?: number;
   rent1?: number;

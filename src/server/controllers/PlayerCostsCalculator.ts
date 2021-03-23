@@ -53,6 +53,8 @@ export class PlayerCostsCalculator {
           s.owner &&
           areIdsEqual(s.owner, player._id) &&
           s.numHouses > 0 &&
+          s.electricityCost &&
+          s.electricityCost > 0 &&
           !s.isMortgaged
         );
       }
@@ -62,18 +64,13 @@ export class PlayerCostsCalculator {
     let totalHouses = 0;
 
     for (const squareState of playerOwnedSquaresWithHouses) {
-      const cost =
-        squareState.numHouses * game.settings.electricityCostPerHouse;
+      const cost = squareState.numHouses * squareState.electricityCost!;
       total += cost;
 
       totalHouses += squareState.numHouses;
     }
 
-    player.electricityTooltip =
-      totalHouses +
-      " houses X " +
-      dollarFormatterServer.format(game.settings.electricityCostPerHouse) +
-      " per house";
+    player.electricityTooltip = totalHouses + " houses";
 
     player.electricityCostsPerTurn = Math.round(total);
   }
