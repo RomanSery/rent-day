@@ -43,7 +43,55 @@ const HtmlTooltip = withStyles((theme: Theme) => ({
 }))(Tooltip);
 
 
-export const getElectricityTooltip = (player: Player | undefined, amount: string) => {
+const getElectricityBreakdownTable = (game: GameState | undefined, electricityTooltip: string): JSX.Element => {
+  if (electricityTooltip.length === 0 || !game) {
+    return (
+      <React.Fragment>
+      </React.Fragment>
+    );
+  }
+
+  if (electricityTooltip.indexOf(",") === -1 || electricityTooltip.indexOf("have to pay for") > 0) {
+    return (
+      <React.Fragment>{electricityTooltip}
+      </React.Fragment>
+    );
+  }
+
+  const rows = electricityTooltip.split(';');
+  if (!rows || rows.length === 0 || electricityTooltip.indexOf(',') === -1) {
+    return (
+      <React.Fragment>{electricityTooltip}
+      </React.Fragment>
+    );
+  }
+
+  return (
+    <TableContainer component={Paper} className="other-info">
+      <Table size="small" aria-label="a dense table">
+        <TableHead>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell align="right">Electricity</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((row) => (
+            <TableRow key={row.split(',')[0]}>
+              <TableCell component="th" scope="row">
+                {getSquareName(row, game)}
+              </TableCell>
+              <TableCell align="right">{row.split(',')[1]}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  );
+};
+
+
+export const getElectricityTooltip = (game: GameState | undefined, player: Player | undefined, amount: string) => {
   if (!player) {
     return amount;
   }
@@ -51,7 +99,7 @@ export const getElectricityTooltip = (player: Player | undefined, amount: string
     title={
       <React.Fragment>
         <Typography color="inherit"><strong>Electricity per Turn</strong></Typography>
-        {player.electricityTooltip}
+        {getElectricityBreakdownTable(game, player.electricityTooltip)}
       </React.Fragment>
     }
   >
@@ -75,8 +123,12 @@ export const getTaxTooltip = (game: GameState | undefined, player: Player | unde
   </HtmlTooltip>);
 }
 
-const getSquareId = (row: string): number => {
-  return parseInt(row.split(',')[0]);
+const getSquareName = (row: string, game: GameState): string => {
+  const squareId = parseInt(row.split(',')[0]);
+  if (game.theme[squareId]) {
+    return game.theme[squareId].name;
+  }
+  return "";
 }
 
 const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): JSX.Element => {
@@ -103,7 +155,7 @@ const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): 
           {rows.map((row) => (
             <TableRow key={row.split(',')[0]}>
               <TableCell component="th" scope="row">
-                {game.theme[getSquareId(row)].name}
+                {getSquareName(row, game)}
               </TableCell>
               <TableCell align="right">{row.split(',')[1]}</TableCell>
               <TableCell align="right">{row.split(',')[2]}</TableCell>
@@ -114,6 +166,8 @@ const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): 
     </TableContainer>
   );
 };
+
+
 
 export const getTotalAssetsTooltip = () => {
   return (<HtmlTooltip

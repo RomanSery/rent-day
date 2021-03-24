@@ -86,7 +86,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
       flex: 0.5,
       renderCell: (params: ValueFormatterParams) => (
         <div style={{ textAlign: "right", width: "100%" }}>
-          {getElectricityTooltip(getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
+          {getElectricityTooltip(gameInfo, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
         </div>
       ),
     },

@@ -61,16 +61,15 @@ export class PlayerCostsCalculator {
     );
 
     let total = 0;
-    let totalHouses = 0;
-
-    for (const squareState of playerOwnedSquaresWithHouses) {
-      const cost = squareState.numHouses * squareState.electricityCost!;
+    const details: Array<string> = [];
+    for (const s of playerOwnedSquaresWithHouses) {
+      const cost = s.numHouses * s.electricityCost!;
       total += cost;
 
-      totalHouses += squareState.numHouses;
+      details.push(s.squareId + "," + dollarFormatterServer.format(cost));
     }
 
-    player.electricityTooltip = totalHouses + " houses";
+    player.electricityTooltip = details.join(";");
 
     player.electricityCostsPerTurn = Math.round(total);
   }
