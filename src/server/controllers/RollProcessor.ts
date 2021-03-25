@@ -156,6 +156,8 @@ export class RollProcessor {
       chance: chance,
     };
 
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
+
     this.game.save();
     return "";
   }
@@ -236,6 +238,7 @@ export class RollProcessor {
 
     this.setMovementKeyFrames(false, false);
 
+    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
     this.game.save();
     return "";
   }

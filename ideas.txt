@@ -1,11 +1,11 @@
 turn timer, autction timer, lotto timer
-when rolling a double and landing on train, travel doesnt work
+
 
 i was able to join the game twice as the same user!!!
 
 when last player gives up and leaves, nothing updates for the winner for some reason, after refresh, shows the game over dialog
 
-i landed on train station, didnt travel, rolled, then still see travel butn
+
 bid more than you have, and it caused a bug
 
 when send GameEvent.LEAVE_GAME, send GameState with it instead of making DB call upon recieving the event
