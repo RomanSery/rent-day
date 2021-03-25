@@ -29,12 +29,11 @@ import { TextField } from "@material-ui/core";
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
-  getPing: (userId: string | undefined) => string;
   getSquareId: () => number | undefined;
   showMovementAnimation: (playerId: string, frames: Array<number>) => void;
 }
 
-export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPing, getSquareId, showMovementAnimation }) => {
+export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSquareId, showMovementAnimation }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -197,7 +196,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getPin
 
         </div>
 
-        <DisplayPlayers gameInfo={gameInfo} getPing={getPing} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
+        <DisplayPlayers gameInfo={gameInfo} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
       <GameOverDialog gameInfo={gameInfo} open={showGameOver()} onLeaveGame={onLeaveGame} />

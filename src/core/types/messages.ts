@@ -4,8 +4,3 @@ export interface JoinedGameMsg {
   gameId: string;
   allJoined: boolean;
 }
-
-export interface LatencyInfoMsg {
-  userId: string;
-  latency: number;
-}

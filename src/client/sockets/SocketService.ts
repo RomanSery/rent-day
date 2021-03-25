@@ -7,7 +7,6 @@ interface GameClientSocket extends Socket {
   playerName?: string;
   userId?: string;
   gameId?: string;
-  latency?: number;
 }
 
 export class SocketService {
@@ -52,12 +51,6 @@ export class SocketService {
 
   public listenForEvent(event: GameEvent, fn: Function): void {
     this.socket.on(event, fn);
-  }
-
-  public sendPingToServer(): void {
-    setInterval(() => {
-      this.socket.volatile.emit(GameEvent.GET_LATENCY, Date.now(), this.gameId);
-    }, 10000);
   }
 
   // disconnect - used when unmounting

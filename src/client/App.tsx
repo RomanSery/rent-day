@@ -170,6 +170,7 @@ export const App: React.FC = () => {
             <Typography component="h2" variant="h5">Rent Day</Typography>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
+            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
           </Container>
         </StaticBoard>

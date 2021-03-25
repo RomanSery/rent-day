@@ -9,12 +9,11 @@ import { PlayerState } from "../../core/enums/PlayerState";
 interface Props {
   gameInfo: GameState | undefined;
   player: Player;
-  getPing: (userId: string | undefined) => string;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
 
-export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, viewPlayer, clearPlayer }) => {
+export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, viewPlayer, clearPlayer }) => {
 
   const getColorStyle = (): React.CSSProperties => {
     if (isPlayersTurn()) {
@@ -46,6 +45,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
     clearPlayer();
   };
 
+
   return (
     <React.Fragment>
       <div className="player-info" style={getColorStyle()} onTouchStart={setPlayerToView2} onClick={setPlayerToView} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
@@ -53,7 +53,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, getPing, view
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
             {player.state === PlayerState.IN_ISOLATION ? <FontAwesomeIcon icon={faBiohazard} size="2x" color="black" /> : null}
-            {player.state !== PlayerState.BANKRUPT ? <div className="ping">{getPing(player._id)}</div> : null}
+            <div className="ping">{player.playerClass}</div>
           </div>
           <div className="sub-name" style={getNameColorStyle()}>
             {player.name}

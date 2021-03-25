@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import * as http from "http";
 import mongoose from "mongoose";
 import { GameEvent } from "../../core/types/GameEvent";
-import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
+import { JoinedGameMsg } from "../../core/types/messages";
 import { GameSocket } from "../../core/types/GameSocket";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { AuctionProcessor } from "../controllers/AuctionProcessor";
@@ -57,7 +57,6 @@ export class GameServer {
       this.joinedGame(socket);
       this.joinGameRoom(socket);
       this.leaveGame(socket);
-      this.getLatency(socket);
 
       socket.on(GameEvent.DISCONNECT, (reason) => {
         socket
@@ -164,33 +163,11 @@ export class GameServer {
     );
   }
 
-  private getLatency(socket: GameSocket): void {
-    socket.on(GameEvent.GET_LATENCY, (start, gameId: string) => {
-      const latency = Date.now() - start;
-      socket.latency = latency;
-
-      const info: LatencyInfoMsg[] = [];
-      this.io
-        .of("/")
-        .in(gameId)
-        .sockets.forEach((s) => {
-          const gameSocket = s as GameSocket;
-          info.push({
-            userId: gameSocket.userId,
-            latency: gameSocket.latency,
-          });
-        });
-
-      socket.to(gameId).broadcast.emit(GameEvent.GET_LATENCY, info);
-    });
-  }
-
   private joinedGame(socket: GameSocket): void {
     socket.on(GameEvent.JOINED_GAME, (m: JoinedGameMsg) => {
       socket.playerName = m.playerName;
       socket.userId = m.userId;
       socket.gameId = m.gameId;
-      socket.latency = 0;
 
       socket.join(m.gameId);
       socket.to(m.gameId).broadcast.emit(GameEvent.JOINED_GAME, m);
@@ -204,7 +181,6 @@ export class GameServer {
         socket.playerName = playerName;
         socket.userId = userId;
         socket.gameId = gameId;
-        socket.latency = 0;
         socket.join(gameId);
 
         socket

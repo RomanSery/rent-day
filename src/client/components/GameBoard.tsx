@@ -2,14 +2,13 @@
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, handleApiError } from "../helpers";
+import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@material-ui/core";
-import { LatencyInfoMsg } from "../../core/types/messages";
 import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
@@ -27,8 +26,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [chanceOpen, setChanceOpen] = useState(false);
-
-  const [pings, setPings] = useState<LatencyInfoMsg[]>();
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
@@ -70,12 +67,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       setSnackOpen(true);
     });
 
-    socketService.listenForEvent(GameEvent.GET_LATENCY, (data: LatencyInfoMsg[]) => {
-      setPings(data);
-    });
-
-    socketService.sendPingToServer();
-
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState, showChance?: boolean) => {
       clearMovement();
@@ -110,17 +101,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setSnackOpen(false);
   };
 
-  const getPing = (userId: string | undefined) => {
-    if (userId && pings) {
-      const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => areObjectIdsEqual(p.userId, userId)
-      );
-      if (pingInfo) {
-        return "Ping: " + pingInfo.latency + "ms";
-      }
-    }
-    return "Ping: 0ms";
-  };
 
   const viewSquare = (id: number) => {
     setSquareToView(id);
@@ -155,7 +135,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} socketService={socketService} getPing={getPing} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
+        <CenterDisplay gameInfo={gameState} socketService={socketService} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
       </div>
 
       <GamePieces gameInfo={gameState} socketService={socketService}

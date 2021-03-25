@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { useHistory, useLocation } from "react-router-dom";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getIconProp, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { getIconProp, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -10,7 +10,7 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Button, Chip, Container, TextField, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@material-ui/core";
-import { JoinedGameMsg, LatencyInfoMsg } from "../../core/types/messages";
+import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { PlayerClass } from "../../core/enums/PlayerClass";
@@ -44,7 +44,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [pings, setPings] = useState<LatencyInfoMsg[]>();
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
@@ -74,12 +73,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       setSnackOpen(true);
       getGameState();
     });
-
-    socketService.listenForEvent(GameEvent.GET_LATENCY, (data: any) => {
-      setPings(data);
-    });
-
-    socketService.sendPingToServer();
 
 
     return function cleanup() {
@@ -154,18 +147,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     return "Players: " + gameState?.players.length + " / " + gameState?.settings.maxPlayers;
   }
 
-
-  const getPing = (userId: string | undefined) => {
-    if (userId && pings) {
-      const pingInfo = pings.find(
-        (p: LatencyInfoMsg) => areObjectIdsEqual(p.userId, userId)
-      );
-      if (pingInfo) {
-        return "Ping: " + pingInfo.latency + "ms";
-      }
-    }
-    return "Ping: 0ms";
-  };
 
   const handlePlayerClassChange = (event: React.ChangeEvent<{ name?: string; value: string }>) => {
     setSelectedPlayerClass(event.target.value);
@@ -277,8 +258,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                     icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
                     label={p.name} />
                   <div className="player-class">{PlayerClass[p.playerClass]}</div>
-                  <div className="ping">{getPing(p._id)}</div>
-
                 </div>
               </div>
             </React.Fragment>
