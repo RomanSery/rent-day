@@ -1,14 +1,16 @@
 turn timer, autction timer, lotto timer
 
 
-i was able to join the game twice as the same user!!!
-
 when last player gives up and leaves, nothing updates for the winner for some reason, after refresh, shows the game over dialog
 
 
 bid more than you have, and it caused a bug
 
 when send GameEvent.LEAVE_GAME, send GameState with it instead of making DB call upon recieving the event
+
+governors doesnt pay electricity costs
+
+join game, befre it starts, leave game.  but upon refresh go back to join game page as if im still in the game
 
 
 DEPLOYMENT

@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../util/secretConstants";
 import { PlayerProcessor } from "./PlayerProcessor";
 import mongoose from "mongoose";
+import _ from "lodash";
 
 export const createAccount = async (
   req: Request,
@@ -112,8 +113,10 @@ export const getCurrentSession = async (
         const currGame = await PlayerProcessor.getUserGame(
           new mongoose.Types.ObjectId(verified.id)
         );
-        if (currGame) {
+        if (currGame && _.some(currGame.players, { id: verified.id })) {
           verified.currGameId = currGame.id;
+        } else {
+          verified.currGameId = null;
         }
 
         res.status(200).send(verified);
