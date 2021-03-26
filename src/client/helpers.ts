@@ -13,6 +13,8 @@ import { PageType } from "../core/enums/PageType";
 import { PieceType } from "../core/enums/PieceType";
 import { GameContext } from "../core/types/GameContext";
 import API from "./api";
+import { SocketService } from "./sockets/SocketService";
+import { GameEvent } from "../core/types/GameEvent";
 
 export const dollarFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -57,20 +59,27 @@ export const hasJoinedGame = (): boolean => {
   return sessionStorage.getItem(StorageConstants.GAME_ID) != null;
 };
 
-export const leaveCurrentGameIfJoined = async (callback: () => void) => {
+export const leaveCurrentGameIfJoined = async (
+  socketService: SocketService | null,
+  callback: () => void
+) => {
   if (!hasJoinedGame()) {
     clearMyGameInfo();
     return callback();
   }
 
   const context: GameContext = getGameContextFromLocalStorage();
+  const gameId = getMyGameId();
 
   await API.post("leaveGame", {
-    gameId: getMyGameId(),
+    gameId: gameId,
     userId: getMyUserId(),
     context,
   })
     .then(function (response) {
+      if (socketService) {
+        socketService.socket.emit(GameEvent.LEAVE_GAME, gameId);
+      }
       clearMyGameInfo();
       return callback();
     })

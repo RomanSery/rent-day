@@ -36,7 +36,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
 
   const onJoinGame = (gameId: string) => {
 
-    leaveCurrentGameIfJoined(() => {
+    leaveCurrentGameIfJoined(null, () => {
       history.push("/join?gid=" + gameId);
     });
   };

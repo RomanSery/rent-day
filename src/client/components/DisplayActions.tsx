@@ -87,10 +87,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   };
 
   const onLeaveGame = async () => {
-    leaveCurrentGameIfJoined(() => {
+    leaveCurrentGameIfJoined(socketService, () => {
       if (gameInfo) {
         socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " has quit");
-        socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
       }
       history.push("/dashboard");
     });

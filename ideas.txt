@@ -4,9 +4,7 @@ turn timer, autction timer, lotto timer
 when last player gives up and leaves, nothing updates for the winner for some reason, after refresh, shows the game over dialog
 
 
-when send GameEvent.LEAVE_GAME, send GameState with it instead of making DB call upon recieving the event
-
-
+add more chance events
 
 
 DEPLOYMENT

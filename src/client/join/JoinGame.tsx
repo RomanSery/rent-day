@@ -68,10 +68,10 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       }
     });
 
-    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any) => {
+    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
       setSnackMsg(data);
       setSnackOpen(true);
-      getGameState();
+      setGameState(game);
     });
 
 
@@ -128,9 +128,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault();
 
-    socketService.socket.emit(GameEvent.LEAVE_GAME, gameToJoinId);
-
-    leaveCurrentGameIfJoined(() => {
+    leaveCurrentGameIfJoined(socketService, () => {
       history.push("/dashboard");
     });
   };

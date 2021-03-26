@@ -194,11 +194,20 @@ export class GameServer {
   }
 
   private leaveGame(socket: GameSocket): void {
-    socket.on(GameEvent.LEAVE_GAME, (gameId: string) => {
+    socket.on(GameEvent.LEAVE_GAME, async (gameId: string) => {
       socket.leave(gameId);
+
+      const gameState: GameInstanceDocument | null = await GameProcessor.getGame(
+        new mongoose.Types.ObjectId(gameId)
+      );
+
       socket
         .to(gameId)
-        .broadcast.emit(GameEvent.LEAVE_GAME, socket.playerName + " has left");
+        .broadcast.emit(
+          GameEvent.LEAVE_GAME,
+          socket.playerName + " has left",
+          gameState
+        );
     });
   }
 }

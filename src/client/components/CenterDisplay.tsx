@@ -152,7 +152,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   }
 
   const onLeaveGame = () => {
-    leaveCurrentGameIfJoined(() => {
+    leaveCurrentGameIfJoined(socketService, () => {
       history.push("/dashboard");
     });
   };

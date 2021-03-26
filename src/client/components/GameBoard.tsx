@@ -50,7 +50,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
   useEffect(() => {
-    getGameState();
+    API.post("getGame", { gameId: context.gameId, context })
+      .then(function (response) {
+        setGameState(response.data.game);
+      })
+      .catch(handleApiError);
   }, []);
 
 
@@ -61,8 +65,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       setSnackOpen(true);
     });
 
-    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any) => {
-      getGameState();
+    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
+      setGameState(game);
       setSnackMsg(data);
       setSnackOpen(true);
     });
@@ -83,14 +87,6 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     };
   }, []);
 
-
-  const getGameState = () => {
-    API.post("getGame", { gameId: context.gameId, context })
-      .then(function (response) {
-        setGameState(response.data.game);
-      })
-      .catch(handleApiError);
-  };
 
 
   const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
