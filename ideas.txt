@@ -1,9 +1,6 @@
 turn timer, autction timer, lotto timer
 
-
-when last player gives up and leaves, nothing updates for the winner for some reason, after refresh, shows the game over dialog
-
-
+add socket.io debug back and try to see why socket connection closes after a while
 add more chance events
 
 
