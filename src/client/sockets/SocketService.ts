@@ -20,7 +20,10 @@ export class SocketService {
     console.log("initiating socket service: " + uri);
     this.gameId = gameId;
 
-    this.manager = new Manager(uri, { withCredentials: true });
+    this.manager = new Manager(uri, {
+      withCredentials: true,
+      rememberUpgrade: true,
+    });
     this.socket = this.manager.socket("/");
     this.pageType = type;
 

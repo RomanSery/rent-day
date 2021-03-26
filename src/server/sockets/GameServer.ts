@@ -23,8 +23,8 @@ export class GameServer {
 
     if (IS_DEV) {
       const options = {
-        pingTimeout: 5000,
-        pingInterval: 10000,
+        pingTimeout: 30000,
+        pingInterval: 25000,
         cors: {
           origin: [
             "http://localhost:3000",
