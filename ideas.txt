@@ -8,9 +8,7 @@ bid more than you have, and it caused a bug
 
 when send GameEvent.LEAVE_GAME, send GameState with it instead of making DB call upon recieving the event
 
-governors doesnt pay electricity costs
 
-join game, befre it starts, leave game.  but upon refresh go back to join game page as if im still in the game
 
 
 DEPLOYMENT

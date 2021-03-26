@@ -6,6 +6,7 @@ import { areIdsEqual, canTravel, dollarFormatterServer } from "./helpers";
 import { conEd_position } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 import { MoneyCalculator } from "./MoneyCalculator";
+import { PlayerClass } from "../../core/enums/PlayerClass";
 
 export class PlayerCostsCalculator {
   public static updatePlayerCosts(
@@ -43,6 +44,13 @@ export class PlayerCostsCalculator {
     if (PlayerCostsCalculator.doesPlayerOwnConEd(game, player._id)) {
       player.electricityTooltip =
         "You own ConEd, so you don't have to pay for electricity";
+      player.electricityCostsPerTurn = 0;
+      return;
+    }
+
+    if (PlayerCostsCalculator.isPlayerGovernor(game, player._id)) {
+      player.electricityTooltip =
+        "You are a Governor, so you don't have to pay for electricity";
       player.electricityCostsPerTurn = 0;
       return;
     }
@@ -230,5 +238,17 @@ export class PlayerCostsCalculator {
       areIdsEqual(squareData.owner, playerId)
       ? true
       : false;
+  }
+
+  private static isPlayerGovernor(
+    game: GameInstanceDocument,
+    playerId: string
+  ): boolean {
+    const player = game.players.find((p) => areIdsEqual(p._id, playerId));
+    if (player && player.playerClass === PlayerClass.Governor) {
+      return true;
+    }
+
+    return false;
   }
 }

@@ -281,6 +281,12 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           </ListItemIcon>
           <ListItemText primary="Start with corruption 2" />
         </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="Due to wide-spread corruption, you don't have to pay for any electricity costs" />
+        </ListItem>
       </List>
     );
   } else if (type === PlayerClass.Banker) {
