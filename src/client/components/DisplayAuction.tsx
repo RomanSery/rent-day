@@ -164,6 +164,13 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   };
 
   const onSubmitBid = async () => {
+    const myPlayer = getMyPlayer();
+    if (myPlayer && myBid && myBid > myPlayer.money) {
+      alert("You cant bid more than what you have");
+      return;
+    }
+
+
     setMySubmittedBid(myBid);
     API.post("actions/bid", { bid: myBid, context })
       .then(function (response) {
