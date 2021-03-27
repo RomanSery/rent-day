@@ -159,31 +159,38 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
         <TableContainer component={Paper} className="other-info">
           <Table size="small" aria-label="a dense table">
             <TableBody>
+
               <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Negotiation)}</TableCell>
-                <TableCell align="right">
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Negotiation)}</div>
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Negotiation)} /> : null}
                   {getSkill(SkillType.Negotiation)}
                 </TableCell>
               </TableRow>
+
               <TableRow key="playerViewer5">
-                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Luck)}</TableCell>
-                <TableCell align="right">
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Luck)}</div>
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Luck)} /> : null}
                   {getSkill(SkillType.Luck)}
                 </TableCell>
               </TableRow>
+
               <TableRow key="playerViewer6">
-                <TableCell component="th" scope="row">{getSkillTypeTooltip(SkillType.Corruption)}</TableCell>
-                <TableCell align="right">
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Corruption)}</div>
                   {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Corruption)} /> : null}
                   {getSkill(SkillType.Corruption)}
                 </TableCell>
               </TableRow>
+
               <TableRow key="playerViewer7">
-                <TableCell component="th" scope="row">Points available</TableCell>
-                <TableCell align="right">{getPlayerPointsAvailable()}</TableCell>
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div className="row-small-name">Points available</div>
+                  {getPlayerPointsAvailable()}
+                </TableCell>
               </TableRow>
+
             </TableBody>
           </Table>
         </TableContainer>
