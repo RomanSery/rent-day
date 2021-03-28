@@ -4,6 +4,7 @@ import { GameSquare } from "../components/GameSquare";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { NyThemeData } from "../../core/config/NyTheme";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { ActionMode } from "../../core/enums/ActionMode";
 
 interface Props {
 
@@ -41,7 +42,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       <div className="board">
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          return (<GameSquare gameInfo={createEmptyState()}
+          return (<GameSquare gameInfo={createEmptyState()} actionMode={ActionMode.None}
             id={id}
             key={id} viewSquare={() => { }} clearSquare={() => { }}
           />)

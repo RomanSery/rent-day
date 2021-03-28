@@ -24,6 +24,7 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@material-ui/core";
+import { ActionMode } from "../../core/enums/ActionMode";
 
 
 interface Props {
@@ -31,9 +32,12 @@ interface Props {
   socketService: SocketService;
   getSquareId: () => number | undefined;
   showMovementAnimation: (playerId: string, frames: Array<number>) => void;
+  actionMode: ActionMode;
+  setActionMode: (mode: ActionMode) => void;
+
 }
 
-export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSquareId, showMovementAnimation }) => {
+export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSquareId, showMovementAnimation, actionMode, setActionMode }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -180,7 +184,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
 
           <div className="player-actions">
-            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel} socketService={socketService}
+            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel}
+              socketService={socketService} actionMode={actionMode} setActionMode={setActionMode}
             />
           </div>
 
@@ -189,7 +194,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
               <PlayerViewer socketService={socketService} gameInfo={gameInfo} getPlayer={getPlayerToView} />
             </div>
             <div className="property-viewer">
-              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} socketService={socketService} />
+              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
             </div>
 
           </div>

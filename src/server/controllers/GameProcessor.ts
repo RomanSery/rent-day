@@ -181,7 +181,7 @@ export class GameProcessor {
     //TODO just for testing
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {
-        //GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+        GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
       }
     }
 

@@ -12,6 +12,7 @@ import { Snackbar } from "@material-ui/core";
 import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
+import { ActionMode } from "../../core/enums/ActionMode";
 
 interface Props {
   socketService: SocketService;
@@ -32,6 +33,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [playerIdToMove, setPlayerIdToMove] = React.useState<string>("");
   const [frames, setFrames] = React.useState<Array<number>>([]);
 
+  const [actionMode, setActionMode] = React.useState<ActionMode>(ActionMode.None);
 
 
 
@@ -124,14 +126,15 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       <div className="board">
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          return (<GameSquare gameInfo={gameState}
+          return (<GameSquare gameInfo={gameState} socketService={socketService}
             id={id}
             key={id}
-            viewSquare={viewSquare} clearSquare={clearSquare}
+            viewSquare={viewSquare} clearSquare={clearSquare} actionMode={actionMode}
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} socketService={socketService} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation} />
+        <CenterDisplay gameInfo={gameState} socketService={socketService} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation}
+          actionMode={actionMode} setActionMode={setActionMode} />
       </div>
 
       <GamePieces gameInfo={gameState} socketService={socketService}

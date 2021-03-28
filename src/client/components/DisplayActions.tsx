@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import { Button } from "@material-ui/core";
+import { Button, Menu, MenuItem } from "@material-ui/core";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
 import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
@@ -10,12 +10,13 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle, faChartBar, faTrain, faPercentage, faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faTimesCircle, faCheckCircle, faTrain, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
+import { ActionMode } from "../../core/enums/ActionMode";
 
 
 interface Props {
@@ -24,9 +25,11 @@ interface Props {
   tradeWithPlayer: (player: Player) => void;
   onRollAction: () => void;
   onTravelAction: () => void;
+  actionMode: ActionMode;
+  setActionMode: (mode: ActionMode) => void;
 }
 
-export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, onTravelAction, tradeWithPlayer }) => {
+export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, onTravelAction, tradeWithPlayer, actionMode, setActionMode }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -34,6 +37,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const [taxesViewOpen, setTaxesViewOpen] = React.useState(false);
   const [helpOpen, setHelpOpen] = React.useState(false);
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
 
   const getMyPlayer = (): Player | undefined => {
@@ -166,14 +170,17 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const onViewStats = async () => {
     setStatsViewOpen(true);
+    setAnchorEl(null);
   };
 
   const onViewTaxes = async () => {
     setTaxesViewOpen(true);
+    setAnchorEl(null);
   };
 
   const onViewHelp = async () => {
     setHelpOpen(true);
+    setAnchorEl(null);
   };
 
   const getRollBtn = () => {
@@ -207,40 +214,58 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     return null;
   };
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const onSetActionMode = (mode: ActionMode) => {
+    setActionMode(mode);
+    setAnchorEl(null);
+  };
+
   const getMyActions = () => {
-    if (isMyTurn()) {
-      return (
-        <React.Fragment>
-          {getRollBtn()}
-
-          {canTravel() ?
-            <Button variant="contained" color="primary" onClick={onClickTravel}
-              startIcon={<FontAwesomeIcon icon={faTrain} />}>Travel</Button>
-            : null}
-
-          {canPayToGetOutOfIsolation() ?
-            <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
-            : null}
-
-          {getCompleteTurnBtn()}
-
-          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
-          <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faQuestion} />} onClick={onViewHelp}></Button>
-          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
-            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
-        </React.Fragment>
-      );
-    }
-
+    const myTurn = isMyTurn();
     return (
       <React.Fragment>
-        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faChartBar} />} onClick={onViewStats}>Stats</Button>
-        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faPercentage} />} onClick={onViewTaxes}>Taxes</Button>
-        <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faQuestion} />} onClick={onViewHelp}></Button>
+        {myTurn ? getRollBtn() : null}
+
+        {myTurn && canTravel() ?
+          <Button variant="contained" color="primary" onClick={onClickTravel}
+            startIcon={<FontAwesomeIcon icon={faTrain} />}>Travel</Button>
+          : null}
+
+        {myTurn && canPayToGetOutOfIsolation() ?
+          <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
+          : null}
+
+        {myTurn ? getCompleteTurnBtn() : null}
+
+        mode: {actionMode}
+
+        <Button startIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="contained" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
+        <Menu id="my-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+          <MenuItem onClick={() => onSetActionMode(ActionMode.Mortgage)}>Mortgage</MenuItem>
+          <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>
+          <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>
+          <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>
+          <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
+          <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
+          <MenuItem onClick={onViewHelp}>Help</MenuItem>
+        </Menu>
+
+        {myTurn &&
+          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
+            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
+        }
       </React.Fragment>
     );
   }
+
+
 
   return (
     <React.Fragment>

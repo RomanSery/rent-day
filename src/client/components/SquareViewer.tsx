@@ -1,4 +1,4 @@
-import { faBiohazard, faDollarSign, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -11,23 +11,15 @@ import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/Squa
 import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
-import { ButtonGroup, Button } from "@material-ui/core";
-import API from '../api';
-import { GameContext } from "../../core/types/GameContext";
-import { GameEvent } from "../../core/types/GameEvent";
-import { SocketService } from "../sockets/SocketService";
-import { faEye } from "@fortawesome/free-regular-svg-icons";
+import { areObjectIdsEqual, dollarFormatter } from "../helpers";
 
 interface Props {
   gameInfo: GameState | undefined;
   getSquareId: () => number | undefined;
-  socketService: SocketService;
 }
 
-export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketService }) => {
+export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
-  const context: GameContext = getGameContextFromLocalStorage();
 
   const getSquareTxt = () => {
     const squareId = getSquareId();
@@ -102,21 +94,6 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
     return "";
   };
 
-  const isOwnedByMe = (): boolean => {
-    const data = getSquareGameData();
-    if (data && gameInfo && data.owner && areObjectIdsEqual(getMyUserId(), data.owner)) {
-      return true;
-    }
-    return false;
-  };
-
-  const getMyName = (): string => {
-    const player = gameInfo && gameInfo.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
-    if (player) {
-      return player.name;
-    }
-    return "";
-  };
 
   const getNameColorStyle = (): React.CSSProperties => {
     const data = getSquareGameData();
@@ -166,11 +143,6 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
     return "";
   }
 
-  const isMyTurn = () => {
-    const uid = getMyUserId();
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
-  }
-
 
   const getSquareGameData = (): SquareGameData | undefined => {
     const squareId = getSquareId();
@@ -180,78 +152,6 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
     return undefined;
   };
 
-
-  const onMortgageProperty = async () => {
-    API.post("actions/mortgage", { squareId: getSquareId(), context })
-      .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " mortaged " + getSquareTxt());
-        }
-      })
-      .catch(handleApiError);
-  };
-
-  const onRedeemProperty = async () => {
-    API.post("actions/redeem", { squareId: getSquareId(), context })
-      .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " redeemed " + getSquareTxt());
-        }
-      })
-      .catch(handleApiError);
-  };
-
-  const onBuildHouse = async () => {
-    API.post("actions/buildHouse", { squareId: getSquareId(), context })
-      .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " built house on " + getSquareTxt());
-        }
-      })
-      .catch(handleApiError);
-  };
-
-  const onSellHouse = async () => {
-    API.post("actions/sellHouse", { squareId: getSquareId(), context })
-      .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " sold house on " + getSquareTxt());
-        }
-      })
-      .catch(handleApiError);
-  };
-
-  const getPropertyActions = () => {
-    if (!isMyTurn() || !isOwnedByMe()) {
-      return null;
-    }
-
-    const squareId = getSquareId();
-    const config = squareId ? SquareConfigDataMap.get(squareId) : undefined;
-    if (config == null) {
-      return null;
-    }
-
-    const showMortgageRedeemOptions = config.type === SquareType.Property || config.type === SquareType.TrainStation;
-    const showBuildingOptions = config.type === SquareType.Property;
-    if (!showMortgageRedeemOptions && !showBuildingOptions) {
-      return null;
-    }
-
-    return (
-      <ButtonGroup variant="contained" color="primary" aria-label="contained primary button group">
-        {showMortgageRedeemOptions && !isMortgaged() ? <Button color="primary" size="small" onClick={onMortgageProperty}>Mortgage</Button> : null}
-        {showMortgageRedeemOptions && isMortgaged() ? <Button color="primary" size="small" onClick={onRedeemProperty}>Redeem</Button> : null}
-
-        {showBuildingOptions ? <Button color="primary" size="small" onClick={onBuildHouse}>Build</Button> : null}
-        {showBuildingOptions ? <Button color="primary" size="small" onClick={onSellHouse}>Sell</Button> : null}
-      </ButtonGroup>
-    );
-  }
 
   const getSquareTaxAmount = () => {
     const data = getSquareGameData();
@@ -347,9 +247,6 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
             </Table>
           </TableContainer>
         </div>
-        <div className="actions">
-          {getPropertyActions()}
-        </div>
       </React.Fragment>
     );
   };
@@ -413,9 +310,6 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId, socketSer
               </TableBody>
             </Table>
           </TableContainer>
-        </div>
-        <div className="actions">
-          {getPropertyActions()}
         </div>
       </React.Fragment>
     );
