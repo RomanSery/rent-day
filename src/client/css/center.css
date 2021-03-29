@@ -21,7 +21,7 @@
 }
 
 .game-results {
-  flex-basis: 40%;
+  flex-basis: 30%;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
@@ -33,6 +33,7 @@
 
 .game-results .description {
   text-align: left;
+  font-size: calc(0.7rem + 0.4vw + 0.5vh);
 }
 
 .auction-container .auction-header {

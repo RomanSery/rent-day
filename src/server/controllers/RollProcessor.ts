@@ -266,13 +266,14 @@ export class RollProcessor {
         gotOutOfIsolation = true;
         this.player.rollHistory = [lastRoll];
         this.rollDesc += lastRoll.isDouble()
-          ? " <br /> rolled a double to get out of quarantine"
-          : " <br /> left quarantine after 3 turns";
+          ? " <br /> Rolled a double to get out of quarantine"
+          : " <br /> Left quarantine after 3 turns";
       } else {
         this.player.numTurnsInIsolation += 1;
         this.rollDesc +=
-          " <br /> still in quarantine # turns:" +
-          this.player.numTurnsInIsolation;
+          " <br /> Still in quarantine " +
+          this.player.numTurnsInIsolation +
+          "/3 turns";
       }
       this.player.hasRolled = true;
     } else if (
@@ -284,7 +285,7 @@ export class RollProcessor {
       this.player.position = isolation_position;
       this.player.hasRolled = true;
       this.rollDesc +=
-        " <br /> caught violating social distancing and put into quarantine";
+        " <br /> Caught violating social distancing and put into quarantine";
 
       if (this.hasRolledThreeConsecutiveDoubles()) {
         rolledThreeDouibles = true;
