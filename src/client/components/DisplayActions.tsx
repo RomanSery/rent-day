@@ -10,7 +10,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faTimesCircle, faCheckCircle, faTrain, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faCheckCircle, faTrain, faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
@@ -227,8 +227,33 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     setAnchorEl(null);
   };
 
+  const onFinishAction = () => {
+    setActionMode(ActionMode.None);
+  };
+
+  const getActionDescription = () => {
+    if (actionMode === ActionMode.Mortgage) {
+      return "Click on a property to mortgage it. When done click here";
+    } else if (actionMode === ActionMode.Redeem) {
+      return "Click on a property to redeem it. When done click here";
+    } else if (actionMode === ActionMode.Build) {
+      return "Click on a property to build houses on. When done click here";
+    } else if (actionMode === ActionMode.Sell) {
+      return "Click on a property to sell houses. When done click here";
+    }
+  }
+
+
   const getMyActions = () => {
     const myTurn = isMyTurn();
+
+    if (actionMode !== ActionMode.None) {
+      return (
+        <Button variant="contained" color="primary" onClick={onFinishAction}>{getActionDescription()}</Button>
+      );
+    }
+
+
     return (
       <React.Fragment>
         {myTurn ? getRollBtn() : null}
@@ -244,23 +269,18 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
         {myTurn ? getCompleteTurnBtn() : null}
 
-        mode: {actionMode}
-
         <Button startIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="contained" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
         <Menu id="my-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
-          <MenuItem onClick={() => onSetActionMode(ActionMode.Mortgage)}>Mortgage</MenuItem>
-          <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>
-          <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>
-          <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>
+          {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Mortgage)}>Mortgage</MenuItem>}
+          {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>}
+          {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>}
+          {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>}
           <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
           <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
           <MenuItem onClick={onViewHelp}>Help</MenuItem>
+          {myTurn && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</MenuItem>}
         </Menu>
 
-        {myTurn &&
-          <Button variant="contained" color="secondary" startIcon={<FontAwesomeIcon icon={faTimesCircle} />}
-            onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</Button>
-        }
       </React.Fragment>
     );
   }
