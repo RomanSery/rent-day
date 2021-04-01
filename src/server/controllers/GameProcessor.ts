@@ -178,7 +178,6 @@ export class GameProcessor {
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
 
-    //TODO just for testing
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {
         GameProcessor.assignSquareTesting(game, game.players[1], id, 30);

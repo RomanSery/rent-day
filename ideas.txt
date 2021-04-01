@@ -11,7 +11,7 @@ make corruption skill better maybe
 maybe increase luck percentage
 change wording to say 'percentage points'
 
-was able to trade with igor even though he was bankrupt
+try to make the player pieces stand out more
 
 DEPLOYMENT
 git push dokku master

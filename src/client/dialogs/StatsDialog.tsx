@@ -11,6 +11,7 @@ import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
 import { getElectricityTooltip, getTaxTooltip } from "../uiHelpers";
+import { PlayerState } from "../../core/enums/PlayerState";
 
 interface Props {
   open: boolean;
@@ -33,6 +34,9 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
     const uid = getMyUserId();
     const player = getPlayerById(params);
     if (player && areObjectIdsEqual(player._id, uid)) {
+      return false;
+    }
+    if (player && player.state === PlayerState.BANKRUPT) {
       return false;
     }
     return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
