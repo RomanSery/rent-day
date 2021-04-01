@@ -56,36 +56,16 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
   return (
 
     <React.Fragment>
-      <div className="chat-messages">
-        <ul>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          <li>fewfewfew1</li>
-          {chatHistory.map((m) => (
-            <li key={m.id}>
-              <b>{m.player}</b> - {m.msg}
-            </li>
-          ))}
-        </ul>
+      <div className="chat-row">
+        <div className="chat-messages">
+          <ul>
+            {chatHistory.map((m) => (
+              <li key={m.id}>
+                <b>{m.player}</b> - {m.msg}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
 

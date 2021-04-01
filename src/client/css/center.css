@@ -220,6 +220,7 @@
 
 .chat-row {
   height: 100%;
+  overflow: scroll;
 }
 
 .chat-messages {
@@ -230,5 +231,4 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
-  overflow: scroll;
 }

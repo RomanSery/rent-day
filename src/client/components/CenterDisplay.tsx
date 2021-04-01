@@ -200,9 +200,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
           </div>
 
-          <div className="chat-row">
-            <ChatWindow gameInfo={gameInfo} socketService={socketService} />
-          </div>
+          <ChatWindow gameInfo={gameInfo} socketService={socketService} />
 
         </div>
 
