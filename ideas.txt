@@ -1,6 +1,5 @@
 turn timer, autction timer, lotto timer
 
-add socket.io debug back and try to see why socket connection closes after a while
 add more chance events
 
 bug when offering a trade will negative money, says cant offer more than what you have ($0)

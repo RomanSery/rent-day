@@ -89,6 +89,7 @@ export class GameServer {
       this.auctionEvents(socket);
       this.tradeEvents(socket);
       this.lottoEvents(socket);
+      this.chatEvents(socket);
 
       socket.on(GameEvent.SHOW_SNACK_MSG, (gameId: string, msg: string) => {
         socket.to(gameId).broadcast.emit(GameEvent.SHOW_SNACK_MSG, msg);
@@ -106,6 +107,15 @@ export class GameServer {
         this.io
           .in(gameId)
           .emit(GameEvent.UPDATE_GAME_STATE, gameState, showChance);
+      }
+    );
+  }
+
+  private chatEvents(socket: GameSocket): void {
+    socket.on(
+      GameEvent.SEND_CHAT_MSG,
+      (gameId: string, msg: string, playerId: string) => {
+        socket.to(gameId).broadcast.emit(GameEvent.NEW_CHAT_MSG, msg, playerId);
       }
     );
   }

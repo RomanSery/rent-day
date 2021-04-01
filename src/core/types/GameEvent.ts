@@ -18,4 +18,7 @@ export enum GameEvent {
 
   SEND_TRADE_OFFER = "sendTradeOffer",
   TRADE_OFFER_REVIEWED = "tradeOfferReviewed",
+
+  SEND_CHAT_MSG = "sendChatMsg",
+  NEW_CHAT_MSG = "newChatMsg",
 }

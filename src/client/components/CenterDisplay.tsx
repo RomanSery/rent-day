@@ -25,6 +25,7 @@ import { useHistory } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@material-ui/core";
 import { ActionMode } from "../../core/enums/ActionMode";
+import { ChatWindow } from "./ChatWindow";
 
 
 interface Props {
@@ -197,6 +198,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
               <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
             </div>
 
+          </div>
+
+          <div className="chat-row">
+            <ChatWindow gameInfo={gameInfo} socketService={socketService} />
           </div>
 
         </div>
