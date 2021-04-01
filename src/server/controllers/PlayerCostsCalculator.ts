@@ -3,7 +3,7 @@ import { Player } from "../../core/types/Player";
 import { TaxSummaryRow } from "../../core/types/TaxSummaryRow";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual, canTravel, dollarFormatterServer } from "./helpers";
-import { conEd_position } from "../../core/constants";
+import { conEd_position, corruptionAdjustment } from "../../core/constants";
 import { Traits } from "../traits/Traits";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { PlayerClass } from "../../core/enums/PlayerClass";
@@ -79,7 +79,13 @@ export class PlayerCostsCalculator {
 
     player.electricityTooltip = details.join(";");
 
-    player.electricityCostsPerTurn = Math.round(total);
+    const corruptionAdjustmentPercent =
+      (player.corruption * corruptionAdjustment) / 100.0;
+    const substraction = total * corruptionAdjustmentPercent;
+    const finalTotal = total - substraction;
+
+    player.electricityCostsPerTurn =
+      finalTotal > 0 ? Math.round(finalTotal) : 0;
   }
 
   private static calculateTaxCostsForPlayer(
@@ -137,11 +143,12 @@ export class PlayerCostsCalculator {
     });
     player.taxTooltip = details.join(";");
 
-    const corruptionAdjustment = (player.corruption * 3) / 100.0;
-    const substraction = total * corruptionAdjustment;
+    const corruptionAdjustmentPercent =
+      (player.corruption * corruptionAdjustment) / 100.0;
+    const substraction = total * corruptionAdjustmentPercent;
     const finalTotal = total - substraction;
 
-    player.taxesPerTurn = Math.round(finalTotal);
+    player.taxesPerTurn = finalTotal > 0 ? Math.round(finalTotal) : 0;
   }
 
   private static calculateTotalAssetsForPlayer(

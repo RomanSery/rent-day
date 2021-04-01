@@ -212,7 +212,7 @@ const getSkillDescription = (type: SkillType): JSX.Element => {
   } else if (type === SkillType.Corruption) {
     return (
       <React.Fragment>
-        {"Each point "} <b>{"lowers"}</b> {" your taxes per turn by "} <b>{corruptionAdjustment}</b>{"% percentage points"}
+        {"Each point "} <b>{"lowers"}</b> {" your taxes & electricity costs per turn by "} <b>{corruptionAdjustment}</b>{"% percentage points"}
       </React.Fragment>
     );
   }
