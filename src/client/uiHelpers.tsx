@@ -200,19 +200,19 @@ const getSkillDescription = (type: SkillType): JSX.Element => {
   if (type === SkillType.Luck) {
     return (
       <React.Fragment>
-        {"Each point "} <b>{"increases"}</b> {" your chance to win lotto prizes by "} <b>{luckAdjustment}</b>{"%"}
+        {"Each point "} <b>{"increases"}</b> {" your chance to win lotto prizes by "} <b>{luckAdjustment}</b>{"% percentage points"}
       </React.Fragment>
     );
   } else if (type === SkillType.Negotiation) {
     return (
       <React.Fragment>
-        {"Each point "} <b>{"lowers"}</b> {" the rent you pay by "} <b>{negotiationAdjustment}</b>{"%"}
+        {"Each point "} <b>{"lowers"}</b> {" the rent you pay by "} <b>{negotiationAdjustment}</b>{"% percentage points"}
       </React.Fragment>
     );
   } else if (type === SkillType.Corruption) {
     return (
       <React.Fragment>
-        {"Each point "} <b>{"lowers"}</b> {" your taxes per turn by "} <b>{corruptionAdjustment}</b>{"%"}
+        {"Each point "} <b>{"lowers"}</b> {" your taxes per turn by "} <b>{corruptionAdjustment}</b>{"% percentage points"}
       </React.Fragment>
     );
   }

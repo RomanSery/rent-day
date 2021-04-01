@@ -10,7 +10,7 @@ export const defaultStartSkillPoints: number = 5;
 
 export const payToGetOutFee: number = 100;
 
-export const luckAdjustment: number = 2;
+export const luckAdjustment: number = 3;
 export const negotiationAdjustment: number = 3;
 export const corruptionAdjustment: number = 3;
 

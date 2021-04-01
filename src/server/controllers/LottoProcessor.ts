@@ -11,6 +11,7 @@ import { Player } from "../../core/types/Player";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { luckAdjustment } from "../../core/constants";
 
 export class LottoProcessor {
   private optNum: number;
@@ -163,7 +164,7 @@ export class LottoProcessor {
     player: Player
   ): Promise<mongoose.Types.ObjectId> {
     const classType = player.playerClass;
-    const luckIncrease = player.luck * 2;
+    const luckIncrease = player.luck * luckAdjustment;
 
     const smallPrize = LottoProcessor.getRandomIntInclusive(100, 200);
     const smallPrizePercent = 50 + luckIncrease;

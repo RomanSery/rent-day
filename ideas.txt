@@ -2,14 +2,12 @@ turn timer, autction timer, lotto timer
 
 add more chance events
 
-bug when offering a trade will negative money, says cant offer more than what you have ($0)
+bug when offering a trade with negative money, says cant offer more than what you have ($0)
 
 show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
 
 maybe small chance of something bad happening when doing train travel
 make corruption skill better maybe
-maybe increase luck percentage
-change wording to say 'percentage points'
 
 try to make the player pieces stand out more
 
