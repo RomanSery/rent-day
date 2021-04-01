@@ -2,7 +2,6 @@ turn timer, autction timer, lotto timer
 
 add more chance events
 
-bug when offering a trade with negative money, says cant offer more than what you have ($0)
 
 show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
 

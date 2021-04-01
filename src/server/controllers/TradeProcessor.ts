@@ -89,11 +89,18 @@ export class TradeProcessor {
       return this.otherPlayer.name + " is bankrupt";
     }
 
-    if (this.myAmount < 0 || this.myAmount > this.me.money) {
+    if (this.myAmount < 0) {
+      return "Can't give less than $0";
+    }
+
+    if (this.myAmount > 0 && this.myAmount > this.me.money) {
       return "Can't give more than you have";
     }
 
-    if (this.theirAmount < 0 || this.theirAmount > this.otherPlayer.money) {
+    if (this.theirAmount < 0) {
+      return "They can't give less than $0";
+    }
+    if (this.theirAmount > 0 && this.theirAmount > this.otherPlayer.money) {
       return "Can't get more than they have";
     }
 
@@ -254,14 +261,22 @@ export class TradeProcessor {
       return participant2.name + " is bankrupt";
     }
 
+    if (tradeDoc.participant1.amountGiven < 0) {
+      return "Can't give less than $0";
+    }
+
     if (
-      tradeDoc.participant1.amountGiven < 0 ||
+      tradeDoc.participant1.amountGiven > 0 &&
       tradeDoc.participant1.amountGiven > participant1.money
     ) {
       return "Can't give more than you have";
     }
+
+    if (tradeDoc.participant2.amountGiven < 0) {
+      return "They can't give less than $0";
+    }
     if (
-      tradeDoc.participant2.amountGiven < 0 ||
+      tradeDoc.participant2.amountGiven > 0 &&
       tradeDoc.participant2.amountGiven > participant2.money
     ) {
       return "Can't get more than they have";
