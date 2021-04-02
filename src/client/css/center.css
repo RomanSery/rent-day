@@ -235,3 +235,8 @@
   padding: 0;
   margin: 0;
 }
+
+.lotto-result {
+  font-size: 130%;
+  font-weight: bold;
+}

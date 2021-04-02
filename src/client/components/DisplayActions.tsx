@@ -133,6 +133,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       if (myPlayer.money < 0) {
         return false;
       }
+      if (gameInfo && gameInfo.lottoId) {
+        return false;
+      }
       return true;
     }
 
