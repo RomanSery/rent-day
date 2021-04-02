@@ -1,4 +1,5 @@
 import { GameStatus } from "../enums/GameStatus";
+import { ChatMsg } from "./ChatMsg";
 import { LastResult } from "./LastResult";
 import { Player } from "./Player";
 import { Settings } from "./Settings";
@@ -18,4 +19,5 @@ export interface GameState {
   readonly lottoId: string;
   readonly results: LastResult;
   readonly status: GameStatus;
+  readonly messages: Array<ChatMsg>;
 }

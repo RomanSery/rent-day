@@ -6,7 +6,7 @@ import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getMyPlayerName, getMyUserId } from "../helpers";
+import { getMyPlayerName } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 
 interface Props {
@@ -17,22 +17,17 @@ interface Props {
 export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
 
   const [sendChatMsg, setSendChatMsg] = React.useState<string | undefined>();
-  const [chatHistory, setChatHistory] = React.useState<Array<ChatMsg>>([]);
 
   React.useEffect(() => {
-    socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: string, playerId: string) => {
-      const player = gameInfo && gameInfo.players.find((p) => areObjectIdsEqual(p._id, playerId));
-      setChatHistory([
-        ...chatHistory,
-        {
-          id: chatHistory.length,
-          msg: msg,
-          player: player ? player.name : ""
-        }
-      ]);
+    socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
+      appendToChatWindow(msg);
 
+      const ul = document.getElementById("chat-window-ul");
+      if (ul) {
+        ul.scrollIntoView(false);
+      }
     });
-  }, [chatHistory, gameInfo, socketService]);
+  }, [socketService]);
 
 
   const onChangeChatMsg = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
@@ -40,17 +35,26 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
   };
 
   const sendChatEvent = () => {
-    socketService.socket.emit(GameEvent.SEND_CHAT_MSG, gameInfo?._id, sendChatMsg, getMyUserId());
-    setSendChatMsg("");
+    if (gameInfo && sendChatMsg && getMyPlayerName()) {
 
-    setChatHistory([
-      ...chatHistory,
-      {
-        id: chatHistory.length,
-        msg: sendChatMsg ? sendChatMsg : "",
+      const newMsg: ChatMsg = {
+        msg: sendChatMsg,
         player: getMyPlayerName()!
-      }
-    ]);
+      };
+
+      socketService.socket.emit(GameEvent.SEND_CHAT_MSG, gameInfo._id, newMsg);
+      setSendChatMsg("");
+      appendToChatWindow(newMsg);
+    }
+  }
+
+  const appendToChatWindow = (msg: ChatMsg) => {
+    const ul = document.getElementById("chat-window-ul");
+    if (ul) {
+      const li = document.createElement("li");
+      li.innerHTML = "<b>" + msg.player + "</b> - " + msg.msg;
+      ul.appendChild(li);
+    }
   }
 
   return (
@@ -58,9 +62,9 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
     <React.Fragment>
       <div className="chat-row">
         <div className="chat-messages">
-          <ul>
-            {chatHistory.map((m) => (
-              <li key={m.id}>
+          <ul id="chat-window-ul">
+            {gameInfo?.messages.map((m) => (
+              <li key={m._id}>
                 <b>{m.player}</b> - {m.msg}
               </li>
             ))}

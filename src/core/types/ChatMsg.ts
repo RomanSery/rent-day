@@ -1,5 +1,5 @@
 export interface ChatMsg {
-  id: number;
+  _id?: string;
   msg: string;
   player: string;
 }

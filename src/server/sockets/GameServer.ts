@@ -13,6 +13,7 @@ import { LottoDocument } from "../../core/schema/LottoSchema";
 import { LottoProcessor } from "../controllers/LottoProcessor";
 import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
+import { ChatMsg } from "../../core/types/ChatMsg";
 
 export class GameServer {
   private io: Server;
@@ -101,12 +102,10 @@ export class GameServer {
     socket.on(
       GameEvent.UPDATE_GAME_STATE,
       async (gameId: string, showChance?: boolean) => {
-        const gameState: GameInstanceDocument | null = await GameProcessor.getGame(
+        const game: GameInstanceDocument | null = await GameProcessor.getGame(
           new mongoose.Types.ObjectId(gameId)
         );
-        this.io
-          .in(gameId)
-          .emit(GameEvent.UPDATE_GAME_STATE, gameState, showChance);
+        this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE, game, showChance);
       }
     );
   }
@@ -114,8 +113,16 @@ export class GameServer {
   private chatEvents(socket: GameSocket): void {
     socket.on(
       GameEvent.SEND_CHAT_MSG,
-      (gameId: string, msg: string, playerId: string) => {
-        socket.to(gameId).broadcast.emit(GameEvent.NEW_CHAT_MSG, msg, playerId);
+      async (gameId: string, newMsg: ChatMsg) => {
+        const game: GameInstanceDocument | null = await GameProcessor.getGame(
+          new mongoose.Types.ObjectId(gameId)
+        );
+        if (game) {
+          game.messages.push(newMsg);
+          await game.save();
+        }
+
+        socket.to(gameId).broadcast.emit(GameEvent.NEW_CHAT_MSG, newMsg);
       }
     );
   }

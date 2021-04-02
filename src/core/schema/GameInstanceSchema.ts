@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { GameStatus } from "../enums/GameStatus";
+import { ChatMsg } from "../types/ChatMsg";
 import { LastResult } from "../types/LastResult";
 import { Player } from "../types/Player";
 import { Settings } from "../types/Settings";
@@ -38,6 +39,11 @@ const PlayerSchema = new mongoose.Schema({
   canTravel: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
   numTurnsInIsolation: { type: Number, required: true },
+});
+
+const ChatMsgSchema = new mongoose.Schema({
+  msg: { type: String, required: true },
+  player: { type: String, required: true },
 });
 
 const SquareGameDataSchema = new mongoose.Schema({
@@ -80,6 +86,7 @@ export type GameInstanceDocument = mongoose.Document & {
   status: GameStatus;
   results: LastResult;
   createdBy: mongoose.Types.ObjectId;
+  messages: ChatMsg[];
 };
 
 const gameInstanceSchema = new mongoose.Schema(
@@ -97,6 +104,7 @@ const gameInstanceSchema = new mongoose.Schema(
     status: String,
     results: Schema.Types.Mixed,
     createdBy: mongoose.Types.ObjectId,
+    messages: [ChatMsgSchema],
   },
   { timestamps: true }
 );
