@@ -13,10 +13,10 @@ flash window when its your turn
 
 even on prod, it says connecting to socket twice!
 
-when he bid 0, it showed as if he bid nothing (empty)
-
 
 put game length
+
+add 'distribute points' message if available
 
 
 It's easy to made a connclusion that I won, but there wasn't any specific message with winners name

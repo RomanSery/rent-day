@@ -106,7 +106,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
       if (auctionState.winnerId && areObjectIdsEqual(bidder._id, auctionState.winnerId)) {
         return (<strong>{dollarFormatter.format(bidder.bid!)}</strong>);
       }
-      return bidder.bid ? dollarFormatter.format(bidder.bid) : "";
+      return bidder.bid && bidder.bid > 0 ? dollarFormatter.format(bidder.bid) : "$0";
     }
 
     if (bidder.submittedBid) {
