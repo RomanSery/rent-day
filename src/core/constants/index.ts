@@ -12,7 +12,7 @@ export const payToGetOutFee: number = 100;
 
 export const luckAdjustment: number = 3;
 export const negotiationAdjustment: number = 3;
-export const corruptionAdjustment: number = 4;
+export const corruptionAdjustment: number = 5;
 
 export const player_colors = [
   "#0014f3", //blue

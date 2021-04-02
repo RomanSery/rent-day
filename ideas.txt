@@ -8,6 +8,34 @@ add more chance events
 
 turn timer, autction timer, lotto timer
 
+have to scroll chat window to bottom whe new msg arrives
+flash window when its your turn
+
+even on prod, it says connecting to socket twice!
+
+when he bid 0, it showed as if he bid nothing (empty)
+
+browser slows down eventually asks to stop page
+
+msg that says you must build evenly, but still allows building house
+
+when rolling a double and landing on lotto, can roll again without picking
+
+put game length
+
+
+It's easy to made a connclusion that I won, but there wasn't any specific message with winners name
+
+
+Once someone chooses “Help” from the main page there’s no button to move back to the main menu
+Favicon is still React logo
+I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
+
+
+Chat history is lost when I refresh the browser
+when you have 3 items: 1) build on item 1; 2) build on item 2; 3) build on item 3; 4) build on item 1, you'll receive a warninng message, but the house will be built. It seems to me like building a lot of houses on a single section can make the game unbalanced in such a way that the other players will spend a lot at the early stage of the game if they’re placed at the field which has a lot of houses built fast
+
+
 
 DEPLOYMENT
 git push dokku master
