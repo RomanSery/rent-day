@@ -16,8 +16,6 @@ even on prod, it says connecting to socket twice!
 
 put game length
 
-add 'distribute points' message if available
-
 
 It's easy to made a connclusion that I won, but there wasn't any specific message with winners name
 

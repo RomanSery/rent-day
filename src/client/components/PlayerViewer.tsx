@@ -69,6 +69,14 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
     return "";
   }
 
+  const hasPointsAvailable = () => {
+    const p = getPlayer();
+    if (p && p.numAbilityPoints > 0) {
+      return true;
+    }
+    return false;
+  }
+
   const getPlayerTaxes = () => {
     const p = getPlayer();
     if (p) {
@@ -188,6 +196,7 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
                 <TableCell component="th" scope="row" colSpan={2}>
                   <div className="row-small-name">Points available</div>
                   {getPlayerPointsAvailable()}
+                  {hasPointsAvailable() && <div><strong>Distribute your points!</strong></div>}
                 </TableCell>
               </TableRow>
 
