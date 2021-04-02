@@ -28,7 +28,7 @@ It's easy to made a connclusion that I won, but there wasn't any specific messag
 
 
 Once someone chooses “Help” from the main page there’s no button to move back to the main menu
-Favicon is still React logo
+
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 
 
