@@ -54,7 +54,7 @@ if (IS_DEV) {
       name: COOKIE_NAME,
       secret: COOKIE_SECRET,
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     })
   );
 } else {
@@ -66,7 +66,7 @@ if (IS_DEV) {
       httpOnly: true,
       domain: "coderdreams.com",
       sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
     })
   );
 }

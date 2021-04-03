@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import API from '../api';
 import { Button } from "@material-ui/core";
 
@@ -67,6 +67,10 @@ export const DisplayAllGames: React.FC<Props> = () => {
             ))}
           </TableBody>
         </Table>
+
+        <br />
+        <Link to="/dashboard">GO BACK</Link>
+
       </TableContainer>
 
     </React.Fragment>

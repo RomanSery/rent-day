@@ -3,7 +3,7 @@ maybe small chance of something bad happening when doing train travel
 show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
 
 
-add more chance events (snitch on neighbor, get reward)
+add more chance events
 
 turn timer, autction timer, lotto timer
 
@@ -13,12 +13,27 @@ flash window when its your turn
 even on prod, it says connecting to socket twice!
 
 
-Once someone chooses “Help” from the main page there’s no button to move back to the main menu
-
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 
 have to sanitize chat messages and limit lenght
 
+make chance events give more detail, like 10% of your money, and say how much
+
+
+session cookie expired, get msg 'invalid auth token'
 
 DEPLOYMENT
 git push dokku master
+
+
+
+good
+snitch on neighbor for hosting small gathering, get reward $55
+Model citizen, You reported $20 you found on the street as income.your parents for 
+
+
+bad
+pay carbon tax 5%
+vehicle mileage tax, pay $5 for each square you moved
+
+

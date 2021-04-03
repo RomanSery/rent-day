@@ -8,6 +8,7 @@ import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import { PlayerInfo } from "../../core/types/PlayerInfo";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@material-ui/data-grid';
+import { Link } from "react-router-dom";
 
 interface Props {
 
@@ -85,6 +86,9 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
         <DataGrid rows={getDataRows()} columns={columns} autoHeight={true} density="compact"
           disableColumnMenu={true} disableColumnSelector={true}
           disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
+
+        <br />
+        <Link to="/dashboard">GO BACK</Link>
 
       </TableContainer>
 

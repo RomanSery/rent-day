@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, TextField, FormControl, InputLabel, NativeSelect, Typography } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 
 
@@ -53,6 +54,10 @@ export const ContactUsPage: React.FC<Props> = () => {
 
         <Button variant="contained" color="primary" type="submit">Submit</Button>
       </form>
+
+      <br />
+
+      <Link to="/dashboard">GO BACK</Link>
 
     </React.Fragment>
   );

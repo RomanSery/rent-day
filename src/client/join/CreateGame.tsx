@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import API from '../api';
@@ -90,6 +90,9 @@ export const CreateGame: React.FC<Props> = () => {
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
       </form>
+
+      <br />
+      <Link to="/dashboard">GO BACK</Link>
 
     </React.Fragment>
   );

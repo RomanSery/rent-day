@@ -2,7 +2,7 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
-import { useHistory } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { handleApiError, setCurrSessionInfo } from "../helpers";
 import _ from "lodash/fp";
 
@@ -62,6 +62,10 @@ export const LoginPage: React.FC<Props> = () => {
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Log In</Button>
       </form>
+
+      <br />
+
+      <Link to="/auth">GO BACK</Link>
 
     </React.Fragment>
   );
