@@ -1,10 +1,9 @@
-try to make the player pieces stand out more
 add more detail to tax/electric tooltips to show how corruption is effectin the values
 maybe small chance of something bad happening when doing train travel
 show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
 
 
-add more chance events
+add more chance events (snitch on neighbor, get reward)
 
 turn timer, autction timer, lotto timer
 
