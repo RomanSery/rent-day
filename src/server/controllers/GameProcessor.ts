@@ -27,7 +27,7 @@ import { PlayerProcessor } from "./PlayerProcessor";
 import bcrypt from "bcrypt-nodejs";
 import { SquareType } from "../../core/enums/SquareType";
 import { IS_DEV } from "../util/secrets";
-import { differenceInDays } from "date-fns";
+import { differenceInDays, differenceInMinutes } from "date-fns";
 
 export class GameProcessor {
   public async createGame(
@@ -180,7 +180,7 @@ export class GameProcessor {
 
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {
-        //GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+        GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
       }
     }
 
@@ -438,6 +438,11 @@ export class GameProcessor {
       game.players.filter((p) => p.state !== PlayerState.BANKRUPT).length === 1;
     if (isGameOver) {
       game.status = GameStatus.FINISHED;
+      game.gameLength = differenceInMinutes(
+        new Date(),
+        game._id.getTimestamp()
+      );
+
       const winner = game.players.filter(
         (p) => p.state !== PlayerState.BANKRUPT
       )[0];

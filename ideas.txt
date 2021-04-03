@@ -26,9 +26,6 @@ I wish I hade this stuff logged somewhere (in the chat, for example). Like who p
 
 have to sanitize chat messages and limit lenght
 
-msg that says you must build evenly, but still allows building house
-when you have 3 items: 1) build on item 1; 2) build on item 2; 3) build on item 3; 4) build on item 1, you'll receive a warninng message, but the house will be built. It seems to me like building a lot of houses on a single section can make the game unbalanced in such a way that the other players will spend a lot at the early stage of the game if they’re placed at the field which has a lot of houses built fast
-
 
 
 DEPLOYMENT

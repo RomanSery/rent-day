@@ -87,6 +87,7 @@ export type GameInstanceDocument = mongoose.Document & {
   results: LastResult;
   createdBy: mongoose.Types.ObjectId;
   messages: ChatMsg[];
+  gameLength: number | null;
 };
 
 const gameInstanceSchema = new mongoose.Schema(
@@ -105,6 +106,7 @@ const gameInstanceSchema = new mongoose.Schema(
     results: Schema.Types.Mixed,
     createdBy: mongoose.Types.ObjectId,
     messages: [ChatMsgSchema],
+    gameLength: Number,
   },
   { timestamps: true }
 );
