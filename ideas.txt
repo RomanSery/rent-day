@@ -24,16 +24,3 @@ session cookie expired, get msg 'invalid auth token'
 
 DEPLOYMENT
 git push dokku master
-
-
-
-good
-snitch on neighbor for hosting small gathering, get reward $55
-Model citizen, You reported $20 you found on the street as income.your parents for 
-
-
-bad
-pay carbon tax 5%
-vehicle mileage tax, pay $5 for each square you moved
-
-

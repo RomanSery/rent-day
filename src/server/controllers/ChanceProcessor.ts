@@ -3,6 +3,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
+import { DiceRoll } from "../../core/types/DiceRoll";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areIdsEqual } from "./helpers";
@@ -134,6 +135,32 @@ export class ChanceProcessor {
       },
     });
 
+    this.events.push({
+      isGood: false,
+      headline: "Carbon Tax",
+      subLine:
+        "Everyone must do their part for the environment. Pay <b>5% of your money</b> for your carbon emissions",
+      chanceId: 6,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        const subtraction = Math.round(player.money * 0.05);
+        player.money -= subtraction;
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: false,
+      headline: "Vehicle Mileage Tax",
+      subLine: "Pay $5 for each square you just moved",
+      chanceId: 8,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        const lastRoll: DiceRoll = player.rollHistory[0];
+        const subtraction = Math.round(lastRoll.sum() * 5);
+        player.money -= subtraction;
+        return false;
+      },
+    });
+
     //GOOD ONES
 
     this.events.push({
@@ -222,6 +249,30 @@ export class ChanceProcessor {
       chanceId: 24,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money += 200;
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Snitched",
+      subLine:
+        "You snitched on your neighbor for hosting a small indoor gathering. Recieve a $55 reward",
+      chanceId: 27,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        player.money += 55;
+        return false;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Government First",
+      subLine:
+        "Your reported your parents to the authorities for not wearing their masks.  Collect a $70 reward",
+      chanceId: 28,
+      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+        player.money += 70;
         return false;
       },
     });
