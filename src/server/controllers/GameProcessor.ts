@@ -451,6 +451,8 @@ export class GameProcessor {
         await PlayerProcessor.updateWins(
           new mongoose.Types.ObjectId(winner._id)
         );
+
+        game.winner = winner.name;
       }
     }
 

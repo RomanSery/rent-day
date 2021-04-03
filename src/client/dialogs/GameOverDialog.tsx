@@ -9,6 +9,7 @@ import { areObjectIdsEqual, getIconProp } from "../helpers";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Container, List, ListItem, ListItemText } from "@material-ui/core";
 
 
 interface Props {
@@ -81,10 +82,37 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
     return rows;
   }
 
+  const getGameLength = () => {
+    if (gameInfo) {
+      return "Game Length: " + gameInfo.gameLength + " minutes";
+    }
+    return "";
+  }
+
+  const getWinnerName = () => {
+    if (gameInfo) {
+      return "Winner: " + gameInfo.winner;
+    }
+    return "";
+  }
+
   return (
     <Dialog fullWidth={true} maxWidth="md" disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="game-over-dialog-title" open={open}>
       <DialogTitle id="game-over-dialog-title">Game Over</DialogTitle>
       <DialogContent>
+
+        <Container maxWidth="xs">
+          <List dense={true} className="game-over-overview">
+            <ListItem>
+              <ListItemText primary={getWinnerName()} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary={getGameLength()} />
+            </ListItem>
+          </List>
+        </Container>
+
+
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"
             disableColumnMenu={true} disableColumnSelector={true}

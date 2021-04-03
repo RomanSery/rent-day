@@ -21,4 +21,5 @@ export interface GameState {
   readonly status: GameStatus;
   readonly messages: Array<ChatMsg>;
   readonly gameLength: number;
+  readonly winner: string;
 }

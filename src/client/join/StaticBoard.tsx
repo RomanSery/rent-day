@@ -30,7 +30,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       _id: '', auctionId: '', auctionSquareId: 0, lottoId: '',
       theme: themeArray, players: [], status: GameStatus.FINISHED,
       nextPlayerToAct: '',
-      name: 'static', messages: [],
+      name: 'static', messages: [], gameLength: 0, winner: '',
       settings: {
         maxPlayers: 0, initialMoney: 0, password: '',
       }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []

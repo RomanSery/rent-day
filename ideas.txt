@@ -14,18 +14,11 @@ flash window when its your turn
 even on prod, it says connecting to socket twice!
 
 
-put game length
-
-
-It's easy to made a connclusion that I won, but there wasn't any specific message with winners name
-
-
 Once someone chooses “Help” from the main page there’s no button to move back to the main menu
 
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 
 have to sanitize chat messages and limit lenght
-
 
 
 DEPLOYMENT

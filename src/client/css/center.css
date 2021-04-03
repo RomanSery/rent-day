@@ -240,3 +240,7 @@
   font-size: 130%;
   font-weight: bold;
 }
+
+.game-over-overview .MuiListItemText-primary {
+  font-weight: bold;
+}
