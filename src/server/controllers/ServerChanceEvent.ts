@@ -4,4 +4,5 @@ import { Player } from "../../core/types/Player";
 
 export interface ServerChanceEvent extends ChanceEvent {
   makeItHappen: (game: GameInstanceDocument, player: Player) => boolean;
+  getSubLine: (game: GameInstanceDocument, player: Player) => string;
 }

@@ -6,7 +6,7 @@ import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
 import { DiceRoll } from "../../core/types/DiceRoll";
 import { Player } from "../../core/types/Player";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areIdsEqual } from "./helpers";
+import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { ServerChanceEvent } from "./ServerChanceEvent";
 
@@ -56,6 +56,9 @@ export class ChanceProcessor {
         player.money -= 150;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
     });
 
     this.events.push({
@@ -67,12 +70,15 @@ export class ChanceProcessor {
         player.money -= 120;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
     });
 
     this.events.push({
       isGood: false,
       headline: "Pay off your debts",
-      subLine: "Pay each active player <b>$30</b>",
+      subLine: "Pay back each active player <b>$30</b>",
       chanceId: 3,
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         const activePlayers = game.players.filter(
@@ -91,6 +97,16 @@ export class ChanceProcessor {
         player.money -= Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const activePlayers = game.players.filter(
+          (p) =>
+            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
+        );
+        const total = 30 * activePlayers.length;
+        return (
+          this.subLine + "<br /> (" + dollarFormatterServer.format(total) + ")"
+        );
       },
     });
 
@@ -121,6 +137,27 @@ export class ChanceProcessor {
         PlayerCostsCalculator.updatePlayerCosts(game, player);
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
+          (s: SquareGameData) => {
+            return (
+              s.owner &&
+              areIdsEqual(s.owner, player._id) &&
+              s.numHouses > 0 &&
+              !s.isMortgaged
+            );
+          }
+        );
+
+        let totalHouses = 0;
+        for (const squareState of playerOwnedSquaresWithHouses) {
+          totalHouses += squareState.numHouses;
+        }
+        const total = totalHouses * 40;
+        return (
+          this.subLine + "<br /> (" + dollarFormatterServer.format(total) + ")"
+        );
+      },
     });
 
     this.events.push({
@@ -132,6 +169,15 @@ export class ChanceProcessor {
         const subtraction = Math.round(player.money * 0.1);
         player.money -= subtraction;
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const subtraction = Math.round(player.money * 0.1);
+        return (
+          this.subLine +
+          "<br /> (" +
+          dollarFormatterServer.format(subtraction) +
+          ")"
+        );
       },
     });
 
@@ -146,6 +192,15 @@ export class ChanceProcessor {
         player.money -= subtraction;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const subtraction = Math.round(player.money * 0.05);
+        return (
+          this.subLine +
+          "<br /> (" +
+          dollarFormatterServer.format(subtraction) +
+          ")"
+        );
+      },
     });
 
     this.events.push({
@@ -159,6 +214,16 @@ export class ChanceProcessor {
         player.money -= subtraction;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const lastRoll: DiceRoll = player.rollHistory[0];
+        const subtraction = Math.round(lastRoll.sum() * 5);
+        return (
+          this.subLine +
+          "<br /> (" +
+          dollarFormatterServer.format(subtraction) +
+          ")"
+        );
+      },
     });
 
     //GOOD ONES
@@ -171,6 +236,9 @@ export class ChanceProcessor {
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money += 100;
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
       },
     });
 
@@ -196,6 +264,17 @@ export class ChanceProcessor {
         player.money += Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const activePlayers = game.players.filter(
+          (p) =>
+            p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
+        );
+
+        const total = activePlayers.length * 30;
+        return (
+          this.subLine + "<br /> (" + dollarFormatterServer.format(total) + ")"
+        );
       },
     });
 
@@ -229,6 +308,26 @@ export class ChanceProcessor {
         PlayerCostsCalculator.updatePlayerCosts(game, player);
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
+          (s: SquareGameData) => {
+            return (
+              s.owner &&
+              areIdsEqual(s.owner, player._id) &&
+              !s.isMortgaged &&
+              s.tax &&
+              s.tax > 0 &&
+              s.purchasePrice &&
+              s.purchasePrice > 0
+            );
+          }
+        );
+
+        const total = playerOwnedSquares.length * 45;
+        return (
+          this.subLine + "<br /> (" + dollarFormatterServer.format(total) + ")"
+        );
+      },
     });
 
     this.events.push({
@@ -240,6 +339,9 @@ export class ChanceProcessor {
         player.numAbilityPoints += 1;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
     });
 
     this.events.push({
@@ -250,6 +352,9 @@ export class ChanceProcessor {
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money += 200;
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
       },
     });
 
@@ -263,6 +368,9 @@ export class ChanceProcessor {
         player.money += 55;
         return false;
       },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
     });
 
     this.events.push({
@@ -274,6 +382,9 @@ export class ChanceProcessor {
       makeItHappen(game: GameInstanceDocument, player: Player): boolean {
         player.money += 70;
         return false;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
       },
     });
   }

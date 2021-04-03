@@ -127,6 +127,7 @@ export class RollProcessor {
       chance = await processor.createChanceEvent();
       if (chance) {
         chance.makeItHappen(this.game, this.player);
+        chance.subLine = chance.getSubLine(this.game, this.player);
       }
     } else if (
       AuctionProcessor.shouldCreateAuction(this.game, this.player.position)

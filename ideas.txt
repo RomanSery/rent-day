@@ -4,8 +4,6 @@ show modal when someone goes bankrupt, but its not game over, saying like alex e
 
 flash window when its your turn (title alert)
 
-make chance events give more detail, like 10% of your money, and say how much
-
 session cookie expired, get msg 'invalid auth token'
 
 
