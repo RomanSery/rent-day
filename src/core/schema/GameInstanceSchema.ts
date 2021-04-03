@@ -41,11 +41,6 @@ const PlayerSchema = new mongoose.Schema({
   numTurnsInIsolation: { type: Number, required: true },
 });
 
-const ChatMsgSchema = new mongoose.Schema({
-  msg: { type: String, required: true },
-  player: { type: String, required: true },
-});
-
 const SquareGameDataSchema = new mongoose.Schema({
   squareId: { type: Number, required: true },
   owner: { type: String },
@@ -106,7 +101,7 @@ const gameInstanceSchema = new mongoose.Schema(
     status: String,
     results: Schema.Types.Mixed,
     createdBy: mongoose.Types.ObjectId,
-    messages: [ChatMsgSchema],
+    messages: [Schema.Types.Mixed],
     gameLength: Number,
     winner: String,
   },

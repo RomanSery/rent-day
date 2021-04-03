@@ -2,25 +2,16 @@ add more detail to tax/electric tooltips to show how corruption is effectin the 
 maybe small chance of something bad happening when doing train travel
 show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
 
-
-add more chance events
-
-turn timer, autction timer, lotto timer
-
-
-flash window when its your turn
-
-even on prod, it says connecting to socket twice!
-
-
-I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
-
-have to sanitize chat messages and limit lenght
+flash window when its your turn (title alert)
 
 make chance events give more detail, like 10% of your money, and say how much
 
-
 session cookie expired, get msg 'invalid auth token'
+
+
+add more chance events
+turn timer, autction timer, lotto timer
+I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 
 DEPLOYMENT
 git push dokku master

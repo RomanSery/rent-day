@@ -14,6 +14,7 @@ import { LottoProcessor } from "../controllers/LottoProcessor";
 import { TradeProcessor } from "../controllers/TradeProcessor";
 import { TradeDocument } from "../../core/schema/TradeSchema";
 import { ChatMsg } from "../../core/types/ChatMsg";
+import xss from "xss";
 
 export class GameServer {
   private io: Server;
@@ -118,6 +119,15 @@ export class GameServer {
           new mongoose.Types.ObjectId(gameId)
         );
         if (game) {
+          const cleaned = xss(newMsg.msg, {
+            whiteList: {},
+          });
+          if (cleaned.length > 200) {
+            newMsg.msg = cleaned.substring(0, 200);
+          } else {
+            newMsg.msg = cleaned;
+          }
+
           game.messages.push(newMsg);
           await game.save();
         }
