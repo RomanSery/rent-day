@@ -57,38 +57,50 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
     }
   }
 
-  return (
+  const getChatWindow = () => {
 
-    <React.Fragment>
-      <div className="chat-row">
-        <div className="chat-messages">
-          <ul id="chat-window-ul">
-            {gameInfo?.messages.map((m) => (
-              <li key={m._id}>
-                <b>{m.player}</b> - {m.msg}
-              </li>
-            ))}
-          </ul>
+    if (gameInfo && gameInfo.auctionId) {
+      return null;
+    }
+    if (gameInfo && gameInfo.lottoId) {
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        <div className="chat-row">
+          <div className="chat-messages">
+            <ul id="chat-window-ul">
+              {gameInfo?.messages.map((m) => (
+                <li key={m._id}>
+                  <b>{m.player}</b> - {m.msg}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
 
 
-      <TextField onChange={(e) => onChangeChatMsg(e)}
-        onKeyPress={(ev) => {
-          if (ev.key === 'Enter') {
-            ev.preventDefault();
-            sendChatEvent();
-          }
-        }}
-        placeholder="Type Message" fullWidth={true} value={sendChatMsg} variant="outlined" InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <FontAwesomeIcon icon={faPaperPlane} size="2x" />
-            </InputAdornment>
-          ),
-        }} />
-    </React.Fragment>
+        <TextField onChange={(e) => onChangeChatMsg(e)}
+          onKeyPress={(ev) => {
+            if (ev.key === 'Enter') {
+              ev.preventDefault();
+              sendChatEvent();
+            }
+          }}
+          placeholder="Type Message" fullWidth={true} value={sendChatMsg} variant="outlined" InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <FontAwesomeIcon icon={faPaperPlane} size="2x" />
+              </InputAdornment>
+            ),
+          }} />
+      </React.Fragment>
+    );
+  }
 
+  return (
+    getChatWindow()
   );
 
 };

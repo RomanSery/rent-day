@@ -1,5 +1,5 @@
-maybe small chance of something bad happening when doing train travel
-lotto & auction display is broken, cutting off chat window
+
+maybe small chance of something bad happening when doing train travel (use new server event to notify everyone that traveler was mugged)
 
 flash window when its your turn (title alert)
 
@@ -9,6 +9,7 @@ session cookie expired, get msg 'invalid auth token'
 add goTo chance events, take ferry to governors island
 turn timer, autction timer, lotto timer
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
+add game settings option for # of initial skill points (default 5)
 
 DEPLOYMENT
 git push dokku master
