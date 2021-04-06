@@ -13,6 +13,7 @@ import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
+import { EliminationDialog } from "../dialogs/EliminationDialog";
 
 interface Props {
   socketService: SocketService;
@@ -27,6 +28,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [chanceOpen, setChanceOpen] = useState(false);
+  const [eliminationOpen, setEliminationOpen] = useState(false);
+  const [eliminationMsg, setEliminationMsg] = useState<string>("");
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
@@ -80,6 +83,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       if (showChance && data.results && data.results.chance) {
         setChanceOpen(true);
       }
+    });
+
+    socketService.listenForEvent(GameEvent.SHOW_ELIMINATION, (msg: string) => {
+      setEliminationOpen(true);
+      setEliminationMsg(msg);
     });
 
     return function cleanup() {
@@ -142,6 +150,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
       <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
+      <EliminationDialog gameInfo={gameState} open={eliminationOpen} eliminationMsg={eliminationMsg} onClose={() => setEliminationOpen(false)} />
 
       <Snackbar
         anchorOrigin={{

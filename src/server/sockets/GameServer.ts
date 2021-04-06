@@ -99,6 +99,14 @@ export class GameServer {
     });
   }
 
+  public sendEventToGameClients(
+    gameId: string,
+    event: string,
+    ...args: any[]
+  ): void {
+    this.io.in(gameId).emit(event, args);
+  }
+
   private updateGameState(socket: GameSocket): void {
     socket.on(
       GameEvent.UPDATE_GAME_STATE,

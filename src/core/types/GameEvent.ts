@@ -21,4 +21,6 @@ export enum GameEvent {
 
   SEND_CHAT_MSG = "sendChatMsg",
   NEW_CHAT_MSG = "newChatMsg",
+
+  SHOW_ELIMINATION = "showEliminationEvent",
 }

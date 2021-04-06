@@ -21,7 +21,7 @@ const server: http.Server = app.listen(app.get("port"), () => {
   console.log("  Press CTRL-C to stop\n");
 });
 
-const gameServer = new GameServer(server);
+export const gameServer = new GameServer(server);
 gameServer.listen();
 
 export default server;

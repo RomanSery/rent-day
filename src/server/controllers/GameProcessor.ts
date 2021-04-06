@@ -28,6 +28,8 @@ import bcrypt from "bcrypt-nodejs";
 import { SquareType } from "../../core/enums/SquareType";
 import { IS_DEV } from "../util/secrets";
 import { differenceInDays, differenceInMinutes } from "date-fns";
+import { gameServer } from "../index";
+import { GameEvent } from "../../core/types/GameEvent";
 
 export class GameProcessor {
   public async createGame(
@@ -454,6 +456,12 @@ export class GameProcessor {
 
         game.winner = winner.name;
       }
+    } else {
+      gameServer.sendEventToGameClients(
+        game.id,
+        GameEvent.SHOW_ELIMINATION,
+        losser.name + " has filed for bankruptcy protection"
+      );
     }
 
     if (

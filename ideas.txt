@@ -1,6 +1,5 @@
-add more detail to tax/electric tooltips to show how corruption is effectin the values
 maybe small chance of something bad happening when doing train travel
-show modal when someone goes bankrupt, but its not game over, saying like alex eleminated roman when he landed on blahah
+lotto & auction display is broken, cutting off chat window
 
 flash window when its your turn (title alert)
 
