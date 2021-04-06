@@ -217,7 +217,7 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
                 </TableRow>
                 <TableRow key="propertyViewer11ele">
                   <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Electricity Cost per House</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
+                    <div className="row-small-name">Electricity</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
                   </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer12">

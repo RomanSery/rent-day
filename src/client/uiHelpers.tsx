@@ -178,7 +178,7 @@ export const getTotalAssetsTooltip = () => {
       </React.Fragment>
     }
   >
-    <span>Total Assets</span>
+    <span>Total</span>
   </HtmlTooltip>);
 }
 
