@@ -79,3 +79,19 @@ body {
 .contact-us-msg {
   width: 100%;
 }
+
+.MuiDataGrid-colCellTitleContainer {
+  overflow: visible !important;
+}
+
+.MuiDataGrid-colCellTitle {
+  overflow: visible !important;
+}
+
+.MuiDataGrid-iconButtonContainer {
+  display: none;
+}
+
+.MuiDataGrid-cell {
+  overflow: visible !important;
+}
