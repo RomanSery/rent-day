@@ -17,6 +17,7 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
+import { ServerMsg } from "../../core/types/ServerMsg";
 import { player_colors } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
@@ -457,10 +458,15 @@ export class GameProcessor {
         game.winner = winner.name;
       }
     } else {
+      const msg: ServerMsg = {
+        title: "Elimination",
+        body: losser.name + " has filed for bankruptcy protection",
+      };
+
       gameServer.sendEventToGameClients(
         game.id,
-        GameEvent.SHOW_ELIMINATION,
-        losser.name + " has filed for bankruptcy protection"
+        GameEvent.SHOW_MSG_FROM_SERVER,
+        msg
       );
     }
 

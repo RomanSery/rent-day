@@ -11,5 +11,7 @@ turn timer, autction timer, lotto timer
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 add game settings option for # of initial skill points (default 5)
 
+make column headers visible somehow without text cutting off in datagrids
+
 DEPLOYMENT
 git push dokku master

@@ -13,7 +13,8 @@ import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
-import { EliminationDialog } from "../dialogs/EliminationDialog";
+import { ServerMsgDialog } from "../dialogs/ServerMsgDialog";
+import { ServerMsg } from "../../core/types/ServerMsg";
 
 interface Props {
   socketService: SocketService;
@@ -28,8 +29,9 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [chanceOpen, setChanceOpen] = useState(false);
-  const [eliminationOpen, setEliminationOpen] = useState(false);
-  const [eliminationMsg, setEliminationMsg] = useState<string>("");
+
+  const [serverMsgModalOpen, setServerMsgModalOpen] = useState(false);
+  const [serverMsg, setServerMsg] = useState<ServerMsg | undefined>(undefined);
 
   const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
@@ -85,9 +87,9 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       }
     });
 
-    socketService.listenForEvent(GameEvent.SHOW_ELIMINATION, (msg: string) => {
-      setEliminationOpen(true);
-      setEliminationMsg(msg);
+    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: ServerMsg) => {
+      setServerMsgModalOpen(true);
+      setServerMsg(data);
     });
 
     return function cleanup() {
@@ -150,7 +152,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
       <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
-      <EliminationDialog gameInfo={gameState} open={eliminationOpen} eliminationMsg={eliminationMsg} onClose={() => setEliminationOpen(false)} />
+      <ServerMsgDialog open={serverMsgModalOpen} msg={serverMsg} onClose={() => setServerMsgModalOpen(false)} />
 
       <Snackbar
         anchorOrigin={{
