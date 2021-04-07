@@ -18,8 +18,8 @@ export const ServerMsgDialog: React.FC<Props> = ({ open, onClose, msg }) => {
   const getMsgContent = () => {
     if (msg) {
       return (
-        <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="elimination-dialog-title" open={open}>
-          <DialogTitle id="elimination-dialog-title">{msg.title}</DialogTitle>
+        <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="server-dialog-title" open={open}>
+          <DialogTitle id="server-dialog-title">{msg.title}</DialogTitle>
           <DialogContent>
             <h1>{msg.body}</h1>
           </DialogContent>

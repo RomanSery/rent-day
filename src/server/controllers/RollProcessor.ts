@@ -15,6 +15,8 @@ import {
   goToIsolationPosition,
   isolation_position,
   last_pos,
+  muggingAmount,
+  muggingChance,
   payToGetOutFee,
 } from "../../core/constants";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
@@ -26,6 +28,9 @@ import { areIdsEqual } from "./helpers";
 import { ChanceProcessor } from "./ChanceProcessor";
 import { ServerChanceEvent } from "./ServerChanceEvent";
 import { IS_DEV } from "../util/secrets";
+import { gameServer } from "../index";
+import { ServerMsg } from "../../core/types/ServerMsg";
+import { GameEvent } from "../../core/types/GameEvent";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -239,9 +244,41 @@ export class RollProcessor {
 
     this.setMovementKeyFrames(false, false);
 
+    if (this.wasMuggedWhileTraveling()) {
+      this.player.money -= muggingAmount;
+
+      const msg: ServerMsg = {
+        title: "Subway Mugging",
+        body:
+          this.player.name +
+          " was mugged while traveling on the subway and lost $" +
+          muggingAmount,
+      };
+
+      setTimeout(
+        (gid) => {
+          gameServer.sendEventToGameClients(
+            gid,
+            GameEvent.SHOW_MSG_FROM_SERVER,
+            msg
+          );
+        },
+        1500,
+        this.game.id
+      );
+    }
+
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
     this.game.save();
     return "";
+  }
+
+  private wasMuggedWhileTraveling(): boolean {
+    const randomNum = RollProcessor.getRandomIntInclusive(1, 100);
+    if (randomNum <= muggingChance) {
+      return true;
+    }
+    return false;
   }
 
   private updatePlayerPosition(): void {
@@ -547,5 +584,11 @@ export class RollProcessor {
 
     await this.game.save();
     return "";
+  }
+
+  private static getRandomIntInclusive(min: number, max: number): number {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1) + min);
   }
 }

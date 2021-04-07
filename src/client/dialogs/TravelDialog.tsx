@@ -20,6 +20,7 @@ import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { Player } from "../../core/types/Player";
+import { muggingAmount, muggingChance } from "../../core/constants";
 
 
 interface Props {
@@ -38,7 +39,6 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
     API.post("actions/travel", { context, squareId: squareId })
       .then(function (response) {
         if (socketService && gameInfo) {
-          //socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
           socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
         }
         onClose();
@@ -80,6 +80,12 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
     <Dialog fullWidth={true} maxWidth="sm" onClose={onCancel} aria-labelledby="travel-dialog-title" open={open}>
       <DialogTitle id="travel-dialog-title">Select station to travel to</DialogTitle>
       <DialogContent>
+        <p>
+          <strong>CAUTION:</strong>
+          <br />
+          The city subway system is dangerous.  <br />
+          If you travel, there is a <b>{muggingChance}%</b> of you being mugged and lossing <b>${muggingAmount}</b>.
+        </p>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
           <Grid className="trade-left" item>
             <Paper>

@@ -87,9 +87,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       }
     });
 
-    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: ServerMsg) => {
-      setServerMsgModalOpen(true);
-      setServerMsg(data);
+    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: Array<ServerMsg>) => {
+      if (data && data.length > 0) {
+        setServerMsg(data[0]);
+        setServerMsgModalOpen(true);
+      }
     });
 
     return function cleanup() {
