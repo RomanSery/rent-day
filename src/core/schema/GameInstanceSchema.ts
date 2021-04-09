@@ -63,6 +63,7 @@ const SquareGameDataSchema = new mongoose.Schema({
 
 const SettingsSchema = new mongoose.Schema({
   initialMoney: { type: Number, required: true },
+  initialSkillPoints: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
   password: { type: String, required: false },
 });

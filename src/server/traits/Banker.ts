@@ -1,4 +1,3 @@
-import { defaultStartSkillPoints } from "../../core/constants";
 import { Player } from "../../core/types/Player";
 import { SkillSettings } from "../../core/types/SkillSettings";
 import { SquareGameData } from "../../core/types/SquareGameData";
@@ -13,7 +12,7 @@ export class Banker {
       negotiation: 0,
       luck: 0,
       corruption: 0,
-      numAbilityPoints: defaultStartSkillPoints,
+      numAbilityPoints: 0,
     };
   }
 

@@ -1,5 +1,4 @@
 import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { defaultStartSkillPoints } from "../../core/constants";
 import { SquareType } from "../../core/enums/SquareType";
 import { Player } from "../../core/types/Player";
 import { SkillSettings } from "../../core/types/SkillSettings";
@@ -15,7 +14,7 @@ export class Conductor {
       negotiation: 2,
       luck: 0,
       corruption: 0,
-      numAbilityPoints: defaultStartSkillPoints,
+      numAbilityPoints: 0,
     };
   }
 

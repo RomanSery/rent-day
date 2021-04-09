@@ -6,6 +6,7 @@ import API from '../api';
 import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import _ from "lodash/fp";
+import { defaultStartSkillPoints } from "../../core/constants";
 
 interface Props {
 
@@ -15,6 +16,7 @@ type Inputs = {
   gameName: string;
   maxPlayers: number;
   initialMoney: number;
+  initialSkillPoints: number;
   gamePwd: string;
 };
 
@@ -87,6 +89,18 @@ export const CreateGame: React.FC<Props> = () => {
 
         <TextField label="Optional password" fullWidth={true} id="gamePwd" name="gamePwd" inputRef={register({ required: false })} />
 
+
+        <TextField label="Initial Skill Points" fullWidth={true} type="number" inputProps={{ min: 0, max: 10 }} defaultValue={defaultStartSkillPoints} required={true} id="initialSkillPoints" name="initialSkillPoints"
+          inputRef={register({ required: true, min: 2, max: 10 })} />
+        {_.get("initialSkillPoints.type", errors) === "required" && (
+          <p className="field-error">Initial Skill Points is required</p>
+        )}
+        {_.get("initialSkillPoints.type", errors) === "min" && (
+          <p className="field-error">Initial Skill Points must be at least 0</p>
+        )}
+        {_.get("initialSkillPoints.type", errors) === "max" && (
+          <p className="field-error">Initial Skill Points must be at most 10</p>
+        )}
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
       </form>

@@ -1,4 +1,4 @@
-import { defaultStartSkillPoints, island_position } from "../../core/constants";
+import { island_position } from "../../core/constants";
 import { Player } from "../../core/types/Player";
 import { SkillSettings } from "../../core/types/SkillSettings";
 import { SquareGameData } from "../../core/types/SquareGameData";
@@ -13,7 +13,7 @@ export class Governor {
       negotiation: 0,
       luck: 0,
       corruption: 2,
-      numAbilityPoints: defaultStartSkillPoints,
+      numAbilityPoints: 0,
     };
   }
 

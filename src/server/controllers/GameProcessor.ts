@@ -37,6 +37,7 @@ export class GameProcessor {
     gameName: string,
     maxPlayers: number,
     initialMoney: number,
+    initialSkillPoints: number,
     userId: mongoose.Types.ObjectId,
     password: string | null
   ): Promise<number> {
@@ -73,6 +74,7 @@ export class GameProcessor {
       maxPlayers: maxPlayers,
       settings: {
         initialMoney: initialMoney,
+        initialSkillPoints: initialSkillPoints,
         maxPlayers: maxPlayers,
         password: password,
       },
@@ -138,7 +140,7 @@ export class GameProcessor {
       type: selectedPiece,
       playerClass: selectedPlayerClass,
       state: PlayerState.ACTIVE,
-      numAbilityPoints: initialSkills.numAbilityPoints,
+      numAbilityPoints: 0,
       negotiation: initialSkills.negotiation,
       luck: initialSkills.luck,
       corruption: initialSkills.corruption,
@@ -174,6 +176,7 @@ export class GameProcessor {
       p.color = player_colors[index];
       p.state = PlayerState.ACTIVE;
       p.hasRolled = false;
+      p.numAbilityPoints = game.settings.initialSkillPoints;
 
       await PlayerProcessor.assignUserToGame(p._id, game);
     });

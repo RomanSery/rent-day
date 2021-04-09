@@ -28,6 +28,10 @@ export const createGame = async (req: Request, res: Response) => {
     .notEmpty()
     .isNumeric()
     .run(req);
+  await check("data.initialSkillPoints", "Initial Skill Points is not valid")
+    .notEmpty()
+    .isNumeric()
+    .run(req);
 
   const errors = validationResult(req);
 
@@ -43,12 +47,14 @@ export const createGame = async (req: Request, res: Response) => {
   const gameName = req.body.data.gameName;
   const maxPlayers = req.body.data.maxPlayers;
   const initialMoney = req.body.data.initialMoney;
+  const initialSkillPoints = req.body.data.initialSkillPoints;
 
   const process = new GameProcessor();
   const newGameId = await process.createGame(
     gameName,
     maxPlayers,
     initialMoney,
+    initialSkillPoints,
     userId,
     req.body.data.gamePwd
   );

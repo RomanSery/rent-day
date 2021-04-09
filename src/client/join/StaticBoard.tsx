@@ -32,7 +32,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       nextPlayerToAct: '',
       name: 'static', messages: [], gameLength: 0, winner: '',
       settings: {
-        maxPlayers: 0, initialMoney: 0, password: '',
+        maxPlayers: 0, initialMoney: 0, password: '', initialSkillPoints: 0,
       }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []
     };
   }
