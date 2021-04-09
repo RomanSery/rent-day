@@ -1,6 +1,7 @@
 flash window when its your turn (title alert)
 
 
+
 add goTo chance events, take ferry to governors island
 turn timer, autction timer, lotto timer
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
