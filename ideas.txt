@@ -1,7 +1,5 @@
 flash window when its your turn (title alert)
 
-session cookie expired, get msg 'invalid auth token'
-
 
 add goTo chance events, take ferry to governors island
 turn timer, autction timer, lotto timer

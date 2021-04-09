@@ -59,6 +59,7 @@ export const App: React.FC = () => {
 
     API.post("current-session")
       .then(function (response) {
+        console.log(response.data);
         setCurrSessionInfo(response.data);
         tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
           if (redirectUrl && redirectUrl.length > 0) {
@@ -66,7 +67,11 @@ export const App: React.FC = () => {
           }
         });
       })
-      .catch(handleApiError);
+      .catch(function (error) {
+        // handle error
+        logOut();
+        history.push("/auth");
+      });
   }, []);
 
 
