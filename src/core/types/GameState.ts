@@ -20,6 +20,7 @@ export interface GameState {
   readonly results: LastResult;
   readonly status: GameStatus;
   readonly messages: Array<ChatMsg>;
+  readonly log: Array<ChatMsg>;
   readonly gameLength: number;
   readonly winner: string;
 }

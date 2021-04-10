@@ -31,6 +31,7 @@ import { IS_DEV } from "../util/secrets";
 import { gameServer } from "../index";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { GameEvent } from "../../core/types/GameEvent";
+import { ChatMsg } from "../../core/types/ChatMsg";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -166,6 +167,12 @@ export class RollProcessor {
     };
 
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
+
+    const newMsg: ChatMsg = {
+      msg: this.game.results.description,
+      player: "",
+    };
+    this.game.log.push(newMsg);
 
     this.game.save();
 
