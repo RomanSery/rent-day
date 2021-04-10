@@ -71,13 +71,13 @@
 .second-row {
   flex-basis: 40%;
   display: flex;
-  height: 315px;
+  height: 260px;
 }
 
 .second-row .player-viewer {
   flex-basis: 50%;
   border: 1px solid black;
-  height: 315px;
+  height: 260px;
 }
 
 .second-row .property-viewer {
@@ -87,7 +87,7 @@
   justify-content: flex-start;
   align-items: stretch;
   border: 1px solid black;
-  height: 315px;
+  height: 260px;
 }
 
 .property-viewer .property-name {
@@ -223,6 +223,8 @@
 
 .chat-row {
   height: 100%;
+  padding-top: 5px;
+  border-top: 2px solid;
   overflow: scroll;
 }
 
@@ -243,4 +245,8 @@
 
 .game-over-overview .MuiListItemText-primary {
   font-weight: bold;
+}
+
+.MuiTableCell-sizeSmall {
+  padding: 6px 0px 6px 10px !important;
 }

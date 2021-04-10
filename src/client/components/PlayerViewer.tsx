@@ -136,30 +136,31 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
           <Table size="small" aria-label="a dense table">
             <TableBody>
               <TableRow key="playerViewer1">
-                <TableCell component="th" scope="row" colSpan={2}>
+                <TableCell component="th" scope="row">
                   <div className="row-small-name">Money</div> {getPlayerMoney()}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  <div className="row-small-name">{getTotalAssetsTooltip()}</div>
+                  {getPlayerTotalAssets()}
                 </TableCell>
               </TableRow>
               <TableRow key="playerViewer2">
-                <TableCell component="th" scope="row" colSpan={2}>
+                <TableCell component="th" scope="row">
                   <div className="row-small-name">{getTaxTooltip(gameInfo, getPlayer(), "Tax")}</div>
                   {getTaxTooltip(gameInfo, getPlayer(), getPlayerTaxes())}
                 </TableCell>
-
-              </TableRow>
-              <TableRow key="playerViewer3">
-                <TableCell component="th" scope="row" colSpan={2}>
+                <TableCell component="th" scope="row">
                   <div className="row-small-name">{getElectricityTooltip(gameInfo, getPlayer(), "Electricity")}</div>
                   {getElectricityTooltip(gameInfo, getPlayer(), getPlayerElectricityCosts())}
                 </TableCell>
               </TableRow>
-              <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div className="row-small-name">{getTotalAssetsTooltip()}</div>
-                  {getPlayerTotalAssets()}
-                </TableCell>
 
-              </TableRow>
+              {hasPointsAvailable() && <TableRow key="playerViewer4">
+                <TableCell component="th" scope="row" colSpan={2}>
+                  <div><strong>Distribute your points!</strong></div>
+                </TableCell>
+              </TableRow>}
+
             </TableBody>
           </Table>
         </TableContainer>
@@ -196,7 +197,6 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
                 <TableCell component="th" scope="row" colSpan={2}>
                   <div className="row-small-name">Available</div>
                   {getPlayerPointsAvailable()}
-                  {hasPointsAvailable() && <div><strong>Distribute your points!</strong></div>}
                 </TableCell>
               </TableRow>
 

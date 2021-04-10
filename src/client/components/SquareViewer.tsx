@@ -177,22 +177,19 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
                   </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer2">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name"><FontAwesomeIcon icon={faHome} /></div> {config.rent1 ? dollarFormatter.format(config.rent1) : ""}
                   </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer3">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent2 ? dollarFormatter.format(config.rent2) : ""}
                   </TableCell>
                 </TableRow>
+
                 <TableRow key="propertyViewer4">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent3 ? dollarFormatter.format(config.rent3) : ""}
                   </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer5">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div>
                     {config.rent4 ? dollarFormatter.format(config.rent4) : ""}
                   </TableCell>
@@ -211,38 +208,29 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
             <Table size="small" aria-label="a dense table">
               <TableBody>
                 <TableRow key="propertyViewer11">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">House Cost</div> {config.houseCost ? dollarFormatter.format(config.houseCost) : ""}
+                  <TableCell component="th" scope="row">
+                    <div className="row-small-name">House</div> {config.houseCost ? dollarFormatter.format(config.houseCost) : ""}
                   </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer11ele">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Electricity</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
+                  <TableCell component="th" scope="row">
+                    <div className="row-small-name">Electric</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
                   </TableCell>
                 </TableRow>
                 <TableRow key="propertyViewer12">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name">Tax</div> {config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}
                   </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer13">
-                  <TableCell component="th" scope="row" colSpan={2} style={getNameColorStyle()}>
+                  <TableCell component="th" scope="row" style={getNameColorStyle()}>
                     <div className="row-small-name">Owner</div> {getowner()}
                   </TableCell>
                 </TableRow>
-
                 <TableRow key="propertyViewer14">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name">Purchase Price</div> {getPurchasePrice()}
                   </TableCell>
-                </TableRow>
-
-                <TableRow key="propertyViewer10">
-                  <TableCell component="th" scope="row" colSpan={2}>
+                  <TableCell component="th" scope="row">
                     <div className="row-small-name">{isMortgaged() ? "To Redeem" : "Mortgage Value"}</div> {isMortgaged() ? getRedeemCost() : getMortgageValue()}
                   </TableCell>
                 </TableRow>
-
               </TableBody>
             </Table>
           </TableContainer>
