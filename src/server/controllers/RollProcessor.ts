@@ -120,18 +120,17 @@ export class RollProcessor {
     this.updateRollHistory();
     this.updatePlayerPosition();
 
-    if (this.playerPassedPayDay === true) {
-      MoneyCalculator.collectSalary(this.player);
-      this.player.numAbilityPoints++;
-    }
-
     let chance: ServerChanceEvent | null = null;
 
     if (ChanceProcessor.shouldCreateChance(this.player.position)) {
       const processor = new ChanceProcessor(this.game);
       chance = await processor.createChanceEvent();
       if (chance) {
-        chance.makeItHappen(this.game, this.player);
+        const moveToPos = chance.makeItHappen(this.game, this.player);
+        if (moveToPos) {
+          this.addChanceMovementKeyFrames(moveToPos);
+          this.player.position = moveToPos;
+        }
         chance.subLine = chance.getSubLine(this.game, this.player);
       }
     } else if (
@@ -150,6 +149,11 @@ export class RollProcessor {
       );
     }
 
+    if (this.playerPassedPayDay === true) {
+      MoneyCalculator.collectSalary(this.player);
+      this.player.numAbilityPoints++;
+    }
+
     const payDesc = await MoneyCalculator.payRent(this.game, this.player);
     if (payDesc.length > 0) {
       this.rollDesc += "<br />" + payDesc;
@@ -159,12 +163,27 @@ export class RollProcessor {
     this.game.results = {
       roll: lastRoll,
       description: "<b>" + this.player.name + "</b> " + this.rollDesc,
-      chance: chance,
     };
 
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     this.game.save();
+
+    if (chance) {
+      setTimeout(
+        (gid, c) => {
+          gameServer.sendEventToGameClients(
+            gid,
+            GameEvent.SEND_CHANCE_EVENT,
+            c
+          );
+        },
+        2000,
+        this.game.id,
+        chance
+      );
+    }
+
     return "";
   }
 
@@ -402,6 +421,35 @@ export class RollProcessor {
     }
   };
 
+  private addChanceMovementKeyFrames = (moveToPos: number) => {
+    const origPos = this.player!.position;
+
+    //add a pause on the chance square
+    for (let i = 0; i <= 10; i++) {
+      this.movementKeyframes.push(origPos);
+    }
+
+    if (origPos > moveToPos) {
+      for (let i = origPos; i <= last_pos; i++) {
+        this.movementKeyframes.push(i);
+      }
+      for (let i = 1; i <= moveToPos; i++) {
+        this.movementKeyframes.push(i);
+      }
+    } else {
+      for (let i = origPos; i <= moveToPos; i++) {
+        this.movementKeyframes.push(i);
+      }
+    }
+
+    if (!this.playerPassedPayDay && moveToPos < origPos) {
+      this.playerPassedPayDay = true;
+      this.rollDesc += " <br /> Payday, collect your salary!";
+    } else {
+      this.playerPassedPayDay = false;
+    }
+  };
+
   private updateRollHistory(): void {
     if (!this.player) {
       return;
@@ -517,7 +565,6 @@ export class RollProcessor {
       this.game.results = {
         roll: last.roll,
         description: last.description,
-        chance: null,
       };
     }
 

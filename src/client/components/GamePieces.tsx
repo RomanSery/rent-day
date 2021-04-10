@@ -32,7 +32,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
     clearMovement();
 
     if (socketService && gameInfo) {
-      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);
+      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
     }
   }
 

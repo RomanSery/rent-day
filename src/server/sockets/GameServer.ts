@@ -108,15 +108,12 @@ export class GameServer {
   }
 
   private updateGameState(socket: GameSocket): void {
-    socket.on(
-      GameEvent.UPDATE_GAME_STATE,
-      async (gameId: string, showChance?: boolean) => {
-        const game: GameInstanceDocument | null = await GameProcessor.getGame(
-          new mongoose.Types.ObjectId(gameId)
-        );
-        this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE, game, showChance);
-      }
-    );
+    socket.on(GameEvent.UPDATE_GAME_STATE, async (gameId: string) => {
+      const game: GameInstanceDocument | null = await GameProcessor.getGame(
+        new mongoose.Types.ObjectId(gameId)
+      );
+      this.io.in(gameId).emit(GameEvent.UPDATE_GAME_STATE, game);
+    });
   }
 
   private chatEvents(socket: GameSocket): void {

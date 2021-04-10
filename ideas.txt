@@ -1,7 +1,7 @@
-add goTo chance events, take ferry to governors island
 I wish I hade this stuff logged somewhere (in the chat, for example). Like who pays who, who bought which item and who exchanged items and which ones
 
 
+play a sound when its your turn, send sound event to specific socket
 turn timer, autction timer, lotto timer
 
 

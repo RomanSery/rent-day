@@ -15,6 +15,7 @@ import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { ServerMsgDialog } from "../dialogs/ServerMsgDialog";
 import { ServerMsg } from "../../core/types/ServerMsg";
+import { ChanceEvent } from "../../core/types/ChanceEvent";
 
 interface Props {
   socketService: SocketService;
@@ -29,6 +30,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [chanceOpen, setChanceOpen] = useState(false);
+  const [chanceEvent, setChanceEvent] = useState<ChanceEvent | undefined>(undefined);
+
 
   const [serverMsgModalOpen, setServerMsgModalOpen] = useState(false);
   const [serverMsg, setServerMsg] = useState<ServerMsg | undefined>(undefined);
@@ -79,18 +82,22 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     });
 
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState, showChance?: boolean) => {
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       clearMovement();
       setGameState(data);
-      if (showChance && data.results && data.results.chance) {
-        setChanceOpen(true);
-      }
     });
 
     socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: Array<ServerMsg>) => {
       if (data && data.length > 0) {
         setServerMsg(data[0]);
         setServerMsgModalOpen(true);
+      }
+    });
+
+    socketService.listenForEvent(GameEvent.SEND_CHANCE_EVENT, (data: Array<ChanceEvent>) => {
+      if (data && data.length > 0) {
+        setChanceEvent(data[0]);
+        setChanceOpen(true);
       }
     });
 
@@ -153,7 +160,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
         getPlayerIdToMove={getPlayerIdToMove} frames={frames} clearMovement={clearMovement} />
 
 
-      <ChanceEventDialog gameInfo={gameState} open={chanceOpen} onClose={() => setChanceOpen(false)} />
+      <ChanceEventDialog open={chanceOpen} chanceEvent={chanceEvent} onClose={() => setChanceOpen(false)} />
       <ServerMsgDialog open={serverMsgModalOpen} msg={serverMsg} onClose={() => setServerMsgModalOpen(false)} />
 
       <Snackbar

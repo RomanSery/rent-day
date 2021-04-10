@@ -1,5 +1,6 @@
 import _ from "lodash";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
+import { island_position } from "../../core/constants";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
 import { GameInstanceDocument } from "../../core/schema/GameInstanceSchema";
@@ -52,9 +53,9 @@ export class ChanceProcessor {
       headline: "Dentist appointment",
       subLine: "You don't have insurance, pay dentist <b>$150</b>",
       chanceId: 1,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 150;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -66,9 +67,9 @@ export class ChanceProcessor {
       headline: "Flat tire",
       subLine: "You hit a pothole. Pay <b>$120</b> to have tire replaced",
       chanceId: 2,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 120;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -80,7 +81,7 @@ export class ChanceProcessor {
       headline: "Pay off your debts",
       subLine: "Pay back each active player <b>$30</b>",
       chanceId: 3,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
           (p) =>
             p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
@@ -96,7 +97,7 @@ export class ChanceProcessor {
 
         player.money -= Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const activePlayers = game.players.filter(
@@ -116,7 +117,7 @@ export class ChanceProcessor {
       subLine:
         "Your buildings have fallen into disrepair.  Pay <b>$40 per building</b>",
       chanceId: 4,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
             return (
@@ -135,7 +136,7 @@ export class ChanceProcessor {
 
         player.money -= totalHouses * 40;
         PlayerCostsCalculator.updatePlayerCosts(game, player);
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
@@ -165,10 +166,10 @@ export class ChanceProcessor {
       headline: "Late credit card payment",
       subLine: "Pay the bank <b>10% of your money</b> in interest",
       chanceId: 5,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const subtraction = Math.round(player.money * 0.1);
         player.money -= subtraction;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const subtraction = Math.round(player.money * 0.1);
@@ -187,10 +188,10 @@ export class ChanceProcessor {
       subLine:
         "Everyone must do their part for the environment. Pay <b>5% of your money</b> for your carbon emissions",
       chanceId: 6,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const subtraction = Math.round(player.money * 0.05);
         player.money -= subtraction;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const subtraction = Math.round(player.money * 0.05);
@@ -208,11 +209,11 @@ export class ChanceProcessor {
       headline: "Vehicle Mileage Tax",
       subLine: "Pay $5 for each square you just moved",
       chanceId: 8,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const lastRoll: DiceRoll = player.rollHistory[0];
         const subtraction = Math.round(lastRoll.sum() * 5);
         player.money -= subtraction;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const lastRoll: DiceRoll = player.rollHistory[0];
@@ -233,9 +234,9 @@ export class ChanceProcessor {
       headline: "Options trading",
       subLine: "You shorted the market and made <b>$100</b> profit",
       chanceId: 20,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 100;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -247,7 +248,7 @@ export class ChanceProcessor {
       headline: "It's your birthday!",
       subLine: "Every active player gives you a $30 gift card",
       chanceId: 21,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
           (p) =>
             p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, player._id)
@@ -263,7 +264,7 @@ export class ChanceProcessor {
 
         player.money += Math.round(total);
         PlayerCostsCalculator.updatePlayerCosts(game, player);
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const activePlayers = game.players.filter(
@@ -284,7 +285,7 @@ export class ChanceProcessor {
       subLine:
         "The city has made an error and your properties have been overtaxed.  <br> Get a refund of $45 for each unmortgaged taxable property you own",
       chanceId: 22,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
             return (
@@ -306,7 +307,7 @@ export class ChanceProcessor {
 
         player.money += total;
         PlayerCostsCalculator.updatePlayerCosts(game, player);
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
@@ -335,9 +336,9 @@ export class ChanceProcessor {
       headline: "Take a college course",
       subLine: "Gain a skill point",
       chanceId: 23,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.numAbilityPoints += 1;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -349,9 +350,9 @@ export class ChanceProcessor {
       headline: "Stimulus check",
       subLine: "Recieve a $200 handout",
       chanceId: 24,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 200;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -364,9 +365,9 @@ export class ChanceProcessor {
       subLine:
         "You snitched on your neighbor for hosting a small indoor gathering. Recieve a $55 reward",
       chanceId: 27,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 55;
-        return false;
+        return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
@@ -379,9 +380,36 @@ export class ChanceProcessor {
       subLine:
         "Your reported your parents to the authorities for not wearing their masks.  Collect a $70 reward",
       chanceId: 28,
-      makeItHappen(game: GameInstanceDocument, player: Player): boolean {
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 70;
-        return false;
+        return null;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
+    });
+
+    //move to events
+    this.events.push({
+      isGood: true,
+      headline: "Travel",
+      subLine: "Take the ferry to Governors Island!",
+      chanceId: 666,
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
+        return island_position;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine;
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Travel",
+      subLine: "Go to Wall Street to tour the stock exchange!",
+      chanceId: 667,
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
+        return 40;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;

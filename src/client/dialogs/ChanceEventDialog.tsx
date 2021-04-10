@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -7,28 +6,29 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSmile, faFrownOpen } from "@fortawesome/free-regular-svg-icons";
+import { ChanceEvent } from "../../core/types/ChanceEvent";
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
+  chanceEvent: ChanceEvent | undefined;
   onClose: () => void;
 }
 
-export const ChanceEventDialog: React.FC<Props> = ({ open, gameInfo, onClose }) => {
+export const ChanceEventDialog: React.FC<Props> = ({ open, onClose, chanceEvent }) => {
 
   const getChanceCard = () => {
-    if (!gameInfo || !gameInfo.results || !gameInfo.results.chance) {
+    if (!chanceEvent) {
       return null;
     }
 
     return (
       <div className="chance-event-info">
         <div className="type">
-          <FontAwesomeIcon icon={gameInfo.results.chance.isGood ? faSmile : faFrownOpen} size="3x" />
+          <FontAwesomeIcon icon={chanceEvent.isGood ? faSmile : faFrownOpen} size="3x" />
         </div>
         <div className="chance-txt">
-          <div className="headline">{gameInfo.results.chance.headline}</div>
-          <div className="sub-line" dangerouslySetInnerHTML={{ __html: gameInfo.results.chance.subLine }}></div>
+          <div className="headline">{chanceEvent.headline}</div>
+          <div className="sub-line" dangerouslySetInnerHTML={{ __html: chanceEvent.subLine }}></div>
         </div>
       </div>
     );
