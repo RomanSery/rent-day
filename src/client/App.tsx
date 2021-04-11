@@ -59,7 +59,6 @@ export const App: React.FC = () => {
 
     API.post("current-session")
       .then(function (response) {
-        console.log(response.data);
         setCurrSessionInfo(response.data);
         tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
           if (redirectUrl && redirectUrl.length > 0) {

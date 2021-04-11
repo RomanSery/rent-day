@@ -27,7 +27,6 @@ import { TextField } from "@material-ui/core";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { ChatWindow } from "./ChatWindow";
 
-
 interface Props {
   gameInfo: GameState | undefined;
   socketService: SocketService;
@@ -78,6 +77,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
     if (socketService && gameInfo) {
       socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
     }
+
 
     setTimeout(() => {
 

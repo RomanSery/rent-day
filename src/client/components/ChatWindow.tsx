@@ -88,12 +88,7 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
 
   const getChatWindow = () => {
 
-    if (gameInfo && gameInfo.auctionId) {
-      return null;
-    }
-    if (gameInfo && gameInfo.lottoId) {
-      return null;
-    }
+
 
     return (
       <React.Fragment>
@@ -105,8 +100,8 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
         <div className="chat-row" style={getChatContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
-              {gameInfo?.messages.map((m) => (
-                <li key={m._id}>
+              {gameInfo?.messages.map((m, index) => (
+                <li key={index}>
                   <b>{m.player}</b> - {m.msg}
                 </li>
               ))}
@@ -117,8 +112,8 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
         <div className="chat-row" style={getLogContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
-              {gameInfo?.log.map((m) => (
-                <li key={m._id} dangerouslySetInnerHTML={{ __html: m.msg }}>
+              {gameInfo?.log.map((m, index) => (
+                <li key={index} dangerouslySetInnerHTML={{ __html: m.msg }}>
 
                 </li>
               ))}

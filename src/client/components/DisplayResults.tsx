@@ -6,6 +6,7 @@ import { SocketService } from "../sockets/SocketService";
 import { AnimatedDice } from "./AnimatedDice";
 import { Die } from "./Die";
 import { useIsMountedRef } from "./useIsMountedRef";
+import { Howl, HowlOptions } from 'howler';
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -28,6 +29,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
     socketService.listenForEvent(GameEvent.ANIMATE_DICE, () => {
       setShowDiceAnimation(true);
       setResultsDesc("");
+      playDiceRollSound();
     });
     socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (playerId: string, diceRoll: DiceRollResult, frames: Array<number>) => {
       setAnimDiceRollResult(diceRoll);
@@ -58,6 +60,13 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
     return { die1: gameInfo.results.roll.die1, die2: gameInfo.results.roll.die2 };
   }
 
+  const playDiceRollSound = () => {
+    const soundOptions: HowlOptions = {
+      src: 'audio/dice_roll.mp3'
+    };
+    var sound = new Howl(soundOptions);
+    sound.play();
+  }
 
   const getResults = () => {
     const result = getDiceResults();
