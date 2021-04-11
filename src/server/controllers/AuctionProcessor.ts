@@ -13,6 +13,8 @@ import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { GameStatus } from "../../core/enums/GameStatus";
+import { ChatMsg } from "../../core/types/ChatMsg";
+import { dollarFormatterServer } from "./helpers";
 
 export class AuctionProcessor {
   private bid: number;
@@ -135,6 +137,23 @@ export class AuctionProcessor {
       if (playerWinner && priceToPay) {
         playerWinner.money = Math.round(playerWinner.money - priceToPay);
         PlayerCostsCalculator.updatePlayerCosts(this.game, playerWinner);
+
+        const squareTheme = this.game.theme.get(
+          this.auction.squareId.toString()
+        );
+        if (squareTheme) {
+          const newMsg: ChatMsg = {
+            msg:
+              "<b>" +
+              playerWinner.name +
+              "</b>" +
+              " won the auction for " +
+              squareTheme.name +
+              " and payed " +
+              dollarFormatterServer.format(priceToPay),
+          };
+          this.game.log.push(newMsg);
+        }
       }
     }
   }

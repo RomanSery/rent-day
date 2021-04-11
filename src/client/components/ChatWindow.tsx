@@ -1,7 +1,7 @@
 
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { InputAdornment, TextField } from "@material-ui/core";
+import { Button, ButtonGroup, InputAdornment, PropTypes, TextField } from "@material-ui/core";
 import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -17,9 +17,11 @@ interface Props {
 export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
 
   const [sendChatMsg, setSendChatMsg] = React.useState<string | undefined>();
+  const [showChat, setShowChat] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
+      setShowChat(true);
       appendToChatWindow(msg);
 
       const ul = document.getElementById("chat-window-ul");
@@ -57,6 +59,33 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
     }
   }
 
+  const getChatContStyle = (): React.CSSProperties => {
+    if (!showChat) {
+      return { display: "none" };
+    }
+    return {};
+  };
+  const getChatBtnColor = (): PropTypes.Color => {
+    if (showChat) {
+      return "primary";
+    }
+    return "default";
+  }
+
+  const getLogBtnColor = (): PropTypes.Color => {
+    if (!showChat) {
+      return "primary";
+    }
+    return "default";
+  }
+
+  const getLogContStyle = (): React.CSSProperties => {
+    if (showChat) {
+      return { display: "none" };
+    }
+    return {};
+  };
+
   const getChatWindow = () => {
 
     if (gameInfo && gameInfo.auctionId) {
@@ -68,12 +97,29 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
 
     return (
       <React.Fragment>
-        <div className="chat-row">
+        <ButtonGroup size="small" color="primary">
+          <Button variant="contained" onClick={() => setShowChat(true)} color={getChatBtnColor()}>Chat</Button>
+          <Button variant="contained" onClick={() => setShowChat(false)} color={getLogBtnColor()}>Game Log</Button>
+        </ButtonGroup>
+
+        <div className="chat-row" style={getChatContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
               {gameInfo?.messages.map((m) => (
                 <li key={m._id}>
                   <b>{m.player}</b> - {m.msg}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="chat-row" style={getLogContStyle()}>
+          <div className="chat-messages">
+            <ul id="chat-window-ul">
+              {gameInfo?.log.map((m) => (
+                <li key={m._id} dangerouslySetInnerHTML={{ __html: m.msg }}>
+
                 </li>
               ))}
             </ul>
@@ -95,6 +141,9 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
               </InputAdornment>
             ),
           }} />
+
+
+
       </React.Fragment>
     );
   }

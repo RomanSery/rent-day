@@ -169,7 +169,7 @@ export class RollProcessor {
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     const newMsg: ChatMsg = {
-      msg: this.game.results.description,
+      msg: this.game.results.description.replace(/<br \/>/g, " - "),
       player: "",
     };
     this.game.log.push(newMsg);
