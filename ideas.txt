@@ -1,8 +1,3 @@
-sound effect for:
-winning lotto
-losing lotto
-
-
 turn timer, autction timer, lotto timer
 computer players
 
