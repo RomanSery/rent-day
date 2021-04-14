@@ -25,4 +25,6 @@ export enum GameEvent {
   SHOW_MSG_FROM_SERVER = "showMsgFromServerEvent",
 
   SEND_CHANCE_EVENT = "showChanceEvent",
+
+  PLAY_SOUND_EFFECT = "playSoundEffect",
 }

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { GameContext } from "../../core/types/GameContext";
 import { GameState } from "../../core/types/GameState";
-import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
@@ -16,6 +16,9 @@ import { ActionMode } from "../../core/enums/ActionMode";
 import { ServerMsgDialog } from "../dialogs/ServerMsgDialog";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { ChanceEvent } from "../../core/types/ChanceEvent";
+import { SoundType } from "../../core/enums/SoundType";
+import { yourTurnSound } from "../gameSounds";
+import { SoundMsg } from "../../core/types/SoundMsg";
 
 interface Props {
   socketService: SocketService;
@@ -98,6 +101,17 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       if (data && data.length > 0) {
         setChanceEvent(data[0]);
         setChanceOpen(true);
+      }
+    });
+
+    socketService.listenForEvent(GameEvent.PLAY_SOUND_EFFECT, (data: Array<SoundMsg>) => {
+      if (data && data.length > 0) {
+        const msg = data[0];
+        if (areObjectIdsEqual(getMyUserId(), msg.playerId)) {
+          if (msg.type === SoundType.YourTurn) {
+            yourTurnSound.play();
+          }
+        }
       }
     });
 

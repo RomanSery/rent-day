@@ -6,6 +6,7 @@ import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GameState } from "../../core/types/GameState";
+import { newChatMsgSound } from "../gameSounds";
 import { getMyPlayerName } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 
@@ -28,6 +29,8 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
       if (ul) {
         ul.scrollIntoView(false);
       }
+
+      newChatMsgSound.play();
     });
   }, [socketService]);
 

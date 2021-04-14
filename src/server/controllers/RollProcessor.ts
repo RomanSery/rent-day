@@ -31,6 +31,8 @@ import { IS_DEV } from "../util/secrets";
 import { gameServer } from "../index";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { GameEvent } from "../../core/types/GameEvent";
+import { SoundMsg } from "../../core/types/SoundMsg";
+import { SoundType } from "../../core/enums/SoundType";
 import { ChatMsg } from "../../core/types/ChatMsg";
 
 export class RollProcessor {
@@ -573,6 +575,18 @@ export class RollProcessor {
         roll: last.roll,
         description: last.description,
       };
+    }
+
+    if (nextPlayerId) {
+      const msg: SoundMsg = {
+        playerId: nextPlayerId.toHexString(),
+        type: SoundType.YourTurn,
+      };
+      gameServer.sendEventToGameClients(
+        this.game.id,
+        GameEvent.PLAY_SOUND_EFFECT,
+        msg
+      );
     }
 
     this.game.save();

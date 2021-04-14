@@ -1,6 +1,10 @@
-play a sound when its your turn, send sound event to specific socket
-turn timer, autction timer, lotto timer
+sound effect for:
+winning lotto
+losing lotto
 
+
+turn timer, autction timer, lotto timer
+computer players
 
 DEPLOYMENT
 git push dokku master
