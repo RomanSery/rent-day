@@ -577,6 +577,8 @@ export class RollProcessor {
       };
     }
 
+    this.game.save();
+
     if (nextPlayerId) {
       const msg: SoundMsg = {
         playerId: nextPlayerId.toHexString(),
@@ -588,8 +590,6 @@ export class RollProcessor {
         msg
       );
     }
-
-    this.game.save();
 
     return "";
   }
