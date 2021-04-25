@@ -19,7 +19,11 @@ export const timesUpAction = async (req: Request, res: Response) => {
   }
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
 
-  const processor = new AutoMoveProcessor(gameId);
+  const processor = new AutoMoveProcessor(
+    gameId,
+    req.body.forceDie1,
+    req.body.forceDie2
+  );
   const errMsg = await processor.autoMove();
 
   if (errMsg && errMsg.length > 0) {
@@ -29,10 +33,10 @@ export const timesUpAction = async (req: Request, res: Response) => {
 
   res.json({
     status: "success",
-    needToAnimate: processor.getNeedToAnimate(),
+    needToAnimate: false,
     playerId: processor.getPlayerId(),
     diceRoll: processor.getLastDiceRoll(),
-    frames: processor.getMovementKeyFrames(),
+    frames: [],
   });
 };
 
@@ -50,7 +54,7 @@ export const roll = async (req: Request, res: Response) => {
     req.body.forceDie2
   );
 
-  const errMsg = await processor.roll();
+  const errMsg = await processor.roll(false);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
@@ -101,7 +105,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new RollProcessor(gameId, userId, null, null);
 
-  const errMsg = await processor.completeMyTurn(false);
+  const errMsg = await processor.completeMyTurn();
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }

@@ -10,18 +10,26 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { isFuture, parseISO } from "date-fns";
 import { RollProcessor } from "./RollProcessor";
 import { DiceRoll } from "../../core/types/DiceRoll";
+import { LottoProcessor } from "./LottoProcessor";
+import { GameProcessor } from "./GameProcessor";
 
 export class AutoMoveProcessor {
   private gameId: mongoose.Types.ObjectId;
   private game?: GameInstanceDocument | null;
   private player?: Player | null;
+  private forceDie1: number | null;
+  private forceDie2: number | null;
 
   private lastDiceRoll: DiceRoll | undefined;
-  private movementKeyframes: Array<number> = [];
-  private needToAnimate: boolean = false;
 
-  constructor(gameId: mongoose.Types.ObjectId) {
+  constructor(
+    gameId: mongoose.Types.ObjectId,
+    forceDie1: number | null,
+    forceDie2: number | null
+  ) {
     this.gameId = gameId;
+    this.forceDie1 = forceDie1;
+    this.forceDie2 = forceDie2;
   }
 
   private async init(): Promise<void> {
@@ -35,12 +43,6 @@ export class AutoMoveProcessor {
     }
   }
 
-  public getMovementKeyFrames(): Array<number> {
-    return this.movementKeyframes;
-  }
-  public getNeedToAnimate(): boolean {
-    return this.needToAnimate;
-  }
   public getLastDiceRoll(): DiceRoll {
     return this.lastDiceRoll!;
   }
@@ -65,50 +67,64 @@ export class AutoMoveProcessor {
     }
 
     if (!this.game.nextPlayerActBy) {
-      return "no turn timer yet";
+      console.log("no turn timer yet");
+      return "";
     }
 
     const actBy = parseISO(this.game.nextPlayerActBy);
     if (isFuture(actBy)) {
-      return "turn timer not up yet for " + this.player.name;
+      console.log("turn timer not up yet for " + this.player.name);
+      return "";
     }
 
-    //if (this.player.hasRolled) {
-    //return "You already rolled this turn";
-    //}
+    if (this.game && this.game.lottoId) {
+      this.completeLotto();
+    }
 
-    //if (this.player.money < 0) {
-    //return "you cant roll with negative money;";
-    //}
+    if (this.player.money < 0) {
+      await GameProcessor.bankruptPlayer(this.game, this.game.nextPlayerToAct);
+      await this.game.save();
+      return "";
+    }
 
     const processor = new RollProcessor(
       this.gameId,
       this.game.nextPlayerToAct,
-      null,
-      null
+      this.forceDie1,
+      this.forceDie2
     );
 
     if (this.player.hasRolled) {
-      const errMsg = await processor.completeMyTurn(true);
-      if (errMsg && errMsg.length > 0) {
-        return errMsg;
-      }
+      const errMsg = await processor.completeMyTurn();
+      console.log(
+        "(1) completing turn for " + this.player.name + " err=" + errMsg
+      );
       return "";
     }
 
-    const errMsg = await processor.roll();
+    const errMsg = await processor.roll(true);
+    console.log(
+      "(2) rolling and completing turn for " +
+        this.player.name +
+        " err=" +
+        errMsg
+    );
     if (errMsg && errMsg.length > 0) {
-      return errMsg;
+      return "";
     }
 
-    this.needToAnimate =
-      processor.getOrigPosition() !== processor.getNewPosition() &&
-      processor.getMovementKeyFrames() &&
-      processor.getMovementKeyFrames().length > 0;
-
     this.lastDiceRoll = processor.getLastDiceRoll();
-    this.movementKeyframes = processor.getMovementKeyFrames();
 
     return "";
+  }
+
+  private async completeLotto(): Promise<void> {
+    const lotto = new LottoProcessor(
+      1,
+      this.gameId,
+      new mongoose.Types.ObjectId(this.player!._id)
+    );
+
+    await lotto.pickOption();
   }
 }

@@ -168,7 +168,10 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   }
 
   const countdownRenderer = (props: CountdownRenderProps) => {
-    return <span>{props.minutes}:{props.seconds}</span>;
+    if (props.minutes > 0) {
+      return <div className="countdown-timer">{props.minutes}:{props.seconds}</div>;
+    }
+    return <div className="countdown-timer">{props.seconds} seconds</div>;
   };
 
   const onCountdownComplete = (timeDelta: CountdownTimeDelta) => {
@@ -182,15 +185,9 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
     setTimeout(() => {
 
-      API.post("actions/timesUpAction", { context })
+      API.post("actions/timesUpAction", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
-
-          if (response.data.needToAnimate) {
-            socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
-          } else {
-            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          }
-
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         })
         .catch(handleApiError);
     }, 1500);

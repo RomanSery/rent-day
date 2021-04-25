@@ -18,7 +18,7 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { ServerMsg } from "../../core/types/ServerMsg";
-import { player_colors } from "../../core/constants";
+import { player_colors, turnTimeLimit } from "../../core/constants";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { Traits } from "../traits/Traits";
 import { SkillSettings } from "../../core/types/SkillSettings";
@@ -28,7 +28,12 @@ import { PlayerProcessor } from "./PlayerProcessor";
 import bcrypt from "bcrypt-nodejs";
 import { SquareType } from "../../core/enums/SquareType";
 import { IS_DEV } from "../util/secrets";
-import { differenceInDays, differenceInMinutes } from "date-fns";
+import {
+  addSeconds,
+  differenceInDays,
+  differenceInMinutes,
+  formatISO,
+} from "date-fns";
 import { gameServer } from "../index";
 import { GameEvent } from "../../core/types/GameEvent";
 
@@ -183,6 +188,10 @@ export class GameProcessor {
 
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
+
+    const now = new Date();
+    const actBy = addSeconds(now, turnTimeLimit);
+    game.nextPlayerActBy = formatISO(actBy);
 
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {

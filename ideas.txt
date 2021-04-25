@@ -2,6 +2,7 @@ turn timer, autction timer, lotto timer
 computer players
 
 when taking action like roll, complete turn, if err msg comes back like 'not your turn', means UI is out of sync, need to do update_game_state
+displaying chance event too early, use anaimatio duration to display at the right time
 
 DEPLOYMENT
 git push dokku master

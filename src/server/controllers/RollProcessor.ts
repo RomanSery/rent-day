@@ -18,6 +18,7 @@ import {
   muggingAmount,
   muggingChance,
   payToGetOutFee,
+  turnTimeLimit,
 } from "../../core/constants";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { GameStatus } from "../../core/enums/GameStatus";
@@ -93,7 +94,7 @@ export class RollProcessor {
     return this.lastDiceRoll!;
   }
 
-  public async roll(): Promise<string> {
+  public async roll(andCompleteTurn: boolean): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -176,6 +177,10 @@ export class RollProcessor {
       player: "",
     };
     this.game.log.push(newMsg);
+
+    if (andCompleteTurn) {
+      this.doCompleteTurn();
+    }
 
     this.game.save();
 
@@ -390,6 +395,10 @@ export class RollProcessor {
 
       if (lastRoll.isDouble()) {
         this.player.hasTraveled = false;
+
+        const now = new Date();
+        const actBy = addSeconds(now, turnTimeLimit);
+        this.game.nextPlayerActBy = formatISO(actBy);
       }
     }
 
@@ -515,7 +524,7 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
-  public async completeMyTurn(timesUp: boolean): Promise<string> {
+  public async completeMyTurn(): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -543,46 +552,52 @@ export class RollProcessor {
       return "you didnt roll yet";
     }
 
-    if (this.game.lottoId && !timesUp) {
+    if (this.game.lottoId) {
       return "There is an active lotto game, pick a prize first";
     }
 
+    this.doCompleteTurn();
+
+    this.game.save();
+
+    return "";
+  }
+
+  private async doCompleteTurn(): Promise<void> {
     const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
-      this.game,
-      this.player
+      this.game!,
+      this.player!
     );
     if (nextPlayerId) {
-      this.game.nextPlayerToAct = nextPlayerId;
+      this.game!.nextPlayerToAct = nextPlayerId;
 
       const now = new Date();
-      const actBy = addSeconds(now, 30);
-      this.game.nextPlayerActBy = formatISO(actBy);
+      const actBy = addSeconds(now, turnTimeLimit);
+      this.game!.nextPlayerActBy = formatISO(actBy);
     }
 
     const nextPlayer =
       nextPlayerId &&
-      this.game.players.find(
+      this.game!.players.find(
         (p) => p._id && new mongoose.Types.ObjectId(p._id).equals(nextPlayerId)
       );
 
     if (nextPlayer) {
       MoneyCalculator.subtractElectricityAndTaxes(nextPlayer);
-      PlayerCostsCalculator.updatePlayerCosts(this.game, nextPlayer);
+      PlayerCostsCalculator.updatePlayerCosts(this.game!, nextPlayer);
     }
 
-    this.player.hasRolled = false;
-    this.player.hasTraveled = false;
-    PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
+    this.player!.hasRolled = false;
+    this.player!.hasTraveled = false;
+    PlayerCostsCalculator.updatePlayerCosts(this.game!, this.player!);
 
-    if (this.game.results) {
-      const last = this.game.results;
-      this.game.results = {
+    if (this.game!.results) {
+      const last = this.game!.results;
+      this.game!.results = {
         roll: last.roll,
         description: last.description,
       };
     }
-
-    this.game.save();
 
     if (nextPlayerId) {
       const msg: SoundMsg = {
@@ -590,13 +605,11 @@ export class RollProcessor {
         type: SoundType.YourTurn,
       };
       gameServer.sendEventToGameClients(
-        this.game.id,
+        this.game!.id,
         GameEvent.PLAY_SOUND_EFFECT,
         msg
       );
     }
-
-    return "";
   }
 
   public static getNextPlayerToAct(
