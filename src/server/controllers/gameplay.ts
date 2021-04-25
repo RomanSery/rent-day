@@ -10,6 +10,31 @@ import { PropertyProcessor } from "./PropertyProcessor";
 import { TradeProcessor } from "./TradeProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
 import { SkillType } from "../../core/enums/SkillType";
+import { AutoMoveProcessor } from "./AutoMoveProcessor";
+
+export const timesUpAction = async (req: Request, res: Response) => {
+  const userId = getVerifiedUserId(req);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+  const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
+
+  const processor = new AutoMoveProcessor(gameId);
+  const errMsg = await processor.autoMove();
+
+  if (errMsg && errMsg.length > 0) {
+    console.log(errMsg);
+    return res.status(400).send(errMsg);
+  }
+
+  res.json({
+    status: "success",
+    needToAnimate: processor.getNeedToAnimate(),
+    playerId: processor.getPlayerId(),
+    diceRoll: processor.getLastDiceRoll(),
+    frames: processor.getMovementKeyFrames(),
+  });
+};
 
 export const roll = async (req: Request, res: Response) => {
   const userId = getVerifiedUserId(req);
@@ -76,7 +101,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new RollProcessor(gameId, userId, null, null);
 
-  const errMsg = await processor.completeMyTurn();
+  const errMsg = await processor.completeMyTurn(false);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }

@@ -14,6 +14,7 @@ export interface GameState {
   readonly squareState: Array<SquareGameData>;
   readonly players: Array<Player>;
   readonly nextPlayerToAct: string;
+  readonly nextPlayerActBy?: string;
   readonly auctionId: string;
   readonly auctionSquareId: number;
   readonly lottoId: string;

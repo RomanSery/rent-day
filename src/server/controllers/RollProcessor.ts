@@ -34,6 +34,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SoundMsg } from "../../core/types/SoundMsg";
 import { SoundType } from "../../core/enums/SoundType";
 import { ChatMsg } from "../../core/types/ChatMsg";
+import { addSeconds, formatISO } from "date-fns";
 
 export class RollProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -514,7 +515,7 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
-  public async completeMyTurn(): Promise<string> {
+  public async completeMyTurn(timesUp: boolean): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -542,7 +543,7 @@ export class RollProcessor {
       return "you didnt roll yet";
     }
 
-    if (this.game.lottoId) {
+    if (this.game.lottoId && !timesUp) {
       return "There is an active lotto game, pick a prize first";
     }
 
@@ -552,6 +553,10 @@ export class RollProcessor {
     );
     if (nextPlayerId) {
       this.game.nextPlayerToAct = nextPlayerId;
+
+      const now = new Date();
+      const actBy = addSeconds(now, 30);
+      this.game.nextPlayerActBy = formatISO(actBy);
     }
 
     const nextPlayer =

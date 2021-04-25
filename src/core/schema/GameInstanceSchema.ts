@@ -75,6 +75,7 @@ export type GameInstanceDocument = mongoose.Document & {
   theme: Map<string, SquareThemeData>;
   squareState: SquareGameData[];
   nextPlayerToAct: mongoose.Types.ObjectId;
+  nextPlayerActBy: string | null;
   auctionId: mongoose.Types.ObjectId | null;
   auctionSquareId: number | null;
   lottoId: mongoose.Types.ObjectId | null;
@@ -96,6 +97,7 @@ const gameInstanceSchema = new mongoose.Schema(
     theme: Map,
     squareState: [SquareGameDataSchema],
     nextPlayerToAct: mongoose.Types.ObjectId,
+    nextPlayerActBy: String,
     auctionId: mongoose.Types.ObjectId,
     auctionSquareId: Number,
     lottoId: mongoose.Types.ObjectId,

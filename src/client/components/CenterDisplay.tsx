@@ -26,6 +26,7 @@ import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@material-ui/core";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { ChatWindow } from "./ChatWindow";
+import Countdown, { CountdownRenderProps, CountdownTimeDelta } from "react-countdown";
 
 interface Props {
   gameInfo: GameState | undefined;
@@ -166,6 +167,36 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
     return process.env.NODE_ENV === "development";
   }
 
+  const countdownRenderer = (props: CountdownRenderProps) => {
+    return <span>{props.minutes}:{props.seconds}</span>;
+  };
+
+  const onCountdownComplete = (timeDelta: CountdownTimeDelta) => {
+    if (!gameInfo) {
+      return;
+    }
+    const playerToAct = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, gameInfo.nextPlayerToAct));
+    if (playerToAct && !playerToAct.hasRolled) {
+      socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
+    }
+
+    setTimeout(() => {
+
+      API.post("actions/timesUpAction", { context })
+        .then(function (response) {
+
+          if (response.data.needToAnimate) {
+            socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
+          } else {
+            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          }
+
+        })
+        .catch(handleApiError);
+    }, 1500);
+  };
+
+
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -188,6 +219,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
             <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel}
               socketService={socketService} actionMode={actionMode} setActionMode={setActionMode}
             />
+
+            <Countdown date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />
           </div>
 
           <div className="second-row">
