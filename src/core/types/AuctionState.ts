@@ -8,4 +8,5 @@ export interface AuctionState {
   readonly squareId: number;
   readonly bidders: Array<Bidder>;
   readonly isTie: boolean;
+  readonly endsAt: string;
 }

@@ -66,7 +66,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     API.post("actions/completeTurn", { context })
       .then(function (response) {
         if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);
         }
       })
       .catch(handleApiError);

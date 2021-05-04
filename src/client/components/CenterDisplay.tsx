@@ -56,6 +56,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
   const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
 
+  const countdownEl = React.useRef<Countdown | null>(null);
+
   const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
@@ -64,6 +66,26 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
       if (areObjectIdsEqual(data.participant2.playerId, getMyUserId())) {
         setTradeOffer(data);
         setReviewTradeOpen(true);
+      }
+    });
+
+    socketService.listenForEvent(GameEvent.ANIMATE_DICE, (gameId: any) => {
+      if (countdownEl.current) {
+        countdownEl.current.pause();
+      }
+    });
+    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (gameId: any) => {
+      if (countdownEl.current) {
+        countdownEl.current.start();
+      }
+    });
+
+
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (gameId: any, completedTurn?: boolean) => {
+      if (completedTurn) {
+        if (countdownEl.current) {
+          countdownEl.current.stop();
+        }
       }
     });
 
@@ -193,7 +215,6 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
     }, 1500);
   };
 
-
   return (
     <React.Fragment>
       <div className="center-square square">
@@ -217,7 +238,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
               socketService={socketService} actionMode={actionMode} setActionMode={setActionMode}
             />
 
-            <Countdown date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />
+            <Countdown ref={countdownEl} date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />
           </div>
 
           <div className="second-row">

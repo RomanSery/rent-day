@@ -7,4 +7,5 @@ export interface Bidder {
   readonly color: string;
   bid?: number;
   submittedBid: boolean;
+  autoBid?: boolean;
 }

@@ -15,6 +15,8 @@ import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { dollarFormatterServer } from "./helpers";
+import { auctionTimeLimit, turnTimeLimit } from "../../core/constants";
+import { addSeconds, formatISO, isFuture, parseISO } from "date-fns";
 
 export class AuctionProcessor {
   private bid: number;
@@ -103,6 +105,60 @@ export class AuctionProcessor {
     return "";
   }
 
+  public async autoBid(): Promise<string> {
+    await this.init();
+
+    if (this.game == null) {
+      return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+    if (this.game.auctionId == null) {
+      return "no active auction";
+    }
+    if (this.auction == null) {
+      return "auction not found";
+    }
+    if (this.auction.finished) {
+      return "auction is finished";
+    }
+
+    if (!this.auction.endsAt) {
+      return "";
+    }
+
+    const endsAt = parseISO(this.auction.endsAt);
+    if (isFuture(endsAt)) {
+      return "";
+    }
+
+    this.auction.bidders.forEach((b: Bidder, key: number) => {
+      if (!b.submittedBid) {
+        b.bid = 0;
+        b.submittedBid = true;
+        b.autoBid = true;
+      }
+    });
+
+    this.determineWinner();
+
+    if (this.game) {
+      this.game.auctionId = null;
+      this.game.auctionSquareId = null;
+
+      const now = new Date();
+      const actBy = addSeconds(now, turnTimeLimit);
+      this.game.nextPlayerActBy = formatISO(actBy);
+
+      this.game.save();
+      console.log("finishe autobid");
+    }
+
+    this.auction.save();
+    return "";
+  }
+
   private isAuctionDone(): boolean {
     return this.auction!.bidders.every((b) => b.bid != null);
   }
@@ -161,7 +217,9 @@ export class AuctionProcessor {
   private getPriceToPay(): number {
     const bids: Array<number> = [];
     this.auction!.bidders.forEach((b) => {
-      bids.push(b.bid!);
+      if (!b.autoBid) {
+        bids.push(b.bid!);
+      }
     });
 
     bids.sort((a, b) => (a > b ? -1 : 1));
@@ -207,11 +265,15 @@ export class AuctionProcessor {
     game: GameInstanceDocument,
     player: Player
   ): Promise<AuctionDocument> {
+    const now = new Date();
+    const actBy = addSeconds(now, auctionTimeLimit);
+
     const newAuction: AuctionDocument = new Auction({
       gameId: game.id,
       squareId: player.position,
       finished: false,
       bidders: AuctionProcessor.getBidders(game),
+      endsAt: formatISO(actBy),
     });
 
     await newAuction.save();

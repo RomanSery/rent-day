@@ -8,6 +8,7 @@ const BidderSchema = new mongoose.Schema({
   color: { type: String, required: true },
   type: { type: String, required: true },
   submittedBid: { type: Boolean, required: true },
+  autoBid: { type: Boolean },
 });
 
 export type AuctionDocument = mongoose.Document & {
@@ -17,6 +18,7 @@ export type AuctionDocument = mongoose.Document & {
   finished: boolean;
   squareId: number;
   isTie: boolean;
+  endsAt: string;
 };
 
 const auctionSchema = new mongoose.Schema(
@@ -27,6 +29,7 @@ const auctionSchema = new mongoose.Schema(
     finished: Boolean,
     isTie: Boolean,
     squareId: Number,
+    endsAt: String,
   },
   { timestamps: true }
 );

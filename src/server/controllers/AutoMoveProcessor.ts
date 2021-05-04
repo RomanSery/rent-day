@@ -12,6 +12,7 @@ import { RollProcessor } from "./RollProcessor";
 import { DiceRoll } from "../../core/types/DiceRoll";
 import { LottoProcessor } from "./LottoProcessor";
 import { GameProcessor } from "./GameProcessor";
+import { AuctionProcessor } from "./AuctionProcessor";
 
 export class AutoMoveProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -59,6 +60,11 @@ export class AutoMoveProcessor {
     if (this.game.status !== GameStatus.ACTIVE) {
       return "Game is not active";
     }
+
+    if (this.game.auctionId) {
+      return this.autoBid();
+    }
+
     if (!this.player) {
       return "player not found";
     }
@@ -116,6 +122,15 @@ export class AutoMoveProcessor {
     this.lastDiceRoll = processor.getLastDiceRoll();
 
     return "";
+  }
+
+  private async autoBid(): Promise<string> {
+    const processor = new AuctionProcessor(
+      0,
+      this.gameId,
+      this.game!.nextPlayerToAct
+    );
+    return await processor.autoBid();
   }
 
   private async completeLotto(): Promise<void> {
