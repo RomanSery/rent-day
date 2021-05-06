@@ -148,7 +148,10 @@ export class RollProcessor {
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
       this.game.nextPlayerActBy = newAuction.endsAt;
-    } else if (LottoProcessor.shouldCreateLotto(this.player.position)) {
+    } else if (
+      !andCompleteTurn &&
+      LottoProcessor.shouldCreateLotto(this.player.position)
+    ) {
       this.game.lottoId = await LottoProcessor.createLotto(
         this.game.id,
         this.player
@@ -179,9 +182,13 @@ export class RollProcessor {
     };
     this.game.log.push(newMsg);
 
-    if (andCompleteTurn) {
+    if (andCompleteTurn && this.player.hasRolled) {
       this.doCompleteTurn();
     }
+
+    const now = new Date();
+    const actBy = addSeconds(now, turnTimeLimit);
+    this.game.nextPlayerActBy = formatISO(actBy);
 
     this.game.save();
 
@@ -194,7 +201,7 @@ export class RollProcessor {
             c
           );
         },
-        2000,
+        5000,
         this.game.id,
         chance
       );
@@ -396,14 +403,6 @@ export class RollProcessor {
 
       if (lastRoll.isDouble()) {
         this.player.hasTraveled = false;
-
-        const now = new Date();
-        const actBy = addSeconds(now, turnTimeLimit);
-        this.game.nextPlayerActBy = formatISO(actBy);
-      } else {
-        const now = new Date();
-        const actBy = addSeconds(now, turnTimeLimit / 2);
-        this.game.nextPlayerActBy = formatISO(actBy);
       }
     }
 

@@ -69,15 +69,18 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
       }
     });
 
+    /*
     socketService.listenForEvent(GameEvent.ANIMATE_DICE, (gameId: any) => {
       if (countdownEl.current) {
         countdownEl.current.pause();
       }
-    });
+    });*/
     socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (gameId: any) => {
-      if (countdownEl.current) {
-        countdownEl.current.start();
-      }
+      setTimeout(() => {
+        if (countdownEl.current) {
+          countdownEl.current.start();
+        }
+      }, 5000);
     });
 
 
@@ -207,7 +210,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
     setTimeout(() => {
 
-      API.post("actions/timesUpAction", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
+      API.post("actions/timesUpAction", { context })
         .then(function (response) {
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
         })

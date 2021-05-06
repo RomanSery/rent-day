@@ -19,11 +19,8 @@ export const timesUpAction = async (req: Request, res: Response) => {
   }
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
 
-  const processor = new AutoMoveProcessor(
-    gameId,
-    req.body.forceDie1,
-    req.body.forceDie2
-  );
+  const processor = new AutoMoveProcessor(gameId);
+
   const errMsg = await processor.autoMove();
 
   if (errMsg && errMsg.length > 0) {

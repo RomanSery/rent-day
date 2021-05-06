@@ -10,7 +10,6 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { isFuture, parseISO } from "date-fns";
 import { RollProcessor } from "./RollProcessor";
 import { DiceRoll } from "../../core/types/DiceRoll";
-import { LottoProcessor } from "./LottoProcessor";
 import { GameProcessor } from "./GameProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 
@@ -18,19 +17,11 @@ export class AutoMoveProcessor {
   private gameId: mongoose.Types.ObjectId;
   private game?: GameInstanceDocument | null;
   private player?: Player | null;
-  private forceDie1: number | null;
-  private forceDie2: number | null;
 
   private lastDiceRoll: DiceRoll | undefined;
 
-  constructor(
-    gameId: mongoose.Types.ObjectId,
-    forceDie1: number | null,
-    forceDie2: number | null
-  ) {
+  constructor(gameId: mongoose.Types.ObjectId) {
     this.gameId = gameId;
-    this.forceDie1 = forceDie1;
-    this.forceDie2 = forceDie2;
   }
 
   private async init(): Promise<void> {
@@ -73,18 +64,12 @@ export class AutoMoveProcessor {
     }
 
     if (!this.game.nextPlayerActBy) {
-      console.log("no turn timer yet");
       return "";
     }
 
     const actBy = parseISO(this.game.nextPlayerActBy);
     if (isFuture(actBy)) {
-      console.log("turn timer not up yet for " + this.player.name);
       return "";
-    }
-
-    if (this.game && this.game.lottoId) {
-      this.completeLotto();
     }
 
     if (this.player.money < 0) {
@@ -96,25 +81,17 @@ export class AutoMoveProcessor {
     const processor = new RollProcessor(
       this.gameId,
       this.game.nextPlayerToAct,
-      this.forceDie1,
-      this.forceDie2
+      null,
+      null
     );
 
     if (this.player.hasRolled) {
-      const errMsg = await processor.completeMyTurn();
-      console.log(
-        "(1) completing turn for " + this.player.name + " err=" + errMsg
-      );
+      await processor.completeMyTurn();
+      this.lastDiceRoll = processor.getLastDiceRoll();
       return "";
     }
 
     const errMsg = await processor.roll(true);
-    console.log(
-      "(2) rolling and completing turn for " +
-        this.player.name +
-        " err=" +
-        errMsg
-    );
     if (errMsg && errMsg.length > 0) {
       return "";
     }
@@ -131,15 +108,5 @@ export class AutoMoveProcessor {
       this.game!.nextPlayerToAct
     );
     return await processor.autoBid();
-  }
-
-  private async completeLotto(): Promise<void> {
-    const lotto = new LottoProcessor(
-      1,
-      this.gameId,
-      new mongoose.Types.ObjectId(this.player!._id)
-    );
-
-    await lotto.pickOption();
   }
 }

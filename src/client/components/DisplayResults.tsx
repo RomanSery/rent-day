@@ -32,22 +32,23 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
       setResultsDesc("");
       diceRollSound.play();
     });
+
     socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (playerId: string, diceRoll: DiceRollResult, frames: Array<number>) => {
       setAnimDiceRollResult(diceRoll);
       setShowDiceAnimation(false);
-
-
       showMovementAnimation(playerId, frames);
     });
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       setShowDiceAnimation(false);
+      setAnimDiceRollResult(undefined);
       if (data && data.results) {
         setResultsDesc(data.results.description);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const getDiceResults = (): DiceRollResult => {
     if (animDiceRollResult) {
