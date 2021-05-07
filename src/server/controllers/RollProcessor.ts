@@ -183,7 +183,7 @@ export class RollProcessor {
     this.game.log.push(newMsg);
 
     if (andCompleteTurn && this.player.hasRolled) {
-      this.doCompleteTurn();
+      this.doCompleteTurn(true);
     }
 
     const now = new Date();
@@ -528,7 +528,7 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
-  public async completeMyTurn(): Promise<string> {
+  public async completeMyTurn(autoComplete: boolean): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -556,18 +556,18 @@ export class RollProcessor {
       return "you didnt roll yet";
     }
 
-    if (this.game.lottoId) {
+    if (!autoComplete && this.game.lottoId) {
       return "There is an active lotto game, pick a prize first";
     }
 
-    this.doCompleteTurn();
+    this.doCompleteTurn(autoComplete);
 
     this.game.save();
 
     return "";
   }
 
-  private async doCompleteTurn(): Promise<void> {
+  private async doCompleteTurn(autoComplete: boolean): Promise<void> {
     const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
       this.game!,
       this.player!
@@ -594,6 +594,10 @@ export class RollProcessor {
     this.player!.hasRolled = false;
     this.player!.hasTraveled = false;
     PlayerCostsCalculator.updatePlayerCosts(this.game!, this.player!);
+
+    if (autoComplete && this.game!.lottoId) {
+      this.game!.lottoId = null;
+    }
 
     if (this.game!.results) {
       const last = this.game!.results;

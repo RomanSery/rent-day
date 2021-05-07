@@ -102,7 +102,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new RollProcessor(gameId, userId, null, null);
 
-  const errMsg = await processor.completeMyTurn();
+  const errMsg = await processor.completeMyTurn(false);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
