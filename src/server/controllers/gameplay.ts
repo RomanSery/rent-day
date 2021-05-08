@@ -51,7 +51,7 @@ export const roll = async (req: Request, res: Response) => {
     req.body.forceDie2
   );
 
-  const errMsg = await processor.roll(false);
+  const errMsg = await processor.roll(false, false);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }
@@ -102,7 +102,7 @@ export const completeTurn = async (req: Request, res: Response) => {
   const gameId = new mongoose.Types.ObjectId(req.body.context.gameId);
   const processor = new RollProcessor(gameId, userId, null, null);
 
-  const errMsg = await processor.completeMyTurn(false);
+  const errMsg = await processor.completeMyTurn(false, false);
   if (errMsg && errMsg.length > 0) {
     return res.status(400).send(errMsg);
   }

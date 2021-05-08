@@ -8,6 +8,7 @@ import { SkillType } from "../core/enums/SkillType";
 import {
   corruptionAdjustment,
   luckAdjustment,
+  maxTimeoutsAllowed,
   negotiationAdjustment,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
@@ -428,6 +429,14 @@ export const getHelpContent = (): JSX.Element => {
       <p>
         You gain an additional skill point every time you pass PAYDAY.
           </p>
+
+      <hr />
+
+      <h4>GAME SETTINGS</h4>
+      <p>
+        Turn timers are enabled by default, however you have the option to disable them.  <b>If a player times out {maxTimeoutsAllowed} times consecutively, they will automatically lose the game.</b>
+      </p>
+      <p>This is to prevent players that abandon the game without quitting from ruining the game for everyone else.</p>
 
       <hr />
 

@@ -12,6 +12,7 @@ import { RollProcessor } from "./RollProcessor";
 import { DiceRoll } from "../../core/types/DiceRoll";
 import { GameProcessor } from "./GameProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
+import { maxTimeoutsAllowed } from "../../core/constants";
 
 export class AutoMoveProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -81,6 +82,12 @@ export class AutoMoveProcessor {
       return "";
     }
 
+    if (this.player.numTimeouts >= maxTimeoutsAllowed) {
+      await GameProcessor.bankruptPlayer(this.game, this.game.nextPlayerToAct);
+      await this.game.save();
+      return "";
+    }
+
     const processor = new RollProcessor(
       this.gameId,
       this.game.nextPlayerToAct,
@@ -89,12 +96,12 @@ export class AutoMoveProcessor {
     );
 
     if (this.player.hasRolled && !this.game.auctionId) {
-      await processor.completeMyTurn(true);
+      await processor.completeMyTurn(true, false);
       this.lastDiceRoll = processor.getLastDiceRoll();
       return "";
     }
 
-    const errMsg = await processor.roll(true);
+    const errMsg = await processor.roll(true, true);
     if (errMsg && errMsg.length > 0) {
       return "";
     }

@@ -94,7 +94,10 @@ export class RollProcessor {
     return this.lastDiceRoll!;
   }
 
-  public async roll(andCompleteTurn: boolean): Promise<string> {
+  public async roll(
+    andCompleteTurn: boolean,
+    incrementTimeouts: boolean
+  ): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -188,7 +191,11 @@ export class RollProcessor {
     this.game.log.push(newMsg);
 
     if (andCompleteTurn && this.player.hasRolled && !createdAuction) {
-      this.doCompleteTurn(true);
+      this.doCompleteTurn(true, incrementTimeouts);
+    }
+
+    if (!andCompleteTurn) {
+      this.player!.numTimeouts = 0;
     }
 
     if (!createdAuction && this.game.settings.useTimers) {
@@ -535,7 +542,10 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
-  public async completeMyTurn(autoComplete: boolean): Promise<string> {
+  public async completeMyTurn(
+    autoComplete: boolean,
+    incrementTimeouts: boolean
+  ): Promise<string> {
     await this.init();
 
     if (!this.game) {
@@ -567,14 +577,17 @@ export class RollProcessor {
       return "There is an active lotto game, pick a prize first";
     }
 
-    this.doCompleteTurn(autoComplete);
+    this.doCompleteTurn(autoComplete, incrementTimeouts);
 
     this.game.save();
 
     return "";
   }
 
-  private async doCompleteTurn(autoComplete: boolean): Promise<void> {
+  private async doCompleteTurn(
+    autoComplete: boolean,
+    incrementTimeouts: boolean
+  ): Promise<void> {
     const nextPlayerId: mongoose.Types.ObjectId | null = RollProcessor.getNextPlayerToAct(
       this.game!,
       this.player!
@@ -602,6 +615,13 @@ export class RollProcessor {
 
     this.player!.hasRolled = false;
     this.player!.hasTraveled = false;
+
+    if (incrementTimeouts) {
+      this.player!.numTimeouts++;
+    } else {
+      this.player!.numTimeouts = 0;
+    }
+
     PlayerCostsCalculator.updatePlayerCosts(this.game!, this.player!);
 
     if (autoComplete && this.game!.lottoId) {

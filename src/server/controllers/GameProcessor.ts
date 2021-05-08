@@ -156,6 +156,7 @@ export class GameProcessor {
       canTravel: false,
       rollHistory: [],
       numTurnsInIsolation: 0,
+      numTimeouts: 0,
     };
 
     game.players.push(newPlayer);
@@ -184,6 +185,7 @@ export class GameProcessor {
       p.state = PlayerState.ACTIVE;
       p.hasRolled = false;
       p.numAbilityPoints = game.settings.initialSkillPoints;
+      p.numTimeouts = 0;
 
       await PlayerProcessor.assignUserToGame(p._id, game);
     });
@@ -199,7 +201,7 @@ export class GameProcessor {
 
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {
-        //GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
+        GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
       }
     }
 

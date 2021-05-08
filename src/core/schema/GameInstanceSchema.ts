@@ -39,6 +39,8 @@ const PlayerSchema = new mongoose.Schema({
   canTravel: { type: Boolean, required: true },
   rollHistory: { type: Schema.Types.Array },
   numTurnsInIsolation: { type: Number, required: true },
+
+  numTimeouts: { type: Number, required: true },
 });
 
 const SquareGameDataSchema = new mongoose.Schema({
