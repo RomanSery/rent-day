@@ -126,6 +126,7 @@ export class RollProcessor {
     this.updatePlayerPosition();
 
     let chance: ServerChanceEvent | null = null;
+    let createdAuction: boolean = false;
 
     if (ChanceProcessor.shouldCreateChance(this.player.position)) {
       const processor = new ChanceProcessor(this.game);
@@ -148,6 +149,7 @@ export class RollProcessor {
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
       this.game.nextPlayerActBy = newAuction.endsAt;
+      createdAuction = true;
     } else if (
       !andCompleteTurn &&
       LottoProcessor.shouldCreateLotto(this.player.position)
@@ -182,13 +184,15 @@ export class RollProcessor {
     };
     this.game.log.push(newMsg);
 
-    if (andCompleteTurn && this.player.hasRolled) {
+    if (andCompleteTurn && this.player.hasRolled && !createdAuction) {
       this.doCompleteTurn(true);
     }
 
-    const now = new Date();
-    const actBy = addSeconds(now, turnTimeLimit);
-    this.game.nextPlayerActBy = formatISO(actBy);
+    if (!createdAuction) {
+      const now = new Date();
+      const actBy = addSeconds(now, turnTimeLimit);
+      this.game.nextPlayerActBy = formatISO(actBy);
+    }
 
     this.game.save();
 

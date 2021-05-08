@@ -18,7 +18,7 @@ export const muggingChance: number = 15;
 export const muggingAmount: number = 200;
 
 export const turnTimeLimit: number = 20;
-export const auctionTimeLimit: number = 20;
+export const auctionTimeLimit: number = 35;
 
 export const player_colors = [
   "#0014f3", //blue

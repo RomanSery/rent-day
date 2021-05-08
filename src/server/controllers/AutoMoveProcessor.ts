@@ -85,7 +85,7 @@ export class AutoMoveProcessor {
       null
     );
 
-    if (this.player.hasRolled) {
+    if (this.player.hasRolled && !this.game.auctionId) {
       await processor.completeMyTurn(true);
       this.lastDiceRoll = processor.getLastDiceRoll();
       return "";
