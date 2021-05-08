@@ -148,7 +148,10 @@ export class RollProcessor {
       );
       this.game.auctionId = new mongoose.Types.ObjectId(newAuction._id);
       this.game.auctionSquareId = newAuction.squareId;
-      this.game.nextPlayerActBy = newAuction.endsAt;
+
+      if (this.game.settings.useTimers) {
+        this.game.nextPlayerActBy = newAuction.endsAt;
+      }
       createdAuction = true;
     } else if (
       !andCompleteTurn &&
@@ -188,7 +191,7 @@ export class RollProcessor {
       this.doCompleteTurn(true);
     }
 
-    if (!createdAuction) {
+    if (!createdAuction && this.game.settings.useTimers) {
       const now = new Date();
       const actBy = addSeconds(now, turnTimeLimit);
       this.game.nextPlayerActBy = formatISO(actBy);
@@ -579,9 +582,11 @@ export class RollProcessor {
     if (nextPlayerId) {
       this.game!.nextPlayerToAct = nextPlayerId;
 
-      const now = new Date();
-      const actBy = addSeconds(now, turnTimeLimit);
-      this.game!.nextPlayerActBy = formatISO(actBy);
+      if (this.game!.settings.useTimers) {
+        const now = new Date();
+        const actBy = addSeconds(now, turnTimeLimit);
+        this.game!.nextPlayerActBy = formatISO(actBy);
+      }
     }
 
     const nextPlayer =

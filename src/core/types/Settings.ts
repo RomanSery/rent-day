@@ -3,4 +3,5 @@ export interface Settings {
   initialSkillPoints: number;
   maxPlayers: number;
   password: string | null;
+  useTimers?: boolean;
 }

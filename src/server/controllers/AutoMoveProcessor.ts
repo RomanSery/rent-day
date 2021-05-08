@@ -51,6 +51,9 @@ export class AutoMoveProcessor {
     if (this.game.status !== GameStatus.ACTIVE) {
       return "Game is not active";
     }
+    if (!this.game.settings.useTimers) {
+      return "";
+    }
 
     if (this.game.auctionId) {
       return this.autoBid();

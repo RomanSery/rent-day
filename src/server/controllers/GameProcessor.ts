@@ -44,7 +44,8 @@ export class GameProcessor {
     initialMoney: number,
     initialSkillPoints: number,
     userId: mongoose.Types.ObjectId,
-    password: string | null
+    password: string | null,
+    useTimers: boolean
   ): Promise<number> {
     const themeData = new Map<string, SquareThemeData>();
     NyThemeData.forEach((value: SquareThemeData, key: number) => {
@@ -82,6 +83,7 @@ export class GameProcessor {
         initialSkillPoints: initialSkillPoints,
         maxPlayers: maxPlayers,
         password: password,
+        useTimers: useTimers,
       },
       players: [],
       status: GameStatus.JOINING,
@@ -189,9 +191,11 @@ export class GameProcessor {
     game.nextPlayerToAct = new mongoose.Types.ObjectId(game.players[0]._id);
     game.status = GameStatus.ACTIVE;
 
-    const now = new Date();
-    const actBy = addSeconds(now, turnTimeLimit);
-    game.nextPlayerActBy = formatISO(actBy);
+    if (game.settings.useTimers) {
+      const now = new Date();
+      const actBy = addSeconds(now, turnTimeLimit);
+      game.nextPlayerActBy = formatISO(actBy);
+    }
 
     if (IS_DEV) {
       for (let id = 1; id <= 38; id++) {

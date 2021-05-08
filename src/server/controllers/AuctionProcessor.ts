@@ -152,7 +152,6 @@ export class AuctionProcessor {
       this.game.nextPlayerActBy = formatISO(actBy);
 
       this.game.save();
-      console.log("finishe autobid");
     }
 
     this.auction.save();

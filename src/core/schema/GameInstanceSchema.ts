@@ -66,6 +66,7 @@ const SettingsSchema = new mongoose.Schema({
   initialSkillPoints: { type: Number, required: true },
   maxPlayers: { type: Number, required: true },
   password: { type: String, required: false },
+  useTimers: { type: Boolean, required: false },
 });
 
 export type GameInstanceDocument = mongoose.Document & {

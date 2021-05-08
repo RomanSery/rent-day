@@ -48,6 +48,7 @@ export const createGame = async (req: Request, res: Response) => {
   const maxPlayers = req.body.data.maxPlayers;
   const initialMoney = req.body.data.initialMoney;
   const initialSkillPoints = req.body.data.initialSkillPoints;
+  const useTimers = req.body.data.useTimers;
 
   const process = new GameProcessor();
   const newGameId = await process.createGame(
@@ -56,7 +57,8 @@ export const createGame = async (req: Request, res: Response) => {
     initialMoney,
     initialSkillPoints,
     userId,
-    req.body.data.gamePwd
+    req.body.data.gamePwd,
+    useTimers
   );
 
   return res.json({ gameId: newGameId });

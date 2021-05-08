@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
+import { Button, Checkbox, FormControlLabel, makeStyles, TextField, Typography } from "@material-ui/core";
 import API from '../api';
 import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
@@ -18,12 +18,14 @@ type Inputs = {
   initialMoney: number;
   initialSkillPoints: number;
   gamePwd: string;
+  useTimers: boolean;
 };
 
 export const CreateGame: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
+  const [useTimersVal, setUseTimesVal] = React.useState<boolean>(true);
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
 
@@ -41,6 +43,10 @@ export const CreateGame: React.FC<Props> = () => {
       marginBottom: 15
     },
   });
+
+  const handleTimerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUseTimesVal(event.target.checked);
+  };
 
   const classes = createStyles();
 
@@ -101,6 +107,16 @@ export const CreateGame: React.FC<Props> = () => {
         {_.get("initialSkillPoints.type", errors) === "max" && (
           <p className="field-error">Initial Skill Points must be at most 10</p>
         )}
+
+
+        <FormControlLabel
+          control={
+            <Checkbox id="useTimers" name="useTimers" checked={useTimersVal} onChange={handleTimerChange} inputRef={register({ required: false })} color="primary" />
+          }
+          label="Use turn timers?"
+        />
+
+        <br />
 
         <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
       </form>

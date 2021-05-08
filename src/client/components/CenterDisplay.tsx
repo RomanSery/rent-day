@@ -241,7 +241,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
               socketService={socketService} actionMode={actionMode} setActionMode={setActionMode}
             />
 
-            <Countdown ref={countdownEl} date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />
+            {gameInfo && gameInfo.settings.useTimers &&
+              <Countdown ref={countdownEl} date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />}
           </div>
 
           <div className="second-row">
