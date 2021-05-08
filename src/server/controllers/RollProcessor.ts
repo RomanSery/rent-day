@@ -184,8 +184,20 @@ export class RollProcessor {
 
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
+    let gameEventMsg =
+      "<b>" +
+      this.player.name +
+      "</b> - (" +
+      lastRoll.prettyPrint() +
+      ") " +
+      this.rollDesc;
+
+    if (incrementTimeouts) {
+      gameEventMsg += " - (TIMEOUT: #" + (this.player.numTimeouts + 1) + ")";
+    }
+
     const newMsg: ChatMsg = {
-      msg: this.game.results.description.replace(/<br \/>/g, " - "),
+      msg: gameEventMsg.replace(/<br \/>/g, " - "),
       player: "",
     };
     this.game.log.push(newMsg);
