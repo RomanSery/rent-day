@@ -142,9 +142,9 @@ export class RollProcessor {
         }
         chance.subLine = chance.getSubLine(this.game, this.player);
       }
-    } else if (
-      AuctionProcessor.shouldCreateAuction(this.game, this.player.position)
-    ) {
+    }
+
+    if (AuctionProcessor.shouldCreateAuction(this.game, this.player.position)) {
       const newAuction: AuctionDocument = await AuctionProcessor.createAuction(
         this.game,
         this.player
@@ -156,7 +156,9 @@ export class RollProcessor {
         this.game.nextPlayerActBy = newAuction.endsAt;
       }
       createdAuction = true;
-    } else if (
+    }
+
+    if (
       !andCompleteTurn &&
       LottoProcessor.shouldCreateLotto(this.player.position)
     ) {
@@ -494,8 +496,6 @@ export class RollProcessor {
     if (!this.playerPassedPayDay && moveToPos < origPos) {
       this.playerPassedPayDay = true;
       this.rollDesc += " <br /> Payday, collect your salary!";
-    } else {
-      this.playerPassedPayDay = false;
     }
   };
 

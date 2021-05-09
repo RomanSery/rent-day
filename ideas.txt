@@ -1,9 +1,6 @@
-displaying chance event too early, use anaimatio duration to display at the right time
 when taking action like roll, complete turn, if err msg comes back like 'not your turn', means UI is out of sync, need to do update_game_state
 
 
-traveled to wall street, but didnt trigger auction!!
-didnt collect salary when got chance and traveled
 
 computer players
 
