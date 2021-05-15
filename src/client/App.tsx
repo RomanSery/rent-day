@@ -232,14 +232,15 @@ export const App: React.FC = () => {
     });
 
 
+    const queryClient = new QueryClient();
 
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-
-          <DisplayAllGames />
-
+          <QueryClientProvider client={queryClient}>
+            <DisplayAllGames />
+          </QueryClientProvider>
 
         </StaticBoard>
       </React.Fragment>
