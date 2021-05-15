@@ -22,6 +22,7 @@ import API from "./api";
 import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
+import { QueryClient, QueryClientProvider } from "react-query";
 
 export const App: React.FC = () => {
 
@@ -207,11 +208,15 @@ export const App: React.FC = () => {
       }
     });
 
+    const queryClient = new QueryClient();
+
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <DisplayAllPlayers />
+          <QueryClientProvider client={queryClient}>
+            <DisplayAllPlayers />
+          </QueryClientProvider>
         </StaticBoard>
       </React.Fragment>
     );
@@ -226,11 +231,16 @@ export const App: React.FC = () => {
       }
     });
 
+
+
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
+
           <DisplayAllGames />
+
+
         </StaticBoard>
       </React.Fragment>
     );

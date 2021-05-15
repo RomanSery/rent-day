@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import API from '../api';
 
 import TableContainer from '@material-ui/core/TableContainer';
@@ -9,6 +9,7 @@ import { GameContext } from "../../core/types/GameContext";
 import { PlayerInfo } from "../../core/types/PlayerInfo";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@material-ui/data-grid';
 import { Link } from "react-router-dom";
+import { useQuery } from "react-query";
 
 interface Props {
 
@@ -17,16 +18,21 @@ interface Props {
 export const DisplayAllPlayers: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const [players, setPlayers] = useState<PlayerInfo[]>([]);
 
-  useEffect(() => {
+  const getPlayers = async () => {
 
-    API.post("findPlayers", { context })
+    let players: PlayerInfo[] = [];
+
+    await API.post("findPlayers", { context })
       .then(function (response) {
-        setPlayers(response.data.players);
+        players = response.data.players;
       })
       .catch(handleApiError);
-  }, []);
+
+    return players;
+  }
+
+  const { status, error, data } = useQuery<PlayerInfo[], Error>("getAllPlayers", getPlayers);
 
   const columns: GridColDef[] = [
     { field: 'id', hide: true },
@@ -63,9 +69,13 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
 
   const getDataRows = (): GridRowsProp => {
 
+    if (!data) {
+      return [];
+    }
+
     const rows: Array<GridRowModel> = [];
 
-    players.forEach((p: PlayerInfo, key: number) => {
+    data.forEach((p: PlayerInfo, key: number) => {
       rows.push({
         id: p.playerId,
         name: p.name,
@@ -78,15 +88,25 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
     return rows;
   }
 
+  const getPlayerDisplay = () => {
+    if (status === "loading" || !data) {
+      return <div>Loading...</div>;
+    }
+    if (status === "error") {
+      return <div>{error!.message}</div>;
+    }
+
+    return (<DataGrid rows={getDataRows()} columns={columns} autoHeight={true} density="compact"
+      disableColumnMenu={true} disableColumnSelector={true}
+      disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />);
+  }
+
 
   return (
     <React.Fragment>
       <TableContainer component={Paper}>
 
-        <DataGrid rows={getDataRows()} columns={columns} autoHeight={true} density="compact"
-          disableColumnMenu={true} disableColumnSelector={true}
-          disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
-
+        {getPlayerDisplay()}
         <br />
         <Link to="/dashboard">GO BACK</Link>
 
