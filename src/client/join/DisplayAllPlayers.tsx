@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import API from '../api';
 
@@ -25,7 +26,7 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
         setPlayers(response.data.players);
       })
       .catch(handleApiError);
-  }, [context]);
+  }, []);
 
   const columns: GridColDef[] = [
     { field: 'id', hide: true },
