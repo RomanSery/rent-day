@@ -101,3 +101,8 @@ body {
   text-align: center;
   padding-left: 10px;
 }
+
+.dashboard-btn {
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+}

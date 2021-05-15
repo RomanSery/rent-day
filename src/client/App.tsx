@@ -5,7 +5,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
-  Switch, Route, withRouter, useHistory, useLocation
+  Switch, Route, withRouter, useHistory, useLocation, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
@@ -79,11 +79,13 @@ export const App: React.FC = () => {
   const homeStyles = makeStyles({
     opt: {
       marginTop: 10,
-      marginBottom: 10
+      marginBottom: 10,
     },
   });
 
+
   const classes = homeStyles();
+  const btnClasses = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-fullWidth dashboard-btn";
 
 
   const GameDisplay = () => {
@@ -146,11 +148,11 @@ export const App: React.FC = () => {
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
             <Typography component="h2" variant="h5">Rent Day</Typography>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/create") }}> CREATE NEW GAME</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/find") }}> JOIN GAME</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/players") }}> PlAYERS</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
+            <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
+            <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
+            <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
+            <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
+            <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
           </Container>
         </StaticBoard>
@@ -172,6 +174,7 @@ export const App: React.FC = () => {
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
             <Typography component="h2" variant="h5">Rent Day</Typography>
+
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
