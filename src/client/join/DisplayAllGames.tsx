@@ -11,7 +11,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
-import { getGameContextFromLocalStorage, getObjectIdAsHexString, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
+import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import { useQuery } from "react-query";
 
@@ -32,28 +32,17 @@ export const DisplayAllGames: React.FC<Props> = () => {
     });
   };
 
-  const getPlayers = async () => {
+  const gamesQuery = useQuery<GameToJoin[], Error>("getAllGames",
+    () => API.post("findGames", { context }).then(function (response) { return response.data.games; }));
 
-    let games: GameToJoin[] = [];
-
-    await API.post("findGames", { context })
-      .then(function (response) {
-        games = response.data.games;
-      })
-      .catch(handleApiError);
-
-    return games;
-  }
-
-  const { status, error, data } = useQuery<GameToJoin[], Error>("getAllGames", getPlayers);
 
 
   const displayGameList = () => {
-    if (status === "loading" || !data) {
+    if (gamesQuery.isLoading || !gamesQuery.data) {
       return <div>Loading...</div>;
     }
-    if (status === "error") {
-      return <div>{error!.message}</div>;
+    if (gamesQuery.isError) {
+      return <div>{gamesQuery.error!.message}</div>;
     }
 
     return (<Table className="find-games" aria-label="simple table">
@@ -65,7 +54,7 @@ export const DisplayAllGames: React.FC<Props> = () => {
         </TableRow>
       </TableHead>
       <TableBody>
-        {data.map((g) => (
+        {gamesQuery.data.map((g) => (
           <TableRow key={getObjectIdAsHexString(g.gameId)}>
             <TableCell component="th" scope="row">
               {g.name}

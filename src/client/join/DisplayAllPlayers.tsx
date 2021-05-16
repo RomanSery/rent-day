@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import API from '../api';
 
 import TableContainer from '@material-ui/core/TableContainer';
 import Paper from '@material-ui/core/Paper';
-import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
+import { getGameContextFromLocalStorage } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import { PlayerInfo } from "../../core/types/PlayerInfo";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@material-ui/data-grid';
@@ -19,20 +18,9 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
 
-  const getPlayers = async () => {
-
-    let players: PlayerInfo[] = [];
-
-    await API.post("findPlayers", { context })
-      .then(function (response) {
-        players = response.data.players;
-      })
-      .catch(handleApiError);
-
-    return players;
-  }
-
-  const { status, error, data } = useQuery<PlayerInfo[], Error>("getAllPlayers", getPlayers);
+  const playersQuery = useQuery<PlayerInfo[], Error>("getAllPlayers",
+    () => API.post("findPlayers", { context }).then(function (response) { return response.data.players; }),
+    { refetchOnWindowFocus: false });
 
   const columns: GridColDef[] = [
     { field: 'id', hide: true },
@@ -69,13 +57,13 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
 
   const getDataRows = (): GridRowsProp => {
 
-    if (!data) {
+    if (!playersQuery.data) {
       return [];
     }
 
     const rows: Array<GridRowModel> = [];
 
-    data.forEach((p: PlayerInfo, key: number) => {
+    playersQuery.data.forEach((p: PlayerInfo, key: number) => {
       rows.push({
         id: p.playerId,
         name: p.name,
@@ -89,11 +77,11 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
   }
 
   const getPlayerDisplay = () => {
-    if (status === "loading" || !data) {
+    if (playersQuery.isLoading || !playersQuery.data) {
       return <div>Loading...</div>;
     }
-    if (status === "error") {
-      return <div>{error!.message}</div>;
+    if (playersQuery.isError) {
+      return <div>{playersQuery.error!.message}</div>;
     }
 
     return (<DataGrid rows={getDataRows()} columns={columns} autoHeight={true} density="compact"
