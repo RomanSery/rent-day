@@ -189,12 +189,15 @@ export const App: React.FC = () => {
   const DisplayJoinGamePage = () => {
 
     const socket = new SocketService(PageType.Join, getGameId(), wsUri);
+    const queryClient = new QueryClient();
 
     return (
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <JoinGame socketService={socket} />
+          <QueryClientProvider client={queryClient}>
+            <JoinGame socketService={socket} />
+          </QueryClientProvider>
         </StaticBoard>
       </React.Fragment>
     );

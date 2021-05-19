@@ -18,6 +18,7 @@ import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../
 import { getPlayerClassDescription } from "../uiHelpers";
 import queryString from "query-string";
 import _ from "lodash/fp";
+import { useQuery } from "react-query";
 
 interface Props {
   socketService: SocketService;
@@ -41,19 +42,14 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const gameToJoinId: string | null = getGameIdFromUrl();
 
-  const [gameState, setGameState] = useState<GameState>();
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
   const { register, handleSubmit, errors } = useForm<Inputs>();
 
-
-
-  useEffect(() => {
-    getGameState();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const gameInfoQuery = useQuery<GameState, Error>("getAllPlayers",
+    () => API.post("getGame", { gameId: gameToJoinId }).then(function (response) { return response.data.game; }));
 
 
   useEffect(() => {
@@ -62,7 +58,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       if (data.allJoined) {
         history.push("/gameinstance");
       } else {
-        getGameState();
+        gameInfoQuery.refetch();
         setSnackMsg(data.playerName + " has joined");
         setSnackOpen(true);
       }
@@ -71,7 +67,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
       setSnackMsg(data);
       setSnackOpen(true);
-      setGameState(game);
+      gameInfoQuery.refetch();
     });
 
 
@@ -82,17 +78,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-
-
-
-  const getGameState = () => {
-    API.post("getGame", { gameId: gameToJoinId })
-      .then(function (response) {
-        setGameState(response.data.game);
-      })
-      .catch(handleApiError);
-  };
 
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
@@ -111,7 +96,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         if (gameToJoinId) {
           setJoinedGameStorage(gameToJoinId);
         }
-        getGameState();
+        gameInfoQuery.refetch();
 
         if (response.data.allJoined) {
           history.push("/gameinstance");
@@ -142,7 +127,13 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   };
 
   const getNumPlayers = () => {
-    return "Players: " + gameState?.players.length + " / " + gameState?.settings.maxPlayers;
+    if (gameInfoQuery.isLoading || !gameInfoQuery.data) {
+      return "Loading...";
+    }
+    if (gameInfoQuery.isError) {
+      return gameInfoQuery.error!.message;
+    }
+    return "Players: " + gameInfoQuery.data.players.length + " / " + gameInfoQuery.data.settings.maxPlayers;
   }
 
 
@@ -150,10 +141,37 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     setSelectedPlayerClass(event.target.value);
   };
 
+
+  const getListOfJoinePlayers = () => {
+    if (gameInfoQuery.isLoading || !gameInfoQuery.data) {
+      return "Loading...";
+    }
+    if (gameInfoQuery.isError) {
+      return gameInfoQuery.error!.message;
+    }
+
+    return (<div className="players-display">
+      {gameInfoQuery.data.players.map((p: Player, index) => {
+        return (
+          <React.Fragment key={getObjectIdAsHexString(p._id)}>
+            <div className="player-info" style={getColorStyle()}>
+              <div className="container">
+                <Chip clickable={false} color="primary" size="medium" variant="outlined"
+                  icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
+                  label={p.name} />
+                <div className="player-class">{PlayerClass[p.playerClass]}</div>
+              </div>
+            </div>
+          </React.Fragment>
+        )
+      })}
+    </div>);
+  }
+
   return (
     <React.Fragment>
       <Container maxWidth="sm">
-        <Typography component="h2" variant="h5">{gameState?.name}</Typography>
+        <Typography component="h2" variant="h5">{gameInfoQuery.data?.name}</Typography>
 
         <List dense={true} className="game-settings">
           <ListItem>
@@ -162,7 +180,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           </ListItem>
           <ListItem>
             <ListItemIcon> <FontAwesomeIcon icon={faDollarSign} size="2x" /> </ListItemIcon>
-            <ListItemText primary={gameState?.settings.initialMoney} />
+            <ListItemText primary={gameInfoQuery.data?.settings.initialMoney} />
           </ListItem>
         </List>
 
@@ -201,7 +219,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
               <p className="field-error">Class Type is required</p>
             )}
 
-            {gameState && gameState.settings && gameState.settings.password &&
+            {gameInfoQuery && gameInfoQuery.data && gameInfoQuery.data.settings && gameInfoQuery.data.settings.password &&
               <FormControl fullWidth >
                 <TextField id="gamePwd" name="gamePwd" required={true} fullWidth={true} label="Password"
                   inputRef={register({ required: true })} />
@@ -246,23 +264,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
       </Container>
 
-      <div className="players-display">
-        {gameState?.players.map((p: Player, index) => {
-          return (
-            <React.Fragment key={getObjectIdAsHexString(p._id)}>
-              <div className="player-info" style={getColorStyle()}>
-                <div className="container">
-                  <Chip clickable={false} color="primary" size="medium" variant="outlined"
-                    icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
-                    label={p.name} />
-                  <div className="player-class">{PlayerClass[p.playerClass]}</div>
-                </div>
-              </div>
-            </React.Fragment>
-          )
-        })}
-      </div>
-
+      {getListOfJoinePlayers()}
 
       <Snackbar
         anchorOrigin={{
