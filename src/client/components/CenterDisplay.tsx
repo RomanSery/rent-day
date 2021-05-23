@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { DisplayPlayers } from "./DisplayPlayers";
-import { GameState } from "../../core/types/GameState";
 import { DisplayActions } from "./DisplayActions";
 import { SocketService } from "../sockets/SocketService";
 import { DisplayResults } from "./DisplayResults";
@@ -24,21 +23,15 @@ import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@material-ui/core";
-import { ActionMode } from "../../core/enums/ActionMode";
 import { ChatWindow } from "./ChatWindow";
 import Countdown, { CountdownRenderProps, CountdownTimeDelta } from "react-countdown";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
-  getSquareId: () => number | undefined;
-  showMovementAnimation: (playerId: string, frames: Array<number>) => void;
-  actionMode: ActionMode;
-  setActionMode: (mode: ActionMode) => void;
-
 }
 
-export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSquareId, showMovementAnimation, actionMode, setActionMode }) => {
+export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -60,6 +53,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
   const isMountedRef = useIsMountedRef();
 
+  const gameState = useGameStateStore(state => state.data);
+
   useEffect(() => {
 
     socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: TradeOffer) => {
@@ -69,12 +64,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
       }
     });
 
-    /*
-    socketService.listenForEvent(GameEvent.ANIMATE_DICE, (gameId: any) => {
-      if (countdownEl.current) {
-        countdownEl.current.pause();
-      }
-    });*/
+
     socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (gameId: any) => {
       setTimeout(() => {
         if (countdownEl.current) {
@@ -100,8 +90,8 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
   const onRollDice = async () => {
 
-    if (socketService && gameInfo) {
-      socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
+    if (socketService && gameState) {
+      socketService.socket.emit(GameEvent.ROLL_DICE, gameState._id);
     }
 
 
@@ -109,11 +99,11 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
       API.post("actions/roll", { context, forceDie1: forceDie1, forceDie2: forceDie2 })
         .then(function (response) {
-          if (socketService && gameInfo) {
+          if (socketService && gameState) {
             if (response.data.needToAnimate) {
-              socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
+              socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameState._id, response.data.playerId, response.data.diceRoll, response.data.frames);
             } else {
-              socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+              socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
             }
           }
         })
@@ -131,7 +121,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
     setPlayerToView(player._id);
   };
   const clearPlayer = () => {
-    if (gameInfo && gameInfo.players) {
+    if (gameState && gameState.players) {
       const myUserId = getMyUserId();
       if (myUserId) {
         setPlayerToView(myUserId);
@@ -143,13 +133,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   };
 
   const getPlayerToView = (): Player | undefined => {
-    if (playerToView && gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerToView));
+    if (playerToView && gameState) {
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerToView));
     }
-    if (gameInfo && gameInfo.players) {
+    if (gameState && gameState.players) {
       const myUserId = getMyUserId();
       if (myUserId) {
-        return gameInfo.players.find((p) => areObjectIdsEqual(p._id, myUserId));
+        return gameState.players.find((p) => areObjectIdsEqual(p._id, myUserId));
       }
       return undefined;
     }
@@ -160,13 +150,13 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
     if (!isMountedRef.current) {
       return null;
     }
-    if (gameInfo?.auctionId) {
-      return (<DisplayAuction gameInfo={gameInfo} socketService={socketService} />);
+    if (gameState?.auctionId) {
+      return (<DisplayAuction socketService={socketService} />);
     }
-    if (gameInfo?.lottoId) {
-      return (<DisplayLotto gameInfo={gameInfo} socketService={socketService} />);
+    if (gameState?.lottoId) {
+      return (<DisplayLotto socketService={socketService} />);
     }
-    return (<DisplayResults gameInfo={gameInfo} socketService={socketService} showMovementAnimation={showMovementAnimation} />);
+    return (<DisplayResults socketService={socketService} />);
   }
 
   const tradeWithPlayer = (player: Player) => {
@@ -179,7 +169,7 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   };
 
   const showGameOver = () => {
-    return gameInfo && gameInfo.status === GameStatus.FINISHED ? true : false;
+    return gameState && gameState.status === GameStatus.FINISHED ? true : false;
   }
 
   const onLeaveGame = () => {
@@ -200,19 +190,19 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
   };
 
   const onCountdownComplete = (timeDelta: CountdownTimeDelta) => {
-    if (!gameInfo) {
+    if (!gameState) {
       return;
     }
-    const playerToAct = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, gameInfo.nextPlayerToAct));
+    const playerToAct = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, gameState.nextPlayerToAct));
     if (playerToAct && !playerToAct.hasRolled) {
-      socketService.socket.emit(GameEvent.ROLL_DICE, gameInfo._id);
+      socketService.socket.emit(GameEvent.ROLL_DICE, gameState._id);
     }
 
     setTimeout(() => {
 
       API.post("actions/timesUpAction", { context })
         .then(function (response) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         })
         .catch(handleApiError);
     }, 1500);
@@ -237,36 +227,36 @@ export const CenterDisplay: React.FC<Props> = ({ gameInfo, socketService, getSqu
 
 
           <div className="player-actions">
-            <DisplayActions tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo} onRollAction={onRollDice} onTravelAction={onTravel}
-              socketService={socketService} actionMode={actionMode} setActionMode={setActionMode}
+            <DisplayActions tradeWithPlayer={tradeWithPlayer} onRollAction={onRollDice} onTravelAction={onTravel}
+              socketService={socketService}
             />
 
-            {gameInfo && gameInfo.settings.useTimers &&
-              <Countdown ref={countdownEl} date={gameInfo?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameInfo?.nextPlayerActBy} />}
+            {gameState && gameState.settings.useTimers &&
+              <Countdown ref={countdownEl} date={gameState?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameState?.nextPlayerActBy} />}
           </div>
 
           <div className="second-row">
             <div className="player-viewer">
-              <PlayerViewer socketService={socketService} gameInfo={gameInfo} getPlayer={getPlayerToView} />
+              <PlayerViewer socketService={socketService} getPlayer={getPlayerToView} />
             </div>
             <div className="property-viewer">
-              <SquareViewer gameInfo={gameInfo} getSquareId={getSquareId} />
+              <SquareViewer />
             </div>
 
           </div>
 
-          <ChatWindow gameInfo={gameInfo} socketService={socketService} />
+          <ChatWindow socketService={socketService} />
 
         </div>
 
-        <DisplayPlayers gameInfo={gameInfo} viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
+        <DisplayPlayers viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
       </div>
 
-      <GameOverDialog gameInfo={gameInfo} open={showGameOver()} onLeaveGame={onLeaveGame} />
-      <TravelDialog socketService={socketService} gameInfo={gameInfo} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
-      <OfferTradeDialog socketService={socketService} gameInfo={gameInfo} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
-      <ReviewTradeDialog socketService={socketService} gameInfo={gameInfo} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
-      <TradeOfferReviewedDialog gameInfo={gameInfo} open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />
+      <GameOverDialog open={showGameOver()} onLeaveGame={onLeaveGame} />
+      <TravelDialog socketService={socketService} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
+      <OfferTradeDialog socketService={socketService} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
+      <ReviewTradeDialog socketService={socketService} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
+      <TradeOfferReviewedDialog open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />
 
     </React.Fragment>
   );

@@ -3,6 +3,7 @@ import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GameState } from "../../core/types/GameState";
 import { diceRollSound } from "../gameSounds";
+import useGameStateStore from "../gameStateStore";
 import { SocketService } from "../sockets/SocketService";
 import { AnimatedDice } from "./AnimatedDice";
 import { Die } from "./Die";
@@ -10,16 +11,19 @@ import { useIsMountedRef } from "./useIsMountedRef";
 
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
-  showMovementAnimation: (playerId: string, frames: Array<number>) => void;
 }
 
-export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showMovementAnimation }) => {
+export const DisplayResults: React.FC<Props> = ({ socketService }) => {
 
   const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
   const [animDiceRollResult, setAnimDiceRollResult] = React.useState<DiceRollResult | undefined>(undefined);
-  const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameInfo && gameInfo.results ? gameInfo.results.description : undefined);
+
+
+  const gameState = useGameStateStore(state => state.data);
+  const showMovementAnimation = useGameStateStore(state => state.showMovementAnimation);
+
+  const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameState && gameState.results ? gameState.results.description : undefined);
 
   const isMountedRef = useIsMountedRef();
 
@@ -55,11 +59,11 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
       return animDiceRollResult;
     }
 
-    if (!gameInfo) {
+    if (!gameState) {
       return { die1: 1, die2: 1 };
     }
 
-    return { die1: gameInfo.results.roll.die1, die2: gameInfo.results.roll.die2 };
+    return { die1: gameState.results.roll.die1, die2: gameState.results.roll.die2 };
   }
 
   const getResults = () => {
@@ -96,7 +100,7 @@ export const DisplayResults: React.FC<Props> = ({ gameInfo, socketService, showM
   return (
     <React.Fragment>
       {showDiceAnimation ? <AnimatedDice key={5} /> : null}
-      {gameInfo && !showDiceAnimation && gameInfo.results ? getResults() : getEmptyResults()}
+      {gameState && !showDiceAnimation && gameState.results ? getResults() : getEmptyResults()}
     </React.Fragment>
   );
 

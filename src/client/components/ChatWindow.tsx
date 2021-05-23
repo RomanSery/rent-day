@@ -5,20 +5,21 @@ import { Button, ButtonGroup, InputAdornment, PropTypes, TextField } from "@mate
 import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
-import { GameState } from "../../core/types/GameState";
 import { newChatMsgSound } from "../gameSounds";
+import useGameStateStore from "../gameStateStore";
 import { getMyPlayerName } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
 }
 
-export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
+export const ChatWindow: React.FC<Props> = ({ socketService }) => {
 
   const [sendChatMsg, setSendChatMsg] = React.useState<string | undefined>();
   const [showChat, setShowChat] = React.useState<boolean>(true);
+
+  const gameState = useGameStateStore(state => state.data);
 
   React.useEffect(() => {
     socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
@@ -40,14 +41,14 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
   };
 
   const sendChatEvent = () => {
-    if (gameInfo && sendChatMsg && getMyPlayerName()) {
+    if (gameState && sendChatMsg && getMyPlayerName()) {
 
       const newMsg: ChatMsg = {
         msg: sendChatMsg,
         player: getMyPlayerName()!
       };
 
-      socketService.socket.emit(GameEvent.SEND_CHAT_MSG, gameInfo._id, newMsg);
+      socketService.socket.emit(GameEvent.SEND_CHAT_MSG, gameState._id, newMsg);
       setSendChatMsg("");
       appendToChatWindow(newMsg);
     }
@@ -103,7 +104,7 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
         <div className="chat-row" style={getChatContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
-              {gameInfo?.messages.map((m, index) => (
+              {gameState?.messages.map((m, index) => (
                 <li key={index}>
                   <b>{m.player}</b> - {m.msg}
                 </li>
@@ -115,7 +116,7 @@ export const ChatWindow: React.FC<Props> = ({ gameInfo, socketService }) => {
         <div className="chat-row" style={getLogContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
-              {gameInfo?.log.map((m, index) => (
+              {gameState?.log.map((m, index) => (
                 <li key={index} dangerouslySetInnerHTML={{ __html: m.msg }}>
 
                 </li>

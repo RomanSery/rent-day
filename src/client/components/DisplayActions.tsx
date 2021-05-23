@@ -2,7 +2,6 @@
 import React from "react";
 import { Button, Menu, MenuItem } from "@material-ui/core";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
-import { GameState } from "../../core/types/GameState";
 import { useHistory } from "react-router-dom";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
@@ -17,19 +16,17 @@ import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
   tradeWithPlayer: (player: Player) => void;
   onRollAction: () => void;
   onTravelAction: () => void;
-  actionMode: ActionMode;
-  setActionMode: (mode: ActionMode) => void;
 }
 
-export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRollAction, onTravelAction, tradeWithPlayer, actionMode, setActionMode }) => {
+export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, onTravelAction, tradeWithPlayer }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
@@ -39,10 +36,14 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
+  const gameState = useGameStateStore(state => state.data);
+  const actionMode = useGameStateStore(state => state.actionMode);
+  const setActionMode = useGameStateStore(state => state.setActionMode);
+
 
   const getMyPlayer = (): Player | undefined => {
-    if (gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    if (gameState) {
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
     }
     return undefined;
   }
@@ -65,8 +66,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const onClickDone = async () => {
     API.post("actions/completeTurn", { context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id, true);
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id, true);
         }
       })
       .catch(handleApiError);
@@ -75,15 +76,15 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
   const onGetOut = async () => {
     API.post("actions/getOut", { context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
       })
       .catch(handleApiError);
   };
 
   const getMyName = (): string => {
-    const player = gameInfo && gameInfo.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
+    const player = gameState && gameState.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
     if (player) {
       return player.name;
     }
@@ -92,8 +93,8 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const onLeaveGame = async () => {
     leaveCurrentGameIfJoined(socketService, () => {
-      if (gameInfo) {
-        socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " has quit");
+      if (gameState) {
+        socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " has quit");
       }
       history.push("/dashboard");
     });
@@ -101,7 +102,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
 
   const isMyTurn = () => {
     const uid = getMyUserId();
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+    return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
   }
 
   const canCompleteTurn = (): boolean => {
@@ -115,7 +116,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     if (p.money < 0) {
       return false;
     }
-    if (gameInfo && gameInfo.lottoId) {
+    if (gameState && gameState.lottoId) {
       return false;
     }
     return true;
@@ -133,7 +134,7 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
       if (myPlayer.money < 0) {
         return false;
       }
-      if (gameInfo && gameInfo.lottoId) {
+      if (gameState && gameState.lottoId) {
         return false;
       }
       return true;
@@ -294,15 +295,9 @@ export const DisplayActions: React.FC<Props> = ({ gameInfo, socketService, onRol
     <React.Fragment>
       {getMyActions()}
 
-      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)}
-      />
-
-      <StatsDialog tradeWithPlayer={tradeWithPlayer} gameInfo={gameInfo}
-        open={statsViewOpen} onClose={() => setStatsViewOpen(false)}
-      />
-      <MyTaxesDialog gameInfo={gameInfo}
-        open={taxesViewOpen} onClose={() => setTaxesViewOpen(false)}
-      />
+      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <StatsDialog tradeWithPlayer={tradeWithPlayer} open={statsViewOpen} onClose={() => setStatsViewOpen(false)} />
+      <MyTaxesDialog open={taxesViewOpen} onClose={() => setTaxesViewOpen(false)} />
     </React.Fragment>
   );
 

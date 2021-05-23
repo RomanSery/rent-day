@@ -42,7 +42,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
       <div className="board">
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          return (<GameSquare gameInfo={createEmptyState()} actionMode={ActionMode.None}
+          return (<GameSquare
             id={id}
             key={id} viewSquare={() => { }} clearSquare={() => { }}
           />)

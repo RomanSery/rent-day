@@ -7,23 +7,20 @@ import { PropertyDisplay } from "../squares/PropertyDisplay";
 import { CentralParkDisplay } from "../squares/CentralParkDisplay";
 import { PayDayDisplay } from "../squares/PayDayDisplay";
 import { UtilityDisplay } from "../squares/UtilityDisplay";
-import { GameState } from "../../core/types/GameState";
 import { LottoDisplay } from "../squares/LottoDisplay";
 import { IsolationDisplay } from "../squares/IsolationDisplay";
 
-
 interface Props {
     id: number;
-    gameInfo: GameState | undefined;
 }
 
-export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
+export const SquareInfo: React.FC<Props> = ({ id }) => {
 
     const type: SquareType | undefined = SquareConfigDataMap.get(id)?.type;
 
     const getInfo = () => {
         if (type === SquareType.TrainStation) {
-            return <TrainStationDisplay id={id} gameInfo={gameInfo} />
+            return <TrainStationDisplay id={id} />
         }
         if (type === SquareType.Chance) {
             return <ChanceDisplay id={id} />
@@ -38,7 +35,7 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
             return <PayDayDisplay id={id} />
         }
         if (type === SquareType.Utility) {
-            return <UtilityDisplay id={id} gameInfo={gameInfo} />
+            return <UtilityDisplay id={id} />
         }
         if (type === SquareType.Isolation) {
             return <IsolationDisplay id={id} />
@@ -48,7 +45,7 @@ export const SquareInfo: React.FC<Props> = ({ id, gameInfo }) => {
             return null;
         }
 
-        return <PropertyDisplay id={id} gameInfo={gameInfo} />
+        return <PropertyDisplay id={id} />
     };
 
 

@@ -3,24 +3,24 @@ import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/Squa
 import { faHome, faHotel } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { GameState } from "../../core/types/GameState";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
     id: number;
-    gameInfo: GameState | undefined;
 }
 
-export const ColorBar: React.FC<Props> = ({ id, gameInfo }) => {
+export const ColorBar: React.FC<Props> = ({ id }) => {
 
     const groupId: number = SquareConfigDataMap.get(id)?.groupId!;
+    const gameState = useGameStateStore(state => state.data);
 
     const getClassName = () => {
         return "square-color-bar " + squareGroupColorMap.get(groupId);
     };
 
     const getNumHouses = (): number => {
-        if (gameInfo && gameInfo.squareState) {
-            const data = gameInfo.squareState.find((p: SquareGameData) => p.squareId === id);
+        if (gameState && gameState.squareState) {
+            const data = gameState.squareState.find((p: SquareGameData) => p.squareId === id);
             if (data && data.numHouses > 0) {
                 return data.numHouses;
             }

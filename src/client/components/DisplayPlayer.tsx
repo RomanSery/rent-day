@@ -1,19 +1,20 @@
 import React, { TouchEvent } from "react";
-import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
 import { faBiohazard } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
   player: Player;
   viewPlayer: (player: Player) => void;
   clearPlayer: () => void;
 }
 
-export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, viewPlayer, clearPlayer }) => {
+export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer }) => {
+
+  const gameState = useGameStateStore(state => state.data);
 
   const getColorStyle = (): React.CSSProperties => {
     if (isPlayersTurn()) {
@@ -27,7 +28,7 @@ export const DisplayPlayer: React.FC<Props> = ({ gameInfo, player, viewPlayer, c
   };
 
   const isPlayersTurn = () => {
-    return gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(player._id, gameInfo.nextPlayerToAct);
+    return gameState && gameState.nextPlayerToAct && areObjectIdsEqual(player._id, gameState.nextPlayerToAct);
   }
 
 

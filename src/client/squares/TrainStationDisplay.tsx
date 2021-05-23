@@ -1,15 +1,16 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSubway } from '@fortawesome/free-solid-svg-icons'
-import { GameState } from "../../core/types/GameState";
 import { getSquareStyle, getSquareTxt } from "./squareHelpers";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
     id: number;
-    gameInfo: GameState | undefined;
 }
 
-export const TrainStationDisplay: React.FC<Props> = ({ id, gameInfo }) => {
+export const TrainStationDisplay: React.FC<Props> = ({ id }) => {
+
+    const gameState = useGameStateStore(state => state.data);
 
     return (
         <React.Fragment>
@@ -18,8 +19,8 @@ export const TrainStationDisplay: React.FC<Props> = ({ id, gameInfo }) => {
                 <FontAwesomeIcon icon={faSubway} size="3x" />
             </div>
 
-            <div className="square-name" style={getSquareStyle(gameInfo, id)}>
-                {getSquareTxt(gameInfo, id)}
+            <div className="square-name" style={getSquareStyle(gameState, id)}>
+                {getSquareTxt(gameState, id)}
             </div>
 
         </React.Fragment>

@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -10,20 +9,22 @@ import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams 
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, List, ListItem, ListItemText } from "@material-ui/core";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onLeaveGame: () => void;
 }
 
-export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame }) => {
+export const GameOverDialog: React.FC<Props> = ({ open, onLeaveGame }) => {
+
+  const gameState = useGameStateStore(state => state.data);
 
   const getPlayerById = (params: ValueFormatterParams) => {
-    if (gameInfo) {
+    if (gameState) {
       const playerId = params.getValue('id')?.toLocaleString();
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     }
     return null;
   }
@@ -60,13 +61,13 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
 
 
   const getDataRows = (): GridRowsProp => {
-    if (!gameInfo) {
+    if (!gameState) {
       return [];
     }
 
     const rows: Array<GridRowModel> = [];
 
-    const players: Player[] = gameInfo.players;
+    const players: Player[] = gameState.players;
     players.sort(function (a: Player, b: Player) {
       return a.finishedRank! - b.finishedRank!;
     });
@@ -83,15 +84,15 @@ export const GameOverDialog: React.FC<Props> = ({ open, gameInfo, onLeaveGame })
   }
 
   const getGameLength = () => {
-    if (gameInfo) {
-      return "Game Length: " + gameInfo.gameLength + " minutes";
+    if (gameState) {
+      return "Game Length: " + gameState.gameLength + " minutes";
     }
     return "";
   }
 
   const getWinnerName = () => {
-    if (gameInfo) {
-      return "Winner: " + gameInfo.winner;
+    if (gameState) {
+      return "Winner: " + gameState.winner;
     }
     return "";
   }

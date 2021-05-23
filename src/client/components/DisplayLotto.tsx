@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { LottoState } from "../../core/types/LottoState";
 import { GameContext } from "../../core/types/GameContext";
-import { GameState } from "../../core/types/GameState";
 import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
@@ -14,24 +13,26 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { motion } from "framer-motion";
 import { AnimatedLottoResult } from "./AnimatedLottoResult";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
 }
 
-export const DisplayLotto: React.FC<Props> = ({ gameInfo, socketService }) => {
+export const DisplayLotto: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [lottoState, setLottoState] = useState<LottoState>();
   const isMountedRef = useIsMountedRef();
+
+  const gameState = useGameStateStore(state => state.data);
 
 
   useEffect(() => {
     if (!isMountedRef.current) {
       return;
     }
-    API.post("getLotto", { lottoId: gameInfo?.lottoId, context })
+    API.post("getLotto", { lottoId: gameState?.lottoId, context })
       .then(function (response) {
         setLottoState(response.data.lotto);
       })
@@ -144,7 +145,7 @@ export const DisplayLotto: React.FC<Props> = ({ gameInfo, socketService }) => {
   const getLottoResults = () => {
     if (lottoState && isLottoFinished()) {
       return (
-        <AnimatedLottoResult gameInfo={gameInfo} socketService={socketService} lottoState={lottoState}
+        <AnimatedLottoResult socketService={socketService} lottoState={lottoState}
           randomNum={lottoState.randomNum} chanceToWin={getPrizeChance(lottoState.optionPicked)} />
       );
     }

@@ -3,7 +3,6 @@ import { BoardSection } from "../../core/enums/BoardSection";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
-import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { player_colors_to_rgb } from "../../core/constants";
@@ -12,21 +11,23 @@ import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
   id: number;
-  gameInfo: GameState | undefined;
   viewSquare: (id: number) => void;
   clearSquare: () => void;
-  actionMode: ActionMode;
   socketService?: SocketService;
 }
 
-export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSquare, actionMode, socketService }) => {
+export const GameSquare: React.FC<Props> = ({ id, viewSquare, clearSquare, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const section: BoardSection = SquareConfigDataMap.get(id)?.section!;
   const squareType: SquareType = SquareConfigDataMap.get(id)?.type!;
+
+  const gameState = useGameStateStore(state => state.data);
+  const actionMode = useGameStateStore(state => state.actionMode);
 
   const sectionMap = new Map<BoardSection, string>([
     [BoardSection.Top, "top"], [BoardSection.Right, "right"], [BoardSection.Left, "left"], [BoardSection.Bottom, "bottom"]
@@ -56,7 +57,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   };
 
   const getMyName = (): string => {
-    const player = gameInfo && gameInfo.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
+    const player = gameState && gameState.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
     if (player) {
       return player.name;
     }
@@ -65,8 +66,8 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
 
   const getSquareTxt = () => {
     const squareId = getSquareId();
-    if (gameInfo && gameInfo.theme && squareId) {
-      return gameInfo.theme[id].name;
+    if (gameState && gameState.theme && squareId) {
+      return gameState.theme[id].name;
     }
     return "";
   }
@@ -74,9 +75,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const onMortgageProperty = async () => {
     API.post("actions/mortgage", { squareId: id, context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " mortaged " + getSquareTxt());
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " mortaged " + getSquareTxt());
         }
       })
       .catch(handleApiError);
@@ -85,9 +86,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const onRedeemProperty = async () => {
     API.post("actions/redeem", { squareId: id, context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " redeemed " + getSquareTxt());
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " redeemed " + getSquareTxt());
         }
       })
       .catch(handleApiError);
@@ -97,9 +98,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const onBuildHouse = async () => {
     API.post("actions/buildHouse", { squareId: id, context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " built house on " + getSquareTxt());
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " built house on " + getSquareTxt());
         }
       })
       .catch(handleApiError);
@@ -108,9 +109,9 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   const onSellHouse = async () => {
     API.post("actions/sellHouse", { squareId: id, context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
-          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameInfo._id, getMyName() + " sold house on " + getSquareTxt());
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
+          socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " sold house on " + getSquareTxt());
         }
       })
       .catch(handleApiError);
@@ -118,7 +119,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
 
   const isOwnedByMe = (): boolean => {
     const data = getSquareGameData();
-    if (data && gameInfo && data.owner && areObjectIdsEqual(getMyUserId(), data.owner)) {
+    if (data && gameState && data.owner && areObjectIdsEqual(getMyUserId(), data.owner)) {
       return true;
     }
     return false;
@@ -126,7 +127,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
 
   const isMyTurn = () => {
     const uid = getMyUserId();
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+    return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
   }
 
 
@@ -167,8 +168,8 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   };
 
   const getSquareGameData = (): SquareGameData | undefined => {
-    if (gameInfo && gameInfo.squareState) {
-      return gameInfo.squareState.find((p: SquareGameData) => p.squareId === id);
+    if (gameState && gameState.squareState) {
+      return gameState.squareState.find((p: SquareGameData) => p.squareId === id);
     }
     return undefined;
   };
@@ -184,10 +185,10 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
   };
 
   const getOwnedStyle = (): React.CSSProperties => {
-    if (isOwned() && gameInfo) {
+    if (isOwned() && gameState) {
       const data = getSquareGameData();
       if (data) {
-        const owner = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+        const owner = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
         if (owner) {
           const fromColor = player_colors_to_rgb.get(owner.color);
           return { background: "linear-gradient(to bottom, " + fromColor + ", rgba(255, 0, 0, 0))" };
@@ -203,7 +204,7 @@ export const GameSquare: React.FC<Props> = ({ id, gameInfo, viewSquare, clearSqu
       <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
 
         <div className={getContainerClassName()}>
-          <SquareInfo id={id} gameInfo={gameInfo} />
+          <SquareInfo id={id} />
 
         </div>
       </div>

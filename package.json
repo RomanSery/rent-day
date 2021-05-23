@@ -52,7 +52,8 @@
     "webpack-cli": "^3.3.12",
     "webpack-node-externals": "^2.5.2",
     "winston": "^3.3.3",
-    "xss": "^1.0.8"
+    "xss": "^1.0.8",
+    "zustand": "^3.5.1"
   },
   "devDependencies": {
     "@types/bcrypt-nodejs": "^0.0.31",

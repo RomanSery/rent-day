@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -7,14 +6,16 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
 }
 
-export const MyTaxesDialog: React.FC<Props> = ({ open, gameInfo, onClose }) => {
+export const MyTaxesDialog: React.FC<Props> = ({ open, onClose }) => {
+
+  const gameState = useGameStateStore(state => state.data);
 
   const columns: GridColDef[] = [
     { field: 'id', hide: true },
@@ -44,11 +45,11 @@ export const MyTaxesDialog: React.FC<Props> = ({ open, gameInfo, onClose }) => {
   }
 
   const getDataRows = (): GridRowsProp => {
-    if (!gameInfo) {
+    if (!gameState) {
       return [];
     }
 
-    const myPlayer = gameInfo.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
+    const myPlayer = gameState.players.find((p) => areObjectIdsEqual(p._id, getMyUserId()));
     if (!myPlayer) {
       return [];
     }
@@ -67,7 +68,7 @@ export const MyTaxesDialog: React.FC<Props> = ({ open, gameInfo, onClose }) => {
 
       rows.push({
         id: getSquareId(s),
-        propertyName: gameInfo.theme[getSquareId(s)].name,
+        propertyName: gameState.theme[getSquareId(s)].name,
         tax: tax,
         adjustedTax: adjustedTax
       });

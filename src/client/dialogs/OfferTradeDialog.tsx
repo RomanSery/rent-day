@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -25,23 +24,25 @@ import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareType } from "../../core/enums/SquareType";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
   tradingWithPlayerId: string | null;
   socketService: SocketService;
 }
 
-export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradingWithPlayerId, socketService }) => {
+export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPlayerId, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [myChecked, setMyChecked] = React.useState<number[]>([]);
   const [theirChecked, setTheirChecked] = React.useState<number[]>([]);
   const [myAmount, setMyAmount] = React.useState<number>(0);
   const [theirAmount, setTheirAmount] = React.useState<number>(0);
+
+  const gameState = useGameStateStore(state => state.data);
 
   const onOfferTrade = () => {
 
@@ -62,11 +63,11 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
   const getPlayerTradeableProperties = (mine: boolean): number[] => {
 
     const playerId = mine ? getMyUserId() : tradingWithPlayerId;
-    if (!playerId || !gameInfo) {
+    if (!playerId || !gameState) {
       return [];
     }
 
-    const properties: SquareGameData[] = gameInfo.squareState.filter((s: SquareGameData) => {
+    const properties: SquareGameData[] = gameState.squareState.filter((s: SquareGameData) => {
       const squareConfig = SquareConfigDataMap.get(s.squareId);
       if (squareConfig) {
         const type = squareConfig.type;
@@ -91,13 +92,13 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
 
 
   const doesGroupHaveAnyHouses = (groupId: number): boolean => {
-    if (!gameInfo) {
+    if (!gameState) {
       return false;
     }
     let hasHouses = false;
     SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
       if (d.groupId && d.groupId === groupId) {
-        const squareData: SquareGameData | undefined = gameInfo.squareState.find(
+        const squareData: SquareGameData | undefined = gameState.squareState.find(
           (p: SquareGameData) => p.squareId === key
         );
 
@@ -112,12 +113,12 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
   };
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
-    if (!gameInfo) {
+    if (!gameState) {
       return <div></div>;
     }
 
     const playerId = mine ? getMyUserId() : tradingWithPlayerId;
-    const p = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
+    const p = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     if (!p) {
       return <div></div>;
     }
@@ -170,7 +171,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tra
                 <ListItemIcon>
                   <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': labelId }} />
                 </ListItemIcon>
-                <ListItemText id={labelId} primary={getSquareTxt(gameInfo, squareId)} />
+                <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
               </ListItem>
             );
           })}

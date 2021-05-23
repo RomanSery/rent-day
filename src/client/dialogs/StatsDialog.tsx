@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -12,20 +11,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
 import { getElectricityTooltip, getTaxTooltip } from "../uiHelpers";
 import { PlayerState } from "../../core/enums/PlayerState";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
   tradeWithPlayer: (player: Player) => void;
 }
 
-export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWithPlayer }) => {
+export const StatsDialog: React.FC<Props> = ({ open, onClose, tradeWithPlayer }) => {
+
+  const gameState = useGameStateStore(state => state.data);
 
   const getPlayerById = (params: ValueFormatterParams) => {
-    if (gameInfo) {
+    if (gameState) {
       const playerId = params.getValue('id')?.toLocaleString();
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     }
     return null;
   }
@@ -39,7 +40,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
     if (player && player.state === PlayerState.BANKRUPT) {
       return false;
     }
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+    return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
   }
 
   const getColorStyle = (params: ValueFormatterParams): React.CSSProperties => {
@@ -79,7 +80,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
       flex: 0.5,
       renderCell: (params: ValueFormatterParams) => (
         <div style={{ textAlign: "right", width: "100%" }}>
-          {getTaxTooltip(gameInfo, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
+          {getTaxTooltip(gameState, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
         </div>
       ),
     },
@@ -90,7 +91,7 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
       flex: 0.5,
       renderCell: (params: ValueFormatterParams) => (
         <div style={{ textAlign: "right", width: "100%" }}>
-          {getElectricityTooltip(gameInfo, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
+          {getElectricityTooltip(gameState, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
         </div>
       ),
     },
@@ -132,13 +133,13 @@ export const StatsDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeWit
 
 
   const getDataRows = (): GridRowsProp => {
-    if (!gameInfo) {
+    if (!gameState) {
       return [];
     }
 
 
     const rows: Array<GridRowModel> = [];
-    gameInfo.players.forEach((p: Player, key: number) => {
+    gameState.players.forEach((p: Player, key: number) => {
       rows.push({
         id: p._id,
         playerName: p.name,

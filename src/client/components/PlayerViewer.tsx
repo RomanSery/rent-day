@@ -5,7 +5,6 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import { Player } from "../../core/types/Player";
 import { SkillType } from "../../core/enums/SkillType";
 import { PlayerClass } from "../../core/enums/PlayerClass";
@@ -17,17 +16,18 @@ import API from '../api';
 import { SocketService } from '../sockets/SocketService';
 import { GameEvent } from '../../core/types/GameEvent';
 import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from '../uiHelpers';
+import useGameStateStore from '../gameStateStore';
 
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
   getPlayer: () => Player | undefined;
 }
 
-export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketService }) => {
+export const PlayerViewer: React.FC<Props> = ({ getPlayer, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
+  const gameState = useGameStateStore(state => state.data);
 
   const getPlayerName = () => {
     const p = getPlayer();
@@ -109,14 +109,14 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
 
   const isMyTurn = () => {
     const uid = getMyUserId();
-    return uid && gameInfo && gameInfo.nextPlayerToAct && areObjectIdsEqual(uid, gameInfo.nextPlayerToAct) && gameInfo.auctionId == null;
+    return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
   }
 
   const upgradeSkill = async (skillType: SkillType) => {
     API.post("actions/upgradeSkill", { skillType: skillType, context })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
       })
       .catch(handleApiError);
@@ -146,12 +146,12 @@ export const PlayerViewer: React.FC<Props> = ({ gameInfo, getPlayer, socketServi
               </TableRow>
               <TableRow key="playerViewer2">
                 <TableCell component="th" scope="row">
-                  <div className="row-small-name">{getTaxTooltip(gameInfo, getPlayer(), "Tax")}</div>
-                  {getTaxTooltip(gameInfo, getPlayer(), getPlayerTaxes())}
+                  <div className="row-small-name">{getTaxTooltip(gameState, getPlayer(), "Tax")}</div>
+                  {getTaxTooltip(gameState, getPlayer(), getPlayerTaxes())}
                 </TableCell>
                 <TableCell component="th" scope="row">
-                  <div className="row-small-name">{getElectricityTooltip(gameInfo, getPlayer(), "Electricity")}</div>
-                  {getElectricityTooltip(gameInfo, getPlayer(), getPlayerElectricityCosts())}
+                  <div className="row-small-name">{getElectricityTooltip(gameState, getPlayer(), "Electricity")}</div>
+                  {getElectricityTooltip(gameState, getPlayer(), getPlayerElectricityCosts())}
                 </TableCell>
               </TableRow>
 

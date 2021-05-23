@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -20,19 +19,20 @@ import { SocketService } from "../sockets/SocketService";
 import { TradeOffer } from "../../core/types/TradeOffer";
 import { getSquareTxt } from "../squares/squareHelpers";
 import { GameEvent } from "../../core/types/GameEvent";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
   tradeOffer: TradeOffer | null;
   socketService: SocketService;
 }
 
-export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeOffer, socketService }) => {
+export const ReviewTradeDialog: React.FC<Props> = ({ open, onClose, tradeOffer, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
+  const gameState = useGameStateStore(state => state.data);
 
   const onAcceptTrade = () => {
     if (!tradeOffer) {
@@ -41,9 +41,9 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
     API.post("actions/acceptTrade", { context, tradeId: tradeOffer._id })
       .then(function (response) {
-        if (socketService && gameInfo) {
+        if (socketService && gameState) {
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
         onClose();
       })
@@ -57,9 +57,9 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
     API.post("actions/declineTrade", { context, tradeId: tradeOffer._id })
       .then(function (response) {
-        if (socketService && gameInfo) {
+        if (socketService && gameState) {
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
         onClose();
       })
@@ -68,12 +68,12 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
-    if (!gameInfo || !tradeOffer) {
+    if (!gameState || !tradeOffer) {
       return <div></div>;
     }
 
     const playerId = mine ? tradeOffer.participant1.playerId : tradeOffer.participant2.playerId;
-    const p = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
+    const p = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     if (!p) {
       return <div></div>;
     }
@@ -108,7 +108,7 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, gameInfo, onClose, tr
 
             return (
               <ListItem key={squareId} role="listitem" className="trade-item">
-                <ListItemText id={labelId} primary={getSquareTxt(gameInfo, squareId)} />
+                <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
               </ListItem>
             );
           })}

@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,19 +8,20 @@ import { motion } from "framer-motion";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getObjectIdAsHexString, getIconProp } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
-  clearMovement: () => void;
-
-  getPlayerIdToMove: () => string;
-  frames: Array<number>;
 }
 
-export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayerIdToMove, frames, clearMovement }) => {
+export const GamePieces: React.FC<Props> = ({ socketService }) => {
 
   const num_squares: Array<number> = Array.from(Array(40));
+
+  const clearMovement = useGameStateStore(state => state.clearMovement);
+  const gameState = useGameStateStore(state => state.data);
+  const frames = useGameStateStore(state => state.frames);
+  const playerIdToMove = useGameStateStore(state => state.playerIdToMove);
 
 
   const getPieceId = (p: Player) => {
@@ -31,22 +31,22 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
   const onFinishPieceMovement = () => {
     clearMovement();
 
-    if (socketService && gameInfo) {
-      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+    if (socketService && gameState) {
+      socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
     }
   }
 
 
 
   const displayGamePieces = () => {
-    if (!gameInfo) {
+    if (!gameState) {
       return null;
     }
     return (
       <React.Fragment>
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          const numOnSquare = getNumPlayersOnSquare(gameInfo, id);
+          const numOnSquare = getNumPlayersOnSquare(gameState, id);
           if (numOnSquare > 0) {
             return displayPiecesForSquare(id);
           }
@@ -58,7 +58,7 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
 
   const displayPiecesForSquare = (squareId: number) => {
     return (
-      gameInfo!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
+      gameState!.players.filter((p) => p.state !== PlayerState.BANKRUPT && p.position === squareId).map((p: Player, index) => {
         return getPieceDisplay(squareId, p, index);
       })
     );
@@ -66,12 +66,12 @@ export const GamePieces: React.FC<Props> = ({ gameInfo, socketService, getPlayer
 
   const getPieceDisplay = (squareId: number, p: Player, index: number) => {
 
-    const pos: PiecePosition = getPiecePosition(gameInfo!, squareId, index);
-    const animate = getPlayerIdToMove().length > 0 && getPlayerIdToMove() === p._id;
+    const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
+    const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
 
-    if (gameInfo && animate) {
+    if (gameState && animate) {
 
-      const myFrames = getMovementKeyFrames(gameInfo, frames);
+      const myFrames = getMovementKeyFrames(gameState, frames);
       const topFrames: Array<number> = myFrames.map((p) => p.top);
       const leftFrames: Array<number> = myFrames.map((p) => p.left);
       const bottomFrames: Array<number> = myFrames.map((p) => p.bottom);

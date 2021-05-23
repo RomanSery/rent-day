@@ -6,21 +6,22 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { dollarFormatter } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import { LottoState } from "../../core/types/LottoState";
-import { GameState } from "../../core/types/GameState";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
   chanceToWin: number;
   randomNum: number;
   socketService: SocketService;
   lottoState: LottoState;
 }
 
-export const AnimatedLottoResult: React.FC<Props> = ({ gameInfo, chanceToWin, randomNum, socketService, lottoState }) => {
+export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, socketService, lottoState }) => {
 
   const x = useMotionValue<number>(0);
   const [animValue, setAnimValue] = useState<number>(0);
   const [showResult, setShowResult] = useState<boolean>(false);
+
+  const gameState = useGameStateStore(state => state.data);
 
   const getBufferValue = (): number => {
     return 100 - chanceToWin;
@@ -51,8 +52,8 @@ export const AnimatedLottoResult: React.FC<Props> = ({ gameInfo, chanceToWin, ra
         setShowResult(true);
 
         setTimeout(() => {
-          if (socketService && gameInfo) {
-            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameInfo._id);
+          if (socketService && gameState) {
+            socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
           }
         }, 3000);
       }

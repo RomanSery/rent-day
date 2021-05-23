@@ -1,21 +1,22 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { GameState } from "../../core/types/GameState";
+import useGameStateStore from "../gameStateStore";
 import { ColorBar } from "./ColorBar";
 import { getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
 
 interface Props {
     id: number;
-    gameInfo: GameState | undefined;
 }
 
-export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
+export const PropertyDisplay: React.FC<Props> = ({ id }) => {
+
+    const gameState = useGameStateStore(state => state.data);
 
     const getNormalSquare = () => {
         return (
             <div className="square-name">
-                <div className="square-title" style={getSquareStyle(gameInfo, id)}>
-                    {getSquareTxt(gameInfo, id)}
+                <div className="square-title" style={getSquareStyle(gameState, id)}>
+                    {getSquareTxt(gameState, id)}
                 </div>
             </div>
         );
@@ -28,8 +29,8 @@ export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
                 loop: Infinity,
                 repeatDelay: 0
             }} className="square-name">
-                <div className="square-title" style={getSquareStyle(gameInfo, id)}>
-                    {getSquareTxt(gameInfo, id)}
+                <div className="square-title" style={getSquareStyle(gameState, id)}>
+                    {getSquareTxt(gameState, id)}
                 </div>
             </motion.div>
         );
@@ -38,8 +39,8 @@ export const PropertyDisplay: React.FC<Props> = ({ id, gameInfo }) => {
 
     return (
         <React.Fragment>
-            <ColorBar id={id} gameInfo={gameInfo} />
-            {isBeingAuctioned(gameInfo, id) ? getAnimatedSquare() : getNormalSquare()}
+            <ColorBar id={id} />
+            {isBeingAuctioned(gameState, id) ? getAnimatedSquare() : getNormalSquare()}
         </React.Fragment>
     );
 

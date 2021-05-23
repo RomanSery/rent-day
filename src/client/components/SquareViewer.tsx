@@ -9,29 +9,29 @@ import Paper from '@material-ui/core/Paper';
 import React from "react";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
-import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, dollarFormatter } from "../helpers";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  gameInfo: GameState | undefined;
-  getSquareId: () => number | undefined;
+
 }
 
-export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
+export const SquareViewer: React.FC<Props> = () => {
+
+  const gameState = useGameStateStore(state => state.data);
+  const squareToView = useGameStateStore(state => state.squareToView);
 
 
   const getSquareTxt = () => {
-    const squareId = getSquareId();
-    if (gameInfo && gameInfo.theme && squareId) {
-      return gameInfo.theme[squareId].name;
+    if (gameState && gameState.theme && squareToView) {
+      return gameState.theme[squareToView].name;
     }
     return "";
   }
 
   const getInfo = () => {
-    const squareId = getSquareId();
-    const config = squareId ? SquareConfigDataMap.get(squareId) : undefined;
+    const config = squareToView ? SquareConfigDataMap.get(squareToView) : undefined;
     if (config == null) {
       return null;
     }
@@ -66,28 +66,26 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   };
 
   const getClassName = () => {
-    const squareId = getSquareId();
-    if (squareId == null) {
+    if (squareToView == null) {
       return "";
     }
-    const groupId: number = SquareConfigDataMap.get(squareId)?.groupId!;
+    const groupId: number = SquareConfigDataMap.get(squareToView)?.groupId!;
     return "property-name square-color-bar " + squareGroupColorMap.get(groupId);
   };
 
   const getDescription = () => {
-    const squareId = getSquareId();
-    if (squareId == null) {
+    if (squareToView == null) {
       return "";
     }
-    const description = SquareConfigDataMap.get(squareId)?.description;
+    const description = SquareConfigDataMap.get(squareToView)?.description;
     return description;
   };
 
 
   const getowner = (): string => {
     const data = getSquareGameData();
-    if (data && gameInfo && data.owner) {
-      const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+    if (data && gameState && data.owner) {
+      const player = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
       return player != null ? player.name : "";
     }
 
@@ -97,8 +95,8 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
 
   const getNameColorStyle = (): React.CSSProperties => {
     const data = getSquareGameData();
-    if (data && gameInfo && data.owner) {
-      const player = gameInfo.players.find((p) => areObjectIdsEqual(p._id, data.owner));
+    if (data && gameState && data.owner) {
+      const player = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
       return player != null ? { color: player.color } : {};
     }
 
@@ -136,18 +134,16 @@ export const SquareViewer: React.FC<Props> = ({ gameInfo, getSquareId }) => {
   };
 
   const getIcon = () => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.theme) {
-      return gameInfo.theme[squareId].icon;
+    if (squareToView && gameState && gameState.theme) {
+      return gameState.theme[squareToView].icon;
     }
     return "";
   }
 
 
   const getSquareGameData = (): SquareGameData | undefined => {
-    const squareId = getSquareId();
-    if (squareId && gameInfo && gameInfo.squareState) {
-      return gameInfo.squareState.find((p: SquareGameData) => p.squareId === squareId);
+    if (squareToView && gameState && gameState.squareState) {
+      return gameState.squareState.find((p: SquareGameData) => p.squareId === squareToView);
     }
     return undefined;
   };

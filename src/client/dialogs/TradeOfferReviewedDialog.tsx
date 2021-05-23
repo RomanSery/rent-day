@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -17,24 +16,26 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { TradeOffer } from "../../core/types/TradeOffer";
 import { getSquareTxt } from "../squares/squareHelpers";
 import { TradeStatus } from "../../core/enums/TradeStatus";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
   tradeOffer: TradeOffer | null;
 }
 
-export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, gameInfo, onClose, tradeOffer }) => {
+export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, onClose, tradeOffer }) => {
+
+  const gameState = useGameStateStore(state => state.data);
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
-    if (!gameInfo || !tradeOffer) {
+    if (!gameState || !tradeOffer) {
       return <div></div>;
     }
 
     const playerId = mine ? tradeOffer.participant1.playerId : tradeOffer.participant2.playerId;
-    const p = gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
+    const p = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     if (!p) {
       return <div></div>;
     }
@@ -76,7 +77,7 @@ export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, gameInfo, onCl
 
             return (
               <ListItem key={squareId} role="listitem" className="trade-item">
-                <ListItemText id={labelId} primary={getSquareTxt(gameInfo, squareId)} />
+                <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
               </ListItem>
             );
           })}

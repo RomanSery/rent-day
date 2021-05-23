@@ -12,24 +12,26 @@ import { Snackbar } from "@material-ui/core";
 import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
-import { ActionMode } from "../../core/enums/ActionMode";
 import { ServerMsgDialog } from "../dialogs/ServerMsgDialog";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { ChanceEvent } from "../../core/types/ChanceEvent";
 import { SoundType } from "../../core/enums/SoundType";
 import { yourTurnSound } from "../gameSounds";
 import { SoundMsg } from "../../core/types/SoundMsg";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
   socketService: SocketService;
 }
+
+
 
 export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   const num_squares: Array<number> = Array.from(Array(40));
   const context: GameContext = getGameContextFromLocalStorage();
 
-  const [gameState, setGameState] = useState<GameState>();
+
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [chanceOpen, setChanceOpen] = useState(false);
@@ -39,14 +41,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const [serverMsgModalOpen, setServerMsgModalOpen] = useState(false);
   const [serverMsg, setServerMsg] = useState<ServerMsg | undefined>(undefined);
 
-  const [squareToView, setSquareToView] = useState<number | undefined>(undefined);
 
-  const [playerIdToMove, setPlayerIdToMove] = React.useState<string>("");
-  const [frames, setFrames] = React.useState<Array<number>>([]);
-
-  const [actionMode, setActionMode] = React.useState<ActionMode>(ActionMode.None);
-
-
+  const updateData = useGameStateStore(state => state.updateData);
+  const setSquareToView = useGameStateStore(state => state.setSquareToView);
+  const clearMovement = useGameStateStore(state => state.clearMovement);
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -65,7 +63,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   useEffect(() => {
     API.post("getGame", { gameId: context.gameId, context })
       .then(function (response) {
-        setGameState(response.data.game);
+        updateData(response.data.game);
       })
       .catch(handleApiError);
   }, []);
@@ -79,7 +77,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     });
 
     socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
-      setGameState(game);
+      updateData(game);
       setSnackMsg(data);
       setSnackOpen(true);
     });
@@ -87,7 +85,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       clearMovement();
-      setGameState(data);
+      updateData(data);
     });
 
     socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: Array<ServerMsg>) => {
@@ -137,41 +135,26 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
     setSquareToView(id);
   };
   const clearSquare = () => {
-    //setSquareToView(undefined);
+
   };
-
-  const showMovementAnimation = (playerId: string, frames: Array<number>) => {
-    setFrames(frames);
-    setPlayerIdToMove(playerId);
-  }
-
-  const clearMovement = () => {
-    setPlayerIdToMove("");
-    setFrames([]);
-  }
-
-  const getPlayerIdToMove = () => {
-    return playerIdToMove;
-  }
 
   return (
     <React.Fragment>
       <div className="board">
+
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          return (<GameSquare gameInfo={gameState} socketService={socketService}
+          return (<GameSquare socketService={socketService}
             id={id}
             key={id}
-            viewSquare={viewSquare} clearSquare={clearSquare} actionMode={actionMode}
+            viewSquare={viewSquare} clearSquare={clearSquare}
           />)
         })}
 
-        <CenterDisplay gameInfo={gameState} socketService={socketService} getSquareId={() => squareToView} showMovementAnimation={showMovementAnimation}
-          actionMode={actionMode} setActionMode={setActionMode} />
+        <CenterDisplay socketService={socketService} />
       </div>
 
-      <GamePieces gameInfo={gameState} socketService={socketService}
-        getPlayerIdToMove={getPlayerIdToMove} frames={frames} clearMovement={clearMovement} />
+      <GamePieces socketService={socketService} />
 
 
       <ChanceEventDialog open={chanceOpen} chanceEvent={chanceEvent} onClose={() => setChanceOpen(false)} />

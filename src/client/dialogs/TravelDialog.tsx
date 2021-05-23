@@ -1,5 +1,4 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -21,25 +20,26 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { Player } from "../../core/types/Player";
 import { muggingAmount, muggingChance } from "../../core/constants";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
   open: boolean;
-  gameInfo: GameState | undefined;
   onClose: () => void;
   onCancel: () => void;
   socketService: SocketService;
 }
 
-export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCancel, socketService }) => {
+export const TravelDialog: React.FC<Props> = ({ open, onClose, onCancel, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
+  const gameState = useGameStateStore(state => state.data);
 
   const onTravel = (squareId: number) => () => {
     API.post("actions/travel", { context, squareId: squareId })
       .then(function (response) {
-        if (socketService && gameInfo) {
-          socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameInfo._id, response.data.playerId, response.data.diceRoll, response.data.frames);
+        if (socketService && gameState) {
+          socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameState._id, response.data.playerId, response.data.diceRoll, response.data.frames);
         }
         onClose();
       })
@@ -47,8 +47,8 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
   };
 
   const getMyPlayer = (): Player | undefined => {
-    if (gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    if (gameState) {
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
     }
     return undefined;
   }
@@ -56,7 +56,7 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
   const getPlayerTrainStations = (): number[] => {
 
     const playerId = getMyUserId();
-    if (!playerId || !gameInfo) {
+    if (!playerId || !gameState) {
       return [];
     }
     const myPlayer = getMyPlayer();
@@ -64,7 +64,7 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
       return [];
     }
 
-    const stations: SquareGameData[] = gameInfo.squareState.filter((s: SquareGameData) => {
+    const stations: SquareGameData[] = gameState.squareState.filter((s: SquareGameData) => {
       const config = SquareConfigDataMap.get(s.squareId);
       return config && s.owner && areObjectIdsEqual(s.owner, playerId)
         && config.type === SquareType.TrainStation && !s.isMortgaged && s.squareId !== myPlayer.position;
@@ -94,7 +94,7 @@ export const TravelDialog: React.FC<Props> = ({ open, gameInfo, onClose, onCance
                 {getPlayerTrainStations().map((squareId: number) => {
                   return (
                     <ListItem key={squareId} role="listitem" button onClick={onTravel(squareId)} className="trade-item">
-                      <ListItemText primary={getSquareTxt(gameInfo, squareId)} />
+                      <ListItemText primary={getSquareTxt(gameState, squareId)} />
                     </ListItem>
                   );
                 })}

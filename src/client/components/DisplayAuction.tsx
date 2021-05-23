@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
-import { GameState } from "../../core/types/GameState";
 import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
@@ -20,20 +19,22 @@ import { CircleLoader } from "./CircleLoader";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
+import useGameStateStore from "../gameStateStore";
 
 
 interface Props {
-  gameInfo: GameState | undefined;
   socketService: SocketService;
 }
 
-export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => {
+export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [auctionState, setAuctionState] = useState<AuctionState>();
   const [myBid, setMyBid] = useState<number>();
   const [mySubmittedBid, setMySubmittedBid] = useState<number | undefined>(undefined);
   const isMountedRef = useIsMountedRef();
+
+  const gameState = useGameStateStore(state => state.data);
 
   useEffect(() => {
     getAuctionState();
@@ -50,8 +51,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
   }, []);
 
   const getMyPlayer = (): Player | undefined => {
-    if (gameInfo) {
-      return gameInfo.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
+    if (gameState) {
+      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, getMyUserId()));
     }
     return undefined;
   }
@@ -60,7 +61,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
     if (!isMountedRef.current) {
       return;
     }
-    API.post("getAuction", { auctionId: gameInfo?.auctionId, context })
+    API.post("getAuction", { auctionId: gameState?.auctionId, context })
       .then(function (response) {
         setAuctionState(response.data.auction);
       })
@@ -136,8 +137,8 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
   const getAuctionHeader = () => {
     const squareId = auctionState?.squareId;
-    if (gameInfo && gameInfo.theme && squareId) {
-      return "Auction - " + gameInfo.theme[squareId].name;
+    if (gameState && gameState.theme && squareId) {
+      return "Auction - " + gameState.theme[squareId].name;
     }
     return "Auction";
   }
@@ -211,7 +212,7 @@ export const DisplayAuction: React.FC<Props> = ({ gameInfo, socketService }) => 
 
         {alreadySubmittedBid() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
 
-        {isAuctionFinished() ? <CircleLoader gameInfo={gameInfo} socketService={socketService} /> : null}
+        {isAuctionFinished() ? <CircleLoader socketService={socketService} /> : null}
       </Container>
 
     </React.Fragment>
