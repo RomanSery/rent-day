@@ -16,11 +16,10 @@ import useGameStateStore from "../gameStateStore";
 interface Props {
   id: number;
   viewSquare: (id: number) => void;
-  clearSquare: () => void;
   socketService?: SocketService;
 }
 
-export const GameSquare: React.FC<Props> = ({ id, viewSquare, clearSquare, socketService }) => {
+export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const section: BoardSection = SquareConfigDataMap.get(id)?.section!;
@@ -163,10 +162,6 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, clearSquare, socke
   };
 
 
-  const leaveSquare = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    clearSquare();
-  };
-
   const getSquareGameData = (): SquareGameData | undefined => {
     if (gameState && gameState.squareState) {
       return gameState.squareState.find((p: SquareGameData) => p.squareId === id);
@@ -201,7 +196,7 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, clearSquare, socke
 
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView} onMouseLeave={leaveSquare}>
+      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}>
 
         <div className={getContainerClassName()}>
           <SquareInfo id={id} />

@@ -6,15 +6,17 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSmile, faFrownOpen } from "@fortawesome/free-regular-svg-icons";
-import { ChanceEvent } from "../../core/types/ChanceEvent";
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  open: boolean;
-  chanceEvent: ChanceEvent | undefined;
-  onClose: () => void;
+
 }
 
-export const ChanceEventDialog: React.FC<Props> = ({ open, onClose, chanceEvent }) => {
+export const ChanceEventDialog: React.FC<Props> = () => {
+
+  const chanceOpen = useGameStateStore(state => state.chanceOpen);
+  const chanceEvent = useGameStateStore(state => state.chanceEvent);
+  const setChanceOpen = useGameStateStore(state => state.setChanceOpen);
 
   const getChanceCard = () => {
     if (!chanceEvent) {
@@ -36,7 +38,7 @@ export const ChanceEventDialog: React.FC<Props> = ({ open, onClose, chanceEvent 
 
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="chance-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setChanceOpen(false)} aria-labelledby="chance-dialog-title" open={chanceOpen}>
       <DialogTitle id="chance-dialog-title">Chance Event</DialogTitle>
       <DialogContent>
         {getChanceCard()}

@@ -4,27 +4,28 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
-import { ServerMsg } from "../../core/types/ServerMsg";
-
+import useGameStateStore from "../gameStateStore";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  msg: ServerMsg | undefined;
+
 }
 
-export const ServerMsgDialog: React.FC<Props> = ({ open, onClose, msg }) => {
+export const ServerMsgDialog: React.FC<Props> = () => {
+
+  const serverMsgModalOpen = useGameStateStore(state => state.serverMsgModalOpen);
+  const serverMsg = useGameStateStore(state => state.serverMsg);
+  const setServerMsgModalOpen = useGameStateStore(state => state.setServerMsgModalOpen);
 
   const getMsgContent = () => {
-    if (msg) {
+    if (serverMsg) {
       return (
-        <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="server-dialog-title" open={open}>
-          <DialogTitle id="server-dialog-title">{msg.title}</DialogTitle>
+        <Dialog fullWidth={true} maxWidth="sm" onClose={() => setServerMsgModalOpen(false)} aria-labelledby="server-dialog-title" open={serverMsgModalOpen}>
+          <DialogTitle id="server-dialog-title">{serverMsg.title}</DialogTitle>
           <DialogContent>
-            <h1>{msg.body}</h1>
+            <h1>{serverMsg.body}</h1>
           </DialogContent>
           <DialogActions>
-            <Button onClick={onClose} color="primary">Close</Button>
+            <Button onClick={() => setServerMsgModalOpen(false)} color="primary">Close</Button>
           </DialogActions>
         </Dialog>
       );

@@ -32,19 +32,17 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const context: GameContext = getGameContextFromLocalStorage();
 
 
-  const [snackOpen, setSnackOpen] = useState<boolean>(false);
-  const [snackMsg, setSnackMsg] = useState<string>("");
-  const [chanceOpen, setChanceOpen] = useState(false);
-  const [chanceEvent, setChanceEvent] = useState<ChanceEvent | undefined>(undefined);
-
-
-  const [serverMsgModalOpen, setServerMsgModalOpen] = useState(false);
-  const [serverMsg, setServerMsg] = useState<ServerMsg | undefined>(undefined);
-
-
   const updateData = useGameStateStore(state => state.updateData);
   const setSquareToView = useGameStateStore(state => state.setSquareToView);
   const clearMovement = useGameStateStore(state => state.clearMovement);
+  const setSnackMsg = useGameStateStore(state => state.setSnackMsg);
+  const setSnackOpen = useGameStateStore(state => state.setSnackOpen);
+  const setServerMsg = useGameStateStore(state => state.setServerMsg);
+  const setServerMsgModalOpen = useGameStateStore(state => state.setServerMsgModalOpen);
+  const setChanceEvent = useGameStateStore(state => state.setChanceEvent);
+  const setChanceOpen = useGameStateStore(state => state.setChanceOpen);
+  const snackOpen = useGameStateStore(state => state.snackOpen);
+  const snackMsg = useGameStateStore(state => state.snackMsg);
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -134,9 +132,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const viewSquare = (id: number) => {
     setSquareToView(id);
   };
-  const clearSquare = () => {
 
-  };
 
   return (
     <React.Fragment>
@@ -144,11 +140,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
         {num_squares.map((n, index) => {
           const id: number = index + 1;
-          return (<GameSquare socketService={socketService}
-            id={id}
-            key={id}
-            viewSquare={viewSquare} clearSquare={clearSquare}
-          />)
+          return (<GameSquare socketService={socketService} id={id} key={id} viewSquare={viewSquare} />)
         })}
 
         <CenterDisplay socketService={socketService} />
@@ -157,8 +149,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       <GamePieces socketService={socketService} />
 
 
-      <ChanceEventDialog open={chanceOpen} chanceEvent={chanceEvent} onClose={() => setChanceOpen(false)} />
-      <ServerMsgDialog open={serverMsgModalOpen} msg={serverMsg} onClose={() => setServerMsgModalOpen(false)} />
+      <ChanceEventDialog />
+      <ServerMsgDialog />
 
       <Snackbar
         anchorOrigin={{
