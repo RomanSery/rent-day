@@ -13,7 +13,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { motion } from "framer-motion";
 import { AnimatedLottoResult } from "./AnimatedLottoResult";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   socketService: SocketService;

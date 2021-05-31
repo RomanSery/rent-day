@@ -18,7 +18,7 @@ import { ChanceEvent } from "../../core/types/ChanceEvent";
 import { SoundType } from "../../core/enums/SoundType";
 import { yourTurnSound } from "../gameSounds";
 import { SoundMsg } from "../../core/types/SoundMsg";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   socketService: SocketService;

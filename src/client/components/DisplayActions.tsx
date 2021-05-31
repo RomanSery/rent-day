@@ -16,7 +16,7 @@ import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {

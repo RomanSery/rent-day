@@ -13,21 +13,22 @@ import Paper from '@material-ui/core/Paper';
 import { ListSubheader } from "@material-ui/core";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { TradeOffer } from "../../core/types/TradeOffer";
 import { getSquareTxt } from "../squares/squareHelpers";
 import { TradeStatus } from "../../core/enums/TradeStatus";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  tradeOffer: TradeOffer | null;
+
 }
 
-export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, onClose, tradeOffer }) => {
+export const TradeOfferReviewedDialog: React.FC<Props> = () => {
 
   const gameState = useGameStateStore(state => state.data);
+  const tradeOffer = useGameStateStore(state => state.tradeOffer);
+  const tradeReviewedOpen = useGameStateStore(state => state.tradeReviewedOpen);
+  const setTradeReviewedOpen = useGameStateStore(state => state.setTradeReviewedOpen);
+
 
   const getPlayerHeader = (mine: boolean): React.ReactElement => {
     if (!gameState || !tradeOffer) {
@@ -88,7 +89,7 @@ export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, onClose, trade
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="reviewed-trade-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setTradeReviewedOpen(false)} aria-labelledby="reviewed-trade-dialog-title" open={tradeReviewedOpen}>
       <DialogTitle id="reviewed-trade-dialog-title">{getResultHeadline()}</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
@@ -98,7 +99,7 @@ export const TradeOfferReviewedDialog: React.FC<Props> = ({ open, onClose, trade
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={() => setTradeReviewedOpen(false)} color="primary">Close</Button>
       </DialogActions>
     </Dialog>
   );

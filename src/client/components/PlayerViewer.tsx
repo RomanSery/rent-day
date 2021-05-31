@@ -16,7 +16,7 @@ import API from '../api';
 import { SocketService } from '../sockets/SocketService';
 import { GameEvent } from '../../core/types/GameEvent';
 import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from '../uiHelpers';
-import useGameStateStore from '../gameStateStore';
+import useGameStateStore from '../stores/gameStateStore';
 
 
 interface Props {

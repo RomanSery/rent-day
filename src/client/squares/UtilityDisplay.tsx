@@ -2,7 +2,7 @@ import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb, faTrain } from '@fortawesome/free-solid-svg-icons'
 import { getSquareStyle, getSquareTxt } from "./squareHelpers";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
     id: number;

@@ -11,7 +11,7 @@ import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/Squa
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, dollarFormatter } from "../helpers";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
 

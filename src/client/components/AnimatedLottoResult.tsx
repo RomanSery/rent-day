@@ -6,7 +6,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { dollarFormatter } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import { LottoState } from "../../core/types/LottoState";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   chanceToWin: number;

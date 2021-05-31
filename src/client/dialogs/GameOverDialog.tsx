@@ -9,7 +9,7 @@ import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams 
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, List, ListItem, ListItemText } from "@material-ui/core";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {

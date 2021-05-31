@@ -24,17 +24,14 @@ import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareType } from "../../core/enums/SquareType";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  tradingWithPlayerId: string | null;
   socketService: SocketService;
 }
 
-export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPlayerId, socketService }) => {
+export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const [myChecked, setMyChecked] = React.useState<number[]>([]);
@@ -43,6 +40,9 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPl
   const [theirAmount, setTheirAmount] = React.useState<number>(0);
 
   const gameState = useGameStateStore(state => state.data);
+  const offerTradeOpen = useGameStateStore(state => state.offerTradeOpen);
+  const tradingWithPlayerId = useGameStateStore(state => state.tradingWithPlayerId);
+  const setOfferTradeOpen = useGameStateStore(state => state.setOfferTradeOpen);
 
   const onOfferTrade = () => {
 
@@ -54,7 +54,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPl
         if (socketService) {
           socketService.socket.emit(GameEvent.SEND_TRADE_OFFER, response.data.newTradeId);
         }
-        onClose();
+        setOfferTradeOpen(false);
       })
       .catch(handleApiError);
 
@@ -182,7 +182,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPl
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} aria-labelledby="offer-trade-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setOfferTradeOpen(false)} aria-labelledby="offer-trade-dialog-title" open={offerTradeOpen}>
       <DialogTitle id="offer-trade-dialog-title">Trade</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
@@ -192,7 +192,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ open, onClose, tradingWithPl
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
+        <Button onClick={() => setOfferTradeOpen(false)} color="primary">Cancel</Button>
         <Button onClick={onOfferTrade} color="primary">Offer Trade</Button>
       </DialogActions>
     </Dialog>

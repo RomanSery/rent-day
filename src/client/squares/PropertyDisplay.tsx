@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import React from "react";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 import { ColorBar } from "./ColorBar";
 import { getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
 

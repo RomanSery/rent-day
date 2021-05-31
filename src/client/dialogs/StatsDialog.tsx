@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
 import { getElectricityTooltip, getTaxTooltip } from "../uiHelpers";
 import { PlayerState } from "../../core/enums/PlayerState";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   open: boolean;

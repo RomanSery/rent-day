@@ -16,23 +16,22 @@ import { ListSubheader } from "@material-ui/core";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SocketService } from "../sockets/SocketService";
-import { TradeOffer } from "../../core/types/TradeOffer";
 import { getSquareTxt } from "../squares/squareHelpers";
 import { GameEvent } from "../../core/types/GameEvent";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  tradeOffer: TradeOffer | null;
   socketService: SocketService;
 }
 
-export const ReviewTradeDialog: React.FC<Props> = ({ open, onClose, tradeOffer, socketService }) => {
+export const ReviewTradeDialog: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const gameState = useGameStateStore(state => state.data);
+  const reviewTradeOpen = useGameStateStore(state => state.reviewTradeOpen);
+  const tradeOffer = useGameStateStore(state => state.tradeOffer);
+  const setReviewTradeOpen = useGameStateStore(state => state.setReviewTradeOpen);
 
   const onAcceptTrade = () => {
     if (!tradeOffer) {
@@ -45,7 +44,7 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, onClose, tradeOffer, 
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
-        onClose();
+        setReviewTradeOpen(false);
       })
       .catch(handleApiError);
   };
@@ -61,7 +60,7 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, onClose, tradeOffer, 
           socketService.socket.emit(GameEvent.TRADE_OFFER_REVIEWED, tradeOffer._id);
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
         }
-        onClose();
+        setReviewTradeOpen(false);
       })
       .catch(handleApiError);
   };
@@ -119,7 +118,7 @@ export const ReviewTradeDialog: React.FC<Props> = ({ open, onClose, tradeOffer, 
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onClose} disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="reivew-trade-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setReviewTradeOpen(false)} disableBackdropClick={true} disableEscapeKeyDown={true} aria-labelledby="reivew-trade-dialog-title" open={reviewTradeOpen}>
       <DialogTitle id="review-trade-dialog-title">Accept/Decline Trade Offer</DialogTitle>
       <DialogContent>
         <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">

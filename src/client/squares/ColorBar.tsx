@@ -3,7 +3,7 @@ import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/Squa
 import { faHome, faHotel } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
     id: number;

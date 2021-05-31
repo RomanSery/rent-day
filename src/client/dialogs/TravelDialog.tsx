@@ -20,20 +20,19 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { Player } from "../../core/types/Player";
 import { muggingAmount, muggingChance } from "../../core/constants";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  onCancel: () => void;
   socketService: SocketService;
 }
 
-export const TravelDialog: React.FC<Props> = ({ open, onClose, onCancel, socketService }) => {
+export const TravelDialog: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const gameState = useGameStateStore(state => state.data);
+  const travelOpen = useGameStateStore(state => state.travelOpen);
+  const setTravelOpen = useGameStateStore(state => state.setTravelOpen);
 
   const onTravel = (squareId: number) => () => {
     API.post("actions/travel", { context, squareId: squareId })
@@ -41,7 +40,7 @@ export const TravelDialog: React.FC<Props> = ({ open, onClose, onCancel, socketS
         if (socketService && gameState) {
           socketService.socket.emit(GameEvent.STOP_ANIMATE_DICE, gameState._id, response.data.playerId, response.data.diceRoll, response.data.frames);
         }
-        onClose();
+        setTravelOpen(false);
       })
       .catch(handleApiError);
   };
@@ -77,7 +76,7 @@ export const TravelDialog: React.FC<Props> = ({ open, onClose, onCancel, socketS
 
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={onCancel} aria-labelledby="travel-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setTravelOpen(false)} aria-labelledby="travel-dialog-title" open={travelOpen}>
       <DialogTitle id="travel-dialog-title">Select station to travel to</DialogTitle>
       <DialogContent>
         <p>
@@ -106,7 +105,7 @@ export const TravelDialog: React.FC<Props> = ({ open, onClose, onCancel, socketS
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} color="primary">Cancel</Button>
+        <Button onClick={() => setTravelOpen(false)} color="primary">Cancel</Button>
       </DialogActions>
     </Dialog>
   );

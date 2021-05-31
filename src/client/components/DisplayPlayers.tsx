@@ -2,7 +2,7 @@ import React from "react";
 import { Player } from "../../core/types/Player";
 import { DisplayPlayer } from "./DisplayPlayer";
 import { getObjectIdAsHexString } from "../helpers";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   viewPlayer: (player: Player) => void;

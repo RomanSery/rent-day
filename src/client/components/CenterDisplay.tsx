@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { DisplayPlayers } from "./DisplayPlayers";
 import { DisplayActions } from "./DisplayActions";
 import { SocketService } from "../sockets/SocketService";
@@ -25,7 +25,7 @@ import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@material-ui/core";
 import { ChatWindow } from "./ChatWindow";
 import Countdown, { CountdownRenderProps, CountdownTimeDelta } from "react-countdown";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   socketService: SocketService;
@@ -36,24 +36,23 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
 
-  const [playerToView, setPlayerToView] = useState<String | undefined>(undefined);
-
-  const [forceDie1, setForceDie1] = useState<number | undefined>(undefined);
-  const [forceDie2, setForceDie2] = useState<number | undefined>(undefined);
-
-  const [offerTradeOpen, setOfferTradeOpen] = useState(false);
-  const [reviewTradeOpen, setReviewTradeOpen] = useState(false);
-  const [tradeReviewedOpen, setTradeReviewedOpen] = useState(false);
-  const [travelOpen, setTravelOpen] = useState(false);
-
-  const [tradingWithPlayerId, setTradingWithPlayerId] = useState<string | null>(null);
-  const [tradeOffer, setTradeOffer] = useState<TradeOffer | null>(null);
-
   const countdownEl = React.useRef<Countdown | null>(null);
-
   const isMountedRef = useIsMountedRef();
 
   const gameState = useGameStateStore(state => state.data);
+  const setTradeOffer = useGameStateStore(state => state.setTradeOffer);
+  const setReviewTradeOpen = useGameStateStore(state => state.setReviewTradeOpen);
+  const setTradeReviewedOpen = useGameStateStore(state => state.setTradeReviewedOpen);
+  const forceDie1 = useGameStateStore(state => state.forceDie1);
+  const forceDie2 = useGameStateStore(state => state.forceDie2);
+  const setForceDie1 = useGameStateStore(state => state.setForceDie1);
+  const setForceDie2 = useGameStateStore(state => state.setForceDie2);
+  const setTravelOpen = useGameStateStore(state => state.setTravelOpen);
+  const setPlayerToView = useGameStateStore(state => state.setPlayerToView);
+  const playerToView = useGameStateStore(state => state.playerToView);
+  const setOfferTradeOpen = useGameStateStore(state => state.setOfferTradeOpen);
+  const setTradingWithPlayerId = useGameStateStore(state => state.setTradingWithPlayerId);
+
 
   useEffect(() => {
 
@@ -164,9 +163,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
     setOfferTradeOpen(true);
   };
 
-  const onCancelTravel = () => {
-    setTravelOpen(false);
-  };
+
 
   const showGameOver = () => {
     return gameState && gameState.status === GameStatus.FINISHED ? true : false;
@@ -253,10 +250,10 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
       </div>
 
       <GameOverDialog open={showGameOver()} onLeaveGame={onLeaveGame} />
-      <TravelDialog socketService={socketService} open={travelOpen} onClose={() => setTravelOpen(false)} onCancel={onCancelTravel} />
-      <OfferTradeDialog socketService={socketService} open={offerTradeOpen} onClose={() => setOfferTradeOpen(false)} tradingWithPlayerId={tradingWithPlayerId} />
-      <ReviewTradeDialog socketService={socketService} open={reviewTradeOpen} onClose={() => setReviewTradeOpen(false)} tradeOffer={tradeOffer} />
-      <TradeOfferReviewedDialog open={tradeReviewedOpen} onClose={() => setTradeReviewedOpen(false)} tradeOffer={tradeOffer} />
+      <TravelDialog socketService={socketService} />
+      <OfferTradeDialog socketService={socketService} />
+      <ReviewTradeDialog socketService={socketService} />
+      <TradeOfferReviewedDialog />
 
     </React.Fragment>
   );

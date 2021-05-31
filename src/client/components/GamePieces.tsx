@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getObjectIdAsHexString, getIconProp } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
   socketService: SocketService;

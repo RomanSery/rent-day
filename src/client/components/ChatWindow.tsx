@@ -6,7 +6,7 @@ import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
 import { newChatMsgSound } from "../gameSounds";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 import { getMyPlayerName } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 

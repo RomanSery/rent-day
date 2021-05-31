@@ -19,7 +19,7 @@ import { CircleLoader } from "./CircleLoader";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 
 
 interface Props {

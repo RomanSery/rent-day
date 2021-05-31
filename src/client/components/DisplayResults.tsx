@@ -3,7 +3,7 @@ import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { GameEvent } from "../../core/types/GameEvent";
 import { GameState } from "../../core/types/GameState";
 import { diceRollSound } from "../gameSounds";
-import useGameStateStore from "../gameStateStore";
+import useGameStateStore from "../stores/gameStateStore";
 import { SocketService } from "../sockets/SocketService";
 import { AnimatedDice } from "./AnimatedDice";
 import { Die } from "./Die";
