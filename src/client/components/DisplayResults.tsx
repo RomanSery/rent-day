@@ -16,12 +16,14 @@ interface Props {
 
 export const DisplayResults: React.FC<Props> = ({ socketService }) => {
 
-  const [showDiceAnimation, setShowDiceAnimation] = React.useState(false);
-  const [animDiceRollResult, setAnimDiceRollResult] = React.useState<DiceRollResult | undefined>(undefined);
-
 
   const gameState = useGameStateStore(state => state.data);
   const showMovementAnimation = useGameStateStore(state => state.showMovementAnimation);
+  const showDiceAnimation = useGameStateStore(state => state.showDiceAnimation);
+  const setShowDiceAnimation = useGameStateStore(state => state.setShowDiceAnimation);
+
+  const animDiceRollResult = useGameStateStore(state => state.animDiceRollResult);
+  const setAnimDiceRollResult = useGameStateStore(state => state.setAnimDiceRollResult);
 
   const [resultsDesc, setResultsDesc] = React.useState<string | undefined>(gameState && gameState.results ? gameState.results.description : undefined);
 

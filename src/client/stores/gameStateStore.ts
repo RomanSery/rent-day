@@ -1,6 +1,7 @@
 import create, { GetState, SetState } from "zustand";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { ChanceEvent } from "../../core/types/ChanceEvent";
+import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { GameState } from "../../core/types/GameState";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { TradeOffer } from "../../core/types/TradeOffer";
@@ -52,10 +53,31 @@ interface GameStateStore {
   setTravelOpen: (newData: boolean) => void;
   setTradingWithPlayerId: (newData: string | null) => void;
   setTradeOffer: (newData: TradeOffer | null) => void;
+
+  statsViewOpen: boolean;
+  taxesViewOpen: boolean;
+  helpOpen: boolean;
+  setStatsViewOpen: (newData: boolean) => void;
+  setTaxesViewOpen: (newData: boolean) => void;
+  setHelpOpen: (newData: boolean) => void;
+
+  showDiceAnimation: boolean;
+  setShowDiceAnimation: (newData: boolean) => void;
+  animDiceRollResult: DiceRollResult | undefined;
+  setAnimDiceRollResult: (newData: DiceRollResult | undefined) => void;
 }
 
 const useGameStateStore = create<GameStateStore>(
   (set: SetState<GameStateStore>, get: GetState<GameStateStore>) => ({
+    showDiceAnimation: false,
+    animDiceRollResult: undefined,
+    setShowDiceAnimation: (newData: boolean): void => {
+      set({ showDiceAnimation: newData });
+    },
+    setAnimDiceRollResult: (newData: DiceRollResult | undefined): void => {
+      set({ animDiceRollResult: newData });
+    },
+
     data: undefined,
     actionMode: ActionMode.None,
     squareToView: undefined,
@@ -77,6 +99,19 @@ const useGameStateStore = create<GameStateStore>(
     travelOpen: false,
     tradingWithPlayerId: null,
     tradeOffer: null,
+
+    statsViewOpen: false,
+    taxesViewOpen: false,
+    helpOpen: false,
+    setStatsViewOpen: (newData: boolean): void => {
+      set({ statsViewOpen: newData });
+    },
+    setTaxesViewOpen: (newData: boolean): void => {
+      set({ taxesViewOpen: newData });
+    },
+    setHelpOpen: (newData: boolean): void => {
+      set({ helpOpen: newData });
+    },
 
     setPlayerToView: (newData: string | undefined): void => {
       set({ playerToView: newData });

@@ -9,6 +9,7 @@ import { newChatMsgSound } from "../gameSounds";
 import useGameStateStore from "../stores/gameStateStore";
 import { getMyPlayerName } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
+import useChatStore from "../stores/chatStore";
 
 interface Props {
   socketService: SocketService;
@@ -16,8 +17,10 @@ interface Props {
 
 export const ChatWindow: React.FC<Props> = ({ socketService }) => {
 
-  const [sendChatMsg, setSendChatMsg] = React.useState<string | undefined>();
-  const [showChat, setShowChat] = React.useState<boolean>(true);
+  const sendChatMsg = useChatStore(state => state.sendChatMsg);
+  const setSendChatMsg = useChatStore(state => state.setSendChatMsg);
+  const showChat = useChatStore(state => state.showChat);
+  const setShowChat = useChatStore(state => state.setShowChat);
 
   const gameState = useGameStateStore(state => state.data);
 
@@ -33,7 +36,7 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
 
       newChatMsgSound.play();
     });
-  }, [socketService]);
+  }, [setShowChat, socketService]);
 
 
   const onChangeChatMsg = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {

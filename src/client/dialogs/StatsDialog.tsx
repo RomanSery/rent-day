@@ -14,14 +14,15 @@ import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
   tradeWithPlayer: (player: Player) => void;
 }
 
-export const StatsDialog: React.FC<Props> = ({ open, onClose, tradeWithPlayer }) => {
+export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
 
   const gameState = useGameStateStore(state => state.data);
+  const statsViewOpen = useGameStateStore(state => state.statsViewOpen);
+  const setStatsViewOpen = useGameStateStore(state => state.setStatsViewOpen);
+
 
   const getPlayerById = (params: ValueFormatterParams) => {
     if (gameState) {
@@ -125,7 +126,7 @@ export const StatsDialog: React.FC<Props> = ({ open, onClose, tradeWithPlayer })
       flex: 0.5,
       renderCell: (params: ValueFormatterParams) => (
         <React.Fragment>
-          {canOfferTrade(params) ? <FontAwesomeIcon icon={faHandshake} onClick={() => { tradeWithPlayer(getPlayerById(params)!); onClose(); }} /> : null}
+          {canOfferTrade(params) ? <FontAwesomeIcon icon={faHandshake} onClick={() => { tradeWithPlayer(getPlayerById(params)!); setStatsViewOpen(false); }} /> : null}
         </React.Fragment>
       )
     },
@@ -156,7 +157,7 @@ export const StatsDialog: React.FC<Props> = ({ open, onClose, tradeWithPlayer })
   }
 
   return (
-    <Dialog fullWidth={true} maxWidth="xl" onClose={onClose} aria-labelledby="stats-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="xl" onClose={() => setStatsViewOpen(false)} aria-labelledby="stats-dialog-title" open={statsViewOpen}>
       <DialogTitle id="stats-dialog-title">Stats</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
@@ -167,7 +168,7 @@ export const StatsDialog: React.FC<Props> = ({ open, onClose, tradeWithPlayer })
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Cancel</Button>
+        <Button onClick={() => setStatsViewOpen(false)} color="primary">Cancel</Button>
       </DialogActions>
     </Dialog>
   );

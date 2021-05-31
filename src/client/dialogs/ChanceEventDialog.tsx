@@ -44,7 +44,7 @@ export const ChanceEventDialog: React.FC<Props> = () => {
         {getChanceCard()}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={() => setChanceOpen(false)} color="primary">Close</Button>
       </DialogActions>
     </Dialog>
   );

@@ -25,6 +25,7 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareType } from "../../core/enums/SquareType";
 import useGameStateStore from "../stores/gameStateStore";
+import useTradeStateStore from "../stores/tradeStateStore";
 
 
 interface Props {
@@ -34,10 +35,15 @@ interface Props {
 export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const [myChecked, setMyChecked] = React.useState<number[]>([]);
-  const [theirChecked, setTheirChecked] = React.useState<number[]>([]);
-  const [myAmount, setMyAmount] = React.useState<number>(0);
-  const [theirAmount, setTheirAmount] = React.useState<number>(0);
+
+  const myChecked = useTradeStateStore(state => state.myChecked);
+  const setMyChecked = useTradeStateStore(state => state.setMyChecked);
+  const theirChecked = useTradeStateStore(state => state.theirChecked);
+  const setTheirChecked = useTradeStateStore(state => state.setTheirChecked);
+  const myAmount = useTradeStateStore(state => state.myAmount);
+  const setMyAmount = useTradeStateStore(state => state.setMyAmount);
+  const theirAmount = useTradeStateStore(state => state.theirAmount);
+  const setTheirAmount = useTradeStateStore(state => state.setTheirAmount);
 
   const gameState = useGameStateStore(state => state.data);
   const offerTradeOpen = useGameStateStore(state => state.offerTradeOpen);

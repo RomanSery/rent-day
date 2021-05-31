@@ -30,15 +30,16 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
 
   const context: GameContext = getGameContextFromLocalStorage();
   const history = useHistory();
-  const [statsViewOpen, setStatsViewOpen] = React.useState(false);
-  const [taxesViewOpen, setTaxesViewOpen] = React.useState(false);
-  const [helpOpen, setHelpOpen] = React.useState(false);
+
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const gameState = useGameStateStore(state => state.data);
   const actionMode = useGameStateStore(state => state.actionMode);
   const setActionMode = useGameStateStore(state => state.setActionMode);
+  const setStatsViewOpen = useGameStateStore(state => state.setStatsViewOpen);
+  const setTaxesViewOpen = useGameStateStore(state => state.setTaxesViewOpen);
+  const setHelpOpen = useGameStateStore(state => state.setHelpOpen);
 
 
   const getMyPlayer = (): Player | undefined => {
@@ -295,9 +296,9 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
     <React.Fragment>
       {getMyActions()}
 
-      <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <StatsDialog tradeWithPlayer={tradeWithPlayer} open={statsViewOpen} onClose={() => setStatsViewOpen(false)} />
-      <MyTaxesDialog open={taxesViewOpen} onClose={() => setTaxesViewOpen(false)} />
+      <HelpDialog />
+      <StatsDialog tradeWithPlayer={tradeWithPlayer} />
+      <MyTaxesDialog />
     </React.Fragment>
   );
 

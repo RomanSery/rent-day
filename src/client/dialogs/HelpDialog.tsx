@@ -5,16 +5,19 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import Button from '@material-ui/core/Button';
 import { getHelpContent } from "../uiHelpers";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
+
 }
 
-export const HelpDialog: React.FC<Props> = ({ open, onClose }) => {
+export const HelpDialog: React.FC<Props> = () => {
+
+  const helpOpen = useGameStateStore(state => state.helpOpen);
+  const setHelpOpen = useGameStateStore(state => state.setHelpOpen);
 
   return (
-    <Dialog maxWidth="md" onClose={onClose} aria-labelledby="help-dialog-title" open={open}>
+    <Dialog maxWidth="md" onClose={() => setHelpOpen(false)} aria-labelledby="help-dialog-title" open={helpOpen}>
       <DialogTitle id="help-dialog-title">Help</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '80%' }}>
@@ -25,7 +28,7 @@ export const HelpDialog: React.FC<Props> = ({ open, onClose }) => {
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={() => setHelpOpen(false)} color="primary">Close</Button>
       </DialogActions>
     </Dialog>
   );

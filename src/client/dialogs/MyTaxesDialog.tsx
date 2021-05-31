@@ -9,13 +9,14 @@ import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams 
 import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
+
 }
 
-export const MyTaxesDialog: React.FC<Props> = ({ open, onClose }) => {
+export const MyTaxesDialog: React.FC<Props> = () => {
 
   const gameState = useGameStateStore(state => state.data);
+  const taxesViewOpen = useGameStateStore(state => state.taxesViewOpen);
+  const setTaxesViewOpen = useGameStateStore(state => state.setTaxesViewOpen);
 
   const columns: GridColDef[] = [
     { field: 'id', hide: true },
@@ -77,7 +78,7 @@ export const MyTaxesDialog: React.FC<Props> = ({ open, onClose }) => {
   }
 
   return (
-    <Dialog fullWidth={true} maxWidth="xl" onClose={onClose} aria-labelledby="taxes-dialog-title" open={open}>
+    <Dialog fullWidth={true} maxWidth="xl" onClose={() => setTaxesViewOpen(false)} aria-labelledby="taxes-dialog-title" open={taxesViewOpen}>
       <DialogTitle id="taxes-dialog-title">My Taxes</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
@@ -88,7 +89,7 @@ export const MyTaxesDialog: React.FC<Props> = ({ open, onClose }) => {
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">Close</Button>
+        <Button onClick={() => setTaxesViewOpen(false)} color="primary">Close</Button>
       </DialogActions>
     </Dialog>
   );

@@ -1,10 +1,6 @@
 import React from "react";
-import { GameState } from "../../core/types/GameState";
 import { GameSquare } from "../components/GameSquare";
-import { SquareThemeData } from "../../core/types/SquareThemeData";
-import { NyThemeData } from "../../core/config/NyTheme";
-import { GameStatus } from "../../core/enums/GameStatus";
-import { ActionMode } from "../../core/enums/ActionMode";
+
 
 interface Props {
 
@@ -14,6 +10,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
 
   const num_squares: Array<number> = Array.from(Array(40));
 
+  /*
   const createEmptyState = (): GameState => {
 
     let themeArray: Array<SquareThemeData> = [];
@@ -35,7 +32,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
         maxPlayers: 0, initialMoney: 0, password: '', initialSkillPoints: 0,
       }, results: { roll: { die1: 1, die2: 1 }, description: '' }, squareState: []
     };
-  }
+  }*/
 
   return (
     <React.Fragment>
@@ -44,7 +41,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
           const id: number = index + 1;
           return (<GameSquare
             id={id}
-            key={id} viewSquare={() => { }} clearSquare={() => { }}
+            key={id} viewSquare={() => { }}
           />)
         })}
 

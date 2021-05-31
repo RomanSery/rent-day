@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
@@ -20,6 +20,7 @@ import { useIsMountedRef } from "./useIsMountedRef";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
+import useAuctionStore from "../stores/auctionStore";
 
 
 interface Props {
@@ -29,12 +30,18 @@ interface Props {
 export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const [auctionState, setAuctionState] = useState<AuctionState>();
-  const [myBid, setMyBid] = useState<number>();
-  const [mySubmittedBid, setMySubmittedBid] = useState<number | undefined>(undefined);
   const isMountedRef = useIsMountedRef();
 
   const gameState = useGameStateStore(state => state.data);
+
+  const auctionState = useAuctionStore(state => state.auctionState);
+  const setAuctionState = useAuctionStore(state => state.setAuctionState);
+
+  const myBid = useAuctionStore(state => state.myBid);
+  const setMyBid = useAuctionStore(state => state.setMyBid);
+
+  const mySubmittedBid = useAuctionStore(state => state.mySubmittedBid);
+  const setMySubmittedBid = useAuctionStore(state => state.setMySubmittedBid);
 
   useEffect(() => {
     getAuctionState();
