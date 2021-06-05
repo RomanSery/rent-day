@@ -18,7 +18,18 @@ const useAuctionStore = create<AuctionStore>(
     mySubmittedBid: undefined,
 
     setAuctionState: (newData: AuctionState | undefined): void => {
-      set({ auctionState: newData });
+      const state = get().auctionState;
+      if (state && state.finished) {
+        set({
+          auctionState: newData,
+          myBid: undefined,
+          mySubmittedBid: undefined,
+        });
+      } else {
+        set({
+          auctionState: newData,
+        });
+      }
     },
     setMyBid: (newData: number | undefined): void => {
       set({ myBid: newData });
