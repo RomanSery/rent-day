@@ -94,9 +94,6 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
   };
 
   const getChatWindow = () => {
-
-
-
     return (
       <React.Fragment>
         <ButtonGroup size="small" color="primary">

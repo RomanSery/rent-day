@@ -1,5 +1,8 @@
 when taking action like roll, complete turn, if err msg comes back like 'not your turn', means UI is out of sync, need to do update_game_state
 
+bug:
+alex had grand central which was mortgaged, but i couldnt trade with him, giving him $ for it, said participant cant trade something they dont have/own
+duplicate chat log msgs
 
 
 computer players
@@ -16,3 +19,7 @@ mongorestore --host localhost:27017 --gzip --archive=C:\roman_db\rentdaydb.gz --
 dokku mongo:expose rentdaydb 20017 20018 20019 20020
 
 npm run-script dev
+
+local config /server/.evn
+MONGO_URL=mongodb://localhost:27017/monopoly
+PORT=4000

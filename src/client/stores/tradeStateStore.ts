@@ -10,6 +10,7 @@ interface TradeStateStore {
   setTheirChecked: (newData: number[]) => void;
   setMyAmount: (newData: number) => void;
   setTheirAmount: (newData: number) => void;
+  clear: () => void;
 }
 
 const useTradeStateStore = create<TradeStateStore>(
@@ -30,6 +31,10 @@ const useTradeStateStore = create<TradeStateStore>(
     },
     setTheirAmount: (newData: number): void => {
       set({ theirAmount: newData });
+    },
+
+    clear: (): void => {
+      set({ myChecked: [], theirChecked: [], myAmount: 0, theirAmount: 0 });
     },
   })
 );
