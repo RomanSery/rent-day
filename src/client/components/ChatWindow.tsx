@@ -21,13 +21,22 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
   const setSendChatMsg = useChatStore(state => state.setSendChatMsg);
   const showChat = useChatStore(state => state.showChat);
   const setShowChat = useChatStore(state => state.setShowChat);
+  const messages = useChatStore(state => state.messages);
+  const addNewMsg = useChatStore(state => state.addNewMsg);
+  const initMessages = useChatStore(state => state.initMessages);
 
   const gameState = useGameStateStore(state => state.data);
 
   React.useEffect(() => {
+    if(gameState) {
+      initMessages(gameState.messages);
+    }    
+  }, [gameState, initMessages]);
+
+  React.useEffect(() => {
     socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
-      setShowChat(true);
-      appendToChatWindow(msg);
+      setShowChat(true);      
+      addNewMsg(msg);
 
       const ul = document.getElementById("chat-window-ul");
       if (ul) {
@@ -36,7 +45,7 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
 
       newChatMsgSound.play();
     });
-  }, [setShowChat, socketService]);
+  }, [setShowChat, socketService, addNewMsg]);
 
 
   const onChangeChatMsg = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>): void => {
@@ -52,19 +61,11 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
       };
 
       socketService.socket.emit(GameEvent.SEND_CHAT_MSG, gameState._id, newMsg);
-      setSendChatMsg("");
-      appendToChatWindow(newMsg);
+      setSendChatMsg("");      
+      addNewMsg(newMsg);
     }
   }
 
-  const appendToChatWindow = (msg: ChatMsg) => {
-    const ul = document.getElementById("chat-window-ul");
-    if (ul) {
-      const li = document.createElement("li");
-      li.innerHTML = "<b>" + msg.player + "</b> - " + msg.msg;
-      ul.appendChild(li);
-    }
-  }
 
   const getChatContStyle = (): React.CSSProperties => {
     if (!showChat) {
@@ -104,7 +105,7 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
         <div className="chat-row" style={getChatContStyle()}>
           <div className="chat-messages">
             <ul id="chat-window-ul">
-              {gameState?.messages.map((m, index) => (
+              {messages.map((m, index) => (
                 <li key={index}>
                   <b>{m.player}</b> - {m.msg}
                 </li>
