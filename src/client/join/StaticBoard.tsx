@@ -35,7 +35,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
   }*/
 
   return (
-    <React.Fragment>
+    
       <div className="board">
         {num_squares.map((n, index) => {
           const id: number = index + 1;
@@ -50,6 +50,6 @@ export const StaticBoard: React.FC<Props> = (props) => {
         </div>
 
       </div>
-    </React.Fragment>
+    
   );
 }

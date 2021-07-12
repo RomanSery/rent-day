@@ -4,7 +4,7 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 
 export class Gambler {
   public static getPaydaySalary(): number {
-    return 100;
+    return 200;
   }
 
   public static getInitialSkills(): SkillSettings {
@@ -33,7 +33,7 @@ export class Gambler {
   }
 
   public static modifyLottoPrizeAmount(prize: number): number {
-    const extra = prize * 0.4;
+    const extra = prize * 0.6;
     return prize + extra;
   }
 }

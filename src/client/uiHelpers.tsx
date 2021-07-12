@@ -16,7 +16,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Player } from "../core/types/Player";
 import Table from '@material-ui/core/Table';
@@ -234,20 +234,14 @@ export const getPlayerClassDescription = (type: string | undefined): JSX.Element
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Lotto prize amounts are 40% higher" />
+          <ListItemText primary="Lotto prize amounts are 60% higher" />
         </ListItem>
         <ListItem>
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
           <ListItemText primary="Start with luck 2" />
-        </ListItem>
-        <ListItem>
-          <ListItemIcon>
-            <FontAwesomeIcon icon={faThumbsDown} size="2x" color="red" />
-          </ListItemIcon>
-          <ListItemText primary="You are unemployed. Only collect $100 on payday" />
-        </ListItem>
+        </ListItem>        
       </List>
     );
   } else if (type === PlayerClass.Conductor) {

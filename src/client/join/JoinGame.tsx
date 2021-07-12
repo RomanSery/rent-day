@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-target-blank */
 import React, { useEffect, useState } from "react";
 
 import { useHistory, useLocation } from "react-router-dom";
@@ -19,6 +20,8 @@ import { getPlayerClassDescription } from "../uiHelpers";
 import queryString from "query-string";
 import _ from "lodash/fp";
 import { useQuery } from "react-query";
+import { Share } from "react-twitter-widgets";
+import { Helmet } from "react-helmet";
 
 interface Props {
   socketService: SocketService;
@@ -168,8 +171,19 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     </div>);
   }
 
+  const shareUrl = window.location.href;
+
+
+  const getShareTitle = () => {
+    return "Let's play a game of Rent Day";
+  };
+
   return (
     <React.Fragment>
+      <Helmet>
+        <meta property="og:url" content={shareUrl} />
+      </Helmet>
+
       <Container maxWidth="sm">
         <Typography component="h2" variant="h5">{gameInfoQuery.data?.name}</Typography>
 
@@ -237,7 +251,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         {hasJoinedGame() &&
           <Button variant="contained" color="secondary" onClick={onLeaveGame}>
             Leave Game
-         </Button>
+          </Button>
         }
 
         <div className="player-class-description">
@@ -258,6 +272,22 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           <div className="skill">
             <div className="header">Corruption</div>
             <div className="description">Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}</b>%</div>
+          </div>
+        </div>
+
+
+        <hr />
+
+        <h2>Invite people to play!</h2>
+
+        <div className="social-cont">
+          <div className="social-share-cont">
+            <Share url={shareUrl} options={{ size: "large", hashtags: "rentday", text: getShareTitle() }} />
+          </div>
+          <div className="social-share-cont">
+            <div className="fb-share-button" data-href={shareUrl} data-layout="button" data-size="large">
+              <a target="_blank" href="https://www.facebook.com/sharer/sharer.php" className="fb-xfbml-parse-ignore">Share</a>
+              </div>
           </div>
         </div>
 

@@ -24,6 +24,7 @@ import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
 import { QueryClient, QueryClientProvider } from "react-query";
 
+
 export const App: React.FC = () => {
 
   const history = useHistory();
@@ -195,7 +196,7 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <QueryClientProvider client={queryClient}>
+          <QueryClientProvider client={queryClient}>                
             <JoinGame socketService={socket} />
           </QueryClientProvider>
         </StaticBoard>
