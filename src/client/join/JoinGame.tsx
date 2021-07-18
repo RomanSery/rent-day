@@ -45,6 +45,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const gameToJoinId: string | null = getGameIdFromUrl();
 
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
@@ -180,6 +181,16 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     </div>);
   }
 
+  const copyLink = () => {
+    const el = document.createElement("input");
+    el.value = window.location.href;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    setCopied(true);
+  }
+
   const shareUrl = window.location.href;
 
 
@@ -290,16 +301,20 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           <div className="social-share-cont">
             <Share url={shareUrl} options={{ size: "large", hashtags: "rentday", text: getShareTitle() }} />
           </div>
-          <div className="social-share-cont">
-            
+          <div className="social-share-cont">            
             <div id="fb-share-button">
                 <svg viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
                     <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
                 </svg>
                 <span>Share</span>
             </div>
+          </div>        
+        </div>
 
-          </div>
+        <br />        
+
+        <div className="socail-cont">
+          <button onClick={ copyLink }>{!copied ? "Copy link to send to others" : "Copied!"}</button>
         </div>
 
 
