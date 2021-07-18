@@ -41,9 +41,22 @@ export const createAccount = async (
     if (info !== undefined) {
       res.status(403).send(info.message);
     } else {
-      req.logIn(user, (error) => {
-        res.status(200).send({ message: "user created" });
+
+      req.logIn(user, () => {
+        const payload = {
+          id: user.id,
+          userName: user.username,
+          currGameId: user.currGameId,
+        };
+        const token = jwt.sign(payload, JWT_SECRET, {
+          expiresIn: 60 * 60,
+        });
+
+        req.session!.rentDayToken = token;
+
+        res.status(200).send(payload);
       });
+
     }
   })(req, res, next);
 };

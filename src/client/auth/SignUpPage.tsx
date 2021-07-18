@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
 import { Link, useHistory } from "react-router-dom";
-import { handleApiError } from "../helpers";
+import { handleApiError, setCurrSessionInfo } from "../helpers";
 import _ from "lodash/fp";
 
 
@@ -27,6 +27,7 @@ export const SignUpPage: React.FC<Props> = () => {
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email })
       .then(function (response) {
+        setCurrSessionInfo(response.data);
         history.push("/dashboard");
       })
       .catch(handleApiError);
