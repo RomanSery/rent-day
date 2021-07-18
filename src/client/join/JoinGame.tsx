@@ -21,7 +21,6 @@ import queryString from "query-string";
 import _ from "lodash/fp";
 import { useQuery } from "react-query";
 import { Share } from "react-twitter-widgets";
-import { Helmet } from "react-helmet";
 
 interface Props {
   socketService: SocketService;
@@ -80,6 +79,16 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = "/js/fb_share.js";
+    script.async = true;
+    document.body.appendChild(script);
+  return () => {
+      document.body.removeChild(script);
+    }
   }, []);
 
 
@@ -179,10 +188,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   };
 
   return (
-    <React.Fragment>
-      <Helmet>
-        <meta property="og:url" content={shareUrl} />
-      </Helmet>
+    <React.Fragment>      
 
       <Container maxWidth="sm">
         <Typography component="h2" variant="h5">{gameInfoQuery.data?.name}</Typography>
@@ -285,9 +291,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             <Share url={shareUrl} options={{ size: "large", hashtags: "rentday", text: getShareTitle() }} />
           </div>
           <div className="social-share-cont">
-            <div className="fb-share-button" data-href={shareUrl} data-layout="button" data-size="large">
-              <a target="_blank" href="https://www.facebook.com/sharer/sharer.php" className="fb-xfbml-parse-ignore">Share</a>
-              </div>
+            <button id="fbShareBtn" className="btn btn-success clearfix">Share</button>
           </div>
         </div>
 
@@ -304,6 +308,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         onClose={closeSnack}
         open={snackOpen} autoHideDuration={5000} message={snackMsg}
       />
+
 
     </React.Fragment>
   );
