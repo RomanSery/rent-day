@@ -10,7 +10,7 @@ when you quit instead of letting game bankrupt you, you are forced out of the ga
 do something for case when its your turn and you have negative $, need to sell something. 
  but when turn over, game automatically makes you lose. instead need to sell a random house if yo have it, or mortgage something
 
-
+after registering, try to do auto login instead of manual
 
 
 
