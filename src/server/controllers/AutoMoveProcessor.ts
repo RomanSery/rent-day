@@ -136,8 +136,6 @@ export class AutoMoveProcessor {
 
   private async autoSell(): Promise<void> {
 
-    //TODO have to auto sell houses/ mortgage properties
-
     while(this.player!.money < 0) {
       const sold = await this.tryToSellAHouse();
       if(!sold) {
@@ -151,7 +149,6 @@ export class AutoMoveProcessor {
         break;
       }
     }
-
 
   }
 
@@ -177,9 +174,8 @@ export class AutoMoveProcessor {
 
       
       const playerId = new mongoose.Types.ObjectId(this.player!._id);
-      const squareId = playerOwnedSquaresWithHouses[0].squareId;
-      const processor = new PropertyProcessor(squareId, this.gameId, playerId);
-      const errMsg = await processor.sellHouse();
+      const squareId = playerOwnedSquaresWithHouses[0].squareId;      
+      const errMsg = await PropertyProcessor.sellHouse(this.game!, this.player!, squareId, playerId);
 
       if (errMsg && errMsg.length > 0) {
         return false;
@@ -207,12 +203,9 @@ export class AutoMoveProcessor {
       return false;
     }
 
-    
-    const playerId = new mongoose.Types.ObjectId(this.player!._id);    
-    const squareId = playerOwnedSquares[0].squareId;
-    const processor = new PropertyProcessor(squareId, this.gameId, playerId);
-    const errMsg = await processor.mortgageProperty();
-
+    const playerId = new mongoose.Types.ObjectId(this.player!._id);
+    const squareId = playerOwnedSquares[0].squareId;      
+    const errMsg = await PropertyProcessor.mortgageProperty(this.game!, this.player!, squareId, playerId);    
     if (errMsg && errMsg.length > 0) {
       return false;
     }

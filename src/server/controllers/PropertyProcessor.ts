@@ -52,7 +52,7 @@ export class PropertyProcessor {
 
   public async mortgageProperty(): Promise<string> {
     await this.init();
-
+    
     if (!this.game) {
       return "game not found";
     }
@@ -101,6 +101,66 @@ export class PropertyProcessor {
     PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
 
     await this.game.save();
+
+    return "";
+  }
+
+
+  public static async mortgageProperty(game: GameInstanceDocument, player: Player, squareId: number, userId: mongoose.Types.ObjectId): Promise<string> {
+    
+    if (!game) {
+      return "game not found";
+    }
+    if (game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+    if (!player) {
+      return "player not owned";
+    }
+    if (player.state === PlayerState.BANKRUPT) {
+      return player.name + " is bankrupt";
+    }
+
+    const state = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+
+    if (!state) {
+      return "property not owned";
+    }
+    if (state.isMortgaged) {
+      return "property already mortgaged";
+    }
+
+    const ownerId = new mongoose.Types.ObjectId(state.owner);
+    if (!userId.equals(ownerId)) {
+      return "you are not the owner";
+    }
+
+    const squareConfig = SquareConfigDataMap.get(squareId);
+
+    if (
+      squareConfig &&
+      squareConfig.type !== SquareType.Property &&
+      squareConfig.type !== SquareType.TrainStation
+    ) {
+      return "You can't mortgage this type of property";
+    }
+
+    if (doesGroupHaveAnyHouses(game, squareConfig!.groupId!)) {
+      return "You have to sell all the houses in the group first";
+    }
+
+    state.isMortgaged = true;
+    if (state.mortgageValue) {
+      player.money = Math.round(
+        player.money + state.mortgageValue
+      );
+    }
+
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+
+    await game.save();
 
     return "";
   }
@@ -289,6 +349,67 @@ export class PropertyProcessor {
 
     return "";
   }
+
+
+
+
+  public static async sellHouse(game: GameInstanceDocument, player: Player, squareId: number, userId: mongoose.Types.ObjectId): Promise<string> {
+    
+    if (!game) {
+      return "game not found";
+    }
+    if (game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+    if (!player) {
+      return "player not owned";
+    }
+    if (player.state === PlayerState.BANKRUPT) {
+      return player.name + " is bankrupt";
+    }
+
+    const state = game.squareState.find(
+      (p: SquareGameData) => p.squareId === squareId
+    );
+
+    if (!state) {
+      return "property not owned";
+    }
+    if (state.isMortgaged) {
+      return "property is mortgaged, you have to redeem it before building/selling";
+    }
+
+    const ownerId = new mongoose.Types.ObjectId(state.owner);
+    if (!userId.equals(ownerId)) {
+      return "you are not the owner";
+    }
+
+    if (!doesOwnAllPropertiesInGroup(game, squareId, userId)) {
+      return "you cant sell, you have to own all properties in the group";
+    }
+
+    if (state.numHouses <= 0) {
+      return "no houses to sell";
+    }
+
+    if (!areHousesEven(game, squareId, false)) {
+      return "You must sell evenly";
+    }
+
+    state.numHouses -= 1;
+    if (state.houseCost) {
+      player.money += MoneyCalculator.getSellPriceForHouse(state);
+    }
+
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+
+    await game.save();
+
+    return "";
+  }
+
+
+
 
   public static getSquareName(
     gameDoc: GameInstanceDocument,
