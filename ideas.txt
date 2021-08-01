@@ -2,11 +2,6 @@ when taking action like roll, complete turn, if err msg comes back like 'not you
 computer players
 
 
-do something for case when its your turn and you have negative $, need to sell something. 
- but when turn over, game automatically makes you lose. instead need to sell a random house if yo have it, or mortgage something
-
-
-
 DEPLOYMENT
 git remote add dokku dokku@165.227.201.218:rentday
 git push dokku master

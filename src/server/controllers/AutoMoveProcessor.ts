@@ -13,6 +13,9 @@ import { DiceRoll } from "../../core/types/DiceRoll";
 import { GameProcessor } from "./GameProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { maxTimeoutsAllowed } from "../../core/constants";
+import { SquareGameData } from "../../core/types/SquareGameData";
+import { areIdsEqual } from "./helpers";
+import { PropertyProcessor } from "./PropertyProcessor";
 
 export class AutoMoveProcessor {
   private gameId: mongoose.Types.ObjectId;
@@ -77,6 +80,16 @@ export class AutoMoveProcessor {
     }
 
     if (this.player.money < 0) {
+      if(this.player.totalAssets <= 0) {
+        await GameProcessor.bankruptPlayer(this.game, this.game.nextPlayerToAct);
+        await this.game.save();
+        return "";
+      } else {        
+        await this.autoSell();
+      }      
+    }
+
+    if (this.player.money < 0 || this.player.totalAssets <= 0) {
       await GameProcessor.bankruptPlayer(this.game, this.game.nextPlayerToAct);
       await this.game.save();
       return "";
@@ -119,4 +132,92 @@ export class AutoMoveProcessor {
     );
     return await processor.autoBid();
   }
+
+
+  private async autoSell(): Promise<void> {
+
+    //TODO have to auto sell houses/ mortgage properties
+
+    while(this.player!.money < 0) {
+      const sold = await this.tryToSellAHouse();
+      if(!sold) {
+        break;
+      }
+    }
+
+    while(this.player!.money < 0) {
+      const mortgaged = await this.tryToMortgageProperty();
+      if(!mortgaged) {
+        break;
+      }
+    }
+
+
+  }
+
+
+  private async tryToSellAHouse(): Promise<boolean> {    
+    
+      const playerOwnedSquaresWithHouses: SquareGameData[] = this.game!.squareState.filter(
+        (s: SquareGameData) => {
+          return (
+            s.owner &&
+            areIdsEqual(s.owner, this.player!._id) &&
+            s.numHouses > 0 &&
+            s.electricityCost &&
+            s.electricityCost > 0 &&
+            !s.isMortgaged
+          );
+        }
+      );
+
+      if(playerOwnedSquaresWithHouses.length === 0) {
+        return false;
+      }
+
+      
+      const playerId = new mongoose.Types.ObjectId(this.player!._id);
+      const squareId = playerOwnedSquaresWithHouses[0].squareId;
+      const processor = new PropertyProcessor(squareId, this.gameId, playerId);
+      const errMsg = await processor.sellHouse();
+
+      if (errMsg && errMsg.length > 0) {
+        return false;
+      }
+
+      return true;
+  }
+
+
+  private async tryToMortgageProperty(): Promise<boolean> {    
+    
+    const playerOwnedSquares: SquareGameData[] = this.game!.squareState.filter(
+      (s: SquareGameData) => {
+        return (
+          s.owner &&
+          areIdsEqual(s.owner, this.player!._id) &&
+          !s.isMortgaged &&
+          s.mortgageValue &&
+          s.mortgageValue > 0
+        );
+      }
+    );
+
+    if(playerOwnedSquares.length === 0) {
+      return false;
+    }
+
+    
+    const playerId = new mongoose.Types.ObjectId(this.player!._id);    
+    const squareId = playerOwnedSquares[0].squareId;
+    const processor = new PropertyProcessor(squareId, this.gameId, playerId);
+    const errMsg = await processor.mortgageProperty();
+
+    if (errMsg && errMsg.length > 0) {
+      return false;
+    }
+
+    return true;
+}
+
 }
