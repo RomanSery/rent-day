@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { Button, Menu, MenuItem } from "@material-ui/core";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
 import { useHistory } from "react-router-dom";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
@@ -101,9 +101,29 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
     });
   };
 
+  const onResign = async () => {
+    resignCurrGame(socketService, () => {
+      if (gameState) {
+        socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " has resigned");
+      }      
+    });
+  };
+
   const isMyTurn = () => {
     const uid = getMyUserId();
     return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
+  }
+
+
+  const stillActivePlayer = () => {
+    const myPlayer = getMyPlayer();
+    if (!myPlayer) {
+      return false;
+    }
+    if (myPlayer.state !== PlayerState.BANKRUPT) {
+      return true;
+    }
+    return false;
   }
 
   const canCompleteTurn = (): boolean => {
@@ -283,7 +303,8 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
           <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
           <MenuItem onClick={onViewHelp}>Help</MenuItem>
-          {myTurn && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to quit the game?')) { onLeaveGame(); } }}>Give Up</MenuItem>}
+          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to resign?')) { onResign(); } }}>Give Up</MenuItem>}
+          {!stillActivePlayer() && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to leave the game?')) { onLeaveGame(); } }}>Leave</MenuItem>}
         </Menu>
 
       </React.Fragment>

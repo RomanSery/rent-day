@@ -86,6 +86,33 @@ export const leaveCurrentGameIfJoined = async (
     .catch(handleApiError);
 };
 
+export const resignCurrGame = async (
+  socketService: SocketService | null,
+  callback: () => void
+) => {
+  if (!hasJoinedGame()) {
+    clearMyGameInfo();
+    return callback();
+  }
+
+  const context: GameContext = getGameContextFromLocalStorage();
+  const gameId = getMyGameId();
+
+  await API.post("resignGame", {
+    gameId: gameId,
+    userId: getMyUserId(),
+    context,
+  })
+    .then(function (response) {
+      if (socketService) {
+        socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameId);
+      }
+      clearMyGameInfo();
+      return callback();
+    })
+    .catch(handleApiError);
+};
+
 export const setCurrSessionInfo = (data: any): void => {
   sessionStorage.setItem(StorageConstants.USER_ID, data.id);
   sessionStorage.setItem(StorageConstants.PLAYER_NAME, data.userName);

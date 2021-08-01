@@ -2,9 +2,6 @@ when taking action like roll, complete turn, if err msg comes back like 'not you
 computer players
 
 
-when you quit instead of letting game bankrupt you, you are forced out of the game and cant watch.  Add optin to quit, but keep watching.  or quit and leave game
-
-
 do something for case when its your turn and you have negative $, need to sell something. 
  but when turn over, game automatically makes you lose. instead need to sell a random house if yo have it, or mortgage something
 

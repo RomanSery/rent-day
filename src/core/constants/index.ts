@@ -17,7 +17,7 @@ export const corruptionAdjustment: number = 5;
 export const muggingChance: number = 15;
 export const muggingAmount: number = 200;
 
-export const turnTimeLimit: number = 60;
+export const turnTimeLimit: number = 80;
 export const auctionTimeLimit: number = 70;
 export const maxTimeoutsAllowed: number = 3;
 

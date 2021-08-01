@@ -85,6 +85,7 @@ app.post("/api/getAuction", actions.getAuction);
 app.post("/api/getLotto", actions.getLotto);
 app.post("/api/getGameStatus", actions.getGameStatus);
 app.post("/api/joinGame", actions.joinGame);
+app.post("/api/resignGame", actions.resignGame);
 app.post("/api/leaveGame", actions.leaveGame);
 app.post("/api/createGame", actions.createGame);
 

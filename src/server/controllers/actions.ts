@@ -216,6 +216,27 @@ export const leaveGame = async (req: Request, res: Response) => {
   res.json({ status: "success" });
 };
 
+export const resignGame = async (req: Request, res: Response) => {
+  await check("gameId", "GameId missing").notEmpty().run(req);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send(errors);
+  }
+
+  const userId = getVerifiedUserId(req);
+  if (userId == null) {
+    return res.status(400).send("Invalid auth token");
+  }
+
+  const gameId = req.body.gameId;
+
+  const resign = new GameProcessor();
+  await resign.resignGame(gameId, userId);
+
+  res.json({ status: "success" });
+};
+
 export const getLotto = async (req: Request, res: Response) => {
   await check("lottoId", "Missing lottoId").notEmpty().run(req);
   const errors = validationResult(req);

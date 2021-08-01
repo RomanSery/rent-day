@@ -413,6 +413,24 @@ export class GameProcessor {
     await PlayerProcessor.updateLossesAndLeaveGame(game, userId);
   }
 
+  public async resignGame(
+    gameId: mongoose.Types.ObjectId,
+    userId: mongoose.Types.ObjectId
+  ): Promise<void> {
+    let game: GameInstanceDocument | null = await GameInstance.findById(gameId);
+    if (game == null) {
+      return;
+    }
+
+    const status: GameStatus = game.status;
+
+    if (status === GameStatus.ACTIVE) {
+      await GameProcessor.bankruptPlayer(game, userId);
+    }
+
+    game.save();
+  }
+
   public static async bankruptPlayer(
     game: GameInstanceDocument,
     userId: mongoose.Types.ObjectId
@@ -430,6 +448,10 @@ export class GameProcessor {
     );
 
     if (!losser) {
+      return;
+    }
+
+    if(losser.state === PlayerState.BANKRUPT) {
       return;
     }
 
