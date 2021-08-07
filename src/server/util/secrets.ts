@@ -2,12 +2,18 @@
 import logger from "./logger";
 import dotenv from "dotenv";
 
-logger.info("environment: " + process.env.NODE_ENV);
+logger.debug("environment: " + process.env.NODE_ENV);
 
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   logger.debug("Using .env file to supply config environment variables");
   dotenv.config({
     path: "src/server/.env",
+    debug: true,
+  });
+} else if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
+  logger.debug("Using .env.production file to supply config environment variables");
+  dotenv.config({
+    path: "src/server/.env.production",
     debug: true,
   });
 }
