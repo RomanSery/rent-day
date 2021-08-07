@@ -12,13 +12,13 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   });
 }
 
-export const MONGO_URL: string = process.env.MONGO_URL!;
+export const DB_CONN_STR: string = process.env.DB_CONN_STR!;
 export const IS_DEV: boolean =
   !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-if (!MONGO_URL) {
+if (!DB_CONN_STR) {
   logger.error(
-    "No mongo connection string. Set MONGO_URL environment variable."
+    "No mongo connection string. Set DB_CONN_STR environment variable."
   );
   process.exit(1);
 }

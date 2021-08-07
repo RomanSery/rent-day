@@ -12,10 +12,11 @@ dokku mongo:export rentdaydb > rentdaydb.gz
 restore
 mongorestore --host localhost:27017 --gzip --archive=C:\roman_db\rentdaydb.gz --db rentdaydb
 
+
 dokku mongo:expose rentdaydb 20017 20018 20019 20020
 
 npm run-script dev
 
 local config /server/.evn
-MONGO_URL=mongodb://localhost:27017/monopoly
+DB_CONN_STR=mongodb://localhost:27017/monopoly
 PORT=4000

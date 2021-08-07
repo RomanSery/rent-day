@@ -17,6 +17,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+.env.production
 .eslintcache
 
 npm-debug.log*
@@ -25,4 +26,5 @@ yarn-error.log*
 
 /dist
 src/server/.env
+src/server/.env.production
 debug.log

@@ -11,14 +11,14 @@ import * as actions from "./controllers/actions";
 import * as gameplay from "./controllers/gameplay";
 import * as authController from "./controllers/authController";
 import * as passportConfig from "./config/passport";
-import { IS_DEV, MONGO_URL } from "./util/secrets";
+import { IS_DEV, DB_CONN_STR } from "./util/secrets";
 import { COOKIE_NAME, COOKIE_SECRET } from "./util/secretConstants";
 
 // Create Express server
 const app = express();
 
 // Connect to MongoDB
-const mongoUrl: string = MONGO_URL;
+const mongoUrl: string = DB_CONN_STR;
 
 mongoose
   .connect(mongoUrl, {
