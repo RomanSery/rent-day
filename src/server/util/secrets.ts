@@ -10,7 +10,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
     path: "src/server/.env",
     debug: true,
   });
-} else if (process.env.NODE_ENV && process.env.NODE_ENV === "production") {
+} else {
   logger.debug("Using .env.production file to supply config environment variables");
   dotenv.config({
     path: "src/server/.env.production",
