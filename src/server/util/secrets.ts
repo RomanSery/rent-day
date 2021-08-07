@@ -2,7 +2,7 @@
 import logger from "./logger";
 //import dotenv from "dotenv";
 
-logger.debug("environment: " + process.env.NODE_ENV);
+console.log("environment: " + process.env.NODE_ENV);
 
 /*
 if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
@@ -27,3 +27,5 @@ if (!DB_CONN_STR) {
   );
   process.exit(1);
 }
+
+console.log(DB_CONN_STR);
