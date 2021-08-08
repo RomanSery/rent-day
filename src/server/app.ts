@@ -26,7 +26,7 @@ mongoose
     useCreateIndex: true,
     useUnifiedTopology: true,
     ssl: true,
-    sslValidate: false,
+    //sslValidate: false,
     authSource: 'admin'
   })
   .then(() => {
