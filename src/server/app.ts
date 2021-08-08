@@ -25,6 +25,8 @@ mongoose
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
+    ssl: true,
+    sslValidate: false
   })
   .then(() => {
     console.log("MongoDB connected");

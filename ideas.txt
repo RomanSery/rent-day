@@ -3,8 +3,8 @@ computer players
 
 
 DEPLOYMENT
-git remote add dokku dokku@165.227.201.218:rentday
-git push dokku master
+git remote add dokku2 dokku@159.65.252.252:rentday
+git push dokku2 master
 
 export
 dokku mongo:export rentdaydb > rentdaydb.gz
