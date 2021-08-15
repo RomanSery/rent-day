@@ -1,6 +1,8 @@
 when taking action like roll, complete turn, if err msg comes back like 'not your turn', means UI is out of sync, need to do update_game_state
 computer players
 
+name = fat cats
+dont change the url for now
 
 DEPLOYMENT
 git remote add dokku2 dokku@159.65.252.252:rentday

@@ -3,7 +3,7 @@ document.getElementById('fb-share-button').onclick = function() {
     FB.ui({
       display: 'popup',
       method: 'share',
-      quote: 'Lets play a game of Rent Day',
+      quote: 'Are you a fat cat? Lets play',
       href: window.location.href,
     }, function(response){});
   };

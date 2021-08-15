@@ -195,7 +195,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
 
   const getShareTitle = () => {
-    return "Let's play a game of Rent Day";
+    return "Are you a Fat Cat? Let's play!";
   };
 
   return (
@@ -299,7 +299,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
         <div className="social-cont">
           <div className="social-share-cont">
-            <Share url={shareUrl} options={{ size: "large", hashtags: "rentday", text: getShareTitle() }} />
+            <Share url={shareUrl} options={{ size: "large", hashtags: "fatcats", text: getShareTitle() }} />
           </div>
           <div className="social-share-cont">            
             <div id="fb-share-button">

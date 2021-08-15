@@ -147,9 +147,9 @@ export const App: React.FC = () => {
     return (
       <React.Fragment>
         <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="xs" className="home-page-options">
-            <Typography component="h2" variant="h5">Rent Day</Typography>
+        <StaticBoard>          
+          <Container maxWidth="xs" className="home-page-options">            
+            <Typography component="h2" variant="h5">Fat Cats</Typography>
             <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
             <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
             <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
@@ -175,7 +175,7 @@ export const App: React.FC = () => {
         <CssBaseline />
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
-            <Typography component="h2" variant="h5">Rent Day</Typography>
+            <Typography component="h2" variant="h5">Fat Cats</Typography>
 
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>

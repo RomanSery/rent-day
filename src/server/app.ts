@@ -20,7 +20,25 @@ const app = express();
 // Connect to MongoDB
 const mongoUrl: string = DB_CONN_STR;
 
-mongoose
+if (process.env.NODE_ENV === "development") {
+  mongoose
+  .connect(mongoUrl, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true    
+  })
+  .then(() => {
+    console.log("MongoDB connected");
+  })
+  .catch((err) => {
+    console.log(
+      `MongoDB connection error. Please make sure MongoDB is running. ${err}`
+    );
+    process.exit();
+  });
+} else {
+
+  mongoose
   .connect(mongoUrl, {
     useNewUrlParser: true,
     useCreateIndex: true,
@@ -38,6 +56,10 @@ mongoose
     );
     process.exit();
   });
+}
+
+
+
 
 // Express configuration
 app.set("port", process.env.PORT || 5000);

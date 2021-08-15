@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import logger from "./logger";
-//import dotenv from "dotenv";
+import dotenv from "dotenv";
 
 console.log("environment: " + process.env.NODE_ENV);
 
-/*
-if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+
+if (process.env.NODE_ENV === "development") {
   logger.debug("Using .env file to supply config environment variables");
   dotenv.config({
     path: "src/server/.env",
@@ -13,7 +13,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
   });
 } else {
   
-}*/
+}
 
 
 export const DB_CONN_STR: string = process.env.DB_CONN_STR!;
