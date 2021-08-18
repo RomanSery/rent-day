@@ -14,7 +14,7 @@ import { DisplayAllGames } from "./join/DisplayAllGames";
 import { DisplayAllPlayers } from "./join/DisplayAllPlayers";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
-import { Button, Container, Typography } from "@material-ui/core";
+import { Button, Container } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
 import { SignUpPage } from "./auth/SignUpPage";
 import { LoginPage } from "./auth/LoginPage";
@@ -148,15 +148,24 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>          
-          <Container maxWidth="xs" className="home-page-options">            
-            <Typography component="h2" variant="h5">Fat Cats</Typography>
+          
+          
+          <Container maxWidth="xs" className="home-page-options">                        
+            <div>
+              <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+            </div>
+
             <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
             <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
             <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
             <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
             <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
-          </Container>
+            <div>
+              <img src="/fat-cat1.png" alt="Fat Cats"></img>
+            </div>
+          </Container>          
+          
         </StaticBoard>
       </React.Fragment>
     );
@@ -175,12 +184,17 @@ export const App: React.FC = () => {
         <CssBaseline />
         <StaticBoard>
           <Container maxWidth="xs" className="home-page-options">
-            <Typography component="h2" variant="h5">Fat Cats</Typography>
+            <div>
+              <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+            </div>
 
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
             <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
+            <div>
+              <img src="/fat-cat1.png" alt="Fat Cats"></img>
+            </div>
           </Container>
         </StaticBoard>
       </React.Fragment>
