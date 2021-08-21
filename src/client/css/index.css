@@ -11,10 +11,25 @@ body {
   height: 100%;
 }
 
+.home-page-cont {
+  display: flex;  
+  align-items: flex-start;
+  flex-grow: 3;
+}
+
 .home-page-options {
   align-items: center;
   flex-direction: row;
+  display: flex;  
+  margin-top: 3%;
 }
+
+.home-page-left {
+  text-align: left;
+  font-size: 110%;
+}
+
+
 
 .skill-descriptions {
   text-align: left;

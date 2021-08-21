@@ -148,24 +148,36 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>          
-          
-          
-          <Container maxWidth="xs" className="home-page-options">                        
-            <div>
-              <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
-            </div>
 
-            <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
-            <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
-            <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
-            <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
-            <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
-            <div>
-              <img src="/fat-cat1.png" alt="Fat Cats"></img>
-            </div>
-          </Container>          
-          
+          <div className="home-page-cont">
+            
+            <Container maxWidth="xs" className="home-page-options">
+              <div>
+                <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+              </div>
+
+              <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
+              <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
+              <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
+              <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
+              <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
+              <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
+              <div>
+                <img src="/fat-cat1.png" alt="Fat Cats"></img>
+              </div>
+            </Container>
+            
+            <Container maxWidth="xs" className="home-page-options home-page-left">                
+              <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
+              <hr />
+              <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>           
+              <hr />
+              <p>No more lucky dice rolls, you must use your financial witts to bid smartly <strong>in the new silent auction system.</strong> </p>
+              <hr />
+              <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
+            </Container>
+        </div>
+                    
         </StaticBoard>
       </React.Fragment>
     );
@@ -183,19 +195,34 @@ export const App: React.FC = () => {
       <React.Fragment>
         <CssBaseline />
         <StaticBoard>
-          <Container maxWidth="xs" className="home-page-options">
-            <div>
-              <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
-            </div>
 
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
-            <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
-            <div>
-              <img src="/fat-cat1.png" alt="Fat Cats"></img>
-            </div>
-          </Container>
+          <div className="home-page-cont">
+          
+              <Container maxWidth="xs" className="home-page-options">
+                <div>
+                  <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+                </div>
+
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
+                <div>
+                  <img src="/fat-cat1.png" alt="Fat Cats"></img>
+                </div>
+              </Container>
+              
+              <Container maxWidth="xs" className="home-page-options home-page-left">                
+                <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
+                <hr />
+                <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>           
+                <hr />
+                <p>No more lucky dice rolls, you must use your financial witts to bid smartly <strong>in the new silent auction system.</strong> </p>
+                <hr />
+                <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
+              </Container>
+          </div>
+
         </StaticBoard>
       </React.Fragment>
     );

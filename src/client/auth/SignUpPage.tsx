@@ -47,6 +47,10 @@ export const SignUpPage: React.FC<Props> = () => {
     <React.Fragment>
 
       <Typography component="h2" variant="h5">Create Account</Typography>
+      
+      <p>
+        <strong>Start playing for free!</strong> - No need to validate your email address
+      </p>
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
