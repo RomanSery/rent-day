@@ -23,7 +23,7 @@ import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
 import { QueryClient, QueryClientProvider } from "react-query";
-
+import ReactGA from 'react-ga';
 
 export const App: React.FC = () => {
 
@@ -31,6 +31,20 @@ export const App: React.FC = () => {
   const location = useLocation();
   const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
   const wsUri = isDev ? "ws://localhost:4000" : "https://rentday.coderdreams.com";
+
+
+
+
+  React.useEffect(() => {
+
+    ReactGA.initialize('G-QQH5PXC14R', {
+      debug: true,
+      titleCase: false
+    });
+
+    ReactGA.pageview(location.pathname + location.search);  
+
+  }, [location]);
 
 
   const getGameId = () => {
@@ -203,10 +217,41 @@ export const App: React.FC = () => {
                   <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
                 </div>
 
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/newuser") }}> CREATE Account</Button>
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/login") }}> LOG IN</Button>
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/help") }}> HELP / RULES</Button>
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={() => { history.push("/contact") }}> CONTACT US</Button>
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Create Account'
+                      });
+                      history.push("/newuser");
+                  }}> CREATE Account</Button>
+
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Log In'
+                      });
+                      history.push("/login");
+                  }}> LOG IN</Button>
+
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Help'
+                      });
+                      history.push("/help");
+                  }}> HELP / RULES</Button>
+
+                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Contact Us'
+                      });
+                      history.push("/contact");
+                  }}> CONTACT US</Button>
                 <div>
                   <img src="/fat-cat1.png" alt="Fat Cats"></img>
                 </div>
@@ -369,7 +414,7 @@ export const App: React.FC = () => {
   };
 
 
-  return (
+  return (    
     <Switch>
       <Route exact path="/" component={withRouter(Home)} />
 
