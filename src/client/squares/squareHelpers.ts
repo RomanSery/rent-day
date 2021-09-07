@@ -1,5 +1,7 @@
+import { NyThemeData } from "../../core/config/NyTheme";
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
+import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { areObjectIdsEqual } from "../helpers";
 
 export const getSquareTxt = (
@@ -9,6 +11,12 @@ export const getSquareTxt = (
   if (gameInfo && gameInfo.theme) {
     return gameInfo.theme[squareId].name;
   }
+
+  const data: SquareThemeData | undefined = NyThemeData.get(squareId);
+  if (data != null) {
+    return data.name;
+  }
+
   return "";
 };
 
