@@ -37,7 +37,7 @@ export const App: React.FC = () => {
 
   React.useEffect(() => {
 
-    ReactGA.initialize('G-QQH5PXC14R', {
+    ReactGA.initialize('UA-207015832-1', {
       debug: false,
       titleCase: false
     });
