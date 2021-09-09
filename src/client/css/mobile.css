@@ -7,4 +7,41 @@
   .fat-cat-logo {
     display: none !important;
   }
+
+  .square.chance .square-name {
+    display: none !important;
+  }
+
+  .square.lotto .square-name {
+    display: none !important;
+  }
+
+  .square-title {
+    overflow: hidden !important;
+  }
+
+}
+
+
+@media (max-width: 450px) {
+  
+  .square-name {
+    font-size: 50%;
+  }
+
+  .square.payday .square-name {
+    display: none !important;
+  }
+
+  .square.central-park .square-name {
+    display: none !important;
+  }
+
+  .square-title {
+    overflow: hidden !important;
+  }
+
+  .square.train-station .square-name {
+    display: none !important;
+  }
 }
