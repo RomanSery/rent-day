@@ -176,7 +176,7 @@ export const App: React.FC = () => {
               <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
               <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
               <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
-              <div>
+              <div className="fat-cat-logo">
                 <img src="/fat-cat1.png" alt="Fat Cats"></img>
               </div>
             </Container>
@@ -252,7 +252,7 @@ export const App: React.FC = () => {
                       });
                       history.push("/contact");
                   }}> CONTACT US</Button>
-                <div>
+                <div className="fat-cat-logo">
                   <img src="/fat-cat1.png" alt="Fat Cats"></img>
                 </div>
               </Container>

@@ -1,0 +1,10 @@
+
+@media (max-width: 768px) {
+  .home-page-left {
+    display: none !important;
+  }  
+
+  .fat-cat-logo {
+    display: none !important;
+  }
+}
