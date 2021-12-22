@@ -97,6 +97,11 @@ export const App: React.FC = () => {
       marginTop: 10,
       marginBottom: 10,
     },
+    opt_forumn: {
+      marginTop: 10,
+      marginBottom: 10,
+      backgroundColor: "green"
+    },
   });
 
 
@@ -175,6 +180,16 @@ export const App: React.FC = () => {
               <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
               <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
               <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
+
+              <Button fullWidth variant="contained" className={classes.opt_forumn} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Forum'
+                      });
+                      window.location.href = "https://www.coderdreams.com/fatcats/";
+                  }}> FORUMS</Button>
+
               <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
               <div className="fat-cat-logo">
                 <img src="/fat-cat1.png" alt="Fat Cats"></img>
@@ -252,6 +267,17 @@ export const App: React.FC = () => {
                       });
                       history.push("/contact");
                   }}> CONTACT US</Button>
+
+
+                <Button fullWidth variant="contained" className={classes.opt_forumn} color="primary" 
+                  onClick={() => { 
+                      ReactGA.event({
+                        category: 'BtnClicks',
+                        action: 'Go to Forum'
+                      });
+                      window.location.href = "https://www.coderdreams.com/fatcats/";
+                  }}> FORUMS</Button>
+
                 <div className="fat-cat-logo">
                   <img src="/fat-cat1.png" alt="Fat Cats"></img>
                 </div>
