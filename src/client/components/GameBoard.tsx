@@ -8,7 +8,7 @@ import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { Snackbar } from "@material-ui/core";
+import { Snackbar } from "@mui/material";
 import { GamePieces } from "./GamePieces";
 import _ from "lodash";
 import { ChanceEventDialog } from "../dialogs/ChanceEventDialog";
@@ -120,7 +120,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
 
-  const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
+  const closeSnack = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }

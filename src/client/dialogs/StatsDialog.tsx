@@ -1,11 +1,11 @@
 import React from "react";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
 import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
-import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowModel, GridRenderCellParams } from '@mui/x-data-grid';
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHandshake } from "@fortawesome/free-solid-svg-icons";
@@ -24,15 +24,15 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
   const setStatsViewOpen = useGameStateStore(state => state.setStatsViewOpen);
 
 
-  const getPlayerById = (params: ValueFormatterParams) => {
+  const getPlayerById = (params: GridRenderCellParams) => {
     if (gameState) {
-      const playerId = params.getValue('id')?.toLocaleString();
+      const playerId = String(params.row.id);
       return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
     }
     return null;
   }
 
-  const canOfferTrade = (params: ValueFormatterParams) => {
+  const canOfferTrade = (params: GridRenderCellParams) => {
     const uid = getMyUserId();
     const player = getPlayerById(params);
     if (player && areObjectIdsEqual(player._id, uid)) {
@@ -44,7 +44,7 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
     return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
   }
 
-  const getColorStyle = (params: ValueFormatterParams): React.CSSProperties => {
+  const getColorStyle = (params: GridRenderCellParams): React.CSSProperties => {
     const player = getPlayerById(params);
     if (player) {
       return { color: player.color };
@@ -53,15 +53,14 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
   };
 
   const columns: GridColDef[] = [
-    { field: 'id', hide: true },
     {
       field: 'playerName', headerName: 'Player', type: 'string', flex: 1,
-      renderCell: (params: ValueFormatterParams) => (
+      renderCell: (params: GridRenderCellParams) => (
         <React.Fragment>
           <div style={getColorStyle(params)}>
             <FontAwesomeIcon icon={getIconProp(getPlayerById(params)!.type)} size="1x" color={getPlayerById(params)!.color} />
             &nbsp;&nbsp;
-            {params.getValue('playerName')}
+            {params.row.playerName}
           </div>
         </React.Fragment>
       )
@@ -71,15 +70,14 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
       headerName: 'Money',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     },
     {
       field: 'taxPerTurn',
       headerName: 'Tax',
       type: 'number',
       flex: 0.5,
-      renderCell: (params: ValueFormatterParams) => (
+      renderCell: (params: GridRenderCellParams) => (
         <div style={{ textAlign: "right", width: "100%" }}>
           {getTaxTooltip(gameState, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
         </div>
@@ -90,7 +88,7 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
       headerName: 'Electric',
       type: 'number',
       flex: 0.5,
-      renderCell: (params: ValueFormatterParams) => (
+      renderCell: (params: GridRenderCellParams) => (
         <div style={{ textAlign: "right", width: "100%" }}>
           {getElectricityTooltip(gameState, getPlayerById(params)!, dollarFormatter.format((params.value as number)))}
         </div>
@@ -101,30 +99,27 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
       headerName: 'Assets',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     },
     {
       field: 'mortgageableValue',
       headerName: 'Mortgageable',
       type: 'number',
       flex: 1,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     },
     {
       field: 'redeemableValue',
       headerName: 'Redeemable',
       type: 'number',
       flex: 1,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     },
     {
       field: 'trade',
       headerName: 'Trade',
       flex: 0.5,
-      renderCell: (params: ValueFormatterParams) => (
+      renderCell: (params: GridRenderCellParams) => (
         <React.Fragment>
           {canOfferTrade(params) ? <FontAwesomeIcon icon={faHandshake} onClick={() => { tradeWithPlayer(getPlayerById(params)!); setStatsViewOpen(false); }} /> : null}
         </React.Fragment>
@@ -161,9 +156,9 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
       <DialogTitle id="stats-dialog-title">Stats</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
-          <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"
+          <DataGrid rows={getDataRows()} columns={columns} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} pageSizeOptions={[10]} autoHeight={true} density="compact"
             disableColumnMenu={true} disableColumnSelector={true}
-            disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
+            disableRowSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
         </div>
 
       </DialogContent>

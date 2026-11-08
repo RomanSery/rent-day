@@ -26,7 +26,7 @@ export const PropertyDisplay: React.FC<Props> = ({ id }) => {
         return (
             <motion.div animate={{ scale: 1.1 }} transition={{
                 duration: 1.0,
-                loop: Infinity,
+                repeat: Infinity,
                 repeatDelay: 0
             }} className="square-name">
                 <div className="square-title" style={getSquareStyle(gameState, id)}>

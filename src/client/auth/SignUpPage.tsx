@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
-import { Button, makeStyles, TextField, Typography } from "@material-ui/core";
+import { Button, TextField, Typography } from "@mui/material";
 import { Link, useHistory } from "react-router-dom";
 import { handleApiError, setCurrSessionInfo } from "../helpers";
 import _ from "lodash/fp";
@@ -21,7 +21,13 @@ type Inputs = {
 export const SignUpPage: React.FC<Props> = () => {
 
   const history = useHistory();
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+  const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
+
+  // react-hook-form 7: wire register() into MUI TextField via inputRef
+  const field = (name: keyof Inputs, rules?: Parameters<typeof register>[1]) => {
+    const { ref, ...rest } = register(name, rules);
+    return { inputRef: ref, ...rest };
+  };
 
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -34,15 +40,6 @@ export const SignUpPage: React.FC<Props> = () => {
   };
 
 
-  const createStyles = makeStyles({
-    opt: {
-      marginTop: 15,
-      marginBottom: 15
-    },
-  });
-
-  const classes = createStyles();
-
   return (
     <React.Fragment>
 
@@ -54,14 +51,14 @@ export const SignUpPage: React.FC<Props> = () => {
 
       <form onSubmit={handleSubmit(onSubmit)}>
 
-        <TextField label="Email" fullWidth={true} name="email" id="email" required={true}
-          inputRef={register({ required: true })} />
+        <TextField label="Email" fullWidth={true} id="email" required={true}
+          {...field("email", { required: true })} />
         {_.get("email.type", errors) === "required" && (
           <p className="field-error">Email is required</p>
         )}
 
-        <TextField label="User name" fullWidth={true} name="username" id="username" required={true}
-          inputRef={register({ required: true, maxLength: 10, minLength: 4 })} />
+        <TextField label="User name" fullWidth={true} id="username" required={true}
+          {...field("username", { required: true, maxLength: 10, minLength: 4 })} />
         {_.get("username.type", errors) === "required" && (
           <p className="field-error">User name is required</p>
         )}
@@ -72,14 +69,14 @@ export const SignUpPage: React.FC<Props> = () => {
           <p className="field-error">User name must be at least 4 characters</p>
         )}
 
-        <TextField label="Password" type="password" fullWidth={true} name="password" id="password" required={true}
-          inputRef={register({ required: true })} />
+        <TextField label="Password" type="password" fullWidth={true} id="password" required={true}
+          {...field("password", { required: true })} />
         {_.get("password.type", errors) === "required" && (
           <p className="field-error">Password is required</p>
         )}
 
-        <TextField label="Confirm Password" type="password" fullWidth={true} name="confirmPassword" id="confirmPassword" required={true}
-          inputRef={register({ required: true })} />
+        <TextField label="Confirm Password" type="password" fullWidth={true} id="confirmPassword" required={true}
+          {...field("confirmPassword", { required: true })} />
         {_.get("confirmPassword.type", errors) === "required" && (
           <p className="field-error">Password is required</p>
         )}
@@ -87,7 +84,7 @@ export const SignUpPage: React.FC<Props> = () => {
 
 
 
-        <Button variant="contained" className={classes.opt} color="primary" type="submit">Create</Button>
+        <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit">Create</Button>
       </form>
 
       <br />

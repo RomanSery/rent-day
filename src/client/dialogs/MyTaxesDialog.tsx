@@ -1,11 +1,11 @@
 import React from "react";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
 import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
-import { DataGrid, GridColDef, GridRowsProp, GridRowModel, ValueFormatterParams } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@mui/x-data-grid';
 import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
@@ -19,7 +19,6 @@ export const MyTaxesDialog: React.FC<Props> = () => {
   const setTaxesViewOpen = useGameStateStore(state => state.setTaxesViewOpen);
 
   const columns: GridColDef[] = [
-    { field: 'id', hide: true },
     {
       field: 'propertyName', headerName: 'Property', type: 'string', flex: 0.5
     },
@@ -28,16 +27,14 @@ export const MyTaxesDialog: React.FC<Props> = () => {
       headerName: 'Tax',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     },
     {
       field: 'adjustedTax',
       headerName: 'Adjusted Tax',
       type: 'number',
       flex: 0.5,
-      valueFormatter: (params: ValueFormatterParams) =>
-        dollarFormatter.format((params.value as number)),
+      valueFormatter: (value: number) => dollarFormatter.format(value),
     }
   ];
 
@@ -82,9 +79,9 @@ export const MyTaxesDialog: React.FC<Props> = () => {
       <DialogTitle id="taxes-dialog-title">My Taxes</DialogTitle>
       <DialogContent>
         <div style={{ height: 400, width: '100%' }}>
-          <DataGrid rows={getDataRows()} columns={columns} pageSize={10} autoHeight={true} density="compact"
+          <DataGrid rows={getDataRows()} columns={columns} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} pageSizeOptions={[10]} autoHeight={true} density="compact"
             disableColumnMenu={true} disableColumnSelector={true}
-            disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
+            disableRowSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />
         </div>
 
       </DialogContent>

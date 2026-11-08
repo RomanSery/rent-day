@@ -1,19 +1,19 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import API from '../api';
-import { Button } from "@material-ui/core";
+import { Button } from "@mui/material";
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 import { GameToJoin } from "../../core/types/GameToJoin";
 import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
 
@@ -32,8 +32,10 @@ export const DisplayAllGames: React.FC<Props> = () => {
     });
   };
 
-  const gamesQuery = useQuery<GameToJoin[], Error>("getAllGames",
-    () => API.post("findGames", { context }).then(function (response) { return response.data.games; }));
+  const gamesQuery = useQuery<GameToJoin[], Error>({
+    queryKey: ["getAllGames"],
+    queryFn: () => API.post("findGames", { context }).then(function (response) { return response.data.games; }),
+  });
 
 
 

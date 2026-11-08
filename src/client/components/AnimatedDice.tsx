@@ -23,7 +23,7 @@ export const AnimatedDice: React.FC<Props> = () => {
           }}
           transition={{
             duration: 0.5,
-            loop: 5,
+            repeat: 5,
             repeatDelay: 0
           }}
           style={{ transformOrigin: "center" }}
@@ -37,7 +37,7 @@ export const AnimatedDice: React.FC<Props> = () => {
           }}
           transition={{
             duration: 0.5,
-            loop: 5,
+            repeat: 5,
             repeatDelay: 0
           }}
           style={{ transformOrigin: "center" }}

@@ -1,22 +1,23 @@
 import React from "react";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
 import API from '../api';
 import { getGameContextFromLocalStorage, getMyUserId, handleApiError, areObjectIdsEqual, getIconProp } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
-import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import Checkbox from '@material-ui/core/Checkbox';
-import Paper from '@material-ui/core/Paper';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Checkbox from '@mui/material/Checkbox';
+import Paper from '@mui/material/Paper';
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { getSquareTxt } from "../squares/squareHelpers";
-import { ListSubheader, TextField } from "@material-ui/core";
+import { ListSubheader, TextField } from "@mui/material";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -179,12 +180,12 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
             const labelId = `transfer-list-item-${squareId}-label`;
 
             return (
-              <ListItem key={squareId} role="listitem" button onClick={handleToggle(mine, squareId)} className="trade-item">
+              <ListItemButton key={squareId} role="listitem" onClick={handleToggle(mine, squareId)} className="trade-item">
                 <ListItemIcon>
                   <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': labelId }} />
                 </ListItemIcon>
                 <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
-              </ListItem>
+              </ListItemButton>
             );
           })}
           <ListItem />
@@ -197,9 +198,9 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
     <Dialog fullWidth={true} maxWidth="sm" onClose={() => closeDialog()} aria-labelledby="offer-trade-dialog-title" open={offerTradeOpen}>
       <DialogTitle id="offer-trade-dialog-title">Trade</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
-          <Grid className="trade-left" item>{propertyList(true)}</Grid>
-          <Grid className="trade-right" item>{propertyList(false)}</Grid>
+        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+          <Grid className="trade-left">{propertyList(true)}</Grid>
+          <Grid className="trade-right">{propertyList(false)}</Grid>
         </Grid>
 
       </DialogContent>

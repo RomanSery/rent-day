@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 
-import CssBaseline from "@material-ui/core/CssBaseline";
+import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
@@ -14,16 +14,14 @@ import { DisplayAllGames } from "./join/DisplayAllGames";
 import { DisplayAllPlayers } from "./join/DisplayAllPlayers";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
-import { Button, Container } from "@material-ui/core";
-import { makeStyles } from "@material-ui/styles";
+import { Button, Container } from "@mui/material";
 import { SignUpPage } from "./auth/SignUpPage";
 import { LoginPage } from "./auth/LoginPage";
 import API from "./api";
 import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
-import { QueryClient, QueryClientProvider } from "react-query";
-import ReactGA from 'react-ga';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const App: React.FC = () => {
 
@@ -32,17 +30,6 @@ export const App: React.FC = () => {
 
 
 
-
-  React.useEffect(() => {
-
-    ReactGA.initialize('UA-207015832-1', {
-      debug: false,
-      titleCase: false
-    });
-
-    ReactGA.pageview(location.pathname + location.search);  
-
-  }, [location]);
 
 
   const getGameId = () => {
@@ -90,20 +77,6 @@ export const App: React.FC = () => {
 
 
 
-  const homeStyles = makeStyles({
-    opt: {
-      marginTop: 10,
-      marginBottom: 10,
-    },
-    opt_forumn: {
-      marginTop: 10,
-      marginBottom: 10,
-      backgroundColor: "green"
-    },
-  });
-
-
-  const classes = homeStyles();
   const btnClasses = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-fullWidth dashboard-btn";
 
 
@@ -179,16 +152,12 @@ export const App: React.FC = () => {
               <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
               <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
 
-              <Button fullWidth variant="contained" className={classes.opt_forumn} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Forum'
-                      });
+              <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary" 
+                  onClick={() => {
                       window.location.href = "https://www.coderdreams.com/fatcats/";
                   }}> FORUMS</Button>
 
-              <Button fullWidth variant="contained" className={classes.opt} color="primary" onClick={onLogout}> LOG OUT</Button>
+              <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
               <div className="fat-cat-logo">
                 <img src="/fat-cat1.png" alt="Fat Cats"></img>
               </div>
@@ -230,49 +199,29 @@ export const App: React.FC = () => {
                   <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
                 </div>
 
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Create Account'
-                      });
+                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
+                  onClick={() => {
                       history.push("/newuser");
                   }}> CREATE Account</Button>
 
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Log In'
-                      });
+                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
+                  onClick={() => {
                       history.push("/login");
                   }}> LOG IN</Button>
 
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Help'
-                      });
+                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
+                  onClick={() => {
                       history.push("/help");
                   }}> HELP / RULES</Button>
 
-                <Button fullWidth variant="contained" className={classes.opt} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Contact Us'
-                      });
+                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
+                  onClick={() => {
                       history.push("/contact");
                   }}> CONTACT US</Button>
 
 
-                <Button fullWidth variant="contained" className={classes.opt_forumn} color="primary" 
-                  onClick={() => { 
-                      ReactGA.event({
-                        category: 'BtnClicks',
-                        action: 'Go to Forum'
-                      });
+                <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary" 
+                  onClick={() => {
                       window.location.href = "https://www.coderdreams.com/fatcats/";
                   }}> FORUMS</Button>
 

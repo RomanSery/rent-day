@@ -22,7 +22,7 @@ import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useHistory } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
-import { TextField } from "@material-ui/core";
+import { TextField } from "@mui/material";
 import { ChatWindow } from "./ChatWindow";
 import Countdown, { CountdownRenderProps, CountdownTimeDelta } from "react-countdown";
 import useGameStateStore from "../stores/gameStateStore";

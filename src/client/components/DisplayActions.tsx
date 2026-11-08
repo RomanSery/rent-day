@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import { Button, Menu, MenuItem } from "@material-ui/core";
+import { Button, Menu, MenuItem } from "@mui/material";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
 import { useHistory } from "react-router-dom";
 import API from '../api';
@@ -213,7 +213,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       return (
         <motion.div animate={{ scale: 1.1 }} transition={{
           duration: 1.0,
-          loop: Infinity,
+          repeat: Infinity,
           repeatDelay: 0
         }}>
           <Button variant="contained" color="primary" onClick={onClickRoll}
@@ -229,7 +229,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       return (
         <motion.div animate={{ scale: 1.1 }} transition={{
           duration: 1.0,
-          loop: Infinity,
+          repeat: Infinity,
           repeatDelay: 0
         }}>
           <Button variant="contained" color="primary" onClick={onClickDone} startIcon={<FontAwesomeIcon icon={faCheckCircle} />}>Done</Button>

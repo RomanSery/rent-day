@@ -1,7 +1,7 @@
 
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, ButtonGroup, InputAdornment, PropTypes, TextField } from "@material-ui/core";
+import { Button, ButtonGroup, ButtonProps, InputAdornment, TextField } from "@mui/material";
 import React from "react";
 import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -73,18 +73,18 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
     }
     return {};
   };
-  const getChatBtnColor = (): PropTypes.Color => {
+  const getChatBtnColor = (): ButtonProps["color"] => {
     if (showChat) {
       return "primary";
     }
-    return "default";
+    return "inherit";
   }
 
-  const getLogBtnColor = (): PropTypes.Color => {
+  const getLogBtnColor = (): ButtonProps["color"] => {
     if (!showChat) {
       return "primary";
     }
-    return "default";
+    return "inherit";
   }
 
   const getLogContStyle = (): React.CSSProperties => {

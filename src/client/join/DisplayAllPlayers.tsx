@@ -1,14 +1,14 @@
 import React from "react";
 import API from '../api';
 
-import TableContainer from '@material-ui/core/TableContainer';
-import Paper from '@material-ui/core/Paper';
+import TableContainer from '@mui/material/TableContainer';
+import Paper from '@mui/material/Paper';
 import { getGameContextFromLocalStorage } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 import { PlayerInfo } from "../../core/types/PlayerInfo";
-import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@material-ui/data-grid';
+import { DataGrid, GridColDef, GridRowsProp, GridRowModel } from '@mui/x-data-grid';
 import { Link } from "react-router-dom";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
 
@@ -18,12 +18,13 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
 
-  const playersQuery = useQuery<PlayerInfo[], Error>("getAllPlayers",
-    () => API.post("findPlayers", { context }).then(function (response) { return response.data.players; }),
-    { refetchOnWindowFocus: false });
+  const playersQuery = useQuery<PlayerInfo[], Error>({
+    queryKey: ["getAllPlayers"],
+    queryFn: () => API.post("findPlayers", { context }).then(function (response) { return response.data.players; }),
+    refetchOnWindowFocus: false,
+  });
 
   const columns: GridColDef[] = [
-    { field: 'id', hide: true },
     {
       field: 'name',
       headerClassName: 'game-grid-header',
@@ -86,7 +87,7 @@ export const DisplayAllPlayers: React.FC<Props> = () => {
 
     return (<DataGrid rows={getDataRows()} columns={columns} autoHeight={true} density="compact"
       disableColumnMenu={true} disableColumnSelector={true}
-      disableSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />);
+      disableRowSelectionOnClick={true} hideFooter={true} hideFooterPagination={true} checkboxSelection={false} />);
   }
 
 

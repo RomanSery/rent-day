@@ -5,7 +5,7 @@ import { GameContext } from "../../core/types/GameContext";
 import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
 import API from '../api';
-import { Container } from "@material-ui/core";
+import { Container } from "@mui/material";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GameEvent } from "../../core/types/GameEvent";

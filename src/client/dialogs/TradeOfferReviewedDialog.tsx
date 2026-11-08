@@ -1,16 +1,16 @@
 import React from "react";
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import Button from '@material-ui/core/Button';
+import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import Button from '@mui/material/Button';
 import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
-import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Paper from '@material-ui/core/Paper';
-import { ListSubheader } from "@material-ui/core";
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import Paper from '@mui/material/Paper';
+import { ListSubheader } from "@mui/material";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { getSquareTxt } from "../squares/squareHelpers";
@@ -92,9 +92,9 @@ export const TradeOfferReviewedDialog: React.FC<Props> = () => {
     <Dialog fullWidth={true} maxWidth="sm" onClose={() => setTradeReviewedOpen(false)} aria-labelledby="reviewed-trade-dialog-title" open={tradeReviewedOpen}>
       <DialogTitle id="reviewed-trade-dialog-title">{getResultHeadline()}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} justify="center" alignItems="center" className="trade-dialog-cont">
-          <Grid className="trade-left" item>{propertyList(true)}</Grid>
-          <Grid className="trade-right" item>{propertyList(false)}</Grid>
+        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+          <Grid className="trade-left">{propertyList(true)}</Grid>
+          <Grid className="trade-right">{propertyList(false)}</Grid>
         </Grid>
 
       </DialogContent>

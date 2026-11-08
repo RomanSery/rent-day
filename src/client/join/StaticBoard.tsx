@@ -3,7 +3,7 @@ import { GameSquare } from "../components/GameSquare";
 
 
 interface Props {
-
+  children?: React.ReactNode;
 }
 
 export const StaticBoard: React.FC<Props> = (props) => {

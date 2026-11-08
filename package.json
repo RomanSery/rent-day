@@ -1,42 +1,50 @@
 {
   "name": "rent-day",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "proxy": "http://localhost:8787",
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@fortawesome/fontawesome-svg-core": "^7.1.0",
     "@fortawesome/free-regular-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
-    "@fortawesome/react-fontawesome": "^0.2.6",
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/data-grid": "4.0.0-alpha.22",
-    "@material-ui/styles": "^4.11.5",
-    "@types/react": "^17.0.93",
-    "@types/react-dom": "^17.0.26",
+    "@fortawesome/react-fontawesome": "^3.1.0",
+    "@mui/material": "^7.3.0",
+    "@mui/x-data-grid": "^7.29.0",
+    "@tanstack/react-query": "^5.90.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
     "axios": "^1.21.0",
-    "framer-motion": "^2.9.5",
+    "framer-motion": "^14.10.1",
     "howler": "^2.2.4",
     "lodash": "^4.18.1",
     "query-string": "^10.0.0",
-    "react": "^17.0.2",
+    "react": "^19.2.0",
     "react-countdown": "^2.3.6",
-    "react-dom": "^17.0.2",
-    "react-ga": "^3.3.1",
-    "react-hook-form": "^6.15.8",
-    "react-query": "^3.39.3",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.65.0",
     "react-router-dom": "^5.3.4",
     "react-scripts": "5.0.1",
     "react-twitter-widgets": "^1.11.0",
-    "zustand": "^4.5.7"
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/howler": "^2.2.13",
     "@types/lodash": "^4.17.27",
-    "@types/material-ui": "^0.21.18",
     "@types/node": "^22.0.0",
     "@types/react-router-dom": "^5.3.3",
     "concurrently": "^10.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.9.0"
+  },
+  "overrides": {
+    "react-scripts": {
+      "typescript": "^5.9.0"
+    },
+    "react-twitter-widgets": {
+      "react": "^19.2.0",
+      "react-dom": "^19.2.0"
+    }
   },
   "scripts": {
     "dev": "concurrently -p name -c \"yellow,blue\" -n \"worker,CRA\" \"npm run dev:worker\" \"npm run dev:client\"",

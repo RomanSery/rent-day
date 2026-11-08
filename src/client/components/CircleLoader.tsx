@@ -32,7 +32,7 @@ export const CircleLoader: React.FC<Props> = ({ socketService }) => {
   };
 
   const spinTransition: Transition = {
-    loop: 5,
+    repeat: 5,
     ease: "linear",
     duration: 1
   };

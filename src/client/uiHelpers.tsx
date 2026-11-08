@@ -1,8 +1,8 @@
 
 import React from "react";
-import { withStyles, Theme } from '@material-ui/core/styles';
-import Tooltip from '@material-ui/core/Tooltip';
-import Typography from '@material-ui/core/Typography';
+import { styled } from '@mui/material/styles';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import Typography from '@mui/material/Typography';
 
 import { SkillType } from "../core/enums/SkillType";
 import {
@@ -12,20 +12,20 @@ import {
   negotiationAdjustment,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Player } from "../core/types/Player";
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import { TableHead } from "@material-ui/core";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+import { TableHead } from "@mui/material";
 import { GameState } from "../core/types/GameState";
 import { SquareConfigDataMap } from "../core/config/SquareData";
 import { BoardSection } from "../core/enums/BoardSection";
@@ -33,18 +33,20 @@ import { PlayerState } from "../core/enums/PlayerState";
 import { PiecePosition } from "../core/types/PiecePosition";
 
 
-const HtmlTooltip = withStyles((theme: Theme) => ({
-  tooltip: {
+const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.tooltip}`]: {
     backgroundColor: '#f5f5f9',
     color: 'rgba(0, 0, 0, 0.87)',
     fontSize: theme.typography.pxToRem(14),
     border: '1px solid #dadde9',
     maxWidth: 'none'
   },
-}))(Tooltip);
+}));
 
 
-const getElectricityBreakdownTable = (game: GameState | undefined, electricityTooltip: string): JSX.Element => {
+const getElectricityBreakdownTable = (game: GameState | undefined, electricityTooltip: string): React.JSX.Element => {
   if (electricityTooltip.length === 0 || !game) {
     return (
       <React.Fragment>
@@ -132,7 +134,7 @@ const getSquareName = (row: string, game: GameState): string => {
   return "";
 }
 
-const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): JSX.Element => {
+const getTaxBreakdownTable = (game: GameState | undefined, taxTooltip: string): React.JSX.Element => {
   if (taxTooltip.length === 0 || !game) {
     return (
       <React.Fragment>
@@ -196,7 +198,7 @@ export const getSkillTypeTooltip = (skill: SkillType) => {
   </HtmlTooltip>);
 }
 
-const getSkillDescription = (type: SkillType): JSX.Element => {
+const getSkillDescription = (type: SkillType): React.JSX.Element => {
 
   if (type === SkillType.Luck) {
     return (
@@ -225,7 +227,7 @@ const getSkillDescription = (type: SkillType): JSX.Element => {
 };
 
 
-export const getPlayerClassDescription = (type: string | undefined): JSX.Element => {
+export const getPlayerClassDescription = (type: string | undefined): React.JSX.Element => {
 
   if (type === PlayerClass.Gambler) {
     return (
@@ -369,7 +371,7 @@ export const getMovementKeyFrames = (gameState: GameState, moves: Array<number>)
 
 
 
-export const getHelpContent = (): JSX.Element => {
+export const getHelpContent = (): React.JSX.Element => {
   return (
     <div>
       <h4>PLAYER CLASSES</h4>

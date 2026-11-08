@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { animate, useMotionValue } from "framer-motion";
 import React, { useEffect, useState } from "react";
-import LinearProgress from '@material-ui/core/LinearProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import { GameEvent } from "../../core/types/GameEvent";
 import { dollarFormatter } from "../helpers";
 import { SocketService } from "../sockets/SocketService";

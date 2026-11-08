@@ -10,7 +10,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { Button, Chip, Container, TextField, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@material-ui/core";
+import { Button, Chip, Container, TextField, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@mui/material";
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
@@ -19,7 +19,7 @@ import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../
 import { getPlayerClassDescription } from "../uiHelpers";
 import queryString from "query-string";
 import _ from "lodash/fp";
-import { useQuery } from "react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Share } from "react-twitter-widgets";
 
 interface Props {
@@ -49,10 +49,18 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
 
-  const { register, handleSubmit, errors } = useForm<Inputs>();
+  const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
 
-  const gameInfoQuery = useQuery<GameState, Error>("getAllPlayers",
-    () => API.post("getGame", { gameId: gameToJoinId }).then(function (response) { return response.data.game; }));
+  // react-hook-form 7: wire register() into MUI inputs via inputRef
+  const field = (name: keyof Inputs, rules?: Parameters<typeof register>[1]) => {
+    const { ref, ...rest } = register(name, rules);
+    return { inputRef: ref, ...rest };
+  };
+
+  const gameInfoQuery = useQuery<GameState, Error>({
+    queryKey: ["getGame", gameToJoinId],
+    queryFn: () => API.post("getGame", { gameId: gameToJoinId }).then(function (response) { return response.data.game; }),
+  });
 
 
   useEffect(() => {
@@ -131,7 +139,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     });
   };
 
-  const closeSnack = (event: React.SyntheticEvent | React.MouseEvent, reason?: string) => {
+  const closeSnack = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -221,8 +229,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             <FormControl fullWidth >
               <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
-              <NativeSelect id="piece-type" name="piece" required={true} fullWidth={true}
-                inputRef={register({ required: true })} >
+              <NativeSelect id="piece-type" required={true} fullWidth={true}
+                {...field("piece", { required: true })} >
                 <option aria-label="None" value="" />
                 <option value="Pawn">Pawn</option>
                 <option value="Hat">Hat</option>
@@ -238,7 +246,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             <FormControl fullWidth >
               <InputLabel htmlFor="class-type">Class Type</InputLabel>
-              <NativeSelect id="class-type" name="playerClass" required={true} fullWidth={true} inputRef={register({ required: true })} onChange={handlePlayerClassChange} >
+              <NativeSelect id="class-type" required={true} fullWidth={true} {...field("playerClass", { required: true })} onChange={handlePlayerClassChange} >
                 <option aria-label="None" value="" />
                 <option value="Banker">Banker</option>
                 <option value="Conductor">Conductor</option>
@@ -252,8 +260,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             {gameInfoQuery && gameInfoQuery.data && gameInfoQuery.data.settings && gameInfoQuery.data.settings.password &&
               <FormControl fullWidth >
-                <TextField id="gamePwd" name="gamePwd" required={true} fullWidth={true} label="Password"
-                  inputRef={register({ required: true })} />
+                <TextField id="gamePwd" required={true} fullWidth={true} label="Password"
+                  {...field("gamePwd", { required: true })} />
 
               </FormControl>
             }
