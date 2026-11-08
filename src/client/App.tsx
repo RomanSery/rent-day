@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
-  Switch, Route, withRouter, useHistory, useLocation, Link
+  Routes, Route, useNavigate, useLocation, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
@@ -25,7 +25,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const App: React.FC = () => {
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
 
@@ -63,14 +63,14 @@ export const App: React.FC = () => {
         setCurrSessionInfo(response.data);
         tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
           if (redirectUrl && redirectUrl.length > 0) {
-            history.push(redirectUrl);
+            navigate(redirectUrl);
           }
         });
       })
       .catch(function (error) {
         // handle error
         logOut();
-        history.push("/auth");
+        navigate("/auth");
       });
   }, []);
 
@@ -84,7 +84,7 @@ export const App: React.FC = () => {
 
     redirectToHomeIfGameNotFound((redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
+        navigate(redirectUrl);
       }
     });
 
@@ -102,9 +102,9 @@ export const App: React.FC = () => {
   const Home = () => {
 
     if (!isLoggedIn()) {
-      history.push("/auth");
+      navigate("/auth");
     } else {
-      history.push("/dashboard");
+      navigate("/dashboard");
     }
 
     return null;
@@ -114,13 +114,13 @@ export const App: React.FC = () => {
   const DashboardDisplay = () => {
 
     if (!isLoggedIn()) {
-      history.push("/auth");
+      navigate("/auth");
       return null;
     }
 
     tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
+        navigate(redirectUrl);
       }
     });
 
@@ -129,7 +129,7 @@ export const App: React.FC = () => {
       API.post("logout")
         .then(function (response) {
           logOut();
-          history.push("/auth");
+          navigate("/auth");
         })
         .catch(handleApiError);
     };
@@ -183,7 +183,7 @@ export const App: React.FC = () => {
   const AuthDisplay = () => {
 
     if (isLoggedIn()) {
-      history.push("/dashboard");
+      navigate("/dashboard");
       return null;
     }
 
@@ -201,22 +201,22 @@ export const App: React.FC = () => {
 
                 <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
                   onClick={() => {
-                      history.push("/newuser");
+                      navigate("/newuser");
                   }}> CREATE Account</Button>
 
                 <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
                   onClick={() => {
-                      history.push("/login");
+                      navigate("/login");
                   }}> LOG IN</Button>
 
                 <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
                   onClick={() => {
-                      history.push("/help");
+                      navigate("/help");
                   }}> HELP / RULES</Button>
 
                 <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
                   onClick={() => {
-                      history.push("/contact");
+                      navigate("/contact");
                   }}> CONTACT US</Button>
 
 
@@ -267,7 +267,7 @@ export const App: React.FC = () => {
 
     tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
+        navigate(redirectUrl);
       }
     });
 
@@ -290,7 +290,7 @@ export const App: React.FC = () => {
 
     tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
+        navigate(redirectUrl);
       }
     });
 
@@ -314,7 +314,7 @@ export const App: React.FC = () => {
 
     tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
-        history.push(redirectUrl);
+        navigate(redirectUrl);
       }
     });
 
@@ -388,23 +388,23 @@ export const App: React.FC = () => {
 
 
   return (    
-    <Switch>
-      <Route exact path="/" component={withRouter(Home)} />
+    <Routes>
+      <Route path="/" element={<Home />} />
 
-      <Route path="/auth" component={AuthDisplay} />
-      <Route path="/dashboard" component={DashboardDisplay} />
+      <Route path="/auth" element={<AuthDisplay />} />
+      <Route path="/dashboard" element={<DashboardDisplay />} />
 
-      <Route path="/gameinstance" component={GameDisplay} />
-      <Route path="/join" component={DisplayJoinGamePage} />
-      <Route path="/players" component={DisplayPlayersPage} />
-      <Route path="/find" component={FindGamesPage} />
-      <Route path="/create" component={CreateGamePage} />
-      <Route path="/help" component={HelpPage} />
-      <Route path="/contact" component={ContactPage} />
+      <Route path="/gameinstance" element={<GameDisplay />} />
+      <Route path="/join" element={<DisplayJoinGamePage />} />
+      <Route path="/players" element={<DisplayPlayersPage />} />
+      <Route path="/find" element={<FindGamesPage />} />
+      <Route path="/create" element={<CreateGamePage />} />
+      <Route path="/help" element={<HelpPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
-      <Route path="/newuser" component={SignUp} />
-      <Route path="/login" component={LogIn} />
-    </Switch>
+      <Route path="/newuser" element={<SignUp />} />
+      <Route path="/login" element={<LogIn />} />
+    </Routes>
   );
 }
 

@@ -20,7 +20,7 @@ import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
 import { TravelDialog } from "../dialogs/TravelDialog";
 import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { GameStatus } from "../../core/enums/GameStatus";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
 import { TextField } from "@mui/material";
 import { ChatWindow } from "./ChatWindow";
@@ -34,7 +34,7 @@ interface Props {
 export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const countdownEl = React.useRef<Countdown | null>(null);
   const isMountedRef = useIsMountedRef();
@@ -171,7 +171,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
   const onLeaveGame = () => {
     leaveCurrentGameIfJoined(socketService, () => {
-      history.push("/dashboard");
+      navigate("/dashboard");
     });
   };
 
@@ -216,8 +216,8 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
           {isDevEnv() &&
             <div>
-              <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die1" />
-              <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} inputProps={{ min: 1, max: 6 }} name="die2" />
+              <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die1" />
+              <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die2" />
             </div>
           }
 

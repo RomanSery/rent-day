@@ -13,9 +13,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
-      "@core/*": ["../src/core/*"]
+      "@core/*": ["./../src/core/*"]
     }
   },
   "include": ["src", "../src/core"]

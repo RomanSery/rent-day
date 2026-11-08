@@ -2,7 +2,7 @@
 import React from "react";
 import { Button, Menu, MenuItem } from "@mui/material";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -29,7 +29,7 @@ interface Props {
 export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, onTravelAction, tradeWithPlayer }) => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -97,7 +97,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       if (gameState) {
         socketService.socket.emit(GameEvent.SHOW_SNACK_MSG, gameState._id, getMyName() + " has quit");
       }
-      history.push("/dashboard");
+      navigate("/dashboard");
     });
   };
 

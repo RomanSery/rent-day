@@ -134,12 +134,14 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
               sendChatEvent();
             }
           }}
-          placeholder="Type Message" fullWidth={true} value={sendChatMsg} variant="outlined" InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <FontAwesomeIcon icon={faPaperPlane} size="2x" />
-              </InputAdornment>
-            ),
+          placeholder="Type Message" fullWidth={true} value={sendChatMsg} variant="outlined" slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <FontAwesomeIcon icon={faPaperPlane} size="2x" />
+                </InputAdornment>
+              ),
+            },
           }} />
 
 

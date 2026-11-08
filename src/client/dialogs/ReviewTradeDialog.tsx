@@ -118,10 +118,10 @@ export const ReviewTradeDialog: React.FC<Props> = ({ socketService }) => {
   };
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={(event, reason) => { if (reason !== "backdropClick") { setReviewTradeOpen(false); } }} disableEscapeKeyDown={true} aria-labelledby="reivew-trade-dialog-title" open={reviewTradeOpen}>
+    <Dialog fullWidth={true} maxWidth="sm" onClose={(event, reason) => { if (reason !== "backdropClick" && reason !== "escapeKeyDown") { setReviewTradeOpen(false); } }} aria-labelledby="reivew-trade-dialog-title" open={reviewTradeOpen}>
       <DialogTitle id="review-trade-dialog-title">Accept/Decline Trade Offer</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }} className="trade-dialog-cont">
           <Grid className="trade-left">{propertyList(true)}</Grid>
           <Grid className="trade-right">{propertyList(false)}</Grid>
         </Grid>

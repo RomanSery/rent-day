@@ -86,7 +86,7 @@ export const TravelDialog: React.FC<Props> = ({ socketService }) => {
           The city subway system is dangerous.  <br />
           If you travel, there is a <b>{muggingChance}%</b> of you being mugged and lossing <b>${muggingAmount}</b>.
         </p>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }} className="trade-dialog-cont">
           <Grid className="trade-left">
             <Paper>
               <List dense disablePadding component="div" role="list">

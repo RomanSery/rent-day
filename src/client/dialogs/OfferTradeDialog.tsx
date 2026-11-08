@@ -182,7 +182,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
             return (
               <ListItemButton key={squareId} role="listitem" onClick={handleToggle(mine, squareId)} className="trade-item">
                 <ListItemIcon>
-                  <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple inputProps={{ 'aria-labelledby': labelId }} />
+                  <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple slotProps={{ input: { 'aria-labelledby': labelId } }} />
                 </ListItemIcon>
                 <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
               </ListItemButton>
@@ -198,7 +198,7 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
     <Dialog fullWidth={true} maxWidth="sm" onClose={() => closeDialog()} aria-labelledby="offer-trade-dialog-title" open={offerTradeOpen}>
       <DialogTitle id="offer-trade-dialog-title">Trade</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }} className="trade-dialog-cont">
           <Grid className="trade-left">{propertyList(true)}</Grid>
           <Grid className="trade-right">{propertyList(false)}</Grid>
         </Grid>

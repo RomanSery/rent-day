@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import API from '../api';
 import { Button } from "@mui/material";
 
@@ -22,13 +22,13 @@ interface Props {
 export const DisplayAllGames: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const history = useHistory();
+  const navigate = useNavigate();
 
 
   const onJoinGame = (gameId: string) => {
 
     leaveCurrentGameIfJoined(null, () => {
-      history.push("/join?gid=" + gameId);
+      navigate("/join?gid=" + gameId);
     });
   };
 

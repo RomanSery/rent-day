@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
 import API from '../api';
@@ -24,7 +24,7 @@ type Inputs = {
 export const CreateGame: React.FC<Props> = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [useTimersVal, setUseTimesVal] = React.useState<boolean>(true);
   const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
 
@@ -33,12 +33,13 @@ export const CreateGame: React.FC<Props> = () => {
     const { ref, ...rest } = register(name, rules);
     return { inputRef: ref, ...rest };
   };
+  const useTimersField = register("useTimers");
 
 
   const onCreateGame: SubmitHandler<Inputs> = (data) => {
     API.post("createGame", { data, context: context })
       .then(function (response) {
-        history.push("/join?gid=" + response.data.gameId);
+        navigate("/join?gid=" + response.data.gameId);
       })
       .catch(handleApiError);
   };
@@ -66,7 +67,7 @@ export const CreateGame: React.FC<Props> = () => {
           <p className="field-error">Game name must be at least 4 characters</p>
         )}
 
-        <TextField label="Num Players" fullWidth={true} type="number" inputProps={{ min: 2, max: 6 }} defaultValue={2} required={true} id="maxPlayers"
+        <TextField label="Num Players" fullWidth={true} type="number" slotProps={{ htmlInput: { min: 2, max: 6 } }} defaultValue={2} required={true} id="maxPlayers"
           {...field("maxPlayers", { required: true, min: 2, max: 6 })} />
         {_.get("maxPlayers.type", errors) === "required" && (
           <p className="field-error">Max players is required</p>
@@ -93,7 +94,7 @@ export const CreateGame: React.FC<Props> = () => {
         <TextField label="Optional password" fullWidth={true} id="gamePwd" {...field("gamePwd", { required: false })} />
 
 
-        <TextField label="Initial Skill Points" fullWidth={true} type="number" inputProps={{ min: 0, max: 10 }} defaultValue={defaultStartSkillPoints} required={true} id="initialSkillPoints"
+        <TextField label="Initial Skill Points" fullWidth={true} type="number" slotProps={{ htmlInput: { min: 0, max: 10 } }} defaultValue={defaultStartSkillPoints} required={true} id="initialSkillPoints"
           {...field("initialSkillPoints", { required: true, min: 2, max: 10 })} />
         {_.get("initialSkillPoints.type", errors) === "required" && (
           <p className="field-error">Initial Skill Points is required</p>
@@ -108,7 +109,7 @@ export const CreateGame: React.FC<Props> = () => {
 
         <FormControlLabel
           control={
-            <Checkbox id="useTimers" checked={useTimersVal} {...field("useTimers", { required: false })} onChange={handleTimerChange} color="primary" />
+            <Checkbox id="useTimers" checked={useTimersVal} name="useTimers" slotProps={{ input: { ref: useTimersField.ref } }} onChange={(e) => { handleTimerChange(e); useTimersField.onChange(e); }} color="primary" />
           }
           label="Use turn timers?"
         />

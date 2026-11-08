@@ -92,7 +92,7 @@ export const TradeOfferReviewedDialog: React.FC<Props> = () => {
     <Dialog fullWidth={true} maxWidth="sm" onClose={() => setTradeReviewedOpen(false)} aria-labelledby="reviewed-trade-dialog-title" open={tradeReviewedOpen}>
       <DialogTitle id="reviewed-trade-dialog-title">{getResultHeadline()}</DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} justifyContent="center" alignItems="center" className="trade-dialog-cont">
+        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }} className="trade-dialog-cont">
           <Grid className="trade-left">{propertyList(true)}</Grid>
           <Grid className="trade-right">{propertyList(false)}</Grid>
         </Grid>

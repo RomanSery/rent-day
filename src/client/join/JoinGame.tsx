@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-target-blank */
 import React, { useEffect, useState } from "react";
 
-import { useHistory, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { GameState } from "../../core/types/GameState";
 import { getIconProp, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import API from '../api';
@@ -34,7 +34,7 @@ type Inputs = {
 
 export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const getGameIdFromUrl = () => {
@@ -67,7 +67,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
     socketService.listenForEvent(GameEvent.JOINED_GAME, (data: JoinedGameMsg) => {
       if (data.allJoined) {
-        history.push("/gameinstance");
+        navigate("/gameinstance");
       } else {
         gameInfoQuery.refetch();
         setSnackMsg(data.playerName + " has joined");
@@ -120,7 +120,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         gameInfoQuery.refetch();
 
         if (response.data.allJoined) {
-          history.push("/gameinstance");
+          navigate("/gameinstance");
         }
       })
       .catch(handleApiError);
@@ -135,7 +135,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     event.preventDefault();
 
     leaveCurrentGameIfJoined(socketService, () => {
-      history.push("/dashboard");
+      navigate("/dashboard");
     });
   };
 

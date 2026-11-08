@@ -2,7 +2,7 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, TextField, Typography } from "@mui/material";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { handleApiError, setCurrSessionInfo } from "../helpers";
 import _ from "lodash/fp";
 
@@ -17,7 +17,7 @@ type Inputs = {
 
 export const LoginPage: React.FC<Props> = () => {
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
 
   // react-hook-form 7: wire register() into MUI TextField via inputRef
@@ -31,7 +31,7 @@ export const LoginPage: React.FC<Props> = () => {
     API.post("logIn", { username: data.username, password: data.password })
       .then(function (response) {
         setCurrSessionInfo(response.data);
-        history.push("/dashboard");
+        navigate("/dashboard");
       })
       .catch(handleApiError);
   };
