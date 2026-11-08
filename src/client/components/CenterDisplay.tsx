@@ -176,7 +176,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   };
 
   const isDevEnv = () => {
-    return process.env.NODE_ENV === "development";
+    return import.meta.env.DEV;
   }
 
   const countdownRenderer = (props: CountdownRenderProps) => {

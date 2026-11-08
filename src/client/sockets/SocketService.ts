@@ -17,16 +17,13 @@ const MAX_RECONNECT_DELAY_MS = 15000;
 const MAX_OUTBOX = 50;
 
 /**
- * Where the game's WebSocket lives. In production it is the same origin as
- * the page (the Worker serves both). In development the React dev server
- * only proxies HTTP, so we talk to wrangler directly.
+ * Where the game's WebSocket lives: the same origin as the page. In
+ * production the Worker serves both; in development the Vite dev server
+ * proxies /ws to `wrangler dev`. VITE_WS_URL overrides it if needed.
  */
 const getWsBase = (): string => {
-  if (process.env.REACT_APP_WS_URL) {
-    return process.env.REACT_APP_WS_URL;
-  }
-  if (process.env.NODE_ENV === "development") {
-    return "ws://localhost:8787";
+  if (import.meta.env.VITE_WS_URL) {
+    return import.meta.env.VITE_WS_URL;
   }
   const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
   return proto + "//" + window.location.host;
