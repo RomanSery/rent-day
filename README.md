@@ -20,7 +20,7 @@ use Durable Object alarms instead of `setTimeout`.
 
 ## Local development
 
-Requirements: Node.js 22 (the Create React App 4 toolchain is happiest there).
+Requirements: Node.js 20 or newer (tested with 22).
 
 ```bash
 npm install            # also installs worker/ dependencies
