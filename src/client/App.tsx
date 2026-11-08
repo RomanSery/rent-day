@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
@@ -23,24 +22,269 @@ import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+// Route components live at module level so that a navigation re-rendering
+// App does not give them a new identity (which would remount them and, for
+// the game pages, reopen the WebSocket).
+
+const queryClient = new QueryClient();
+
+const btnClasses = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-fullWidth dashboard-btn";
+
+/** Game id from the ?gid query parameter, falling back to the stored one. */
+const useGameIdFromQuery = (): string | null => {
+  const location = useLocation();
+  if (location.search) {
+    const parsed = queryString.parse(location.search);
+    if (parsed && parsed.gid) {
+      return parsed.gid as string;
+    }
+  }
+  return getMyGameId();
+};
+
+/** Sends the player back into their current game, if they have one. */
+const useRedirectToGame = (pageType: PageType): void => {
+  const navigate = useNavigate();
+  const gameId = useGameIdFromQuery();
+
+  React.useEffect(() => {
+    tryToRedirectToGame(pageType, gameId, (redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        navigate(redirectUrl);
+      }
+    });
+  }, [pageType, gameId, navigate]);
+};
+
+const Page: React.FC<{ maxWidth?: "xs" | "sm" | "md" | "lg"; children?: React.ReactNode }> = ({ maxWidth, children }) => (
+  <React.Fragment>
+    <CssBaseline />
+    <StaticBoard>
+      {maxWidth ? <Container maxWidth={maxWidth}>{children}</Container> : children}
+    </StaticBoard>
+  </React.Fragment>
+);
+
+const Blurb: React.FC = () => (
+  <Container maxWidth="xs" className="home-page-options home-page-left">
+    <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
+    <hr />
+    <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>
+    <hr />
+    <p>No more lucky dice rolls, you must use your financial witts to bid smartly <strong>in the new silent auction system.</strong> </p>
+    <hr />
+    <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
+  </Container>
+);
+
+const ForumsButton: React.FC = () => (
+  <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary"
+    onClick={() => {
+      window.location.href = "https://www.coderdreams.com/fatcats/";
+    }}> FORUMS</Button>
+);
+
+const Home: React.FC = () => {
+  return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
+};
+
+const GameDisplay: React.FC = () => {
+  const navigate = useNavigate();
+  const myGameId = getMyGameId();
+
+  // one socket per game for the lifetime of this page
+  const socket = React.useMemo(
+    () => (myGameId ? new SocketService(PageType.Game, myGameId) : null),
+    [myGameId]
+  );
+
+  React.useEffect(() => {
+    if (!myGameId) {
+      return;
+    }
+    redirectToHomeIfGameNotFound((redirectUrl: string) => {
+      if (redirectUrl && redirectUrl.length > 0) {
+        navigate(redirectUrl);
+      }
+    });
+  }, [myGameId, navigate]);
+
+  if (!myGameId || !socket) {
+    // no current game for this session: don't mount the board at all
+    return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
+  }
+
+  return (
+    <React.Fragment>
+      <CssBaseline />
+      <GameBoard socketService={socket} />
+    </React.Fragment>
+  );
+};
+
+const DashboardDisplay: React.FC = () => {
+  const navigate = useNavigate();
+  useRedirectToGame(PageType.Home);
+
+  if (!isLoggedIn()) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  const onLogout = async () => {
+    API.post("logout")
+      .then(function (response) {
+        logOut();
+        navigate("/auth");
+      })
+      .catch(handleApiError);
+  };
+
+  return (
+    <Page>
+      <div className="home-page-cont">
+
+        <Container maxWidth="xs" className="home-page-options">
+          <div>
+            <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+          </div>
+
+          <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
+          <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
+          <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
+          <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
+          <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
+
+          <ForumsButton />
+
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
+          <div className="fat-cat-logo">
+            <img src="/fat-cat1.png" alt="Fat Cats"></img>
+          </div>
+        </Container>
+
+        <Blurb />
+      </div>
+    </Page>
+  );
+};
+
+const AuthDisplay: React.FC = () => {
+  const navigate = useNavigate();
+
+  if (isLoggedIn()) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return (
+    <Page>
+      <div className="home-page-cont">
+
+        <Container maxWidth="xs" className="home-page-options">
+          <div>
+            <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+          </div>
+
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
+            onClick={() => navigate("/newuser")}> CREATE Account</Button>
+
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
+            onClick={() => navigate("/login")}> LOG IN</Button>
+
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
+            onClick={() => navigate("/help")}> HELP / RULES</Button>
+
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
+            onClick={() => navigate("/contact")}> CONTACT US</Button>
+
+          <ForumsButton />
+
+          <div className="fat-cat-logo">
+            <img src="/fat-cat1.png" alt="Fat Cats"></img>
+          </div>
+        </Container>
+
+        <Blurb />
+      </div>
+    </Page>
+  );
+};
+
+const DisplayJoinGamePage: React.FC = () => {
+  const gameId = useGameIdFromQuery();
+  const socket = React.useMemo(() => new SocketService(PageType.Join, gameId), [gameId]);
+
+  return (
+    <Page>
+      <QueryClientProvider client={queryClient}>
+        <JoinGame socketService={socket} />
+      </QueryClientProvider>
+    </Page>
+  );
+};
+
+const DisplayPlayersPage: React.FC = () => {
+  useRedirectToGame(PageType.Find);
+
+  return (
+    <Page>
+      <QueryClientProvider client={queryClient}>
+        <DisplayAllPlayers />
+      </QueryClientProvider>
+    </Page>
+  );
+};
+
+const FindGamesPage: React.FC = () => {
+  useRedirectToGame(PageType.Find);
+
+  return (
+    <Page>
+      <QueryClientProvider client={queryClient}>
+        <DisplayAllGames />
+      </QueryClientProvider>
+    </Page>
+  );
+};
+
+const CreateGamePage: React.FC = () => {
+  useRedirectToGame(PageType.Find);
+
+  return (
+    <Page maxWidth="xs">
+      <CreateGame />
+    </Page>
+  );
+};
+
+const SignUp: React.FC = () => (
+  <Page maxWidth="xs">
+    <SignUpPage />
+  </Page>
+);
+
+const LogIn: React.FC = () => (
+  <Page maxWidth="xs">
+    <LoginPage />
+  </Page>
+);
+
+const HelpPage: React.FC = () => (
+  <Page maxWidth="lg">
+    <HelpPageContent />
+  </Page>
+);
+
+const ContactPage: React.FC = () => (
+  <Page maxWidth="md">
+    <ContactUsPage />
+  </Page>
+);
+
 export const App: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-
-
-
-
-
-  const getGameId = () => {
-    if (location.search) {
-      const parsed = queryString.parse(location.search);
-      if (parsed && parsed.gid) {
-        return parsed.gid as string;
-      }
-    }
-    return getMyGameId();
-  };
+  const gameIdFromQuery = useGameIdFromQuery();
 
   // Pages that read the current game from session storage must wait until
   // the session check has run, otherwise a fresh tab opened straight on
@@ -58,7 +302,7 @@ export const App: React.FC = () => {
     API.post("current-session")
       .then(function (response) {
         setCurrSessionInfo(response.data);
-        tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
+        tryToRedirectToGame(PageType.Home, gameIdFromQuery, (redirectUrl: string) => {
           if (redirectUrl && redirectUrl.length > 0) {
             navigate(redirectUrl);
           }
@@ -72,319 +316,9 @@ export const App: React.FC = () => {
       .finally(() => {
         setSessionChecked(true);
       });
+    // runs once on load
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-
-
-
-  const btnClasses = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-fullWidth dashboard-btn";
-
-
-  const GameDisplay = () => {
-
-    const myGameId = getMyGameId();
-    if (!myGameId) {
-      // no current game for this session: don't mount the board at all
-      return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
-    }
-
-    redirectToHomeIfGameNotFound((redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        navigate(redirectUrl);
-      }
-    });
-
-    const socket = new SocketService(PageType.Game, myGameId);
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <GameBoard socketService={socket} />
-      </React.Fragment>
-    );
-  };
-
-
-  const Home = () => {
-    return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
-  };
-
-
-  const DashboardDisplay = () => {
-
-    if (!isLoggedIn()) {
-      navigate("/auth");
-      return null;
-    }
-
-    tryToRedirectToGame(PageType.Home, getGameId(), (redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        navigate(redirectUrl);
-      }
-    });
-
-    const onLogout = async () => {
-
-      API.post("logout")
-        .then(function (response) {
-          logOut();
-          navigate("/auth");
-        })
-        .catch(handleApiError);
-    };
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>          
-
-          <div className="home-page-cont">
-            
-            <Container maxWidth="xs" className="home-page-options">
-              <div>
-                <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
-              </div>
-
-              <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
-              <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
-              <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
-              <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
-              <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
-
-              <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary" 
-                  onClick={() => {
-                      window.location.href = "https://www.coderdreams.com/fatcats/";
-                  }}> FORUMS</Button>
-
-              <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
-              <div className="fat-cat-logo">
-                <img src="/fat-cat1.png" alt="Fat Cats"></img>
-              </div>
-            </Container>
-            
-            <Container maxWidth="xs" className="home-page-options home-page-left">                
-              <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
-              <hr />
-              <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>           
-              <hr />
-              <p>No more lucky dice rolls, you must use your financial witts to bid smartly <strong>in the new silent auction system.</strong> </p>
-              <hr />
-              <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
-            </Container>
-        </div>
-                    
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-
-  const AuthDisplay = () => {
-
-    if (isLoggedIn()) {
-      navigate("/dashboard");
-      return null;
-    }
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-
-          <div className="home-page-cont">
-          
-              <Container maxWidth="xs" className="home-page-options">
-                <div>
-                  <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
-                </div>
-
-                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
-                  onClick={() => {
-                      navigate("/newuser");
-                  }}> CREATE Account</Button>
-
-                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
-                  onClick={() => {
-                      navigate("/login");
-                  }}> LOG IN</Button>
-
-                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
-                  onClick={() => {
-                      navigate("/help");
-                  }}> HELP / RULES</Button>
-
-                <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" 
-                  onClick={() => {
-                      navigate("/contact");
-                  }}> CONTACT US</Button>
-
-
-                <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary" 
-                  onClick={() => {
-                      window.location.href = "https://www.coderdreams.com/fatcats/";
-                  }}> FORUMS</Button>
-
-                <div className="fat-cat-logo">
-                  <img src="/fat-cat1.png" alt="Fat Cats"></img>
-                </div>
-              </Container>
-              
-              <Container maxWidth="xs" className="home-page-options home-page-left">                
-                <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
-                <hr />
-                <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>           
-                <hr />
-                <p>No more lucky dice rolls, you must use your financial witts to bid smartly <strong>in the new silent auction system.</strong> </p>
-                <hr />
-                <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
-              </Container>
-          </div>
-
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const DisplayJoinGamePage = () => {
-
-    const socket = new SocketService(PageType.Join, getGameId());
-    const queryClient = new QueryClient();
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <QueryClientProvider client={queryClient}>                
-            <JoinGame socketService={socket} />
-          </QueryClientProvider>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const DisplayPlayersPage = () => {
-
-    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        navigate(redirectUrl);
-      }
-    });
-
-    const queryClient = new QueryClient();
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <QueryClientProvider client={queryClient}>
-            <DisplayAllPlayers />
-          </QueryClientProvider>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-
-  const FindGamesPage = () => {
-
-    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        navigate(redirectUrl);
-      }
-    });
-
-
-    const queryClient = new QueryClient();
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <QueryClientProvider client={queryClient}>
-            <DisplayAllGames />
-          </QueryClientProvider>
-
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const CreateGamePage = () => {
-
-    tryToRedirectToGame(PageType.Find, getGameId(), (redirectUrl: string) => {
-      if (redirectUrl && redirectUrl.length > 0) {
-        navigate(redirectUrl);
-      }
-    });
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="xs">
-            <CreateGame />
-          </Container>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const SignUp = () => {
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="xs">
-            <SignUpPage />
-          </Container>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const LogIn = () => {
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="xs">
-            <LoginPage />
-          </Container>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const HelpPage = () => {
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="lg">
-            <HelpPageContent />
-          </Container>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
-  const ContactPage = () => {
-
-    return (
-      <React.Fragment>
-        <CssBaseline />
-        <StaticBoard>
-          <Container maxWidth="md">
-            <ContactUsPage />
-          </Container>
-        </StaticBoard>
-      </React.Fragment>
-    );
-  };
-
 
   if (!sessionChecked) {
     return null;
