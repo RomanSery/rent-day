@@ -55,18 +55,28 @@ export class SocketService {
       emit: (event: GameEvent, ...args: any[]) => this.send(event, args),
     };
 
-    if (this.gameId) {
-      console.log("initiating socket service for game " + this.gameId);
-      this.connect();
-    } else {
+    if (!this.gameId) {
       console.log("socket service: no game id, not connecting");
     }
+    // The connection is opened lazily on first use. Components construct
+    // this service during render, and React (StrictMode in particular) may
+    // throw a render away; an eagerly opened socket would then leak.
   }
 
   public listenForEvent(event: GameEvent, fn: Function): void {
     const existing = this.listeners.get(event) || [];
     existing.push(fn as Listener);
     this.listeners.set(event, existing);
+    this.ensureConnected();
+  }
+
+  private ensureConnected(): void {
+    if (!this.gameId || this.ws) {
+      return;
+    }
+    this.closedByUser = false;
+    console.log("initiating socket service for game " + this.gameId);
+    this.connect();
   }
 
   // disconnect - used when unmounting
@@ -171,6 +181,7 @@ export class SocketService {
     if (!this.gameId) {
       return;
     }
+    this.ensureConnected();
     const payload = JSON.stringify({ event, args } as WireMessage);
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(payload);

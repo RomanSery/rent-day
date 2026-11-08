@@ -37,6 +37,8 @@ export interface GameStore {
 export interface GameEvents {
   send(event: GameEvent, payload: unknown): void;
   sendDelayed(delayMs: number, event: GameEvent, payload: unknown): Promise<void>;
+  /** Push the current game state to every connected client. */
+  refreshGameState(): Promise<void>;
 }
 
 export interface GameContext {

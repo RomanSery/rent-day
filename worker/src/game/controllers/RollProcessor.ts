@@ -29,6 +29,7 @@ import { MoneyCalculator } from "./MoneyCalculator";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { areIdsEqual, getRandomIntInclusive } from "./helpers";
 import { ChanceProcessor } from "./ChanceProcessor";
+import { GameProcessor } from "./GameProcessor";
 import { ServerChanceEvent, toClientChanceEvent } from "./ServerChanceEvent";
 
 export class RollProcessor {
@@ -115,7 +116,7 @@ export class RollProcessor {
     }
 
     if (this.player.money < 0) {
-      return "you cant roll with negative money;";
+      return (await this.handleNegativeMoney()) ?? "you cant roll with negative money;";
     }
 
     this.updateRollHistory();
@@ -565,16 +566,23 @@ export class RollProcessor {
       return this.player.name + " is bankrupt";
     }
 
-    if (this.player.money < 0) {
-      return "you cant complete your turn with negative money;";
-    }
-
     if (!areIdsEqual(this.userId, this.game.nextPlayerToAct)) {
       return "not your turn";
     }
 
+    if (this.player.money < 0) {
+      return (
+        (await this.handleNegativeMoney()) ??
+        "you cant complete your turn with negative money;"
+      );
+    }
+
     if (!this.player.hasRolled) {
       return "you didnt roll yet";
+    }
+
+    if (!autoComplete && this.game.auctionId) {
+      return "There is an active auction, place your bid first";
     }
 
     if (!autoComplete && this.game.lottoId) {
@@ -647,24 +655,48 @@ export class RollProcessor {
     }
   }
 
+  /**
+   * A player with negative money and nothing left to sell or mortgage can
+   * never act again, so eliminate them instead of leaving the game stuck.
+   * Returns the message for the caller, or null if the player can still
+   * recover by selling/mortgaging.
+   */
+  private async handleNegativeMoney(): Promise<string | null> {
+    if (!this.game || !this.player || this.player.totalAssets > 0) {
+      return null;
+    }
+
+    await GameProcessor.bankruptPlayer(this.ctx, this.game, this.player._id);
+    await this.ctx.store.saveGame(this.game);
+    await this.ctx.events.refreshGameState();
+
+    return "You have no money or assets left and are out of the game";
+  }
+
+  /**
+   * The next non-bankrupt player in seating order after `player`, even when
+   * `player` has just gone bankrupt themselves.
+   */
   public static getNextPlayerToAct(
     game: GameInstanceDocument,
     player: Player
   ): string | null {
-    if (!game || !player) {
+    if (!game || !player || game.players.length === 0) {
       return null;
     }
 
-    const activePlayers = game.players.filter(
-      (p: Player) => p.state !== PlayerState.BANKRUPT
-    );
+    const count = game.players.length;
+    const index = game.players.findIndex((p) => areIdsEqual(p._id, player._id));
+    const start = index === -1 ? 0 : index + 1;
 
-    const index = activePlayers.indexOf(player);
-    const nextPlayer =
-      index < activePlayers.length - 1
-        ? activePlayers[index + 1]
-        : activePlayers[0];
-    return nextPlayer ? nextPlayer._id : null;
+    for (let step = 0; step < count; step++) {
+      const candidate = game.players[(start + step) % count];
+      if (candidate.state !== PlayerState.BANKRUPT) {
+        return candidate._id;
+      }
+    }
+
+    return null;
   }
 
   public async payToGetOut(): Promise<string> {

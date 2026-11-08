@@ -352,6 +352,14 @@ export class GameProcessor {
     }
 
     await ctx.store.saveGame(game);
+
+    // the player chose to leave: stop sending them back into this game
+    const user = await ctx.store.getUser(userId);
+    if (user && areIdsEqual(user.currGameId, game._id)) {
+      user.currGameId = undefined;
+      user.currGameName = undefined;
+      await ctx.store.saveUser(user);
+    }
   }
 
   public static async bankruptPlayer(
@@ -434,6 +442,11 @@ export class GameProcessor {
     );
     if (nextPlayerId) {
       game.nextPlayerToAct = nextPlayerId;
+
+      // the turn passes to someone else, so give them a full turn's time
+      if (game.settings.useTimers) {
+        game.nextPlayerActBy = formatISO(addSeconds(new Date(), turnTimeLimit));
+      }
     }
 
     const nextPlayer =

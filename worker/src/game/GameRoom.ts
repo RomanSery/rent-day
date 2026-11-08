@@ -102,6 +102,10 @@ export class GameRoom extends DurableObject<Env> {
         send: (event, payload) => this.broadcastServerEvent(event, payload),
         sendDelayed: (delayMs, event, payload) =>
           this.scheduleEvent(delayMs, event, payload),
+        refreshGameState: async () => {
+          const game = toClientGame(await this.store.getGame());
+          this.broadcastAll(GameEvent.UPDATE_GAME_STATE, game);
+        },
       },
     };
   }
@@ -393,12 +397,13 @@ export class GameRoom extends DurableObject<Env> {
 
     switch (event) {
       case GameEvent.JOINED_GAME: {
-        const m = (args[0] ?? {}) as Partial<JoinedGameMsg>;
+        // take the lobby state from the game itself rather than the client
+        const game = await this.store.getGame();
         const msg: JoinedGameMsg = {
           playerName: me.playerName,
           userId: me.userId,
-          gameId: typeof m.gameId === "string" ? m.gameId : "",
-          allJoined: !!m.allJoined,
+          gameId: game ? game._id : "",
+          allJoined: !!game && game.allJoined,
         };
         this.broadcastOthers(ws, GameEvent.JOINED_GAME, msg);
         return;
@@ -467,9 +472,10 @@ export class GameRoom extends DurableObject<Env> {
       case GameEvent.SEND_CHAT_MSG: {
         const incoming = (args[1] ?? {}) as Partial<ChatMsg>;
         const cleaned = escapeTags(String(incoming.msg ?? "")).substring(0, MAX_CHAT_LENGTH);
+        // the sender's name comes from the verified session, not the message
         const newMsg: ChatMsg = {
           msg: cleaned,
-          player: typeof incoming.player === "string" ? incoming.player : me.playerName,
+          player: me.playerName,
         };
 
         await this.run(async () => {

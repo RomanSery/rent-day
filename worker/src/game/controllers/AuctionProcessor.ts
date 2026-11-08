@@ -71,7 +71,8 @@ export class AuctionProcessor {
     if (myBid == null) {
       return "player bid not found!";
     }
-    if (myBid.bid) {
+    // a bid of 0 is a valid bid, so check the flag rather than the amount
+    if (myBid.submittedBid || myBid.bid != null) {
       return "player already placed bid";
     }
 

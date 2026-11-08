@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
 import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import {
-  Routes, Route, useNavigate, useLocation, Link
+  Routes, Route, Navigate, useNavigate, useLocation, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
@@ -42,21 +42,18 @@ export const App: React.FC = () => {
     return getMyGameId();
   };
 
+  // Pages that read the current game from session storage must wait until
+  // the session check has run, otherwise a fresh tab opened straight on
+  // /gameinstance asks the API for a game with no id.
+  const [sessionChecked, setSessionChecked] = React.useState(false);
+
   React.useEffect(() => {
 
-    if (location && location.pathname === "/help") {
+    const publicPages = ["/help", "/newuser", "/login", "/contact"];
+    if (location && publicPages.includes(location.pathname)) {
+      setSessionChecked(true);
       return;
     }
-    if (location && location.pathname === "/newuser") {
-      return;
-    }
-    if (location && location.pathname === "/login") {
-      return;
-    }
-    if (location && location.pathname === "/contact") {
-      return;
-    }
-
 
     API.post("current-session")
       .then(function (response) {
@@ -71,6 +68,9 @@ export const App: React.FC = () => {
         // handle error
         logOut();
         navigate("/auth");
+      })
+      .finally(() => {
+        setSessionChecked(true);
       });
   }, []);
 
@@ -82,13 +82,19 @@ export const App: React.FC = () => {
 
   const GameDisplay = () => {
 
+    const myGameId = getMyGameId();
+    if (!myGameId) {
+      // no current game for this session: don't mount the board at all
+      return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
+    }
+
     redirectToHomeIfGameNotFound((redirectUrl: string) => {
       if (redirectUrl && redirectUrl.length > 0) {
         navigate(redirectUrl);
       }
     });
 
-    const socket = new SocketService(PageType.Game, getMyGameId());
+    const socket = new SocketService(PageType.Game, myGameId);
 
     return (
       <React.Fragment>
@@ -100,14 +106,7 @@ export const App: React.FC = () => {
 
 
   const Home = () => {
-
-    if (!isLoggedIn()) {
-      navigate("/auth");
-    } else {
-      navigate("/dashboard");
-    }
-
-    return null;
+    return <Navigate to={isLoggedIn() ? "/dashboard" : "/auth"} replace />;
   };
 
 
@@ -387,7 +386,11 @@ export const App: React.FC = () => {
   };
 
 
-  return (    
+  if (!sessionChecked) {
+    return null;
+  }
+
+  return (
     <Routes>
       <Route path="/" element={<Home />} />
 
