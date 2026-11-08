@@ -1,4 +1,4 @@
-import create, { GetState, SetState } from "zustand";
+import { create } from "zustand";
 
 interface TradeStateStore {
   myChecked: number[];
@@ -13,30 +13,28 @@ interface TradeStateStore {
   clear: () => void;
 }
 
-const useTradeStateStore = create<TradeStateStore>(
-  (set: SetState<TradeStateStore>, get: GetState<TradeStateStore>) => ({
-    myChecked: [],
-    theirChecked: [],
-    myAmount: 0,
-    theirAmount: 0,
+const useTradeStateStore = create<TradeStateStore>()((set, get) => ({
+  myChecked: [],
+  theirChecked: [],
+  myAmount: 0,
+  theirAmount: 0,
 
-    setMyChecked: (newData: number[]): void => {
-      set({ myChecked: newData });
-    },
-    setTheirChecked: (newData: number[]): void => {
-      set({ theirChecked: newData });
-    },
-    setMyAmount: (newData: number): void => {
-      set({ myAmount: newData });
-    },
-    setTheirAmount: (newData: number): void => {
-      set({ theirAmount: newData });
-    },
+  setMyChecked: (newData: number[]): void => {
+    set({ myChecked: newData });
+  },
+  setTheirChecked: (newData: number[]): void => {
+    set({ theirChecked: newData });
+  },
+  setMyAmount: (newData: number): void => {
+    set({ myAmount: newData });
+  },
+  setTheirAmount: (newData: number): void => {
+    set({ theirAmount: newData });
+  },
 
-    clear: (): void => {
-      set({ myChecked: [], theirChecked: [], myAmount: 0, theirAmount: 0 });
-    },
-  })
-);
+  clear: (): void => {
+    set({ myChecked: [], theirChecked: [], myAmount: 0, theirAmount: 0 });
+  },
+}));
 
 export default useTradeStateStore;

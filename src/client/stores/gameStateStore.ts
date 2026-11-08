@@ -1,4 +1,4 @@
-import create, { GetState, SetState } from "zustand";
+import { create } from "zustand";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { ChanceEvent } from "../../core/types/ChanceEvent";
 import { DiceRollResult } from "../../core/types/DiceRollResult";
@@ -67,121 +67,119 @@ interface GameStateStore {
   setAnimDiceRollResult: (newData: DiceRollResult | undefined) => void;
 }
 
-const useGameStateStore = create<GameStateStore>(
-  (set: SetState<GameStateStore>, get: GetState<GameStateStore>) => ({
-    showDiceAnimation: false,
-    animDiceRollResult: undefined,
-    setShowDiceAnimation: (newData: boolean): void => {
-      set({ showDiceAnimation: newData });
-    },
-    setAnimDiceRollResult: (newData: DiceRollResult | undefined): void => {
-      set({ animDiceRollResult: newData });
-    },
+const useGameStateStore = create<GameStateStore>()((set, get) => ({
+  showDiceAnimation: false,
+  animDiceRollResult: undefined,
+  setShowDiceAnimation: (newData: boolean): void => {
+    set({ showDiceAnimation: newData });
+  },
+  setAnimDiceRollResult: (newData: DiceRollResult | undefined): void => {
+    set({ animDiceRollResult: newData });
+  },
 
-    data: undefined,
-    actionMode: ActionMode.None,
-    squareToView: undefined,
-    playerIdToMove: "",
-    frames: [],
-    snackOpen: false,
-    snackMsg: "",
-    chanceOpen: false,
-    chanceEvent: undefined,
-    serverMsgModalOpen: false,
-    serverMsg: undefined,
+  data: undefined,
+  actionMode: ActionMode.None,
+  squareToView: undefined,
+  playerIdToMove: "",
+  frames: [],
+  snackOpen: false,
+  snackMsg: "",
+  chanceOpen: false,
+  chanceEvent: undefined,
+  serverMsgModalOpen: false,
+  serverMsg: undefined,
 
-    playerToView: undefined,
-    forceDie1: undefined,
-    forceDie2: undefined,
-    offerTradeOpen: false,
-    reviewTradeOpen: false,
-    tradeReviewedOpen: false,
-    travelOpen: false,
-    tradingWithPlayerId: null,
-    tradeOffer: null,
+  playerToView: undefined,
+  forceDie1: undefined,
+  forceDie2: undefined,
+  offerTradeOpen: false,
+  reviewTradeOpen: false,
+  tradeReviewedOpen: false,
+  travelOpen: false,
+  tradingWithPlayerId: null,
+  tradeOffer: null,
 
-    statsViewOpen: false,
-    taxesViewOpen: false,
-    helpOpen: false,
-    setStatsViewOpen: (newData: boolean): void => {
-      set({ statsViewOpen: newData });
-    },
-    setTaxesViewOpen: (newData: boolean): void => {
-      set({ taxesViewOpen: newData });
-    },
-    setHelpOpen: (newData: boolean): void => {
-      set({ helpOpen: newData });
-    },
+  statsViewOpen: false,
+  taxesViewOpen: false,
+  helpOpen: false,
+  setStatsViewOpen: (newData: boolean): void => {
+    set({ statsViewOpen: newData });
+  },
+  setTaxesViewOpen: (newData: boolean): void => {
+    set({ taxesViewOpen: newData });
+  },
+  setHelpOpen: (newData: boolean): void => {
+    set({ helpOpen: newData });
+  },
 
-    setPlayerToView: (newData: string | undefined): void => {
-      set({ playerToView: newData });
-    },
-    setForceDie1: (newData: number | undefined): void => {
-      set({ forceDie1: newData });
-    },
-    setForceDie2: (newData: number | undefined): void => {
-      set({ forceDie2: newData });
-    },
+  setPlayerToView: (newData: string | undefined): void => {
+    set({ playerToView: newData });
+  },
+  setForceDie1: (newData: number | undefined): void => {
+    set({ forceDie1: newData });
+  },
+  setForceDie2: (newData: number | undefined): void => {
+    set({ forceDie2: newData });
+  },
 
-    setOfferTradeOpen: (newData: boolean): void => {
-      set({ offerTradeOpen: newData });
-    },
-    setReviewTradeOpen: (newData: boolean): void => {
-      set({ reviewTradeOpen: newData });
-    },
-    setTradeReviewedOpen: (newData: boolean): void => {
-      set({ tradeReviewedOpen: newData });
-    },
-    setTravelOpen: (newData: boolean): void => {
-      set({ travelOpen: newData });
-    },
-    setTradingWithPlayerId: (newData: string | null): void => {
-      set({ tradingWithPlayerId: newData });
-    },
-    setTradeOffer: (newData: TradeOffer | null): void => {
-      set({ tradeOffer: newData });
-    },
+  setOfferTradeOpen: (newData: boolean): void => {
+    set({ offerTradeOpen: newData });
+  },
+  setReviewTradeOpen: (newData: boolean): void => {
+    set({ reviewTradeOpen: newData });
+  },
+  setTradeReviewedOpen: (newData: boolean): void => {
+    set({ tradeReviewedOpen: newData });
+  },
+  setTravelOpen: (newData: boolean): void => {
+    set({ travelOpen: newData });
+  },
+  setTradingWithPlayerId: (newData: string | null): void => {
+    set({ tradingWithPlayerId: newData });
+  },
+  setTradeOffer: (newData: TradeOffer | null): void => {
+    set({ tradeOffer: newData });
+  },
 
-    setSnackOpen: (newData: boolean): void => {
-      set({ snackOpen: newData });
-    },
-    setSnackMsg: (newData: string): void => {
-      set({ snackMsg: newData });
-    },
-    setChanceOpen: (newData: boolean): void => {
-      set({ chanceOpen: newData });
-    },
-    setChanceEvent: (newData: ChanceEvent | undefined): void => {
-      set({ chanceEvent: newData });
-    },
-    setServerMsgModalOpen: (newData: boolean): void => {
-      set({ serverMsgModalOpen: newData });
-    },
-    setServerMsg: (newData: ServerMsg | undefined): void => {
-      set({ serverMsg: newData });
-    },
+  setSnackOpen: (newData: boolean): void => {
+    set({ snackOpen: newData });
+  },
+  setSnackMsg: (newData: string): void => {
+    set({ snackMsg: newData });
+  },
+  setChanceOpen: (newData: boolean): void => {
+    set({ chanceOpen: newData });
+  },
+  setChanceEvent: (newData: ChanceEvent | undefined): void => {
+    set({ chanceEvent: newData });
+  },
+  setServerMsgModalOpen: (newData: boolean): void => {
+    set({ serverMsgModalOpen: newData });
+  },
+  setServerMsg: (newData: ServerMsg | undefined): void => {
+    set({ serverMsg: newData });
+  },
 
-    updateData: (newData: GameState): void => {
-      set({ data: newData });
-    },
-    setSquareToView: (square: number): void => {
-      set({ squareToView: square });
-    },
-    setPlayerIdToMove: (playerId: string): void => {
-      set({ playerIdToMove: playerId });
-    },
+  updateData: (newData: GameState): void => {
+    set({ data: newData });
+  },
+  setSquareToView: (square: number): void => {
+    set({ squareToView: square });
+  },
+  setPlayerIdToMove: (playerId: string): void => {
+    set({ playerIdToMove: playerId });
+  },
 
-    clearMovement: (): void => {
-      set({ playerIdToMove: "", frames: [] });
-    },
+  clearMovement: (): void => {
+    set({ playerIdToMove: "", frames: [] });
+  },
 
-    showMovementAnimation: (playerId: string, frames: Array<number>) => {
-      set({ playerIdToMove: playerId, frames: frames });
-    },
-    setActionMode: (mode: ActionMode): void => {
-      set({ actionMode: mode });
-    },
-  })
-);
+  showMovementAnimation: (playerId: string, frames: Array<number>) => {
+    set({ playerIdToMove: playerId, frames: frames });
+  },
+  setActionMode: (mode: ActionMode): void => {
+    set({ actionMode: mode });
+  },
+}));
 
 export default useGameStateStore;

@@ -1,4 +1,4 @@
-import create, { GetState, SetState } from "zustand";
+import { create } from "zustand";
 import { ChatMsg } from "../../core/types/ChatMsg";
 
 interface ChatStore {
@@ -12,27 +12,25 @@ interface ChatStore {
   initMessages: (msgs: Array<ChatMsg>) => void;
 }
 
-const useChatStore = create<ChatStore>(
-  (set: SetState<ChatStore>, get: GetState<ChatStore>) => ({
-    sendChatMsg: undefined,
-    showChat: true,
-    messages: [],
+const useChatStore = create<ChatStore>()((set, get) => ({
+  sendChatMsg: undefined,
+  showChat: true,
+  messages: [],
 
-    setSendChatMsg: (newData: string | undefined): void => {
-      set({ sendChatMsg: newData });
-    },
-    setShowChat: (newData: boolean): void => {
-      set({ showChat: newData });
-    },
-    initMessages: (msgs: Array<ChatMsg>): void => {
-      set({ messages: msgs });
-    },
-    addNewMsg: (newMsg: ChatMsg): void => {
-      const msgs = get().messages;
-      set({ messages: [...msgs, newMsg] });
+  setSendChatMsg: (newData: string | undefined): void => {
+    set({ sendChatMsg: newData });
+  },
+  setShowChat: (newData: boolean): void => {
+    set({ showChat: newData });
+  },
+  initMessages: (msgs: Array<ChatMsg>): void => {
+    set({ messages: msgs });
+  },
+  addNewMsg: (newMsg: ChatMsg): void => {
+    const msgs = get().messages;
+    set({ messages: [...msgs, newMsg] });
 
-    }
-  })
-);
+  }
+}));
 
 export default useChatStore;
