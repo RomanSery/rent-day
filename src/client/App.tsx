@@ -29,8 +29,6 @@ export const App: React.FC = () => {
 
   const history = useHistory();
   const location = useLocation();
-  const isDev = !process.env.NODE_ENV || process.env.NODE_ENV === "development";
-  const wsUri = isDev ? "ws://localhost:4000" : "https://rentday.coderdreams.com";
 
 
 
@@ -117,7 +115,7 @@ export const App: React.FC = () => {
       }
     });
 
-    const socket = new SocketService(PageType.Game, getMyGameId(), wsUri);
+    const socket = new SocketService(PageType.Game, getMyGameId());
 
     return (
       <React.Fragment>
@@ -301,7 +299,7 @@ export const App: React.FC = () => {
 
   const DisplayJoinGamePage = () => {
 
-    const socket = new SocketService(PageType.Join, getGameId(), wsUri);
+    const socket = new SocketService(PageType.Join, getGameId());
     const queryClient = new QueryClient();
 
     return (

@@ -1,0 +1,51 @@
+{
+  // Cloudflare Workers configuration for the Rent Day backend.
+  // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rent-day",
+  "main": "src/index.ts",
+  "tsconfig": "tsconfig.json",
+  "compatibility_date": "2025-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // The React build (../build) is served as static assets by the same
+  // Worker. Only /api/* and /ws reach the Worker script; everything else is
+  // served from the build folder with SPA fallback to index.html.
+  "assets": {
+    "directory": "../build",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/ws", "/ws/*"]
+  },
+
+  // One Durable Object per game: holds the game state, auctions, lottos,
+  // trades and the players' WebSocket connections.
+  "durable_objects": {
+    "bindings": [{ "name": "GAME_ROOM", "class_name": "GameRoom" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["GameRoom"] }],
+
+  // D1 holds user accounts and the lobby's list of games.
+  // Create it with:  npm run db:create   (inside the worker folder)
+  // then paste the returned database_id below and run db:migrate:remote.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rentday-db",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "vars": {
+    "ENVIRONMENT": "production",
+    // PBKDF2 iterations for password hashing. Lower it if logins hit the
+    // free plan's CPU limit.
+    "PBKDF2_ITERATIONS": "100000"
+  },
+
+  // JWT_SECRET is a secret, not a var:  npm run secret:jwt
+  // For local dev put it in worker/.dev.vars (see .dev.vars.example).
+
+  "observability": { "enabled": true }
+}

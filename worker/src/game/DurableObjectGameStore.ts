@@ -1,0 +1,78 @@
+import { GameStore } from "./GameContext";
+import {
+  AuctionDocument,
+  GameInstanceDocument,
+  LottoDocument,
+  TradeDocument,
+  UserDocument,
+} from "./model";
+import { UsersRepo } from "../db/users";
+
+export const GAME_KEY = "game";
+
+/**
+ * GameStore backed by a Durable Object's storage (game, auctions, lottos and
+ * trades) plus D1 for user accounts.
+ */
+export class DurableObjectGameStore implements GameStore {
+  constructor(
+    private readonly storage: DurableObjectStorage,
+    private readonly users: UsersRepo
+  ) {}
+
+  async getGame(): Promise<GameInstanceDocument | null> {
+    const game = await this.storage.get<GameInstanceDocument>(GAME_KEY);
+    return game ?? null;
+  }
+
+  async saveGame(game: GameInstanceDocument): Promise<void> {
+    game.updatedAt = new Date().toISOString();
+    // The game logic keeps class instances (DiceRoll) in the state while a
+    // request runs; persist plain JSON like the old Mongo documents were.
+    await this.storage.put(GAME_KEY, JSON.parse(JSON.stringify(game)));
+  }
+
+  async getAuction(auctionId: string | null | undefined): Promise<AuctionDocument | null> {
+    if (!auctionId) {
+      return null;
+    }
+    const auction = await this.storage.get<AuctionDocument>(`auction:${auctionId}`);
+    return auction ?? null;
+  }
+
+  async saveAuction(auction: AuctionDocument): Promise<void> {
+    await this.storage.put(`auction:${auction._id}`, auction);
+  }
+
+  async getLotto(lottoId: string | null | undefined): Promise<LottoDocument | null> {
+    if (!lottoId) {
+      return null;
+    }
+    const lotto = await this.storage.get<LottoDocument>(`lotto:${lottoId}`);
+    return lotto ?? null;
+  }
+
+  async saveLotto(lotto: LottoDocument): Promise<void> {
+    await this.storage.put(`lotto:${lotto._id}`, lotto);
+  }
+
+  async getTrade(tradeId: string | null | undefined): Promise<TradeDocument | null> {
+    if (!tradeId) {
+      return null;
+    }
+    const trade = await this.storage.get<TradeDocument>(`trade:${tradeId}`);
+    return trade ?? null;
+  }
+
+  async saveTrade(trade: TradeDocument): Promise<void> {
+    await this.storage.put(`trade:${trade._id}`, trade);
+  }
+
+  async getUser(userId: string | null | undefined): Promise<UserDocument | null> {
+    return this.users.findById(userId);
+  }
+
+  async saveUser(user: UserDocument): Promise<void> {
+    await this.users.save(user);
+  }
+}

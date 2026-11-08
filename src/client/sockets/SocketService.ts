@@ -1,63 +1,231 @@
-import { Manager, Socket } from "socket.io-client";
 import { PageType } from "../../core/enums/PageType";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getMyPlayerName, getMyUserId, hasJoinedGame } from "../helpers";
 
-interface GameClientSocket extends Socket {
-  playerName?: string;
-  userId?: string;
-  gameId?: string;
+type Listener = (...args: any[]) => void;
+
+interface GameClientSocket {
+  emit: (event: GameEvent, ...args: any[]) => void;
 }
 
+interface WireMessage {
+  event: string;
+  args: any[];
+}
+
+const MAX_RECONNECT_DELAY_MS = 15000;
+const MAX_OUTBOX = 50;
+
+/**
+ * Where the game's WebSocket lives. In production it is the same origin as
+ * the page (the Worker serves both). In development the React dev server
+ * only proxies HTTP, so we talk to wrangler directly.
+ */
+const getWsBase = (): string => {
+  if (process.env.REACT_APP_WS_URL) {
+    return process.env.REACT_APP_WS_URL;
+  }
+  if (process.env.NODE_ENV === "development") {
+    return "ws://localhost:8787";
+  }
+  const proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+  return proto + "//" + window.location.host;
+};
+
+/**
+ * Thin WebSocket client with the same surface the components used with
+ * socket.io: `socket.emit(event, ...args)`, `listenForEvent(event, fn)` and
+ * `disconnect()`. Messages are JSON `{ event, args }` in both directions.
+ */
 export class SocketService {
   private pageType: PageType;
-  private manager: Manager;
-  public socket: GameClientSocket;
-
   private gameId: string | null;
 
-  constructor(type: PageType, gameId: string | null, uri: string) {
-    console.log("initiating socket service: " + uri);
-    this.gameId = gameId;
+  private ws: WebSocket | null = null;
+  private listeners: Map<string, Listener[]> = new Map();
+  private outbox: string[] = [];
+  private closedByUser = false;
+  private hasConnectedOnce = false;
+  private reconnectAttempts = 0;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
-    this.manager = new Manager(uri, {
-      withCredentials: true,
-      rememberUpgrade: true,
-    });
-    this.socket = this.manager.socket("/");
+  public socket: GameClientSocket;
+
+  constructor(type: PageType, gameId: string | null) {
     this.pageType = type;
+    this.gameId = gameId;
+    this.socket = {
+      emit: (event: GameEvent, ...args: any[]) => this.send(event, args),
+    };
 
-    if (this.pageType === PageType.Join) {
-      if (
-        hasJoinedGame() &&
-        getMyPlayerName() !== null &&
-        getMyUserId() !== null
-      ) {
-        this.socket.emit(GameEvent.JOINED_GAME, {
-          playerName: getMyPlayerName()!,
-          userId: getMyUserId()!,
-          gameId: this.gameId,
-          allJoined: false,
-        });
-      }
-    }
-
-    if (this.gameId && this.gameId !== null) {
-      this.socket.emit(
-        GameEvent.JOIN_GAME_ROOM,
-        this.gameId,
-        getMyUserId(),
-        getMyPlayerName()
-      );
+    if (this.gameId) {
+      console.log("initiating socket service for game " + this.gameId);
+      this.connect();
+    } else {
+      console.log("socket service: no game id, not connecting");
     }
   }
 
   public listenForEvent(event: GameEvent, fn: Function): void {
-    this.socket.on(event, fn);
+    const existing = this.listeners.get(event) || [];
+    existing.push(fn as Listener);
+    this.listeners.set(event, existing);
   }
 
   // disconnect - used when unmounting
   public disconnect(): void {
-    this.socket.disconnect();
+    this.closedByUser = true;
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    if (this.ws) {
+      try {
+        this.ws.close(1000, "client left");
+      } catch (e) {
+        // ignore
+      }
+      this.ws = null;
+    }
+  }
+
+  private connect(): void {
+    if (!this.gameId || this.closedByUser) {
+      return;
+    }
+
+    const url =
+      getWsBase() + "/ws?gameId=" + encodeURIComponent(this.gameId);
+    const ws = new WebSocket(url);
+    this.ws = ws;
+
+    ws.onopen = () => {
+      if (this.ws !== ws) {
+        return;
+      }
+      this.reconnectAttempts = 0;
+      this.announce();
+      this.flushOutbox();
+    };
+
+    ws.onmessage = (ev: MessageEvent) => {
+      this.dispatch(ev.data);
+    };
+
+    ws.onclose = () => {
+      if (this.ws === ws) {
+        this.ws = null;
+      }
+      if (!this.closedByUser) {
+        this.scheduleReconnect();
+      }
+    };
+
+    ws.onerror = () => {
+      // onclose follows and handles reconnecting
+    };
+  }
+
+  /** Mirrors what the old socket.io client emitted right after connecting. */
+  private announce(): void {
+    if (!this.hasConnectedOnce) {
+      this.hasConnectedOnce = true;
+
+      if (
+        this.pageType === PageType.Join &&
+        hasJoinedGame() &&
+        getMyPlayerName() !== null &&
+        getMyUserId() !== null
+      ) {
+        this.sendNow(GameEvent.JOINED_GAME, [
+          {
+            playerName: getMyPlayerName()!,
+            userId: getMyUserId()!,
+            gameId: this.gameId,
+            allJoined: false,
+          },
+        ]);
+      }
+    }
+
+    this.sendNow(GameEvent.JOIN_GAME_ROOM, [
+      this.gameId,
+      getMyUserId(),
+      getMyPlayerName(),
+    ]);
+  }
+
+  private scheduleReconnect(): void {
+    if (this.reconnectTimer) {
+      return;
+    }
+    const delay = Math.min(
+      1000 * Math.pow(2, this.reconnectAttempts),
+      MAX_RECONNECT_DELAY_MS
+    );
+    this.reconnectAttempts++;
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      this.connect();
+    }, delay);
+  }
+
+  private send(event: GameEvent, args: any[]): void {
+    if (!this.gameId) {
+      return;
+    }
+    const payload = JSON.stringify({ event, args } as WireMessage);
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(payload);
+    } else {
+      // queue until (re)connected
+      this.outbox.push(payload);
+      if (this.outbox.length > MAX_OUTBOX) {
+        this.outbox.shift();
+      }
+    }
+  }
+
+  private sendNow(event: GameEvent, args: any[]): void {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ event, args } as WireMessage));
+    }
+  }
+
+  private flushOutbox(): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
+    const queued = this.outbox;
+    this.outbox = [];
+    for (const payload of queued) {
+      this.ws.send(payload);
+    }
+  }
+
+  private dispatch(raw: unknown): void {
+    if (typeof raw !== "string") {
+      return;
+    }
+    let msg: WireMessage;
+    try {
+      msg = JSON.parse(raw);
+    } catch (e) {
+      return;
+    }
+    if (!msg || typeof msg.event !== "string") {
+      return;
+    }
+    const args = Array.isArray(msg.args) ? msg.args : [];
+    const fns = this.listeners.get(msg.event);
+    if (fns) {
+      for (const fn of fns) {
+        try {
+          fn(...args);
+        } catch (e) {
+          console.log("socket listener failed", msg.event, e);
+        }
+      }
+    }
   }
 }

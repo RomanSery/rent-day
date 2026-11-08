@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faBicycle,
@@ -229,12 +228,9 @@ export const getIconProp = (type: PieceType): IconDefinition => {
   return faChessPawn;
 };
 
+// ids are plain 24-hex strings now; these helpers only normalise them
 export const getObjectIdAsHexString = (id: string | any): string => {
-  if (typeof id === "string") {
-    return new mongoose.Types.ObjectId(id).toHexString();
-  }
-
-  return (id as mongoose.Types.ObjectId).toHexString();
+  return String(id).toLowerCase();
 };
 
 export const areObjectIdsEqual = (
@@ -242,9 +238,7 @@ export const areObjectIdsEqual = (
   id2: string | any
 ): boolean => {
   if (id1 && id2) {
-    const objectId1 = new mongoose.Types.ObjectId(id1);
-    const objectId2 = new mongoose.Types.ObjectId(id2);
-    return objectId1.equals(objectId2);
+    return String(id1).toLowerCase() === String(id2).toLowerCase();
   }
 
   return false;
