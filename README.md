@@ -39,21 +39,80 @@ to measure rule changes.
 
 ## Local development
 
-Requirements: Node.js 20 or newer (tested with 22).
+### Requirements
+
+- **Node.js 20 or newer** (developed with 22). Check with `node --version` in a
+  terminal. If the command is not found, install the LTS build from
+  https://nodejs.org, or unzip a portable build somewhere and add its folder to
+  your `PATH` (Windows: `setx PATH "%PATH%;C:\path	o
+ode"`, then reopen
+  the terminal or editor).
+- A browser. Nothing else: the database and the game objects run locally
+  inside `wrangler dev`.
+
+### First-time setup
+
+From the repository root (the VS Code terminal works fine):
 
 ```bash
-npm install            # also installs worker/ dependencies
-cp worker/.dev.vars.example worker/.dev.vars   # then set JWT_SECRET
-npm --prefix worker run db:migrate:local
+npm install                                    # also installs worker/ dependencies
+cp worker/.dev.vars.example worker/.dev.vars   # then set JWT_SECRET to any long random string
+npm --prefix worker run db:migrate:local       # creates the local D1 tables
+```
+
+`.dev.vars` is git-ignored. Its `ENVIRONMENT=development` setting enables the
+development shortcuts described below.
+
+### Running the game
+
+```bash
 npm run dev
 ```
 
-`npm run dev` starts `wrangler dev` on http://localhost:8787 (API, WebSockets,
-local D1 and Durable Objects) and the Vite dev server on
-http://localhost:3000, which proxies both `/api` and the `/ws` WebSocket to
-the Worker (see `vite.config.ts`).
+This starts two processes side by side:
 
-Useful commands:
+- `wrangler dev` on http://localhost:8787: the API, the WebSockets, the local
+  D1 database and the per-game Durable Objects.
+- the Vite dev server on http://localhost:3000, which serves the React client
+  and proxies `/api` and the `/ws` WebSocket to the Worker (see
+  `vite.config.ts`).
+
+Open http://localhost:3000, create an account and a game. Edits to the client
+or the worker reload automatically. Stop both with Ctrl+C.
+
+To play against yourself as two humans, sign in with a second account in a
+different browser or a private window (the login cookie is per browser
+profile), or add computer players from the create game form.
+
+If a start fails with "address already in use", an earlier run is still
+holding the port: on Windows, `taskkill /F /IM workerd.exe` and
+`taskkill /F /IM node.exe` clear leftover servers.
+
+### Production-style run
+
+To see the exact setup that runs on Cloudflare, with the Worker serving the
+built client, the API and the WebSockets from one origin:
+
+```bash
+npm run build                 # Vite build into build/
+npm --prefix worker run dev   # Worker only, on http://localhost:8787
+```
+
+### Development shortcuts
+
+These only apply with `ENVIRONMENT=development` in `worker/.dev.vars`:
+
+- `forceDie1` / `forceDie2` in the body of `/api/actions/roll` force the dice
+  (the tests use this to steer players onto specific squares).
+- `DEV_BOT_PACE_MS` sets the delay between computer player actions (default
+  1000 ms); `DEV_TURN_SECONDS` and `DEV_AUCTION_SECONDS` shorten the turn and
+  auction timers. They can be set in `.dev.vars` or passed on the command line,
+  for example from `worker/`:
+  `npx wrangler dev --var DEV_BOT_PACE_MS:200 --var DEV_TURN_SECONDS:10`.
+- `DEV_PREOWN_PROPERTIES=true` restores the old server's shortcut where the
+  second player starts owning every property.
+
+### Useful commands
 
 ```bash
 npm run typecheck            # tsc over the client
@@ -63,12 +122,10 @@ npm run preview              # serve the production build locally
 npm --prefix worker run tail # live logs from the deployed Worker
 ```
 
-End-to-end API tests live in `worker/test` (see its README): `npm run test:api`
-and `npm run test:api:deep` from `worker/` against a running `wrangler dev`.
-
-With `ENVIRONMENT=development`, `forceDie1`/`forceDie2` are honoured on
-`/api/actions/roll`. Setting `DEV_PREOWN_PROPERTIES=true` as well turns on the
-old server's shortcut where the second player starts owning every property.
+End-to-end API tests live in `worker/test` (see its README); they run against
+a `wrangler dev` that is already up: `npm run test:api`, `test:api:deep`,
+`test:api:timers`, `test:api:bots`, `test:api:rejoin` and the `sim`
+measuring tool, all from `worker/`.
 
 ## Deploying to Cloudflare
 
