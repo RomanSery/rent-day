@@ -3,4 +3,5 @@ export interface GameToJoin {
   readonly name: string;
   readonly maxPlayers: number;
   readonly playersJoined: number;
+  readonly bots: number;
 }

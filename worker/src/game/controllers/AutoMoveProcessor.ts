@@ -4,14 +4,13 @@ import { GameStatus } from "@core/enums/GameStatus";
 import { isFuture, parseISO } from "date-fns";
 import { DiceRoll } from "@core/types/DiceRoll";
 import { maxTimeoutsAllowed } from "@core/constants";
-import { SquareGameData } from "@core/types/SquareGameData";
 import { GameInstanceDocument } from "../model";
 import { GameContext } from "../GameContext";
 import { RollProcessor } from "./RollProcessor";
 import { GameProcessor } from "./GameProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 import { areIdsEqual } from "./helpers";
-import { PropertyProcessor } from "./PropertyProcessor";
+import { Liquidation } from "./Liquidation";
 
 export class AutoMoveProcessor {
   private ctx: GameContext;
@@ -140,84 +139,6 @@ export class AutoMoveProcessor {
   }
 
   private async autoSell(): Promise<void> {
-    while (this.player!.money < 0) {
-      const sold = await this.tryToSellAHouse();
-      if (!sold) {
-        break;
-      }
-    }
-
-    while (this.player!.money < 0) {
-      const mortgaged = await this.tryToMortgageProperty();
-      if (!mortgaged) {
-        break;
-      }
-    }
-  }
-
-  private async tryToSellAHouse(): Promise<boolean> {
-    const playerOwnedSquaresWithHouses: SquareGameData[] = this.game!.squareState.filter(
-      (s: SquareGameData) => {
-        return (
-          s.owner &&
-          areIdsEqual(s.owner, this.player!._id) &&
-          s.numHouses > 0 &&
-          s.electricityCost &&
-          s.electricityCost > 0 &&
-          !s.isMortgaged
-        );
-      }
-    );
-
-    if (playerOwnedSquaresWithHouses.length === 0) {
-      return false;
-    }
-
-    const squareId = playerOwnedSquaresWithHouses[0].squareId;
-    const errMsg = await PropertyProcessor.sellHouse(
-      this.ctx,
-      this.game!,
-      this.player!,
-      squareId,
-      this.player!._id
-    );
-
-    if (errMsg && errMsg.length > 0) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private async tryToMortgageProperty(): Promise<boolean> {
-    const playerOwnedSquares: SquareGameData[] = this.game!.squareState.filter(
-      (s: SquareGameData) => {
-        return (
-          s.owner &&
-          areIdsEqual(s.owner, this.player!._id) &&
-          !s.isMortgaged &&
-          s.mortgageValue &&
-          s.mortgageValue > 0
-        );
-      }
-    );
-
-    if (playerOwnedSquares.length === 0) {
-      return false;
-    }
-
-    const squareId = playerOwnedSquares[0].squareId;
-    const errMsg = await PropertyProcessor.mortgageProperty(
-      this.ctx,
-      this.game!,
-      this.player!,
-      squareId,
-      this.player!._id
-    );
-    if (errMsg && errMsg.length > 0) {
-      return false;
-    }
-
-    return true;
+    await Liquidation.raiseCash(this.ctx, this.game!, this.player!, 0);
   }
 }

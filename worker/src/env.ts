@@ -12,6 +12,8 @@ export interface Env {
   /** development only: shorten the turn / auction timers (seconds) */
   DEV_TURN_SECONDS?: string;
   DEV_AUCTION_SECONDS?: string;
+  /** development only: base delay between computer player actions (ms) */
+  DEV_BOT_PACE_MS?: string;
 }
 
 export const isDevEnv = (env: Env): boolean =>

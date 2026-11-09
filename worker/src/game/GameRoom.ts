@@ -29,6 +29,10 @@ import { PropertyProcessor } from "./controllers/PropertyProcessor";
 import { TradeProcessor } from "./controllers/TradeProcessor";
 import { PlayerProcessor } from "./controllers/PlayerProcessor";
 import { AutoMoveProcessor } from "./controllers/AutoMoveProcessor";
+import { BotLevel } from "@core/enums/BotLevel";
+import { PlayerState } from "@core/enums/PlayerState";
+import { areIdsEqual } from "./controllers/helpers";
+import { BotPlayer, isBotId } from "./bots/BotPlayer";
 
 /** Result of a game action: errMsg is "" on success. */
 export interface ActionResult {
@@ -41,11 +45,23 @@ interface WsAttachment {
   playerName: string;
 }
 
-interface PendingEvent {
+/** Work the object has scheduled for itself through its alarm. */
+type Job =
+  | { kind: "event"; at: number; event: GameEvent; payload: unknown }
+  | { kind: "raw"; at: number; event: GameEvent; args: unknown[] }
+  | { kind: "refresh"; at: number }
+  | { kind: "botStep"; at: number; botId: string }
+  | { kind: "botBids"; at: number }
+  | { kind: "botTrade"; at: number; tradeId: string };
+
+/** Stored entries written before job kinds existed. */
+interface LegacyPendingEvent {
   at: number;
   event: GameEvent;
   payload: unknown;
 }
+
+const MAX_BOT_STEPS_PER_TURN = 60;
 
 interface IndexState {
   status: GameStatus;
@@ -58,6 +74,14 @@ const devSeconds = (env: Env, value: string | undefined, fallback: number): numb
   }
   const n = parseInt(value, 10);
   return Number.isFinite(n) && n > 0 ? n : fallback;
+};
+
+const devMillis = (env: Env, value: string | undefined, fallback: number): number => {
+  if (!isDevEnv(env) || !value) {
+    return fallback;
+  }
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) && n >= 0 ? n : fallback;
 };
 
 const PENDING_EVENTS_KEY = "pendingEvents";
@@ -111,42 +135,59 @@ export class GameRoom extends DurableObject<Env> {
       // development may shorten the timers so timeout flows can be tested
       turnTimeLimit: devSeconds(env, env.DEV_TURN_SECONDS, turnTimeLimit),
       auctionTimeLimit: devSeconds(env, env.DEV_AUCTION_SECONDS, auctionTimeLimit),
+      botPaceMs: devMillis(env, env.DEV_BOT_PACE_MS, 1000),
       events: {
         send: (event, payload) => this.broadcastServerEvent(event, payload),
         sendDelayed: (delayMs, event, payload) =>
-          this.scheduleEvent(delayMs, event, payload),
+          this.scheduleJob({ kind: "event", at: Date.now() + delayMs, event, payload }),
         refreshGameState: async () => {
           const game = toClientGame(await this.store.getGame());
           this.broadcastAll(GameEvent.UPDATE_GAME_STATE, game);
         },
+        broadcast: (event, ...args) => this.broadcastAll(event, ...args),
+        broadcastDelayed: (delayMs, event, args) =>
+          this.scheduleJob({ kind: "raw", at: Date.now() + delayMs, event, args }),
       },
     };
+  }
+
+  /** bot steps taken since the turn last changed hands, per bot */
+  private botSteps = new Map<string, number>();
+  private lastTurnPlayer: string | null = null;
+
+  private pace(factor: number): number {
+    return Math.round(this.gameCtx.botPaceMs * factor);
   }
 
   // ---------------------------------------------------------------------
   // RPC methods called by the Worker
   // ---------------------------------------------------------------------
 
-  async createGame(params: CreateGameParams): Promise<string> {
+  async createGame(params: CreateGameParams, numBots: number = 0, botLevel: BotLevel = BotLevel.Normal): Promise<string> {
     return this.run(async () => {
       const existing = await this.store.getGame();
       if (existing) {
         throw new Error("game already exists");
       }
-      const game = await GameProcessor.createGame(this.gameCtx, params);
+      let game = await GameProcessor.createGame(this.gameCtx, params);
+      for (let i = 0; i < numBots && i < params.maxPlayers - 1; i++) {
+        await GameProcessor.addBot(this.gameCtx, botLevel);
+      }
+      game = (await this.store.getGame()) ?? game;
       await this.gamesIndex.upsert({
         id: game._id,
         name: game.name,
         status: game.status,
         maxPlayers: game.settings.maxPlayers,
-        playersJoined: 0,
+        playersJoined: game.players.length,
         hasPassword: !!game.settings.password,
+        bots: game.players.filter((p) => p.isBot).length,
         createdBy: game.createdBy,
         createdAt: game.createdAt,
       });
       await this.ctx.storage.put<IndexState>(INDEX_STATE_KEY, {
         status: game.status,
-        playersJoined: 0,
+        playersJoined: game.players.length,
       });
       return game._id;
     });
@@ -183,6 +224,32 @@ export class GameRoom extends DurableObject<Env> {
     return this.runAction(() =>
       GameProcessor.joinGame(this.gameCtx, userId, piece, playerClass, gamePwd)
     );
+  }
+
+  /** The game's creator adds a computer player to the lobby. */
+  async addBot(userId: string, level: BotLevel): Promise<{ errMsg: string; result: JoinResult | null }> {
+    return this.runAction(async () => {
+      const game = await this.store.getGame();
+      if (!game) {
+        return { errMsg: "game not found", result: null };
+      }
+      if (!areIdsEqual(game.createdBy, userId)) {
+        return { errMsg: "Only the game's creator can add computer players", result: null };
+      }
+      const outcome = await GameProcessor.addBot(this.gameCtx, level);
+      if (outcome.result) {
+        const after = await this.store.getGame();
+        const bot = after?.players.find((p) => p.name === outcome.result!.playerName);
+        const msg: JoinedGameMsg = {
+          playerName: outcome.result.playerName,
+          userId: bot?._id ?? "",
+          gameId: game._id,
+          allJoined: outcome.result.allJoined,
+        };
+        this.broadcastAll(GameEvent.JOINED_GAME, msg);
+      }
+      return outcome;
+    });
   }
 
   async leaveGame(userId: string): Promise<void> {
@@ -328,7 +395,12 @@ export class GameRoom extends DurableObject<Env> {
       if (errMsg) {
         return fail(errMsg);
       }
-      return ok({ newTradeId: processor.getNewTradeId() });
+      const tradeId = processor.getNewTradeId();
+      const game = await this.store.getGame();
+      if (tradeId && game && isBotId(game, tradingWithPlayerId)) {
+        await this.scheduleJob({ kind: "botTrade", at: Date.now() + this.pace(1.5), tradeId });
+      }
+      return ok({ newTradeId: tradeId });
     });
   }
 
@@ -452,14 +524,7 @@ export class GameRoom extends DurableObject<Env> {
 
       case GameEvent.AUCTION_BID: {
         const auctionId = args[1];
-        const auction = await this.store.getAuction(
-          typeof auctionId === "string" ? auctionId : null
-        );
-        // each player gets a view that hides the other players' bids
-        for (const socket of this.ctx.getWebSockets()) {
-          const viewer = this.attachmentOf(socket);
-          this.sendTo(socket, GameEvent.AUCTION_UPDATE, AuctionProcessor.viewFor(auction, viewer.userId));
-        }
+        await this.broadcastAuctionViews(typeof auctionId === "string" ? auctionId : null);
         return;
       }
 
@@ -535,34 +600,181 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   // ---------------------------------------------------------------------
-  // Delayed events (replaces setTimeout on the old server)
+  // Scheduled work: delayed events and computer player moves, all driven by
+  // the object's alarm (replaces setTimeout on the old server)
   // ---------------------------------------------------------------------
 
-  private async scheduleEvent(delayMs: number, event: GameEvent, payload: unknown): Promise<void> {
-    const pending = (await this.ctx.storage.get<PendingEvent[]>(PENDING_EVENTS_KEY)) ?? [];
-    const at = Date.now() + delayMs;
-    pending.push({ at, event, payload });
-    await this.ctx.storage.put(PENDING_EVENTS_KEY, pending);
+  private async loadJobs(): Promise<Job[]> {
+    const stored = (await this.ctx.storage.get<Array<Job | LegacyPendingEvent>>(PENDING_EVENTS_KEY)) ?? [];
+    return stored.map((j) => ("kind" in j ? j : { kind: "event", at: j.at, event: j.event, payload: j.payload }));
+  }
 
+  private async saveJobs(jobs: Job[]): Promise<void> {
+    await this.ctx.storage.put(PENDING_EVENTS_KEY, jobs);
+  }
+
+  private async armAlarm(): Promise<void> {
+    const jobs = await this.loadJobs();
+    if (jobs.length === 0) {
+      return;
+    }
+    const next = Math.min(...jobs.map((j) => j.at));
     const current = await this.ctx.storage.getAlarm();
-    if (current == null || at < current) {
-      await this.ctx.storage.setAlarm(at);
+    if (current == null || next < current) {
+      await this.ctx.storage.setAlarm(next);
+    }
+  }
+
+  private async scheduleJob(job: Job): Promise<void> {
+    const jobs = await this.loadJobs();
+    jobs.push(job);
+    await this.saveJobs(jobs);
+    await this.armAlarm();
+  }
+
+  /** Schedule unless an equivalent job is already waiting. */
+  private async scheduleOnce(job: Job): Promise<void> {
+    const jobs = await this.loadJobs();
+    const duplicate = jobs.some(
+      (j) => j.kind === job.kind && (j.kind !== "botStep" || job.kind !== "botStep" || j.botId === job.botId)
+    );
+    if (!duplicate) {
+      await this.scheduleJob(job);
     }
   }
 
   async alarm(): Promise<void> {
-    const pending = (await this.ctx.storage.get<PendingEvent[]>(PENDING_EVENTS_KEY)) ?? [];
+    const jobs = await this.loadJobs();
     const now = Date.now() + 50; // alarms can fire a few ms early
-    const due = pending.filter((p) => p.at <= now);
-    const rest = pending.filter((p) => p.at > now);
+    const due = jobs.filter((j) => j.at <= now).sort((a, b) => a.at - b.at);
+    const rest = jobs.filter((j) => j.at > now);
+    // persist the remainder first so handlers can schedule new work safely
+    await this.saveJobs(rest);
 
-    for (const e of due) {
-      this.broadcastServerEvent(e.event, e.payload);
+    for (const job of due) {
+      try {
+        await this.runJob(job);
+      } catch (e) {
+        console.log("scheduled job failed", job.kind, e);
+      }
     }
 
-    await this.ctx.storage.put(PENDING_EVENTS_KEY, rest);
-    if (rest.length > 0) {
-      await this.ctx.storage.setAlarm(Math.min(...rest.map((r) => r.at)));
+    await this.armAlarm();
+  }
+
+  private async runJob(job: Job): Promise<void> {
+    switch (job.kind) {
+      case "event":
+        this.broadcastServerEvent(job.event, job.payload);
+        return;
+      case "raw":
+        this.broadcastAll(job.event, ...job.args);
+        return;
+      case "refresh":
+        await this.gameCtx.events.refreshGameState();
+        return;
+      case "botStep":
+        await this.run(async () => {
+          const steps = (this.botSteps.get(job.botId) ?? 0) + 1;
+          this.botSteps.set(job.botId, steps);
+          if (steps > MAX_BOT_STEPS_PER_TURN) {
+            console.log("bot step limit reached for", job.botId);
+            return;
+          }
+          const result = await BotPlayer.step(this.gameCtx, job.botId);
+          if (result === "rolled") {
+            // let the clients animate the move before the bot continues
+            await this.scheduleJob({ kind: "refresh", at: Date.now() + this.pace(7) });
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(7.5) });
+          } else if (result === "acted") {
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(1) });
+          }
+          await this.syncIndex();
+          await this.afterAction();
+        });
+        return;
+      case "botBids":
+        await this.run(async () => {
+          const before = await this.store.getGame();
+          const auctionId = before?.auctionId ?? null;
+          const placed = await BotPlayer.placeBids(this.gameCtx);
+          if (placed) {
+            await this.broadcastAuctionViews(auctionId);
+            const after = await this.store.getGame();
+            if (after && !after.auctionId) {
+              await this.gameCtx.events.refreshGameState();
+            }
+          }
+          await this.afterAction();
+        });
+        return;
+      case "botTrade":
+        await this.run(async () => {
+          await BotPlayer.answerTrade(this.gameCtx, job.tradeId);
+          await this.syncIndex();
+          await this.afterAction();
+        });
+        return;
+      default:
+        return;
+    }
+  }
+
+  /**
+   * After anything changed the game: end it if no human is left, otherwise
+   * make sure the computer players owe nothing (a bid, a move).
+   */
+  private async afterAction(): Promise<void> {
+    try {
+      const game = await this.store.getGame();
+      if (!game || game.status !== GameStatus.ACTIVE) {
+        return;
+      }
+
+      const humanLeft = game.players.some((p) => !p.isBot && p.state !== PlayerState.BANKRUPT);
+      if (!humanLeft && game.players.some((p) => p.isBot)) {
+        await BotPlayer.finishWithoutHumans(this.gameCtx, game);
+        await this.gameCtx.events.refreshGameState();
+        await this.syncIndex();
+        return;
+      }
+
+      if (game.auctionId) {
+        const auction = await this.store.getAuction(game.auctionId);
+        const botOwesBid =
+          !!auction &&
+          !auction.finished &&
+          auction.bidders.some((b) => !b.submittedBid && isBotId(game, b._id));
+        if (botOwesBid) {
+          await this.scheduleOnce({ kind: "botBids", at: Date.now() + this.pace(1) });
+        }
+        return;
+      }
+
+      const next = game.players.find((p) => areIdsEqual(p._id, game.nextPlayerToAct));
+      if (this.lastTurnPlayer !== game.nextPlayerToAct) {
+        // the turn changed hands: reset the loop guard
+        this.lastTurnPlayer = game.nextPlayerToAct;
+        this.botSteps.clear();
+      }
+      if (next && next.isBot && next.state !== PlayerState.BANKRUPT) {
+        if ((this.botSteps.get(next._id) ?? 0) > MAX_BOT_STEPS_PER_TURN) {
+          console.log("bot", next.name, "is stuck; not rescheduling");
+          return;
+        }
+        await this.scheduleOnce({ kind: "botStep", botId: next._id, at: Date.now() + this.pace(1) });
+      }
+    } catch (e) {
+      console.log("afterAction failed", e);
+    }
+  }
+
+  /** Send every connected player their own view of an auction. */
+  private async broadcastAuctionViews(auctionId: string | null): Promise<void> {
+    const auction = await this.store.getAuction(auctionId);
+    for (const socket of this.ctx.getWebSockets()) {
+      const viewer = this.attachmentOf(socket);
+      this.sendTo(socket, GameEvent.AUCTION_UPDATE, AuctionProcessor.viewFor(auction, viewer.userId));
     }
   }
 
@@ -602,6 +814,7 @@ export class GameRoom extends DurableObject<Env> {
     return this.run(async () => {
       const value = await fn();
       await this.syncIndex();
+      await this.afterAction();
       return value;
     });
   }
@@ -627,6 +840,7 @@ export class GameRoom extends DurableObject<Env> {
         maxPlayers: game.settings.maxPlayers,
         playersJoined: game.players.length,
         hasPassword: !!game.settings.password,
+        bots: game.players.filter((p) => p.isBot).length,
         createdBy: game.createdBy,
         createdAt: game.createdAt,
       });

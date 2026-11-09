@@ -8,6 +8,7 @@ export interface GameIndexRow {
   maxPlayers: number;
   playersJoined: number;
   hasPassword: boolean;
+  bots: number;
   createdBy: string;
   createdAt: string;
 }
@@ -23,11 +24,12 @@ export class GamesIndexRepo {
     const now = new Date().toISOString();
     await this.db
       .prepare(
-        `INSERT INTO games (id, name, status, max_players, players_joined, has_password, created_by, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `INSERT INTO games (id, name, status, max_players, players_joined, has_password, bots, created_by, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
            status = excluded.status,
            players_joined = excluded.players_joined,
+           bots = excluded.bots,
            updated_at = excluded.updated_at`
       )
       .bind(
@@ -37,6 +39,7 @@ export class GamesIndexRepo {
         row.maxPlayers,
         row.playersJoined,
         row.hasPassword ? 1 : 0,
+        row.bots,
         row.createdBy,
         row.createdAt,
         now
@@ -47,18 +50,19 @@ export class GamesIndexRepo {
   async listJoining(createdAfterIso: string): Promise<GameToJoin[]> {
     const result = await this.db
       .prepare(
-        `SELECT id, name, max_players, players_joined FROM games
+        `SELECT id, name, max_players, players_joined, bots FROM games
          WHERE status = ? AND created_at > ?
          ORDER BY created_at DESC`
       )
       .bind(GameStatus.JOINING, createdAfterIso)
-      .all<{ id: string; name: string; max_players: number; players_joined: number }>();
+      .all<{ id: string; name: string; max_players: number; players_joined: number; bots: number }>();
 
     return (result.results ?? []).map((r) => ({
       gameId: r.id,
       name: r.name,
       maxPlayers: r.max_players,
       playersJoined: r.players_joined,
+      bots: r.bots,
     }));
   }
 }

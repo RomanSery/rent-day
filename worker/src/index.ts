@@ -4,6 +4,7 @@ import { GameStatus } from "@core/enums/GameStatus";
 import { PieceType } from "@core/enums/PieceType";
 import { PlayerClass } from "@core/enums/PlayerClass";
 import { SkillType } from "@core/enums/SkillType";
+import { BotLevel } from "@core/enums/BotLevel";
 import { PlayerInfo } from "@core/types/PlayerInfo";
 import { Env } from "./env";
 import { clearSession, createSession, getSession } from "./auth/session";
@@ -277,20 +278,47 @@ app.post("/api/createGame", async (c) => {
     return validationError(c, "Initial Skill Points is not valid", "data.initialSkillPoints");
   }
 
+  const numBots = toInt(data.numBots) ?? 0;
+  if (numBots < 0 || numBots > maxPlayers - 1) {
+    return validationError(c, "Computer players must leave a seat for you", "data.numBots");
+  }
+  const botLevel = Object.values(BotLevel).includes(data.botLevel) ? (data.botLevel as BotLevel) : BotLevel.Normal;
+
   const gameId = newId();
   const room = roomFor(c, gameId);
-  await room.createGame({
-    gameId,
-    gameName,
-    maxPlayers,
-    initialMoney,
-    initialSkillPoints,
-    userId,
-    password: data.gamePwd ? String(data.gamePwd) : null,
-    useTimers: !!data.useTimers,
-  });
+  await room.createGame(
+    {
+      gameId,
+      gameName,
+      maxPlayers,
+      initialMoney,
+      initialSkillPoints,
+      userId,
+      password: data.gamePwd ? String(data.gamePwd) : null,
+      useTimers: !!data.useTimers,
+    },
+    numBots,
+    botLevel
+  );
 
   return c.json({ gameId });
+});
+
+app.post("/api/addBot", async (c) => {
+  const body = await readBody(c);
+  if (!isValidId(body.gameId)) {
+    return validationError(c, "GameId missing", "gameId");
+  }
+  const userId = await requireUserId(c);
+  if (!userId) {
+    return invalidAuth(c);
+  }
+  const level = Object.values(BotLevel).includes(body.level) ? (body.level as BotLevel) : BotLevel.Normal;
+  const { errMsg, result } = await roomFor(c, body.gameId).addBot(userId, level);
+  if (errMsg || !result) {
+    return c.text(errMsg || "Could not add a computer player", 400);
+  }
+  return c.json(result);
 });
 
 app.post("/api/getGame", async (c) => {

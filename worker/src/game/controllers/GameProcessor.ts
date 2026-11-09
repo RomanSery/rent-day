@@ -30,6 +30,8 @@ import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
 import { hashPassword, verifyPassword } from "../../auth/password";
+import { BotLevel } from "@core/enums/BotLevel";
+import { createBotPlayer } from "../bots/BotPlayer";
 
 const GAME_PASSWORD_ITERATIONS = 10000;
 
@@ -190,6 +192,34 @@ export class GameProcessor {
     };
   }
 
+  /** Adds a computer player to a lobby; starts the game if that fills it. */
+  public static async addBot(
+    ctx: GameContext,
+    level: BotLevel
+  ): Promise<{ errMsg: string; result: JoinResult | null }> {
+    const game = await ctx.store.getGame();
+    if (!game) {
+      return { errMsg: "game not found", result: null };
+    }
+    if (game.status !== GameStatus.JOINING || game.allJoined) {
+      return { errMsg: "The game has already started", result: null };
+    }
+    if (game.players.length >= game.settings.maxPlayers) {
+      return { errMsg: "The game is full", result: null };
+    }
+
+    const bot = createBotPlayer(game, level);
+    game.players.push(bot);
+
+    if (game.players.length === game.settings.maxPlayers) {
+      game.allJoined = true;
+      await GameProcessor.initGame(ctx, game);
+    }
+    await ctx.store.saveGame(game);
+
+    return { errMsg: "", result: { allJoined: game.allJoined, playerName: bot.name } };
+  }
+
   private static async initGame(
     ctx: GameContext,
     game: GameInstanceDocument
@@ -328,6 +358,10 @@ export class GameProcessor {
 
     if (status === GameStatus.JOINING) {
       game.players = game.players.filter((p) => !areIdsEqual(p._id, userId));
+      if (!game.players.some((p) => !p.isBot)) {
+        // nobody human left in the lobby: the computer players leave too
+        game.players = [];
+      }
     } else if (status === GameStatus.ACTIVE) {
       await GameProcessor.bankruptPlayer(ctx, game, userId);
     }

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
+import { Button, Checkbox, FormControl, FormControlLabel, InputLabel, NativeSelect, TextField, Typography } from "@mui/material";
 import API from '../api';
 import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
@@ -19,6 +19,8 @@ type Inputs = {
   initialSkillPoints: number;
   gamePwd: string;
   useTimers: boolean;
+  numBots: number;
+  botLevel: string;
 };
 
 export const CreateGame: React.FC<Props> = () => {
@@ -106,6 +108,21 @@ export const CreateGame: React.FC<Props> = () => {
           <p className="field-error">Initial Skill Points must be at most 10</p>
         )}
 
+
+        <TextField label="Computer players" fullWidth={true} type="number" slotProps={{ htmlInput: { min: 0, max: 5 } }} defaultValue={0} id="numBots"
+          helperText="They take the remaining seats; the game starts as soon as the humans have joined"
+          {...field("numBots", { min: 0, max: 5 })} />
+        {_.get("numBots.type", errors) === "max" && (
+          <p className="field-error">At most 5 computer players</p>
+        )}
+
+        <FormControl fullWidth={true} sx={{ mt: "8px" }}>
+          <InputLabel variant="standard" htmlFor="botLevel">Computer skill</InputLabel>
+          <NativeSelect id="botLevel" defaultValue="Normal" {...field("botLevel")}>
+            <option value="Normal">Normal</option>
+            <option value="Easy">Easy</option>
+          </NativeSelect>
+        </FormControl>
 
         <FormControlLabel
           control={

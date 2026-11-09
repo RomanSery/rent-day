@@ -28,3 +28,11 @@ the Worker started with short timers:
 ```bash
 npx wrangler dev --var DEV_TURN_SECONDS:6 --var DEV_AUCTION_SECONDS:6
 ```
+
+`npm run test:api:bots` plays a human against two computer players to the
+end of a game and checks the lobby controls for bots. Start the Worker with a
+fast bot pace so it finishes in under a minute:
+
+```bash
+npx wrangler dev --var DEV_BOT_PACE_MS:30
+```

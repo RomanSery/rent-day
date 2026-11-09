@@ -2,10 +2,15 @@ import { PieceType } from "../enums/PieceType";
 import { PlayerClass } from "../enums/PlayerClass";
 import { PlayerState } from "../enums/PlayerState";
 import { DiceRoll } from "./DiceRoll";
+import { BotLevel } from "../enums/BotLevel";
 
 export interface Player {
   _id: string;
   readonly name: string;
+
+  /** computer-controlled player */
+  isBot?: boolean;
+  botLevel?: BotLevel;
 
   finishedRank?: number;
 

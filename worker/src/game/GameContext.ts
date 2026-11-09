@@ -39,6 +39,9 @@ export interface GameEvents {
   sendDelayed(delayMs: number, event: GameEvent, payload: unknown): Promise<void>;
   /** Push the current game state to every connected client. */
   refreshGameState(): Promise<void>;
+  /** Raw socket-style event: clients receive exactly these arguments. */
+  broadcast(event: GameEvent, ...args: unknown[]): void;
+  broadcastDelayed(delayMs: number, event: GameEvent, args: unknown[]): Promise<void>;
 }
 
 export interface GameContext {
@@ -52,4 +55,6 @@ export interface GameContext {
   readonly turnTimeLimit: number;
   /** seconds an auction stays open before unsubmitted bids become 0 */
   readonly auctionTimeLimit: number;
+  /** base delay between computer player actions, in milliseconds */
+  readonly botPaceMs: number;
 }

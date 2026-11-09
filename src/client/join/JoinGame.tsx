@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { GameState } from "../../core/types/GameState";
-import { getIconProp, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { areObjectIdsEqual, getIconProp, getMyUserId, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { GameStatus } from "../../core/enums/GameStatus";
 import API from '../api';
 import { Player } from "../../core/types/Player";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -127,6 +128,19 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   };
 
+  const [botLevel, setBotLevel] = useState<string>("Normal");
+
+  const onAddBot = () => {
+    API.post("addBot", { gameId: gameToJoinId, level: botLevel })
+      .then(function (response) {
+        gameInfoQuery.refetch();
+        if (response.data.allJoined) {
+          navigate("/gameinstance");
+        }
+      })
+      .catch(handleApiError);
+  };
+
   const getColorStyle = (): React.CSSProperties => {
     return { borderColor: "#000000" };
   };
@@ -179,7 +193,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
               <div className="container">
                 <Chip clickable={false} color="primary" size="medium" variant="outlined"
                   icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
-                  label={p.name} />
+                  label={p.isBot ? p.name + " (computer)" : p.name} />
                 <div className="player-class">{PlayerClass[p.playerClass]}</div>
               </div>
             </div>
@@ -271,6 +285,21 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
             <input type="submit" value="Join" />
           </form>
+        }
+
+        {gameInfoQuery.data && gameInfoQuery.data.status === GameStatus.JOINING &&
+          areObjectIdsEqual(gameInfoQuery.data.createdBy, getMyUserId()) &&
+          gameInfoQuery.data.players.length < gameInfoQuery.data.settings.maxPlayers &&
+          <div className="add-bot">
+            <FormControl fullWidth>
+              <InputLabel variant="standard" htmlFor="bot-level">Computer skill</InputLabel>
+              <NativeSelect id="bot-level" value={botLevel} onChange={(e) => setBotLevel(e.target.value)}>
+                <option value="Normal">Normal</option>
+                <option value="Easy">Easy</option>
+              </NativeSelect>
+            </FormControl>
+            <Button variant="contained" color="primary" sx={{ mt: "8px" }} onClick={onAddBot}>Add computer player</Button>
+          </div>
         }
 
         {hasJoinedGame() &&

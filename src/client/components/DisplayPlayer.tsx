@@ -2,7 +2,7 @@ import React, { TouchEvent } from "react";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
-import { faBiohazard } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faRobot } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
 
@@ -54,6 +54,7 @@ export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer
           <div className="name">
             <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
             {player.state === PlayerState.IN_ISOLATION ? <FontAwesomeIcon icon={faBiohazard} size="2x" color="black" /> : null}
+            {player.isBot ? <FontAwesomeIcon icon={faRobot} size="1x" color="#555" title="Computer player" /> : null}
             <div className="ping">{player.playerClass}</div>
           </div>
           <div className="sub-name" style={getNameColorStyle()}>

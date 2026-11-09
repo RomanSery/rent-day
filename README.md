@@ -18,6 +18,19 @@ runs entirely on Cloudflare's free tier: no server to keep running.
 Delayed server events (the 5s chance-card reveal, the subway mugging message)
 use Durable Object alarms instead of `setTimeout`.
 
+### Computer players
+
+A game can include computer players: choose how many when creating a game,
+or let the game's creator add them from the lobby. Bots are ordinary entries
+in the game's player list flagged `isBot`; the game's Durable Object drives
+their turns through its alarm (`worker/src/game/bots`), reusing the same
+rule processors as human actions and broadcasting the same dice and state
+events, so clients need nothing special to watch them play. Two levels exist:
+Easy bids low and never builds, Normal values properties by rent and group
+completion, builds houses evenly, answers trades and spends skill points.
+When the last human leaves or goes bankrupt the game ends and the remaining
+bots are ranked by assets.
+
 ## Local development
 
 Requirements: Node.js 20 or newer (tested with 22).
