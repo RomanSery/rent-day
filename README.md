@@ -44,9 +44,12 @@ npm run preview              # serve the production build locally
 npm --prefix worker run tail # live logs from the deployed Worker
 ```
 
-With `ENVIRONMENT=development` the dev shortcuts from the old server are on:
-the second player starts owning every property, and `forceDie1`/`forceDie2`
-are honoured on `/api/actions/roll`.
+End-to-end API tests live in `worker/test` (see its README): `npm run test:api`
+and `npm run test:api:deep` from `worker/` against a running `wrangler dev`.
+
+With `ENVIRONMENT=development`, `forceDie1`/`forceDie2` are honoured on
+`/api/actions/roll`. Setting `DEV_PREOWN_PROPERTIES=true` as well turns on the
+old server's shortcut where the second player starts owning every property.
 
 ## Deploying to Cloudflare
 

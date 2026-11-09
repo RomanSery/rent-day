@@ -151,6 +151,24 @@ export const doesGroupHaveAnyHouses = (
   return hasHouses;
 };
 
+export const doesGroupHaveMortgagedProperty = (
+  game: GameInstanceDocument,
+  groupId: number
+): boolean => {
+  let hasMortgaged = false;
+  SquareConfigDataMap.forEach((d: SquareConfigData, key: number) => {
+    if (d.groupId && d.groupId === groupId) {
+      const squareData: SquareGameData | undefined = game.squareState.find(
+        (p: SquareGameData) => p.squareId === key
+      );
+      if (squareData && squareData.isMortgaged) {
+        hasMortgaged = true;
+      }
+    }
+  });
+  return hasMortgaged;
+};
+
 export const areHousesEven = (
   game: GameInstanceDocument,
   squareId: number,

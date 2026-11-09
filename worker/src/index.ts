@@ -382,6 +382,17 @@ app.post("/api/joinGame", async (c) => {
     return c.text("Invalid player class", 400);
   }
 
+  // one game at a time: joining another lobby would detach the account
+  // from the game it is still playing
+  const users = new UsersRepo(c.env.DB);
+  const user = await users.findById(userId);
+  if (user) {
+    const currentGameId = await resolveCurrentGame(c, users, user);
+    if (currentGameId && currentGameId !== body.gameId) {
+      return c.text("You are already in another game. Leave it first.", 400);
+    }
+  }
+
   const { errMsg, result } = await roomFor(c, body.gameId).joinGame(
     userId,
     piece,

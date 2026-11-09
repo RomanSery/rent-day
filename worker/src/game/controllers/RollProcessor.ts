@@ -209,6 +209,10 @@ export class RollProcessor {
 
     if (andCompleteTurn && this.player.hasRolled && !createdAuction) {
       this.doCompleteTurn(true, incrementTimeouts);
+    } else if (incrementTimeouts) {
+      // the timer rolled for an idle player but the turn stays open (an
+      // auction was created or a double was rolled): still count it
+      this.player.numTimeouts++;
     }
 
     if (!andCompleteTurn) {
@@ -628,9 +632,11 @@ export class RollProcessor {
 
     if (incrementTimeouts) {
       this.player!.numTimeouts++;
-    } else {
+    } else if (!autoComplete) {
+      // the player ended the turn themselves: they are back
       this.player!.numTimeouts = 0;
     }
+    // an automatic completion after the player rolled leaves the count alone
 
     PlayerCostsCalculator.updatePlayerCosts(this.game!, this.player!);
 

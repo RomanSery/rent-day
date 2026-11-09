@@ -98,6 +98,7 @@ export class GameRoom extends DurableObject<Env> {
     this.gameCtx = {
       store: this.store,
       isDev: isDevEnv(env),
+      devPreownProperties: isDevEnv(env) && env.DEV_PREOWN_PROPERTIES === "true",
       events: {
         send: (event, payload) => this.broadcastServerEvent(event, payload),
         sendDelayed: (delayMs, event, payload) =>

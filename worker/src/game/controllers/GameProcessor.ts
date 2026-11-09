@@ -218,9 +218,10 @@ export class GameProcessor {
       game.nextPlayerActBy = formatISO(actBy);
     }
 
-    if (ctx.isDev && game.players.length > 1) {
+    if (ctx.devPreownProperties && game.players.length > 1) {
       // dev shortcut carried over from the original server: give the second
       // player every property so rent/tax paths are easy to exercise.
+      // Opt in with DEV_PREOWN_PROPERTIES=true in worker/.dev.vars.
       for (let id = 1; id <= 38; id++) {
         GameProcessor.assignSquareTesting(game, game.players[1], id, 30);
       }

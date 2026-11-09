@@ -44,5 +44,8 @@ export interface GameEvents {
 export interface GameContext {
   readonly store: GameStore;
   readonly events: GameEvents;
+  /** development mode: forced dice are honoured */
   readonly isDev: boolean;
+  /** dev shortcut: the second player starts owning every property */
+  readonly devPreownProperties: boolean;
 }

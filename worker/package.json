@@ -11,7 +11,9 @@
     "db:migrate:local": "wrangler d1 migrations apply rentday-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply rentday-db --remote",
     "secret:jwt": "wrangler secret put JWT_SECRET",
-    "tail": "wrangler tail"
+    "tail": "wrangler tail",
+    "test:api": "node test/smoke.mjs && node test/chance.mjs",
+    "test:api:deep": "node test/deep.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

@@ -12,6 +12,7 @@ import {
   doesOwnAllPropertiesInGroup,
   areHousesEven,
   doesGroupHaveAnyHouses,
+  doesGroupHaveMortgagedProperty,
 } from "./helpers";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
@@ -264,6 +265,11 @@ export class PropertyProcessor {
 
     if (!doesOwnAllPropertiesInGroup(this.game, this.squareId, this.userId)) {
       return "you cant build, you have to own all properties in the group";
+    }
+
+    const groupId = SquareConfigDataMap.get(this.squareId)?.groupId;
+    if (groupId && doesGroupHaveMortgagedProperty(this.game, groupId)) {
+      return "you cant build while a property in the group is mortgaged";
     }
 
     if (this.state.numHouses >= 5) {

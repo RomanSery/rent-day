@@ -3,3 +3,6 @@
 JWT_SECRET=change-me-to-a-long-random-string
 ENVIRONMENT=development
 PBKDF2_ITERATIONS=100000
+
+# Dev shortcut: the second player starts owning every property
+DEV_PREOWN_PROPERTIES=false
