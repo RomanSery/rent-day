@@ -44,8 +44,7 @@ to measure rule changes.
 - **Node.js 20 or newer** (developed with 22). Check with `node --version` in a
   terminal. If the command is not found, install the LTS build from
   https://nodejs.org, or unzip a portable build somewhere and add its folder to
-  your `PATH` (Windows: `setx PATH "%PATH%;C:\path	o
-ode"`, then reopen
+  your `PATH` (Windows: `setx PATH "%PATH%;C:\path\to\node"`, then reopen
   the terminal or editor).
 - A browser. Nothing else: the database and the game objects run locally
   inside `wrangler dev`.
