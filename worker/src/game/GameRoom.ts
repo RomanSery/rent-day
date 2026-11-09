@@ -513,7 +513,28 @@ export class GameRoom extends DurableObject<Env> {
       }
 
       case GameEvent.JOIN_GAME_ROOM: {
+        // a (re)connecting player may have missed moves: send them the
+        // current state straight away
+        const game = toClientGame(await this.store.getGame());
+        this.sendTo(ws, GameEvent.UPDATE_GAME_STATE, game);
+        if (game && game.auctionId) {
+          const auction = await this.store.getAuction(game.auctionId);
+          this.sendTo(ws, GameEvent.AUCTION_UPDATE, AuctionProcessor.viewFor(auction, me.userId));
+        }
         this.broadcastOthers(ws, GameEvent.SHOW_SNACK_MSG, me.playerName + " re-connected");
+        return;
+      }
+
+      case "devDropConnection": {
+        // development only: close every socket of this user so the client's
+        // reconnect path can be exercised (used by tests)
+        if (this.gameCtx.isDev) {
+          for (const socket of this.ctx.getWebSockets()) {
+            if (this.attachmentOf(socket).userId === me.userId) {
+              socket.close(4001, "dropped for test");
+            }
+          }
+        }
         return;
       }
 

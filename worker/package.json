@@ -16,7 +16,8 @@
     "test:api:deep": "node test/deep.mjs",
     "test:api:timers": "node test/timeouts.mjs",
     "test:api:bots": "node test/bots.mjs",
-    "sim": "node test/sim.mjs"
+    "sim": "node test/sim.mjs",
+    "test:api:rejoin": "node test/rejoin.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

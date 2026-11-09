@@ -110,6 +110,9 @@ export class SocketService {
       if (this.ws !== ws) {
         return;
       }
+      if (this.hasConnectedOnce) {
+        console.log("socket reconnected; requesting current game state");
+      }
       this.reconnectAttempts = 0;
       this.announce();
       this.flushOutbox();

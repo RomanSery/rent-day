@@ -82,6 +82,15 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
       gameInfoQuery.refetch();
     });
 
+    // sent on (re)connect so a returning player sees who has joined meanwhile
+    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (game: GameState) => {
+      if (game && game.status === GameStatus.ACTIVE) {
+        navigate("/gameinstance");
+      } else {
+        gameInfoQuery.refetch();
+      }
+    });
+
 
     return function cleanup() {
       if (socketService) {

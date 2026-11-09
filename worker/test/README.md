@@ -46,3 +46,10 @@ and after. Start the Worker with no bot pacing:
 npx wrangler dev --var DEV_BOT_PACE_MS:0
 GAMES=12 LEVELS=Normal,Normal,Easy,Easy npm run sim
 ```
+
+`npm run test:api:rejoin` covers leaving and coming back: a player who closes
+the page keeps their seat and is sent back into the game by the session
+check, a reconnecting socket immediately receives the current game state
+(and any open auction), and the others see "disconnected" / "re-connected".
+It uses a development-only `devDropConnection` socket message to force a
+server-side disconnect.
