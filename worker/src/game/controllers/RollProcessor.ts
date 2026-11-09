@@ -628,6 +628,7 @@ export class RollProcessor {
 
     this.player!.hasRolled = false;
     this.player!.hasTraveled = false;
+    this.game!.turnNumber = (this.game!.turnNumber ?? 0) + 1;
 
     if (incrementTimeouts) {
       this.player!.numTimeouts++;

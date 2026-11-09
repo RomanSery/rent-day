@@ -46,13 +46,16 @@ interface WsAttachment {
 }
 
 /** Work the object has scheduled for itself through its alarm. */
-type Job =
+type Job = { attempts?: number } & (
   | { kind: "event"; at: number; event: GameEvent; payload: unknown }
   | { kind: "raw"; at: number; event: GameEvent; args: unknown[] }
   | { kind: "refresh"; at: number }
   | { kind: "botStep"; at: number; botId: string }
   | { kind: "botBids"; at: number }
-  | { kind: "botTrade"; at: number; tradeId: string };
+  | { kind: "botTrade"; at: number; tradeId: string }
+);
+
+const MAX_JOB_ATTEMPTS = 3;
 
 /** Stored entries written before job kinds existed. */
 interface LegacyPendingEvent {
@@ -62,6 +65,8 @@ interface LegacyPendingEvent {
 }
 
 const MAX_BOT_STEPS_PER_TURN = 60;
+/** a bots-only simulation that has not ended by then is scored by assets */
+const MAX_SIMULATION_TURNS = 400;
 
 interface IndexState {
   status: GameStatus;
@@ -147,6 +152,13 @@ export class GameRoom extends DurableObject<Env> {
         broadcast: (event, ...args) => this.broadcastAll(event, ...args),
         broadcastDelayed: (delayMs, event, args) =>
           this.scheduleJob({ kind: "raw", at: Date.now() + delayMs, event, args }),
+        onTradeOffered: async (tradeId) => {
+          const game = await this.store.getGame();
+          const trade = await this.store.getTrade(tradeId);
+          if (game && trade && isBotId(game, trade.participant2.playerId)) {
+            await this.scheduleJob({ kind: "botTrade", at: Date.now() + this.pace(1.5), tradeId });
+          }
+        },
       },
     };
   }
@@ -163,16 +175,23 @@ export class GameRoom extends DurableObject<Env> {
   // RPC methods called by the Worker
   // ---------------------------------------------------------------------
 
-  async createGame(params: CreateGameParams, numBots: number = 0, botLevel: BotLevel = BotLevel.Normal): Promise<string> {
+  async createGame(
+    params: CreateGameParams,
+    numBots: number = 0,
+    botLevel: BotLevel = BotLevel.Normal,
+    botLevels?: BotLevel[]
+  ): Promise<string> {
     return this.run(async () => {
       const existing = await this.store.getGame();
       if (existing) {
         throw new Error("game already exists");
       }
       let game = await GameProcessor.createGame(this.gameCtx, params);
-      for (let i = 0; i < numBots && i < params.maxPlayers - 1; i++) {
-        await GameProcessor.addBot(this.gameCtx, botLevel);
+      const seatsForBots = params.botsOnly ? params.maxPlayers : params.maxPlayers - 1;
+      for (let i = 0; i < numBots && i < seatsForBots; i++) {
+        await GameProcessor.addBot(this.gameCtx, botLevels ? botLevels[i % botLevels.length] : botLevel);
       }
+      await this.afterAction();
       game = (await this.store.getGame()) ?? game;
       await this.gamesIndex.upsert({
         id: game._id,
@@ -396,9 +415,8 @@ export class GameRoom extends DurableObject<Env> {
         return fail(errMsg);
       }
       const tradeId = processor.getNewTradeId();
-      const game = await this.store.getGame();
-      if (tradeId && game && isBotId(game, tradingWithPlayerId)) {
-        await this.scheduleJob({ kind: "botTrade", at: Date.now() + this.pace(1.5), tradeId });
+      if (tradeId) {
+        await this.gameCtx.events.onTradeOffered(tradeId);
       }
       return ok({ newTradeId: tradeId });
     });
@@ -655,7 +673,12 @@ export class GameRoom extends DurableObject<Env> {
       try {
         await this.runJob(job);
       } catch (e) {
-        console.log("scheduled job failed", job.kind, e);
+        const attempts = (job.attempts ?? 0) + 1;
+        console.log("scheduled job failed", job.kind, "attempt", attempts, e);
+        if (attempts < MAX_JOB_ATTEMPTS) {
+          // transient runtime errors happen; try again shortly
+          await this.scheduleJob({ ...job, at: Date.now() + 300, attempts });
+        }
       }
     }
 
@@ -732,7 +755,8 @@ export class GameRoom extends DurableObject<Env> {
       }
 
       const humanLeft = game.players.some((p) => !p.isBot && p.state !== PlayerState.BANKRUPT);
-      if (!humanLeft && game.players.some((p) => p.isBot)) {
+      const overLong = game.settings.botsOnly && (game.turnNumber ?? 0) >= MAX_SIMULATION_TURNS;
+      if ((!humanLeft && game.players.some((p) => p.isBot) && !game.settings.botsOnly) || overLong) {
         await BotPlayer.finishWithoutHumans(this.gameCtx, game);
         await this.gameCtx.events.refreshGameState();
         await this.syncIndex();

@@ -25,4 +25,6 @@ export interface GameState {
   readonly gameLength: number;
   readonly winner: string;
   readonly createdBy: string;
+  /** completed turns so far */
+  readonly turnNumber?: number;
 }

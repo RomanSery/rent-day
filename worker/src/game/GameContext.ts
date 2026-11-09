@@ -42,6 +42,8 @@ export interface GameEvents {
   /** Raw socket-style event: clients receive exactly these arguments. */
   broadcast(event: GameEvent, ...args: unknown[]): void;
   broadcastDelayed(delayMs: number, event: GameEvent, args: unknown[]): Promise<void>;
+  /** A trade was offered: lets a computer recipient answer it. */
+  onTradeOffered(tradeId: string): Promise<void>;
 }
 
 export interface GameContext {

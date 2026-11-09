@@ -6,7 +6,7 @@ import { PlayerClass } from "@core/enums/PlayerClass";
 import { SkillType } from "@core/enums/SkillType";
 import { BotLevel } from "@core/enums/BotLevel";
 import { PlayerInfo } from "@core/types/PlayerInfo";
-import { Env } from "./env";
+import { Env, isDevEnv } from "./env";
 import { clearSession, createSession, getSession } from "./auth/session";
 import { DEFAULT_ITERATIONS, hashPassword, isLegacyHash, verifyPassword } from "./auth/password";
 import { UsersRepo } from "./db/users";
@@ -302,6 +302,53 @@ app.post("/api/createGame", async (c) => {
   );
 
   return c.json({ gameId });
+});
+
+/**
+ * Development only: create a game played entirely by computer players.
+ * Body: { levels: ["Normal", "Easy", ...], initialMoney?: number }
+ * Used by worker/test/sim.mjs to measure the bots against each other.
+ */
+app.post("/api/dev/simulate", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  const levels: BotLevel[] = Array.isArray(body.levels)
+    ? body.levels.filter((l: unknown): l is BotLevel => Object.values(BotLevel).includes(l as BotLevel))
+    : [];
+  if (levels.length < 2 || levels.length > 6) {
+    return c.text("levels must list 2 to 6 bot levels", 400);
+  }
+  const gameId = newId();
+  await roomFor(c, gameId).createGame(
+    {
+      gameId,
+      gameName: "Simulation " + gameId.slice(-4),
+      maxPlayers: levels.length,
+      initialMoney: toInt(body.initialMoney) ?? 1500,
+      initialSkillPoints: toInt(body.initialSkillPoints) ?? 5,
+      userId: "simulation",
+      password: null,
+      useTimers: false,
+      botsOnly: true,
+    },
+    levels.length,
+    BotLevel.Normal,
+    levels
+  );
+  return c.json({ gameId });
+});
+
+app.post("/api/dev/game", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  if (!isValidId(body.gameId)) {
+    return c.text("missing gameId", 400);
+  }
+  return c.json({ game: await roomFor(c, body.gameId).getGame() });
 });
 
 app.post("/api/addBot", async (c) => {

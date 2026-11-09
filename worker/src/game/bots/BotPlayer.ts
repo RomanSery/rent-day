@@ -23,7 +23,16 @@ import { PropertyProcessor } from "../controllers/PropertyProcessor";
 import { RollProcessor } from "../controllers/RollProcessor";
 import { TradeProcessor } from "../controllers/TradeProcessor";
 import { areIdsEqual } from "../controllers/helpers";
-import { acceptsTrade, bidFor, buildPlan, lottoChoice, shouldPayOut, skillChoice } from "./BotBrain";
+import {
+  acceptsTrade,
+  bidFor,
+  buildPlan,
+  lottoChoice,
+  shouldPayOut,
+  skillChoice,
+  tradeProposal,
+  travelChoice,
+} from "./BotBrain";
 
 export const BOT_NAMES = [
   "Robo Whiskers",
@@ -138,7 +147,7 @@ export class BotPlayer {
       // 2. spend skill points
       let guard = 0;
       while (bot.numAbilityPoints > 0 && guard++ < 10) {
-        const errMsg = await new PlayerProcessor(ctx, botId).upgradeSkill(skillChoice(bot));
+        const errMsg = await new PlayerProcessor(ctx, botId).upgradeSkill(skillChoice(game, bot));
         if (errMsg) {
           break;
         }
@@ -153,6 +162,24 @@ export class BotPlayer {
         bot = BotPlayer.find(game, botId)!;
       }
 
+      // 3b. offer to buy the square that completes a group (rate limited)
+      const proposal = tradeProposal(game, bot);
+      const turn = game.turnNumber ?? 0;
+      if (proposal && turn - (bot.botLastOfferTurn ?? -100) >= 5) {
+        const tp = new TradeProcessor(ctx, botId, proposal.toPlayerId, [], [proposal.squareId], proposal.amount, 0);
+        const errMsg = await tp.offerTrade();
+        const tradeId = tp.getNewTradeId();
+        if (!errMsg && tradeId) {
+          game = (await ctx.store.getGame())!;
+          bot = BotPlayer.find(game, botId)!;
+          bot.botLastOfferTurn = turn;
+          await ctx.store.saveGame(game);
+          const trade = await ctx.store.getTrade(tradeId);
+          ctx.events.broadcast(GameEvent.SEND_TRADE_OFFER, trade);
+          await ctx.events.onTradeOffered(tradeId);
+        }
+      }
+
       // 4. build houses
       for (const squareId of buildPlan(game, bot)) {
         const errMsg = await new PropertyProcessor(ctx, squareId, botId).buildHouse();
@@ -161,6 +188,17 @@ export class BotPlayer {
         }
         game = (await ctx.store.getGame())!;
         bot = BotPlayer.find(game, botId)!;
+      }
+
+      // 4b. take the subway away from an expensive stretch of board
+      const destination = travelChoice(game, bot);
+      if (destination) {
+        const trip = new RollProcessor(ctx, botId, null, null);
+        const errMsg = await trip.travel(destination);
+        if (!errMsg) {
+          ctx.events.broadcast(GameEvent.STOP_ANIMATE_DICE, botId, null, trip.getMovementKeyFrames());
+          return "rolled"; // let the piece animate; the roll follows next step
+        }
       }
 
       // 5. roll

@@ -36,3 +36,13 @@ fast bot pace so it finishes in under a minute:
 ```bash
 npx wrangler dev --var DEV_BOT_PACE_MS:30
 ```
+
+`npm run sim` (test/sim.mjs) is not a pass/fail test but a measuring tool:
+it plays many bots-only games and reports win rate, average rank and final
+assets per skill level, so a change to `BotBrain.ts` can be compared before
+and after. Start the Worker with no bot pacing:
+
+```bash
+npx wrangler dev --var DEV_BOT_PACE_MS:0
+GAMES=12 LEVELS=Normal,Normal,Easy,Easy npm run sim
+```

@@ -4,4 +4,6 @@ export interface Settings {
   maxPlayers: number;
   password: string | null;
   useTimers?: boolean;
+  /** development simulation: a game played entirely by computer players */
+  botsOnly?: boolean;
 }

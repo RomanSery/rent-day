@@ -44,6 +44,8 @@ export interface CreateGameParams {
   userId: string;
   password: string | null;
   useTimers: boolean;
+  /** development only: no human seats, the game runs itself */
+  botsOnly?: boolean;
 }
 
 export class GameProcessor {
@@ -94,6 +96,7 @@ export class GameProcessor {
         maxPlayers: params.maxPlayers,
         password: password,
         useTimers: params.useTimers,
+        botsOnly: params.botsOnly ? true : undefined,
       },
       players: [],
       status: GameStatus.JOINING,
@@ -108,6 +111,7 @@ export class GameProcessor {
       log: [],
       gameLength: null,
       winner: null,
+      turnNumber: 0,
       createdAt: now,
       updatedAt: now,
     };

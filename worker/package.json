@@ -15,7 +15,8 @@
     "test:api": "node test/smoke.mjs && node test/chance.mjs",
     "test:api:deep": "node test/deep.mjs",
     "test:api:timers": "node test/timeouts.mjs",
-    "test:api:bots": "node test/bots.mjs"
+    "test:api:bots": "node test/bots.mjs",
+    "sim": "node test/sim.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

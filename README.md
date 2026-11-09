@@ -29,7 +29,13 @@ events, so clients need nothing special to watch them play. Two levels exist:
 Easy bids low and never builds, Normal values properties by rent and group
 completion, builds houses evenly, answers trades and spends skill points.
 When the last human leaves or goes bankrupt the game ends and the remaining
-bots are ranked by assets.
+bots are ranked by assets. Normal bots value a square by the rent it will
+collect over the rest of the game (opponents, remaining turns, building
+upside), add a premium for blocking a rival's group, rank house purchases by
+rent gained per dollar, propose trades for the last square of a group, take
+the subway away from dangerous stretches and stay in quarantine when the
+board ahead is expensive. `worker/test/sim.mjs` plays bots against each other
+to measure rule changes.
 
 ## Local development
 

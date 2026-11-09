@@ -31,6 +31,8 @@ export interface GameInstanceDocument {
   log: ChatMsg[];
   gameLength: number | null;
   winner: string | null;
+  /** completed turns so far (missing on games created before it existed) */
+  turnNumber?: number;
   createdAt: string;
   updatedAt: string;
 }

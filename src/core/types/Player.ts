@@ -11,6 +11,8 @@ export interface Player {
   /** computer-controlled player */
   isBot?: boolean;
   botLevel?: BotLevel;
+  /** turn number of the bot's last trade proposal */
+  botLastOfferTurn?: number;
 
   finishedRank?: number;
 
