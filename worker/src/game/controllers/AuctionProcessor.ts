@@ -6,7 +6,6 @@ import { SquareType } from "@core/enums/SquareType";
 import { SquareGameData } from "@core/types/SquareGameData";
 import { GameStatus } from "@core/enums/GameStatus";
 import { ChatMsg } from "@core/types/ChatMsg";
-import { auctionTimeLimit, turnTimeLimit } from "@core/constants";
 import { addSeconds, formatISO, isFuture, parseISO } from "date-fns";
 import { AuctionDocument, GameInstanceDocument } from "../model";
 import { GameContext } from "../GameContext";
@@ -142,7 +141,7 @@ export class AuctionProcessor {
       this.game.auctionSquareId = null;
 
       const now = new Date();
-      const actBy = addSeconds(now, turnTimeLimit);
+      const actBy = addSeconds(now, this.ctx.turnTimeLimit);
       this.game.nextPlayerActBy = formatISO(actBy);
 
       await this.ctx.store.saveGame(this.game);
@@ -263,7 +262,7 @@ export class AuctionProcessor {
     player: Player
   ): Promise<AuctionDocument> {
     const now = new Date();
-    const actBy = addSeconds(now, auctionTimeLimit);
+    const actBy = addSeconds(now, ctx.auctionTimeLimit);
 
     const newAuction: AuctionDocument = {
       _id: newId(),

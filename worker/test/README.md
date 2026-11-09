@@ -20,3 +20,11 @@ scenarios need `ENVIRONMENT=development` (forced dice) and
 
 The tests create throwaway accounts on every run; the local D1 database in
 `.wrangler/state` keeps them, which is harmless.
+
+`npm run test:api:timers` covers the turn-timer flows (three timeouts
+eliminate a player, a timed-out player in debt mortgages assets). It needs
+the Worker started with short timers:
+
+```bash
+npx wrangler dev --var DEV_TURN_SECONDS:6 --var DEV_AUCTION_SECONDS:6
+```

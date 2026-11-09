@@ -6,3 +6,7 @@ PBKDF2_ITERATIONS=100000
 
 # Dev shortcut: the second player starts owning every property
 DEV_PREOWN_PROPERTIES=false
+
+# Development only: shorten the timers (seconds) to test timeout flows
+# DEV_TURN_SECONDS=6
+# DEV_AUCTION_SECONDS=6

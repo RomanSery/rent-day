@@ -65,11 +65,18 @@ const cb = b.events.filter((e) => e.event === "showChanceEvent");
 check(ca.length === 1 && cb.length === 1, "both clients received showChanceEvent after the 5s alarm");
 check(ca.length === 1 && Array.isArray(ca[0].args[0]) && typeof ca[0].args[0][0].headline === "string", "payload wrapped in array with headline: " + JSON.stringify(ca[0]?.args[0]?.[0]?.headline));
 
-// timesUp should do nothing while the turn timer is in the future
-r = await b.post("actions/timesUpAction", { context: { gameId } });
-check(r.status === 200, "timesUpAction with time remaining -> " + r.status + " " + JSON.stringify(r.data));
+// timesUp should do nothing while the turn timer is in the future (with the
+// short dev timers the deadline may already have passed during the 6s wait)
 game = (await a.post("getGame", { gameId })).data.game;
-check(game.nextPlayerToAct === cur.id && game.players.find((p) => p._id === cur.id).numTimeouts === 0, "turn not auto-moved early");
+const deadlineAhead = new Date(game.nextPlayerActBy).getTime() > Date.now() + 500;
+r = await b.post("actions/timesUpAction", { context: { gameId } });
+check(r.status === 200, "timesUpAction -> " + r.status + " " + JSON.stringify(r.data));
+game = (await a.post("getGame", { gameId })).data.game;
+if (deadlineAhead) {
+  check(game.nextPlayerToAct === cur.id && game.players.find((p) => p._id === cur.id).numTimeouts === 0, "turn not auto-moved early");
+} else {
+  console.log("    (deadline already passed under short timers; early-move check skipped)");
+}
 
 a.ws.close(); b.ws.close();
 console.log(failures === 0 ? "\nALL CHECKS PASSED" : `\n${failures} CHECK(S) FAILED`);

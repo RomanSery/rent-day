@@ -9,6 +9,7 @@ import { ChatMsg } from "@core/types/ChatMsg";
 import { JoinedGameMsg } from "@core/types/messages";
 import { DiceRoll } from "@core/types/DiceRoll";
 import { DiceRollResult } from "@core/types/DiceRollResult";
+import { auctionTimeLimit, turnTimeLimit } from "@core/constants";
 import { Env, isDevEnv } from "../env";
 import { UsersRepo } from "../db/users";
 import { GamesIndexRepo } from "../db/gamesIndex";
@@ -50,6 +51,14 @@ interface IndexState {
   status: GameStatus;
   playersJoined: number;
 }
+
+const devSeconds = (env: Env, value: string | undefined, fallback: number): number => {
+  if (!isDevEnv(env) || !value) {
+    return fallback;
+  }
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+};
 
 const PENDING_EVENTS_KEY = "pendingEvents";
 const INDEX_STATE_KEY = "indexState";
@@ -99,6 +108,9 @@ export class GameRoom extends DurableObject<Env> {
       store: this.store,
       isDev: isDevEnv(env),
       devPreownProperties: isDevEnv(env) && env.DEV_PREOWN_PROPERTIES === "true",
+      // development may shorten the timers so timeout flows can be tested
+      turnTimeLimit: devSeconds(env, env.DEV_TURN_SECONDS, turnTimeLimit),
+      auctionTimeLimit: devSeconds(env, env.DEV_AUCTION_SECONDS, auctionTimeLimit),
       events: {
         send: (event, payload) => this.broadcastServerEvent(event, payload),
         sendDelayed: (delayMs, event, payload) =>

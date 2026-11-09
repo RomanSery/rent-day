@@ -13,7 +13,8 @@
     "secret:jwt": "wrangler secret put JWT_SECRET",
     "tail": "wrangler tail",
     "test:api": "node test/smoke.mjs && node test/chance.mjs",
-    "test:api:deep": "node test/deep.mjs"
+    "test:api:deep": "node test/deep.mjs",
+    "test:api:timers": "node test/timeouts.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

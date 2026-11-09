@@ -48,4 +48,8 @@ export interface GameContext {
   readonly isDev: boolean;
   /** dev shortcut: the second player starts owning every property */
   readonly devPreownProperties: boolean;
+  /** seconds a player has to act before the timer moves for them */
+  readonly turnTimeLimit: number;
+  /** seconds an auction stays open before unsubmitted bids become 0 */
+  readonly auctionTimeLimit: number;
 }

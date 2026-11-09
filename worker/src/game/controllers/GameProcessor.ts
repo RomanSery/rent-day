@@ -11,7 +11,7 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { SquareConfigDataMap } from "@core/config/SquareData";
 import { SquareConfigData } from "@core/types/SquareConfigData";
 import { ServerMsg } from "@core/types/ServerMsg";
-import { player_colors, turnTimeLimit } from "@core/constants";
+import { player_colors } from "@core/constants";
 import { SkillSettings } from "@core/types/SkillSettings";
 import { SquareType } from "@core/enums/SquareType";
 import { GameEvent } from "@core/types/GameEvent";
@@ -214,7 +214,7 @@ export class GameProcessor {
 
     if (game.settings.useTimers) {
       const now = new Date();
-      const actBy = addSeconds(now, turnTimeLimit);
+      const actBy = addSeconds(now, ctx.turnTimeLimit);
       game.nextPlayerActBy = formatISO(actBy);
     }
 
@@ -446,7 +446,7 @@ export class GameProcessor {
 
       // the turn passes to someone else, so give them a full turn's time
       if (game.settings.useTimers) {
-        game.nextPlayerActBy = formatISO(addSeconds(new Date(), turnTimeLimit));
+        game.nextPlayerActBy = formatISO(addSeconds(new Date(), ctx.turnTimeLimit));
       }
     }
 

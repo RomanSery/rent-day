@@ -8,7 +8,6 @@ import {
   muggingAmount,
   muggingChance,
   payToGetOutFee,
-  turnTimeLimit,
 } from "@core/constants";
 import { GameStatus } from "@core/enums/GameStatus";
 import { SquareConfigDataMap } from "@core/config/SquareData";
@@ -221,7 +220,7 @@ export class RollProcessor {
 
     if (!createdAuction && this.game.settings.useTimers) {
       const now = new Date();
-      const actBy = addSeconds(now, turnTimeLimit);
+      const actBy = addSeconds(now, this.ctx.turnTimeLimit);
       this.game.nextPlayerActBy = formatISO(actBy);
     }
 
@@ -613,7 +612,7 @@ export class RollProcessor {
 
       if (this.game!.settings.useTimers) {
         const now = new Date();
-        const actBy = addSeconds(now, turnTimeLimit);
+        const actBy = addSeconds(now, this.ctx.turnTimeLimit);
         this.game!.nextPlayerActBy = formatISO(actBy);
       }
     }
