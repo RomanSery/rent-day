@@ -74,8 +74,8 @@ export const DisplayResults: React.FC<Props> = ({ socketService }) => {
       <React.Fragment>
 
         <div className="dice-roll">
-          <Die key={1} value={result.die1} />
-          <Die key={2} value={result.die2} />
+          <Die key={1} value={result.die1} land={!!animDiceRollResult} />
+          <Die key={2} value={result.die2} land={!!animDiceRollResult} />
         </div>
 
         <div className="description" dangerouslySetInnerHTML={{ __html: resultsDesc ? resultsDesc : "" }}>
