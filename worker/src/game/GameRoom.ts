@@ -35,6 +35,10 @@ import { areIdsEqual } from "./controllers/helpers";
 import { BotPlayer, isBotId } from "./bots/BotPlayer";
 import { movementDurationMs } from "@core/movementTiming";
 import { FINAL_SNAPSHOT_KEY, SNAPSHOT_PREFIX, TurnSnapshot, unpackSnapshot } from "./snapshots";
+import { emptyRoomUsage, meterD1, meterStorage, RoomUsage } from "../dev/usage";
+
+/** development only: where the usage meters are kept (not metered itself) */
+const USAGE_KEY = "__devUsage";
 
 /** Result of a game action: errMsg is "" on success. */
 export interface ActionResult {
@@ -180,11 +184,24 @@ export class GameRoom extends DurableObject<Env> {
   private readonly gamesIndex: GamesIndexRepo;
   private readonly gameCtx: GameContext;
   private readonly purgeAfterMs: number;
+  /** ctx.storage, metered in development (see dev/usage.ts) */
+  private readonly storage: DurableObjectStorage;
+  /** development only: what this object has cost so far */
+  private usage: RoomUsage | null = null;
+  private usagePersist: Promise<void> | null = null;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    this.store = new DurableObjectGameStore(ctx.storage, new UsersRepo(env.DB));
-    this.gamesIndex = new GamesIndexRepo(env.DB);
+    const dev = isDevEnv(env);
+    this.storage = dev ? meterStorage(ctx.storage, () => this.devUsage()) : ctx.storage;
+    const db = dev ? meterD1(env.DB, () => this.devUsage().d1) : env.DB;
+    if (dev) {
+      ctx.blockConcurrencyWhile(async () => {
+        this.usage = (await ctx.storage.get<RoomUsage>(USAGE_KEY)) ?? emptyRoomUsage();
+      });
+    }
+    this.store = new DurableObjectGameStore(this.storage, new UsersRepo(db));
+    this.gamesIndex = new GamesIndexRepo(db);
     this.purgeAfterMs = devSeconds(env, env.DEV_PURGE_SECONDS, PURGE_FINISHED_AFTER_SECONDS) * 1000;
     this.gameCtx = {
       store: this.store,
@@ -274,7 +291,7 @@ export class GameRoom extends DurableObject<Env> {
         createdBy: game.createdBy,
         createdAt: game.createdAt,
       });
-      await this.ctx.storage.put<IndexState>(INDEX_STATE_KEY, {
+      await this.storage.put<IndexState>(INDEX_STATE_KEY, {
         status: game.status,
         playersJoined: game.players.length,
       });
@@ -297,7 +314,7 @@ export class GameRoom extends DurableObject<Env> {
     if (!game) {
       return [];
     }
-    const stored = await this.ctx.storage.list<string>({ prefix: SNAPSHOT_PREFIX });
+    const stored = await this.storage.list<string>({ prefix: SNAPSHOT_PREFIX });
     return Array.from(stored, ([key, raw]) => unpackSnapshot(game, raw, key === FINAL_SNAPSHOT_KEY));
   }
 
@@ -595,7 +612,35 @@ export class GameRoom extends DurableObject<Env> {
   // WebSockets (hibernation API)
   // ---------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------
+  // Development-only usage meters (worker/test/usage.mjs)
+  // ---------------------------------------------------------------------
+
+  /** The meters, saved after every change so hibernation doesn't lose them. */
+  private devUsage(): RoomUsage {
+    this.usage ??= emptyRoomUsage();
+    this.usagePersist ??= Promise.resolve().then(async () => {
+      this.usagePersist = null;
+      await this.ctx.storage.put(USAGE_KEY, this.usage);
+    });
+    return this.usage;
+  }
+
+  async getDevUsage(): Promise<RoomUsage | null> {
+    return this.gameCtx.isDev ? (this.usage ?? (await this.ctx.storage.get<RoomUsage>(USAGE_KEY)) ?? null) : null;
+  }
+
+  async resetDevUsage(): Promise<void> {
+    if (this.gameCtx.isDev) {
+      this.usage = emptyRoomUsage();
+      await this.ctx.storage.put(USAGE_KEY, this.usage);
+    }
+  }
+
   async fetch(request: Request): Promise<Response> {
+    if (this.gameCtx.isDev) {
+      this.devUsage().wsConnects++;
+    }
     if (request.headers.get("Upgrade") !== "websocket") {
       return new Response("Expected a WebSocket upgrade", { status: 426 });
     }
@@ -688,6 +733,9 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    if (this.gameCtx.isDev) {
+      this.devUsage().wsMessages++;
+    }
     if (typeof message !== "string" || message.length > MAX_WS_MESSAGE_BYTES) {
       return;
     }
@@ -884,12 +932,12 @@ export class GameRoom extends DurableObject<Env> {
   // ---------------------------------------------------------------------
 
   private async loadJobs(): Promise<Job[]> {
-    const stored = (await this.ctx.storage.get<Array<Job | LegacyPendingEvent>>(PENDING_EVENTS_KEY)) ?? [];
+    const stored = (await this.storage.get<Array<Job | LegacyPendingEvent>>(PENDING_EVENTS_KEY)) ?? [];
     return stored.map((j) => ("kind" in j ? j : { kind: "event", at: j.at, event: j.event, payload: j.payload }));
   }
 
   private async saveJobs(jobs: Job[]): Promise<void> {
-    await this.ctx.storage.put(PENDING_EVENTS_KEY, jobs);
+    await this.storage.put(PENDING_EVENTS_KEY, jobs);
   }
 
   private async armAlarm(): Promise<void> {
@@ -898,9 +946,9 @@ export class GameRoom extends DurableObject<Env> {
       return;
     }
     const next = Math.min(...jobs.map((j) => j.at));
-    const current = await this.ctx.storage.getAlarm();
+    const current = await this.storage.getAlarm();
     if (current == null || next < current) {
-      await this.ctx.storage.setAlarm(next);
+      await this.storage.setAlarm(next);
     }
   }
 
@@ -923,6 +971,9 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   async alarm(): Promise<void> {
+    if (this.gameCtx.isDev) {
+      this.devUsage().alarms++;
+    }
     const jobs = await this.loadJobs();
     const now = Date.now() + 50; // alarms can fire a few ms early
     const due = jobs.filter((j) => j.at <= now).sort((a, b) => a.at - b.at);
@@ -1021,8 +1072,8 @@ export class GameRoom extends DurableObject<Env> {
           }
           // everything this object stores: game, snapshots, auctions, lottos,
           // trades and pending jobs
-          await this.ctx.storage.deleteAlarm();
-          await this.ctx.storage.deleteAll();
+          await this.storage.deleteAlarm();
+          await this.storage.deleteAll();
         });
         return;
       case "expireLobby":
@@ -1039,8 +1090,8 @@ export class GameRoom extends DurableObject<Env> {
               // already closing
             }
           }
-          await this.ctx.storage.deleteAlarm();
-          await this.ctx.storage.deleteAll();
+          await this.storage.deleteAlarm();
+          await this.storage.deleteAll();
         });
         return;
       default:
@@ -1171,7 +1222,7 @@ export class GameRoom extends DurableObject<Env> {
       status: game.status,
       playersJoined: game.players.length,
     };
-    const last = await this.ctx.storage.get<IndexState>(INDEX_STATE_KEY);
+    const last = await this.storage.get<IndexState>(INDEX_STATE_KEY);
     if (last && last.status === current.status && last.playersJoined === current.playersJoined) {
       return;
     }
@@ -1187,7 +1238,7 @@ export class GameRoom extends DurableObject<Env> {
         createdBy: game.createdBy,
         createdAt: game.createdAt,
       });
-      await this.ctx.storage.put(INDEX_STATE_KEY, current);
+      await this.storage.put(INDEX_STATE_KEY, current);
     } catch (e) {
       console.log("failed to update lobby index", e);
     }

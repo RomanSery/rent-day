@@ -36,6 +36,15 @@ the form limits (or more than 3 open lobbies). Start the Worker with
 `LOBBY_EXPIRY=1 npm run test:api:abuse` to also check that unfilled lobbies
 are deleted.
 
+`npm run usage` (test/usage.mjs) is a measuring tool, not a test: scripted
+players that behave like the real client play a 4-human game, a 1-human +
+3-bot game and a bots-only game, and it prints what each costs in
+Cloudflare billing units (Worker and Durable Object requests, D1 and Durable
+Object rows read and written) for getting into a game and per turn. It reads
+the development-only meters in `src/dev/usage.ts`. Start the Worker with
+`npx wrangler dev --var DEV_BOT_PACE_MS:0`, keep other tests off that server,
+and pick scenarios with `SCENARIOS=humans,mixed,bots TURNS=40`.
+
 `npm run test:api:timers` covers the turn-timer flows (three timeouts
 eliminate a player, a timed-out player in debt mortgages assets). It needs
 the Worker started with short timers:

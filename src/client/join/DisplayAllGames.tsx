@@ -10,9 +10,6 @@ import { GameToJoin } from "../../core/types/GameToJoin";
 import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
-/** how often the list refreshes itself while the page is open */
-const REFRESH_MS = 10000;
-
 /** "just now", "5 min ago", "2 h ago" */
 const age = (iso: string): string => {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -56,7 +53,10 @@ export const DisplayAllGames: React.FC = () => {
   const gamesQuery = useQuery<GameToJoin[], Error>({
     queryKey: ["getAllGames"],
     queryFn: () => API.post("findGames", { context }).then(function (response) { return response.data.games; }),
-    refetchInterval: REFRESH_MS,
+    // loaded when the page opens; the Refresh button reloads it. No polling,
+    // and no reload on tab focus: each one is a Worker request and a D1 read.
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
 
   const games = gamesQuery.data ?? [];
@@ -117,7 +117,7 @@ export const DisplayAllGames: React.FC = () => {
           <BackLink to="/dashboard" label="Lobby" />
           <h1>Join a game</h1>
           <p className="gl-sub">
-            {gamesQuery.isSuccess ? `${games.length} open ${games.length === 1 ? "game" : "games"} · updates every ${REFRESH_MS / 1000} seconds` : " "}
+            {gamesQuery.isSuccess ? `${games.length} open ${games.length === 1 ? "game" : "games"}` : " "}
           </p>
         </div>
         <div className="gl-actions">

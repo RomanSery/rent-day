@@ -18,6 +18,7 @@
     "test:api:timers": "node test/timeouts.mjs",
     "test:api:bots": "node test/bots.mjs",
     "sim": "node test/sim.mjs",
+    "usage": "node test/usage.mjs",
     "test:api:rejoin": "node test/rejoin.mjs",
     "test:api:snapshots": "node test/snapshots.mjs",
     "test:api:seeded": "node test/seeded.mjs"

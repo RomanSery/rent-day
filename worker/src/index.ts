@@ -16,6 +16,7 @@ import { GamesIndexRepo } from "./db/gamesIndex";
 import { isValidId, newId } from "./game/ids";
 import { UserDocument } from "./game/model";
 import { ActionResult, GameRoom } from "./game/GameRoom";
+import { meterD1, meterStub, resetWorkerUsage, workerUsage } from "./dev/usage";
 
 export { GameRoom };
 
@@ -23,6 +24,15 @@ type AppContext = Context<{ Bindings: Env }>;
 type Body = Record<string, any>;
 
 const app = new Hono<{ Bindings: Env }>();
+
+// development only: count requests and D1 rows for worker/test/usage.mjs
+app.use("*", async (c, next) => {
+  if (isDevEnv(c.env) && !c.req.path.startsWith("/api/dev/usage")) {
+    workerUsage.requests++;
+    c.env = { ...c.env, DB: meterD1(c.env.DB, () => workerUsage.d1) };
+  }
+  await next();
+});
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -48,8 +58,10 @@ const requireUserId = async (c: AppContext): Promise<string | null> => {
   return session ? session.id : null;
 };
 
-const roomFor = (c: AppContext, gameId: string) =>
-  c.env.GAME_ROOM.get(c.env.GAME_ROOM.idFromName(gameId));
+const roomFor = (c: AppContext, gameId: string) => {
+  const stub = c.env.GAME_ROOM.get(c.env.GAME_ROOM.idFromName(gameId));
+  return isDevEnv(c.env) ? meterStub(stub) : stub;
+};
 
 const gameIdFromContext = (body: Body): string | null => {
   const gameId = body?.context?.gameId;
@@ -452,6 +464,37 @@ app.post("/api/dev/simulate", async (c) => {
     levels
   );
   return c.json({ gameId });
+});
+
+/**
+ * Development only: the usage meters (dev/usage.ts). Body: { gameIds: [...] }.
+ * Returns the Worker's totals and each game object's own.
+ */
+app.post("/api/dev/usage", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  const ids: string[] = Array.isArray(body.gameIds) ? body.gameIds.filter(isValidId) : [];
+  const rooms: Record<string, unknown> = {};
+  for (const id of ids) {
+    // straight to the stub so reading the meters isn't metered
+    rooms[id] = await c.env.GAME_ROOM.get(c.env.GAME_ROOM.idFromName(id)).getDevUsage();
+  }
+  return c.json({ worker: workerUsage, rooms });
+});
+
+app.post("/api/dev/usage/reset", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  const ids: string[] = Array.isArray(body.gameIds) ? body.gameIds.filter(isValidId) : [];
+  for (const id of ids) {
+    await c.env.GAME_ROOM.get(c.env.GAME_ROOM.idFromName(id)).resetDevUsage();
+  }
+  resetWorkerUsage();
+  return c.json({});
 });
 
 app.post("/api/dev/game", async (c) => {
