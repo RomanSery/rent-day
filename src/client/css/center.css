@@ -778,3 +778,15 @@
 .travel-station.here .travel-station-icon {
   background: #1976d2;
 }
+
+.action-mode-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1976d2;
+  white-space: nowrap;
+}
+
+.action-mode-hint.none {
+  background: #f6f7f9;
+  color: #5f6b76;
+}

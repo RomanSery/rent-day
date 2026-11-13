@@ -13,6 +13,17 @@ import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import useGameStateStore from "../stores/gameStateStore";
+import { ActionEligibility, getActionEligibility } from "../squares/actionEligibility";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortawesome/free-solid-svg-icons";
+
+/** icon on the squares a click would work on, per action mode */
+const ACTION_ICONS: Partial<Record<ActionMode, IconDefinition>> = {
+  [ActionMode.Mortgage]: faHandHoldingDollar,
+  [ActionMode.Redeem]: faUnlock,
+  [ActionMode.Build]: faPlus,
+  [ActionMode.Sell]: faMinus,
+};
 
 interface Props {
   id: number;
@@ -56,8 +67,12 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
     if (owner) {
       classes.push("owned", "owned-" + sectionMap.get(section));
     }
-    // a player is being pointed at in the player list: light up what they own
-    if (spotlightPlayerId) {
+    if (actionTarget) {
+      // mortgaging, building, ...: the squares a click would work on stand
+      // out, the rest dim (this wins over the player-list spotlight)
+      classes.push(actionTarget.eligible ? "action-target" : "dimmed");
+    } else if (spotlightPlayerId) {
+      // a player is being pointed at in the player list: light up what they own
       classes.push(owner && areObjectIdsEqual(owner._id, spotlightPlayerId) ? "spotlit" : "dimmed");
     }
     return classes.join(" ");
@@ -199,9 +214,17 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
   // the owner's colour drives the stripe on the square's outer edge (board.css)
   const ownedStyle = owner ? ({ "--owner": owner.color } as React.CSSProperties) : undefined;
 
+  // in an action mode (mortgage, redeem, build, sell): can this square be clicked?
+  const actionTarget: ActionEligibility | undefined =
+    gameState && actionMode !== ActionMode.None
+      ? (isMyTurn() ? getActionEligibility(gameState, id, actionMode, getMyUserId()) : { eligible: false, reason: "Wait for your turn" })
+      : undefined;
+  const actionIcon = ACTION_ICONS[actionMode];
+
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} style={ownedStyle} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}>
+      <div className={getSquareClassName()} style={ownedStyle} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}
+        title={actionTarget && !actionTarget.eligible ? actionTarget.reason : undefined}>
 
         <div className={getContainerClassName()}>
           <SquareInfo id={id} />
@@ -212,6 +235,9 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
           <span className="owner-badge" style={{ background: owner.color }} title={"Owned by " + owner.name}>
             <FontAwesomeIcon icon={getIconProp(owner.type)} />
           </span>}
+
+        {actionTarget?.eligible && actionIcon &&
+          <span className="action-chip" aria-hidden="true"><FontAwesomeIcon icon={actionIcon} /></span>}
       </div>
     </React.Fragment>
 

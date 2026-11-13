@@ -185,3 +185,14 @@
   .game-board .square.owned-left::after,
   .game-board .square.owned-right::after { width: 3px; }
 }
+
+/* Portrait phones: the ring alone marks action targets; no room for the icon */
+@media (max-width: 700px) and (orientation: portrait) {
+  .game-board .action-chip {
+    display: none;
+  }
+
+  .game-board .square.action-target {
+    box-shadow: 0 0 0 2px #1976d2, 0 0 8px rgba(25, 118, 210, 0.6);
+  }
+}

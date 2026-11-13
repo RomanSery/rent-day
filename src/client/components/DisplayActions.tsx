@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { SkillPointsButton } from "./SkillPointsButton";
+import { countEligibleSquares } from "../squares/actionEligibility";
 import useGameStateStore from "../stores/gameStateStore";
 
 
@@ -274,16 +275,16 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
     setActionMode(ActionMode.None);
   };
 
-  const getActionDescription = () => {
-    if (actionMode === ActionMode.Mortgage) {
-      return "Tap a property to mortgage it";
-    } else if (actionMode === ActionMode.Redeem) {
-      return "Tap a property to redeem it";
-    } else if (actionMode === ActionMode.Build) {
-      return "Tap a property to build a house";
-    } else if (actionMode === ActionMode.Sell) {
-      return "Tap a property to sell a house";
-    }
+  /** what to do in an action mode, or that there's nothing to do */
+  const getActionDescription = (available: number) => {
+    const texts: Partial<Record<ActionMode, [string, string]>> = {
+      [ActionMode.Mortgage]: ["Tap a highlighted property to mortgage it", "Nothing you can mortgage right now"],
+      [ActionMode.Redeem]: ["Tap a highlighted property to redeem it", "Nothing you can redeem right now"],
+      [ActionMode.Build]: ["Tap a highlighted property to build a house", "Nowhere you can build right now"],
+      [ActionMode.Sell]: ["Tap a highlighted property to sell a house", "No houses you can sell right now"],
+    };
+    const [some, none] = texts[actionMode] ?? ["", ""];
+    return available > 0 ? some : none;
   }
 
 
@@ -292,9 +293,11 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
     const me = getMyPlayer();
 
     if (actionMode !== ActionMode.None) {
+      const available = gameState ? countEligibleSquares(gameState, actionMode, getMyUserId()) : 0;
       return (
-        <div className="action-mode-hint">
-          <span>{getActionDescription()}</span>
+        <div className={"action-mode-hint" + (available === 0 ? " none" : "")}>
+          <span>{getActionDescription(available)}</span>
+          {available > 0 && <span className="action-mode-count">{available} available</span>}
           <Button variant="contained" color="primary" size="small" onClick={onFinishAction}>Done</Button>
         </div>
       );
