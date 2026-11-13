@@ -174,3 +174,19 @@ body {
   font-size: 14px;
   padding: 0 3px
 }
+
+/* Game lobby: the skill glossary at the bottom of the join page */
+.lobby-skills dt {
+  font-weight: 600;
+}
+
+.lobby-skills dd {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* Class perks under the class picker: smaller icons than the help page */
+.lobby .player-class-description .MuiListItemIcon-root {
+  min-width: 30px;
+  font-size: 0.5rem;
+}

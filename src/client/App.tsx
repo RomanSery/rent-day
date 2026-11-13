@@ -206,7 +206,7 @@ const DisplayJoinGamePage: React.FC = () => {
   const socket = React.useMemo(() => new SocketService(PageType.Join, gameId), [gameId]);
 
   return (
-    <Page>
+    <Page maxWidth="sm">
       <QueryClientProvider client={queryClient}>
         <JoinGame socketService={socket} />
       </QueryClientProvider>

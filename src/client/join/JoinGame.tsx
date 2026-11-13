@@ -1,25 +1,25 @@
-/* eslint-disable react/jsx-no-target-blank */
 import React, { useEffect, useState } from "react";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { GameState } from "../../core/types/GameState";
-import { areObjectIdsEqual, getIconProp, getMyUserId, getObjectIdAsHexString, handleApiError, hasJoinedGame, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId, getObjectIdAsHexString, handleApiError, leaveCurrentGameIfJoined, setJoinedGameStorage } from "../helpers";
 import { GameStatus } from "../../core/enums/GameStatus";
 import API from '../api';
 import { Player } from "../../core/types/Player";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
-import { Button, Chip, Container, TextField, FormControl, InputLabel, List, ListItem, ListItemIcon, ListItemText, NativeSelect, Snackbar, Typography } from "@mui/material";
+import {
+  Alert, Box, Button, Chip, Divider, FormHelperText, Paper, Snackbar, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography
+} from "@mui/material";
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUsers, faDollarSign } from "@fortawesome/free-solid-svg-icons";
+import { faUsers, faCoins, faLock, faRobot, faLink, faCheck, faChair } from "@fortawesome/free-solid-svg-icons";
 import { PlayerClass } from "../../core/enums/PlayerClass";
 import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
 import { getPlayerClassDescription } from "../uiHelpers";
 import queryString from "query-string";
-import _ from "lodash/fp";
 import { useQuery } from "@tanstack/react-query";
 import { Share } from "react-twitter-widgets";
 
@@ -28,10 +28,56 @@ interface Props {
 }
 
 type Inputs = {
-  piece: PieceType;
-  playerClass: PlayerClass;
+  piece: PieceType | "";
+  playerClass: PlayerClass | "";
   gamePwd: string | null;
 };
+
+const PIECES: PieceType[] = [PieceType.Pawn, PieceType.Hat, PieceType.Car, PieceType.Bicycle, PieceType.Cat, PieceType.Dog];
+const CLASSES: PlayerClass[] = [PlayerClass.Banker, PlayerClass.Conductor, PlayerClass.Gambler, PlayerClass.Governor];
+
+/** Piece and class pickers: make the chosen button unmistakable. */
+const pickedSx = {
+  "&.Mui-selected, &.Mui-selected:hover": { bgcolor: "primary.main", color: "primary.contrastText" },
+} as const;
+
+const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.5, display: "block", textAlign: "left" }}>
+    {children}
+  </Typography>
+);
+
+/**
+ * One row in the list of seats: a joined player, or an open seat. Drawn in
+ * neutral ink: player colours are only handed out when the game starts, so
+ * in the lobby every player still has the same placeholder colour.
+ */
+const Seat: React.FC<{ player?: Player; isMe?: boolean }> = ({ player, isMe }) => (
+  <Stack direction="row" spacing={1.5} className="lobby-seat"
+    sx={{
+      alignItems: "center", px: 1.5, py: 1, borderRadius: 1, minHeight: 52,
+      border: "1px solid", borderColor: isMe ? "primary.main" : (player ? "divider" : "transparent"),
+      bgcolor: player ? "background.paper" : "action.hover",
+    }}>
+    <Box sx={{ width: 28, textAlign: "center", flexShrink: 0 }}>
+      <FontAwesomeIcon icon={player ? getIconProp(player.type) : faChair} size="lg"
+        color={player ? "#37474f" : "#9e9e9e"} />
+    </Box>
+    {player ?
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Typography noWrap sx={{ fontWeight: 600, lineHeight: 1.3 }}>
+          {player.name}{isMe ? " (you)" : ""}
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.3 }}>
+          {player.playerClass}{player.isBot ? " · computer" : ""}
+        </Typography>
+      </Box>
+      :
+      <Typography color="text.secondary" sx={{ flex: 1 }}>Open seat</Typography>
+    }
+    {player?.isBot && <FontAwesomeIcon icon={faRobot} color="#757575" title="Computer player" />}
+  </Stack>
+);
 
 export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
@@ -48,20 +94,22 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
-  const [selectedPlayerClass, setSelectedPlayerClass] = useState<string | undefined>(undefined);
+  const [botLevel, setBotLevel] = useState<string>("Normal");
 
-  const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
-
-  // react-hook-form 7: wire register() into MUI inputs via inputRef
-  const field = (name: keyof Inputs, rules?: Parameters<typeof register>[1]) => {
-    const { ref, ...rest } = register(name, rules);
-    return { inputRef: ref, ...rest };
-  };
+  const { register, control, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<Inputs>({
+    defaultValues: { piece: "", playerClass: "", gamePwd: null },
+  });
+  const selectedPlayerClass = watch("playerClass");
 
   const gameInfoQuery = useQuery<GameState, Error>({
     queryKey: ["getGame", gameToJoinId],
     queryFn: () => API.post("getGame", { gameId: gameToJoinId }).then(function (response) { return response.data.game; }),
   });
+  const game = gameInfoQuery.data;
+
+  // react-hook-form 7: wire register() into MUI inputs via inputRef
+  const { ref: pwdRef, ...pwdRest } = register("gamePwd", { required: !!game?.settings.password });
+  const pwdField = { inputRef: pwdRef, ...pwdRest };
 
 
   useEffect(() => {
@@ -105,7 +153,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     script.src = "/js/fb_share.js";
     script.async = true;
     document.body.appendChild(script);
-  return () => {
+    return () => {
       document.body.removeChild(script);
     }
   }, []);
@@ -113,7 +161,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
-    API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass, gamePwd: data.gamePwd })
+    return API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass, gamePwd: data.gamePwd })
       .then(function (response) {
         if (socketService) {
           socketService.socket.emit(GameEvent.JOINED_GAME, {
@@ -137,8 +185,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   };
 
-  const [botLevel, setBotLevel] = useState<string>("Normal");
-
   const onAddBot = () => {
     API.post("addBot", { gameId: gameToJoinId, level: botLevel })
       .then(function (response) {
@@ -148,10 +194,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         }
       })
       .catch(handleApiError);
-  };
-
-  const getColorStyle = (): React.CSSProperties => {
-    return { borderColor: "#000000" };
   };
 
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -170,203 +212,194 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     setSnackOpen(false);
   };
 
-  const getNumPlayers = () => {
-    if (gameInfoQuery.isLoading || !gameInfoQuery.data) {
-      return "Loading...";
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+    } catch {
+      // older browsers, or a page without clipboard permission
+      const el = document.createElement("input");
+      el.value = window.location.href;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
     }
-    if (gameInfoQuery.isError) {
-      return gameInfoQuery.error!.message;
-    }
-    return "Players: " + gameInfoQuery.data.players.length + " / " + gameInfoQuery.data.settings.maxPlayers;
-  }
-
-
-  const handlePlayerClassChange = (event: React.ChangeEvent<{ name?: string; value: string }>) => {
-    setSelectedPlayerClass(event.target.value);
-  };
-
-
-  const getListOfJoinePlayers = () => {
-    if (gameInfoQuery.isLoading || !gameInfoQuery.data) {
-      return "Loading...";
-    }
-    if (gameInfoQuery.isError) {
-      return gameInfoQuery.error!.message;
-    }
-
-    return (<div className="players-display">
-      {gameInfoQuery.data.players.map((p: Player, index) => {
-        return (
-          <React.Fragment key={getObjectIdAsHexString(p._id)}>
-            <div className="player-info" style={getColorStyle()}>
-              <div className="container">
-                <Chip clickable={false} color="primary" size="medium" variant="outlined"
-                  icon={<FontAwesomeIcon icon={getIconProp(p.type)} size="2x" />}
-                  label={p.isBot ? p.name + " (computer)" : p.name} />
-                <div className="player-class">{PlayerClass[p.playerClass]}</div>
-              </div>
-            </div>
-          </React.Fragment>
-        )
-      })}
-    </div>);
-  }
-
-  const copyLink = () => {
-    const el = document.createElement("input");
-    el.value = window.location.href;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand("copy");
-    document.body.removeChild(el);
     setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
   }
 
   const shareUrl = window.location.href;
+  const shareTitle = "Think you can be a Block Baron? Let's play!";
 
+  if (gameInfoQuery.isError) {
+    return (
+      <Paper elevation={2} sx={{ my: 1, p: 2.5 }}>
+        <Alert severity="error">{gameInfoQuery.error.message}</Alert>
+        <Button fullWidth sx={{ mt: 1.5 }} onClick={() => navigate("/dashboard")}>Back</Button>
+      </Paper>
+    );
+  }
 
-  const getShareTitle = () => {
-    return "Think you can be a Block Baron? Let's play!";
-  };
+  if (!game) {
+    return (
+      <Paper elevation={2} sx={{ my: 1, p: 2.5 }}>
+        <Typography color="text.secondary">Loading game…</Typography>
+      </Paper>
+    );
+  }
+
+  const myUserId = getMyUserId();
+  // seated at this table (session storage only says this tab is in *some* game)
+  const joined = game.players.some((p) => areObjectIdsEqual(p._id, myUserId));
+  const openSeats = Math.max(0, game.settings.maxPlayers - game.players.length);
+  const takenPieces = new Set(game.players.map((p) => p.type));
+  const canAddBot = game.status === GameStatus.JOINING && areObjectIdsEqual(game.createdBy, myUserId) && openSeats > 0;
 
   return (
-    <React.Fragment>      
+    <React.Fragment>
+      <Paper elevation={2} className="lobby" sx={{ my: 1, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
+        <Stack spacing={1.5}>
 
-      <Container maxWidth="sm">
-        <Typography component="h2" variant="h5">{gameInfoQuery.data?.name}</Typography>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography component="h2" variant="h5">{game.name}</Typography>
+            <Stack direction="row" spacing={1} useFlexGap sx={{ mt: 1, flexWrap: "wrap", justifyContent: "center" }}>
+              <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faUsers} />}
+                label={`${game.players.length} of ${game.settings.maxPlayers} seats taken`} />
+              <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faCoins} />}
+                label={`${dollarFormatter.format(game.settings.initialMoney)} each`} />
+              {game.settings.password &&
+                <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faLock} />} label="Password" />}
+            </Stack>
+          </Box>
 
-        <List dense={true} className="game-settings">
-          <ListItem>
-            <ListItemIcon> <FontAwesomeIcon icon={faUsers} size="2x" /> </ListItemIcon>
-            <ListItemText primary={getNumPlayers()} />
-          </ListItem>
-          <ListItem>
-            <ListItemIcon> <FontAwesomeIcon icon={faDollarSign} size="2x" /> </ListItemIcon>
-            <ListItemText primary={gameInfoQuery.data?.settings.initialMoney} />
-          </ListItem>
-        </List>
+          <Divider />
+          <SectionTitle>At the table</SectionTitle>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1 }}>
+            {game.players.map((p) => (
+              <Seat key={getObjectIdAsHexString(p._id)} player={p} isMe={areObjectIdsEqual(p._id, myUserId)} />
+            ))}
+            {Array.from({ length: openSeats }).map((_, i) => <Seat key={"open-" + i} />)}
+          </Box>
 
-
-        {!hasJoinedGame() &&
-          <form onSubmit={handleSubmit(onJoinGame)}>
-
-            <FormControl fullWidth >
-              <InputLabel htmlFor="piece-type">Piece Type</InputLabel>
-              <NativeSelect id="piece-type" required={true} fullWidth={true}
-                {...field("piece", { required: true })} >
-                <option aria-label="None" value="" />
-                <option value="Pawn">Pawn</option>
-                <option value="Hat">Hat</option>
-                <option value="Car">Car</option>
-                <option value="Bicycle">Bicycle</option>
-                <option value="Cat">Cat</option>
-                <option value="Dog">Dog</option>
-              </NativeSelect>
-            </FormControl>
-            {_.get("piece.type", errors) === "required" && (
-              <p className="field-error">Piece Type is required</p>
-            )}
-
-            <FormControl fullWidth >
-              <InputLabel htmlFor="class-type">Class Type</InputLabel>
-              <NativeSelect id="class-type" required={true} fullWidth={true} {...field("playerClass", { required: true })} onChange={handlePlayerClassChange} >
-                <option aria-label="None" value="" />
-                <option value="Banker">Banker</option>
-                <option value="Conductor">Conductor</option>
-                <option value="Gambler">Gambler</option>
-                <option value="Governor">Governor</option>
-              </NativeSelect>
-            </FormControl>
-            {_.get("playerClass.type", errors) === "required" && (
-              <p className="field-error">Class Type is required</p>
-            )}
-
-            {gameInfoQuery && gameInfoQuery.data && gameInfoQuery.data.settings && gameInfoQuery.data.settings.password &&
-              <FormControl fullWidth >
-                <TextField id="gamePwd" required={true} fullWidth={true} label="Password"
-                  {...field("gamePwd", { required: true })} />
-
-              </FormControl>
-            }
-
-
-            <br />
-
-            <input type="submit" value="Join" />
-          </form>
-        }
-
-        {gameInfoQuery.data && gameInfoQuery.data.status === GameStatus.JOINING &&
-          areObjectIdsEqual(gameInfoQuery.data.createdBy, getMyUserId()) &&
-          gameInfoQuery.data.players.length < gameInfoQuery.data.settings.maxPlayers &&
-          <div className="add-bot">
-            <FormControl fullWidth>
-              <InputLabel variant="standard" htmlFor="bot-level">Computer skill</InputLabel>
-              <NativeSelect id="bot-level" value={botLevel} onChange={(e) => setBotLevel(e.target.value)}>
+          {canAddBot &&
+            <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
+              <TextField size="small" select label="Computer skill" id="bot-level" value={botLevel}
+                onChange={(e) => setBotLevel(e.target.value)} sx={{ minWidth: 130 }}
+                slotProps={{ select: { native: true } }}>
                 <option value="Normal">Normal</option>
                 <option value="Easy">Easy</option>
-              </NativeSelect>
-            </FormControl>
-            <Button variant="contained" color="primary" sx={{ mt: "8px" }} onClick={onAddBot}>Add computer player</Button>
-          </div>
-        }
+              </TextField>
+              <Button variant="outlined" onClick={onAddBot} startIcon={<FontAwesomeIcon icon={faRobot} />}
+                sx={{ flex: 1, height: 40 }}>
+                Add computer player
+              </Button>
+            </Stack>
+          }
 
-        {hasJoinedGame() &&
-          <Button variant="contained" color="secondary" onClick={onLeaveGame}>
-            Leave Game
-          </Button>
-        }
+          <Divider />
 
-        <div className="player-class-description">
-          {getPlayerClassDescription(selectedPlayerClass)}
-        </div>
+          {!joined &&
+            <form onSubmit={handleSubmit(onJoinGame)} noValidate>
+              <Stack spacing={1.5}>
+                <SectionTitle>Join this game</SectionTitle>
 
-        <hr />
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Piece</Typography>
+                  <Controller name="piece" control={control} rules={{ required: true }}
+                    render={({ field }) => (
+                      <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Piece"
+                        value={field.value || null}
+                        onChange={(_e, v) => { if (v) field.onChange(v); }}>
+                        {PIECES.map((piece) => (
+                          <ToggleButton key={piece} value={piece} aria-label={piece} title={takenPieces.has(piece) ? piece + " (taken)" : piece}
+                            disabled={takenPieces.has(piece)} sx={{ py: 1, ...pickedSx }}>
+                            <FontAwesomeIcon icon={getIconProp(piece)} size="lg" />
+                          </ToggleButton>
+                        ))}
+                      </ToggleButtonGroup>
+                    )} />
+                  {errors.piece && <FormHelperText error>Pick a piece</FormHelperText>}
+                </Box>
 
-        <div className="skill-descriptions">
-          <div className="skill">
-            <div className="header">Luck</div>
-            <div className="description">Each point <b>increases</b> your chance to win lotto prizes by <b>{luckAdjustment}</b>%</div>
-          </div>
-          <div className="skill">
-            <div className="header">Negotiation</div>
-            <div className="description">Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}</b>%</div>
-          </div>
-          <div className="skill">
-            <div className="header">Corruption</div>
-            <div className="description">Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}</b>%</div>
-          </div>
-        </div>
+                <Box>
+                  <Typography variant="body2" sx={{ mb: 0.5 }}>Class</Typography>
+                  <Controller name="playerClass" control={control} rules={{ required: true }}
+                    render={({ field }) => (
+                      <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Class"
+                        value={field.value || null}
+                        onChange={(_e, v) => { if (v) field.onChange(v); }}
+                        sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" } }}>
+                        {CLASSES.map((c) => (
+                          <ToggleButton key={c} value={c} sx={{ textTransform: "none", fontWeight: 600, ...pickedSx }}>{c}</ToggleButton>
+                        ))}
+                      </ToggleButtonGroup>
+                    )} />
+                  {errors.playerClass && <FormHelperText error>Pick a class</FormHelperText>}
+                </Box>
 
+                {selectedPlayerClass &&
+                  <Box className="player-class-description" sx={{ bgcolor: "action.hover", borderRadius: 1, px: 1 }}>
+                    {getPlayerClassDescription(selectedPlayerClass)}
+                  </Box>
+                }
 
-        <hr />
+                {game.settings.password &&
+                  <TextField size="small" id="gamePwd" required fullWidth label="Game password"
+                    error={!!errors.gamePwd} helperText={errors.gamePwd ? "Password is required" : undefined}
+                    {...pwdField} />
+                }
 
-        <h2>Invite people to play!</h2>
+                <Button variant="contained" color="primary" type="submit" fullWidth size="large" disabled={isSubmitting}>
+                  Join game
+                </Button>
+              </Stack>
+            </form>
+          }
 
-        <div className="social-cont">
-          <div className="social-share-cont">
-            <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: getShareTitle() }} />
-          </div>
-          <div className="social-share-cont">            
-            <div id="fb-share-button">
+          {joined &&
+            <Stack spacing={1.5}>
+              <Alert severity="success" icon={<FontAwesomeIcon icon={faCheck} />}>
+                You're in. The game starts when {openSeats === 1 ? "the last seat is" : `all ${openSeats} open seats are`} filled.
+              </Alert>
+              <Button variant="outlined" color="secondary" onClick={onLeaveGame} fullWidth>
+                Leave game
+              </Button>
+            </Stack>
+          }
+
+          <Divider />
+          <SectionTitle>Invite friends</SectionTitle>
+          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
+            <Button variant="outlined" onClick={copyLink}
+              startIcon={<FontAwesomeIcon icon={copied ? faCheck : faLink} />}>
+              {copied ? "Link copied" : "Copy invite link"}
+            </Button>
+            <div className="social-share-cont">
+              <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: shareTitle }} />
+            </div>
+            <div className="social-share-cont">
+              <div id="fb-share-button">
                 <svg viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
-                    <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
+                  <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
                 </svg>
                 <span>Share</span>
+              </div>
             </div>
-          </div>        
-        </div>
+          </Stack>
 
-        <br />        
+          <Divider />
+          <SectionTitle>How skills work</SectionTitle>
+          <Box component="dl" className="lobby-skills" sx={{ m: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: 2, rowGap: 0.5 }}>
+            <dt>Luck</dt>
+            <dd>Each point <b>raises</b> your chance to win lotto prizes by <b>{luckAdjustment}%</b></dd>
+            <dt>Negotiation</dt>
+            <dd>Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}%</b></dd>
+            <dt>Corruption</dt>
+            <dd>Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}%</b></dd>
+          </Box>
 
-        <div className="socail-cont">
-          <button onClick={ copyLink }>{!copied ? "Copy link to send to others" : "Copied!"}</button>
-        </div>
-
-
-      </Container>
-
-      {getListOfJoinePlayers()}
+        </Stack>
+      </Paper>
 
       <Snackbar
         anchorOrigin={{
@@ -376,7 +409,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         onClose={closeSnack}
         open={snackOpen} autoHideDuration={5000} message={snackMsg}
       />
-
 
     </React.Fragment>
   );
