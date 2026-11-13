@@ -8,3 +8,9 @@
   stroke: red;
   stroke-width: 10;
 }
+
+/* the piece that is hopping across the board stays on top of the others */
+.single-piece.moving {
+  z-index: 10;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.35));
+}
