@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { SquareConfigDataMap } from "@core/config/SquareData";
 import { island_position } from "@core/constants";
 import { PlayerState } from "@core/enums/PlayerState";
@@ -10,6 +9,7 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { ServerChanceEvent } from "./ServerChanceEvent";
+import { randomPick } from "../random";
 
 export class ChanceProcessor {
   private game?: GameInstanceDocument | null;
@@ -35,7 +35,7 @@ export class ChanceProcessor {
   }
 
   private getRandomEvent(): ServerChanceEvent | undefined {
-    return _.sample(this.events);
+    return this.game ? randomPick(this.game, this.events) : undefined;
   }
 
   public static shouldCreateChance(squareId: number): boolean {

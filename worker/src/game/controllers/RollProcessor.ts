@@ -26,7 +26,8 @@ import { AuctionProcessor } from "./AuctionProcessor";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
-import { areIdsEqual, getRandomIntInclusive } from "./helpers";
+import { areIdsEqual } from "./helpers";
+import { randomInt } from "../random";
 import { ChanceProcessor } from "./ChanceProcessor";
 import { GameProcessor } from "./GameProcessor";
 import { ServerChanceEvent, toClientChanceEvent } from "./ServerChanceEvent";
@@ -158,7 +159,7 @@ export class RollProcessor {
     ) {
       this.game.lottoId = await LottoProcessor.createLotto(
         this.ctx,
-        this.game._id,
+        this.game,
         this.player
       );
     }
@@ -343,7 +344,7 @@ export class RollProcessor {
   }
 
   private wasMuggedWhileTraveling(): boolean {
-    const randomNum = getRandomIntInclusive(1, 100);
+    const randomNum = randomInt(this.game!, 1, 100);
     if (randomNum <= muggingChance) {
       return true;
     }
@@ -503,7 +504,7 @@ export class RollProcessor {
       return;
     }
 
-    const newRoll = new DiceRoll();
+    const newRoll = new DiceRoll(randomInt(this.game!, 1, 6), randomInt(this.game!, 1, 6));
 
     if (this.ctx.isDev) {
       if (this.forceDie1 && this.forceDie2) {

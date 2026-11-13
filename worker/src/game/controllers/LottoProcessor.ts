@@ -10,7 +10,8 @@ import { GameContext } from "../GameContext";
 import { newId } from "../ids";
 import { Traits } from "../traits/Traits";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
-import { areIdsEqual, getRandomIntInclusive } from "./helpers";
+import { areIdsEqual } from "./helpers";
+import { randomInt } from "../random";
 
 export class LottoProcessor {
   private ctx: GameContext;
@@ -76,7 +77,7 @@ export class LottoProcessor {
       return "Not your lotto game";
     }
 
-    const randomNum = getRandomIntInclusive(1, 100);
+    const randomNum = randomInt(this.game!, 1, 100);
 
     this.lotto.optionPicked = this.optNum;
     this.lotto.randomNum = randomNum;
@@ -148,24 +149,24 @@ export class LottoProcessor {
 
   public static async createLotto(
     ctx: GameContext,
-    gameId: string,
+    game: GameInstanceDocument,
     player: Player
   ): Promise<string> {
     const classType = player.playerClass;
     const luckIncrease = player.luck * luckAdjustment;
 
-    const smallPrize = getRandomIntInclusive(100, 200);
+    const smallPrize = randomInt(game, 100, 200);
     const smallPrizePercent = 50 + luckIncrease;
 
-    const mediumPrize = getRandomIntInclusive(230, 400);
+    const mediumPrize = randomInt(game, 230, 400);
     const mediumPrizePercent = 20 + luckIncrease;
 
-    const largePrize = getRandomIntInclusive(430, 600);
+    const largePrize = randomInt(game, 430, 600);
     const largePrizePercent = 10 + luckIncrease;
 
     const newObj: LottoDocument = {
       _id: newId(),
-      gameId: gameId,
+      gameId: game._id,
       playerId: player._id,
       playerName: player.name,
       playerColor: player.color,

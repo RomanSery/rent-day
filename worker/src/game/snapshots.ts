@@ -29,8 +29,12 @@ const STATES: PlayerState[] = [PlayerState.ACTIVE, PlayerState.IN_ISOLATION, Pla
 type PackedPlayer = [number, number, number, number];
 /** [squareId, owner seat, houses, mortgaged 0/1], owned squares only */
 type PackedSquare = [number, number, number, number];
-/** [turn, seat to act or -1, players, squares] */
-type PackedSnapshot = [number, number, PackedPlayer[], PackedSquare[]];
+/**
+ * [turn, seat to act or -1, players, squares, random generator state]. The
+ * generator state is kept so an undo cannot reroll the dice; it is never
+ * returned to players.
+ */
+type PackedSnapshot = [number, number, PackedPlayer[], PackedSquare[], number?];
 
 export interface TurnSnapshot {
   turn: number;
@@ -70,7 +74,13 @@ export const packSnapshot = (game: GameInstanceDocument): string => {
       squares.push([s.squareId, owner, s.numHouses, s.isMortgaged ? 1 : 0]);
     }
   }
-  const packed: PackedSnapshot = [game.turnNumber ?? 0, seatOf(game, game.nextPlayerToAct), players, squares];
+  const packed: PackedSnapshot = [
+    game.turnNumber ?? 0,
+    seatOf(game, game.nextPlayerToAct),
+    players,
+    squares,
+    game.rngState,
+  ];
   return JSON.stringify(packed);
 };
 

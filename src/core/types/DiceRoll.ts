@@ -2,9 +2,10 @@ export class DiceRoll {
   die1: number;
   die2: number;
 
-  constructor() {
-    this.die1 = Math.floor(Math.random() * 6) + 1;
-    this.die2 = Math.floor(Math.random() * 6) + 1;
+  /** The server passes dice from the game's seeded generator. */
+  constructor(die1?: number, die2?: number) {
+    this.die1 = die1 ?? Math.floor(Math.random() * 6) + 1;
+    this.die2 = die2 ?? Math.floor(Math.random() * 6) + 1;
   }
 
   prettyPrint() {

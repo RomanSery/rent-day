@@ -13,6 +13,7 @@ import { differenceInMinutes, parseISO } from "date-fns";
 import { GameInstanceDocument } from "../model";
 import { GameContext } from "../GameContext";
 import { newId } from "../ids";
+import { randomPick } from "../random";
 import { Traits } from "../traits/Traits";
 import { AuctionProcessor } from "../controllers/AuctionProcessor";
 import { GameProcessor } from "../controllers/GameProcessor";
@@ -62,7 +63,7 @@ export const createBotPlayer = (game: GameInstanceDocument, level: BotLevel): Pl
     BOT_NAMES.find((n) => !takenNames.has(n)) ?? `Bot ${game.players.length + 1}`;
 
   const classes = Object.values(PlayerClass);
-  const playerClass = classes[Math.floor(Math.random() * classes.length)];
+  const playerClass = randomPick(game, classes) ?? classes[0];
   const skills = Traits.getInitialSkills(playerClass);
 
   return {
@@ -261,7 +262,9 @@ export class BotPlayer {
       return false;
     }
 
-    let placed = false;
+    // decide every bid first: the amounts draw on the game's random
+    // generator, which must be saved before the bids reload the game
+    const bids: Array<{ bot: Player; amount: number }> = [];
     for (const bidder of auction.bidders) {
       if (bidder.submittedBid) {
         continue;
@@ -270,7 +273,14 @@ export class BotPlayer {
       if (!bot || !bot.isBot) {
         continue;
       }
-      const amount = bidFor(game, auction, bot);
+      bids.push({ bot, amount: bidFor(game, auction, bot) });
+    }
+    if (bids.length) {
+      await ctx.store.saveGame(game);
+    }
+
+    let placed = false;
+    for (const { bot, amount } of bids) {
       const errMsg = await new AuctionProcessor(ctx, amount, bot._id).placeBid();
       if (errMsg) {
         console.log("bot bid failed", errMsg);

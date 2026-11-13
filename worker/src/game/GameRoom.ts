@@ -115,8 +115,12 @@ export const toClientGame = (
   if (!game) {
     return null;
   }
+  // the generator's state would let a player predict the dice; the seed is
+  // shown once the game is over (for bug reports and replays)
+  const { rngState: _rngState, seed, ...rest } = game;
   return {
-    ...game,
+    ...rest,
+    seed: game.status === GameStatus.FINISHED ? seed : undefined,
     settings: {
       ...game.settings,
       password: game.settings.password ? "protected" : null,

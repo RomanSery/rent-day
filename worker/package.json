@@ -18,7 +18,8 @@
     "test:api:bots": "node test/bots.mjs",
     "sim": "node test/sim.mjs",
     "test:api:rejoin": "node test/rejoin.mjs",
-    "test:api:snapshots": "node test/snapshots.mjs"
+    "test:api:snapshots": "node test/snapshots.mjs",
+    "test:api:seeded": "node test/seeded.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

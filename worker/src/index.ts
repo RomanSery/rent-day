@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { toSeed } from "./game/random";
 import type { Context } from "hono";
 import { GameStatus } from "@core/enums/GameStatus";
 import { PieceType } from "@core/enums/PieceType";
@@ -296,6 +297,8 @@ app.post("/api/createGame", async (c) => {
       userId,
       password: data.gamePwd ? String(data.gamePwd) : null,
       useTimers: !!data.useTimers,
+      // development only: a fixed seed replays the same dice (tests, bug reports)
+      seed: isDevEnv(c.env) ? toSeed(data.seed) : undefined,
     },
     numBots,
     botLevel
@@ -332,6 +335,7 @@ app.post("/api/dev/simulate", async (c) => {
       password: null,
       useTimers: false,
       botsOnly: true,
+      seed: toSeed(body.seed),
     },
     levels.length,
     BotLevel.Normal,

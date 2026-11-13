@@ -46,6 +46,12 @@ bots and a short clean-up delay:
 npx wrangler dev --var DEV_BOT_PACE_MS:0 --var DEV_PURGE_SECONDS:20
 ```
 
+`npm run test:api:seeded` plays two bots-only games with the same seed and
+checks they match turn by turn, and that a different seed plays differently.
+Start the Worker with `--var DEV_BOT_PACE_MS:0`. In development, both
+`dev/simulate` and `createGame` accept a `seed` (a number or any text) to
+replay the same dice.
+
 `npm run sim` (test/sim.mjs) is not a pass/fail test but a measuring tool:
 it plays many bots-only games and reports win rate, average rank and final
 assets per skill level, so a change to `BotBrain.ts` can be compared before

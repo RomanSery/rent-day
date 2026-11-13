@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { SquareThemeData } from "@core/types/SquareThemeData";
 import { NyThemeData } from "@core/config/NyTheme";
+import { newSeed, shuffled } from "../random";
 import { GameStatus } from "@core/enums/GameStatus";
 import { PlayerState } from "@core/enums/PlayerState";
 import { JoinResult } from "@core/types/JoinResult";
@@ -46,6 +47,8 @@ export interface CreateGameParams {
   useTimers: boolean;
   /** development only: no human seats, the game runs itself */
   botsOnly?: boolean;
+  /** seed for the game's random generator; a fresh one when missing */
+  seed?: number;
 }
 
 export class GameProcessor {
@@ -84,6 +87,7 @@ export class GameProcessor {
         : null;
 
     const now = formatISO(new Date());
+    const seed = params.seed ?? newSeed();
     const newGame: GameInstanceDocument = {
       _id: params.gameId,
       name: params.gameName,
@@ -112,6 +116,8 @@ export class GameProcessor {
       gameLength: null,
       winner: null,
       turnNumber: 0,
+      seed,
+      rngState: seed,
       createdAt: now,
       updatedAt: now,
     };
@@ -228,7 +234,7 @@ export class GameProcessor {
     ctx: GameContext,
     game: GameInstanceDocument
   ): Promise<void> {
-    game.players = _.shuffle(game.players);
+    game.players = shuffled(game, game.players);
 
     for (let index = 0; index < game.players.length; index++) {
       const p = game.players[index];

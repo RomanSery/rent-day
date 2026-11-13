@@ -13,6 +13,7 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { conEd_position, mta_position, payToGetOutFee } from "@core/constants";
 import { AuctionDocument, GameInstanceDocument, LottoDocument, TradeDocument } from "../model";
 import { areIdsEqual, doesGroupHaveMortgagedProperty } from "../controllers/helpers";
+import { random } from "../random";
 
 // --- board helpers -------------------------------------------------------
 
@@ -240,8 +241,8 @@ export const valueOf = (game: GameInstanceDocument, bot: Player, squareId: numbe
   return Math.round(value);
 };
 
-const jitter = (amount: number, spread: number): number =>
-  amount * (1 - spread + Math.random() * spread * 2);
+const jitter = (game: GameInstanceDocument, amount: number, spread: number): number =>
+  amount * (1 - spread + random(game) * spread * 2);
 
 /** The silent bid for the square under auction (second-price, so bid value). */
 export const bidFor = (game: GameInstanceDocument, auction: AuctionDocument, bot: Player): number => {
@@ -255,7 +256,7 @@ export const bidFor = (game: GameInstanceDocument, auction: AuctionDocument, bot
   const cap = isEasy(bot)
     ? Math.floor(bot.money * 0.3)
     : bot.money - Math.max(reserveFor(game, bot), exposure);
-  const amount = Math.round(jitter(Math.min(value, cap), 0.08));
+  const amount = Math.round(jitter(game, Math.min(value, cap), 0.08));
   if (amount < 5) {
     return 0;
   }

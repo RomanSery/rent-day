@@ -31,6 +31,10 @@ export interface GameInstanceDocument {
   log: ChatMsg[];
   gameLength: number | null;
   winner: string | null;
+  /** seed of the game's random generator (see random.ts) */
+  seed?: number;
+  /** the generator's current state; never sent to players */
+  rngState?: number;
   /** completed turns so far (missing on games created before it existed) */
   turnNumber?: number;
   createdAt: string;
