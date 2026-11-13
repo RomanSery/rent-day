@@ -508,3 +508,19 @@
 .MuiTableCell-sizeSmall {
   padding: 6px 0px 6px 10px !important;
 }
+
+.skill-points-left {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #37424c;
+}
+
+.skill-row-level {
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* the level that just went up */
+.skill-row-level.bumped {
+  background: #2e7d32;
+  color: #fff;
+}

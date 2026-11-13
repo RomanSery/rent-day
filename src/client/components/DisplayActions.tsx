@@ -299,7 +299,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
 
         {myTurn ? getCompleteTurnBtn() : null}
 
-        {me && <SkillPointsButton socketService={socketService} me={me} myTurn={myTurn} />}
+        {me && <SkillPointsButton socketService={socketService} me={me} />}
 
         <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
         <Menu id="my-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
