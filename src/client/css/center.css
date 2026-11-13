@@ -672,3 +672,109 @@
   font-size: 12px;
   color: #8a949d;
 }
+
+/* ---- subway travel ------------------------------------------------------ */
+
+.travel-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.travel-title svg {
+  color: #37474f;
+}
+
+.travel-intro {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #37424c;
+}
+
+.travel-stations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .travel-stations {
+    grid-template-columns: 1fr;
+  }
+}
+
+.travel-station {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #c5ccd3;
+  border-left: 4px solid #37474f;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.travel-station:not(:disabled):hover,
+.travel-station:not(:disabled):focus-visible {
+  background: #e3f2fd;
+  border-color: #1976d2;
+  box-shadow: 0 1px 4px rgba(25, 118, 210, 0.25);
+  outline: none;
+}
+
+.travel-station-icon {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #37474f;
+  color: #fff;
+  font-size: 16px;
+}
+
+.travel-station-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.travel-station-name {
+  font-weight: 600;
+  font-size: 15px;
+  color: #1d2126;
+}
+
+.travel-station-sub {
+  font-size: 12px;
+  color: #5f6b76;
+}
+
+.travel-station.blocked {
+  cursor: default;
+  background: #f6f7f9;
+  border-color: #e3e7eb;
+  border-left-color: #c5ccd3;
+}
+
+.travel-station.blocked .travel-station-icon {
+  background: #c5ccd3;
+}
+
+.travel-station.blocked .travel-station-name {
+  color: #8a949d;
+}
+
+.travel-station.here {
+  border-left-color: #1976d2;
+}
+
+.travel-station.here .travel-station-icon {
+  background: #1976d2;
+}
