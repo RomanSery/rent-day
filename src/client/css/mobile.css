@@ -45,3 +45,144 @@
     display: none !important;
   }
 }
+
+
+/* Portrait phones: the board shrinks to a square pinned at the top, the player
+   list moves into its middle (.board-hub), and the controls get the rest of the
+   screen as a scrolling panel underneath. GameBoard renders the same elements
+   in every layout, so rotating only changes which CSS applies. */
+.board-hub {
+  display: none;
+}
+
+@media (max-width: 700px) and (orientation: portrait) {
+  /* only the panel scrolls; pieces poking past the right edge, or a desktop
+     scrollbar eating into 100vw, must not make the page itself scroll */
+  html:has(.game-board),
+  html:has(.game-board) body {
+    overflow: hidden;
+  }
+
+  /* pieces live outside the board element; sized to the smaller squares */
+  html:has(.game-board) .single-piece {
+    font-size: min(2.6vw, 1.35svh);
+    padding-left: 2px;
+  }
+
+  .game-board {
+    /* svh: the board keeps its size while the browser's address bar slides
+       in and out; the panel below absorbs the difference */
+    --board-size: min(100vw, 52vh);
+    --board-size: min(100vw, 52svh);
+    --corner: calc(var(--board-size) * 0.12);
+    --edge: calc(var(--board-size) * 0.76 / 9);
+
+    height: 100vh;
+    height: 100dvh;
+    grid-template-columns: var(--corner) repeat(9, var(--edge)) var(--corner);
+    grid-template-rows: var(--corner) repeat(9, var(--edge)) var(--corner) minmax(0, 1fr);
+  }
+
+  .game-board > .board-hub {
+    display: flex;
+    grid-row: 2 / 11;
+    grid-column: 2 / 11;
+    min-height: 0;
+    overflow: hidden;
+    padding: 4px;
+    background: #eaeaea;
+  }
+
+  .board-hub .players-display {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    gap: 4px;
+  }
+
+  .board-hub .player-info {
+    margin: 0;
+    min-width: 0;
+    padding: 0 4px 4px;
+  }
+
+  .board-hub .player-info .sub-name {
+    flex-wrap: wrap;
+    column-gap: 4px;
+  }
+
+  /* the controls panel: full width under the board, scrolling on its own */
+  .game-board > .center-square {
+    grid-row: 12;
+    grid-column: 1 / -1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 6px 8px 12px;
+  }
+
+  .game-board > .center-square > .players-display {
+    display: none;
+  }
+
+  .game-board .center-left-side {
+    flex-basis: 100%;
+    min-width: 0;
+  }
+
+  .game-board .game-results {
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .game-board .game-results .description {
+    font-size: 0.95rem;
+    min-width: 0;
+  }
+
+  .game-board .die-face {
+    width: 44px;
+    height: 44px;
+    margin: 6px;
+    padding: 6px;
+  }
+
+  .game-board .pip {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* thumb-sized buttons */
+  .game-board .player-actions {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+  }
+
+  .game-board .player-actions .MuiButton-root {
+    min-height: 44px;
+  }
+
+  .game-board .second-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .game-board .second-row .player-viewer,
+  .game-board .second-row .property-viewer {
+    flex-basis: auto;
+  }
+
+  /* the square you just tapped comes first, right under the buttons */
+  .game-board .second-row .property-viewer {
+    order: -1;
+  }
+
+  .game-board .chat-row {
+    height: auto;
+    max-height: 12rem;
+    overflow-y: auto;
+  }
+}

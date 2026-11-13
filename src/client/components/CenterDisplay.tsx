@@ -48,7 +48,6 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   const setForceDie1 = useGameStateStore(state => state.setForceDie1);
   const setForceDie2 = useGameStateStore(state => state.setForceDie2);
   const setTravelOpen = useGameStateStore(state => state.setTravelOpen);
-  const setPlayerToView = useGameStateStore(state => state.setPlayerToView);
   const playerToView = useGameStateStore(state => state.playerToView);
   const setOfferTradeOpen = useGameStateStore(state => state.setOfferTradeOpen);
   const setTradingWithPlayerId = useGameStateStore(state => state.setTradingWithPlayerId);
@@ -114,21 +113,6 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   const onTravel = async () => {
     setTravelOpen(true);
 
-  };
-
-  const viewPlayer = (player: Player) => {
-    setPlayerToView(player._id);
-  };
-  const clearPlayer = () => {
-    if (gameState && gameState.players) {
-      const myUserId = getMyUserId();
-      if (myUserId) {
-        setPlayerToView(myUserId);
-      }
-
-    } else {
-      setPlayerToView(undefined);
-    }
   };
 
   const getPlayerToView = (): Player | undefined => {
@@ -246,7 +230,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
         </div>
 
-        <DisplayPlayers viewPlayer={viewPlayer} clearPlayer={clearPlayer} />
+        <DisplayPlayers />
       </div>
 
       <GameOverDialog open={showGameOver()} onLeaveGame={onLeaveGame} />

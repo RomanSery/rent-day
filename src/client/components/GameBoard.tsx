@@ -6,6 +6,7 @@ import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleA
 import { GameSquare } from "./GameSquare";
 import API from '../api';
 import { CenterDisplay } from "./CenterDisplay";
+import { DisplayPlayers } from "./DisplayPlayers";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import { Snackbar } from "@mui/material";
@@ -136,12 +137,20 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
   return (
     <React.Fragment>
-      <div className="board">
+      <div className="board game-board">
 
         {num_squares.map((n, index) => {
           const id: number = index + 1;
           return (<GameSquare socketService={socketService} id={id} key={id} viewSquare={viewSquare} />)
         })}
+
+        {/* Middle of the board on portrait phones, where the controls move
+            below the board (mobile.css). Always rendered so that rotating the
+            phone never remounts CenterDisplay, whose socket listeners can't
+            be removed and would double up. */}
+        <div className="board-hub">
+          <DisplayPlayers />
+        </div>
 
         <CenterDisplay socketService={socketService} />
       </div>
