@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
-import { Button, Menu, MenuItem } from "@mui/material";
+import { Button, CircularProgress, Menu, MenuItem } from "@mui/material";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
 import { useNavigate } from "react-router-dom";
 import API from '../api';
@@ -50,9 +50,13 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
     return undefined;
   }
 
+  // Done answers at once; the button goes away when the new game state arrives
+  const [endingTurn, setEndingTurn] = React.useState(false);
+
   React.useEffect(() => {
     socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
       setRollBtnHidden(false);
+      setEndingTurn(false);
     });
   }, []);
 
@@ -66,13 +70,20 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   };
 
   const onClickDone = async () => {
+    if (endingTurn) {
+      return;
+    }
+    setEndingTurn(true);
     API.post("actions/completeTurn", { context })
       .then(function (response) {
         if (socketService && gameState) {
           socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id, true);
         }
       })
-      .catch(handleApiError);
+      .catch((err) => {
+        setEndingTurn(false);
+        handleApiError(err);
+      });
   };
 
   const onGetOut = async () => {
@@ -226,6 +237,12 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   };
 
   const getCompleteTurnBtn = () => {
+    if (canCompleteTurn() && endingTurn) {
+      return (
+        <Button variant="contained" color="primary" disabled
+          startIcon={<CircularProgress size={14} color="inherit" />}>Ending turn…</Button>
+      );
+    }
     if (canCompleteTurn()) {
       return (
         <motion.div animate={{ scale: 1.05 }} transition={{

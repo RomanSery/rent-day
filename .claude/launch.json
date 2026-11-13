@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "worker",
+      "runtimeExecutable": "C:\\Users\\Roman\\tools\\node\\npm.cmd",
+      "runtimeArgs": ["--prefix", "worker", "run", "dev"],
+      "port": 8787
+    },
+    {
+      "name": "client",
+      "runtimeExecutable": "C:\\Users\\Roman\\tools\\node\\npm.cmd",
+      "runtimeArgs": ["run", "dev:client"],
+      "port": 3000
+    }
+  ]
+}
