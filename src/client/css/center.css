@@ -10,6 +10,13 @@
   flex-direction: row;
 }
 
+/* Menus and forms outside a game: scroll inside the middle of the board
+   instead of spilling over the bottom row when the window is short. */
+.static-center {
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .center-square .players-display {
   flex-basis: 15%;
 }

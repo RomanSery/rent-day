@@ -21,7 +21,7 @@ export const StaticBoard: React.FC<Props> = (props) => {
           />)
         })}
 
-        <div className="center-square square">
+        <div className="center-square square static-center">
           {props.children}
         </div>
 

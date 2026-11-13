@@ -102,28 +102,28 @@ export const CreateGame: React.FC = () => {
       .catch(handleApiError);
 
   return (
-    <Paper elevation={2} sx={{ mt: 2, p: { xs: 2, sm: 3 }, textAlign: "left" }}>
-      <Typography component="h2" variant="h5" sx={{ textAlign: "center", mb: 2 }}>Create Game</Typography>
+    <Paper elevation={2} sx={{ my: 1, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
+      <Typography component="h2" variant="h5" sx={{ textAlign: "center", mb: 1 }}>Create Game</Typography>
 
       <form onSubmit={handleSubmit(onCreateGame)} noValidate>
-        <Stack spacing={2}>
+        <Stack spacing={1.5}>
 
           <SectionTitle>Game</SectionTitle>
-          <TextField label="Game name" fullWidth required autoFocus id="gameName"
+          <TextField size="small" label="Game name" fullWidth required autoFocus id="gameName"
             error={!!errors.gameName} helperText={errorFor(errors, "gameName")}
             {...field("gameName", { required: true, maxLength: 30, minLength: 4 })} />
-          <TextField label="Password" fullWidth id="gamePwd"
+          <TextField size="small" label="Password" fullWidth id="gamePwd"
             helperText="Optional. Players need it to join."
             {...field("gamePwd", { required: false })} />
 
           <Divider />
           <SectionTitle>Players</SectionTitle>
           <Pair>
-            <TextField label="Seats" type="number" fullWidth required id="maxPlayers"
+            <TextField size="small" label="Seats" type="number" fullWidth required id="maxPlayers"
               slotProps={{ htmlInput: { min: 2, max: 6 } }}
               error={!!errors.maxPlayers} helperText={errorFor(errors, "maxPlayers") ?? "2 to 6"}
               {...field("maxPlayers", { required: true, min: 2, max: 6 })} />
-            <TextField label="Computer players" type="number" fullWidth id="numBots"
+            <TextField size="small" label="Computer players" type="number" fullWidth id="numBots"
               slotProps={{ htmlInput: { min: 0, max: 5 } }}
               error={!!errors.numBots} helperText={errorFor(errors, "numBots") ?? "Fill the empty seats"}
               {...field("numBots", {
@@ -131,7 +131,7 @@ export const CreateGame: React.FC = () => {
                 validate: { fitsTable: (v, all) => Number(v) <= Number(all.maxPlayers) - 1 },
               })} />
           </Pair>
-          <TextField select label="Computer skill" fullWidth id="botLevel" disabled={!hasBots}
+          <TextField size="small" select label="Computer skill" fullWidth id="botLevel" disabled={!hasBots}
             slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
             helperText={hasBots ? "The game starts as soon as the humans have joined" : "Add computer players to choose"}
             {...field("botLevel")}>
@@ -142,14 +142,14 @@ export const CreateGame: React.FC = () => {
           <Divider />
           <SectionTitle>Rules</SectionTitle>
           <Pair>
-            <TextField label="Starting money" fullWidth required id="initialMoney" type="number"
+            <TextField size="small" label="Starting money" fullWidth required id="initialMoney" type="number"
               slotProps={{
                 htmlInput: { min: 500, max: 5000, step: 100 },
                 input: { startAdornment: <InputAdornment position="start">$</InputAdornment> },
               }}
               error={!!errors.initialMoney} helperText={errorFor(errors, "initialMoney") ?? "$500 to $5,000"}
               {...field("initialMoney", { required: true, min: 500, max: 5000 })} />
-            <TextField label="Skill points" type="number" fullWidth required id="initialSkillPoints"
+            <TextField size="small" label="Skill points" type="number" fullWidth required id="initialSkillPoints"
               slotProps={{ htmlInput: { min: 0, max: 10 } }}
               error={!!errors.initialSkillPoints} helperText={errorFor(errors, "initialSkillPoints") ?? "Per player, 0 to 10"}
               {...field("initialSkillPoints", { required: true, min: 0, max: 10 })} />
@@ -159,7 +159,7 @@ export const CreateGame: React.FC = () => {
             label="Turn timers"
           />
 
-          <Button variant="contained" color="primary" type="submit" size="large" fullWidth disabled={isSubmitting}>
+          <Button variant="contained" color="primary" type="submit" fullWidth disabled={isSubmitting}>
             Create game
           </Button>
           <Button component={RouterLink} to="/dashboard" fullWidth>Back</Button>
