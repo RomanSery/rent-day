@@ -270,6 +270,25 @@ section("adding bots from the lobby");
   A.close(); B.close();
 }
 
+section("bots can't take the creator's seat");
+{
+  const D = await newUser("d");
+  r = await D.post("createGame", { data: { gameName: "Saved seat", maxPlayers: 3, initialMoney: 1500, initialSkillPoints: 5 }, context: {} });
+  const gid = r.data.gameId;
+  r = await D.post("addBot", { gameId: gid, level: "Easy" });
+  check(r.status === 200 && r.data.allJoined === false, "creator adds a bot before joining");
+  r = await D.post("addBot", { gameId: gid, level: "Easy" });
+  check(r.status === 200 && r.data.allJoined === false, "and a second, leaving one seat open");
+  r = await D.post("addBot", { gameId: gid, level: "Easy" });
+  check(r.status === 400 && /kept for you/.test(r.data), "the last seat stays the creator's while they haven't joined: " + r.data);
+  g = await getGame(D, gid);
+  check(g.players.length === 2 && g.status === "Joining", "game still waiting, two bots seated");
+  // bots pick pieces at random; take one that's still free
+  const freePiece = ["Pawn", "Hat", "Car", "Bicycle", "Cat", "Dog"].find((p) => !g.players.some((pl) => pl.type === p));
+  r = await D.post("joinGame", { gameId: gid, piece: freePiece, playerClass: "Governor" });
+  check(r.status === 200 && r.data.allJoined, "creator joins the kept seat and the game starts: " + r.status + " " + JSON.stringify(r.data));
+}
+
 H.close();
 console.log(`\n${checks} checks, ${failures} failed`);
 console.log(failures === 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED");

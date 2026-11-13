@@ -255,6 +255,12 @@ export class GameRoom extends DurableObject<Env> {
       if (!areIdsEqual(game.createdBy, userId)) {
         return { errMsg: "Only the game's creator can add computer players", result: null };
       }
+      // the creator plays too: a bot may not take the last seat while they
+      // haven't joined, or the game would start with only bots
+      const creatorSeated = game.players.some((p) => areIdsEqual(p._id, userId));
+      if (!creatorSeated && game.players.length >= game.settings.maxPlayers - 1) {
+        return { errMsg: "The last seat is kept for you. Join the game first.", result: null };
+      }
       const outcome = await GameProcessor.addBot(this.gameCtx, level);
       if (outcome.result) {
         const after = await this.store.getGame();

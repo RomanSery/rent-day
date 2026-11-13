@@ -11,7 +11,7 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import {
-  Alert, Box, Button, Chip, FormHelperText, Paper, Snackbar, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography
+  Alert, Box, Button, Chip, CircularProgress, FormHelperText, Paper, Snackbar, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography
 } from "@mui/material";
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -95,6 +95,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const [copied, setCopied] = useState<boolean>(false);
   const [snackMsg, setSnackMsg] = useState<string>("");
   const [botLevel, setBotLevel] = useState<string>("Normal");
+  const [addingBot, setAddingBot] = useState<boolean>(false);
 
   const { register, control, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<Inputs>({
     defaultValues: { piece: "", playerClass: "", gamePwd: null },
@@ -186,6 +187,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   };
 
   const onAddBot = () => {
+    setAddingBot(true);
     API.post("addBot", { gameId: gameToJoinId, level: botLevel })
       .then(function (response) {
         gameInfoQuery.refetch();
@@ -193,7 +195,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
           navigate("/gameinstance");
         }
       })
-      .catch(handleApiError);
+      .catch(handleApiError)
+      .finally(() => setAddingBot(false));
   };
 
   const onLeaveGame = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -253,7 +256,12 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   const joined = game.players.some((p) => areObjectIdsEqual(p._id, myUserId));
   const openSeats = Math.max(0, game.settings.maxPlayers - game.players.length);
   const takenPieces = new Set(game.players.map((p) => p.type));
-  const canAddBot = game.status === GameStatus.JOINING && areObjectIdsEqual(game.createdBy, myUserId) && openSeats > 0;
+  const isCreator = game.status === GameStatus.JOINING && areObjectIdsEqual(game.createdBy, myUserId);
+  // until the creator joins, one open seat stays theirs (bots can't fill it,
+  // or the game would start without them); the server enforces the same rule
+  const seatsForBots = openSeats - (joined ? 0 : 1);
+  const canAddBot = isCreator && seatsForBots > 0;
+  const lastSeatIsYours = isCreator && !joined && openSeats === 1;
 
   return (
     <React.Fragment>
@@ -304,11 +312,17 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                   <option value="Normal">Normal</option>
                   <option value="Easy">Easy</option>
                 </TextField>
-                <Button variant="outlined" onClick={onAddBot} startIcon={<FontAwesomeIcon icon={faRobot} />}
+                <Button variant="outlined" onClick={onAddBot} disabled={addingBot}
+                  startIcon={addingBot ? <CircularProgress size={14} color="inherit" /> : <FontAwesomeIcon icon={faRobot} />}
                   sx={{ flex: 1, height: 40 }}>
                   Add computer player
                 </Button>
               </Stack>
+            }
+            {lastSeatIsYours &&
+              <Typography variant="body2" color="text.secondary">
+                The last open seat is kept for you. Join the game to start it.
+              </Typography>
             }
           </Stack>
 
