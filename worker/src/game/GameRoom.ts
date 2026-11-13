@@ -33,6 +33,7 @@ import { BotLevel } from "@core/enums/BotLevel";
 import { PlayerState } from "@core/enums/PlayerState";
 import { areIdsEqual } from "./controllers/helpers";
 import { BotPlayer, isBotId } from "./bots/BotPlayer";
+import { movementDurationMs } from "@core/movementTiming";
 
 /** Result of a game action: errMsg is "" on success. */
 export interface ActionResult {
@@ -89,6 +90,13 @@ const devMillis = (env: Env, value: string | undefined, fallback: number): numbe
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 };
 
+/**
+ * Base delay between computer player actions (ms). Everything a bot does is a
+ * multiple of it, so humans can follow along; DEV_BOT_PACE_MS overrides it in
+ * development (the API tests run bots at 30ms).
+ */
+const DEFAULT_BOT_PACE_MS = 1600;
+
 const PENDING_EVENTS_KEY = "pendingEvents";
 const INDEX_STATE_KEY = "indexState";
 const MAX_CHAT_LENGTH = 200;
@@ -140,7 +148,7 @@ export class GameRoom extends DurableObject<Env> {
       // development may shorten the timers so timeout flows can be tested
       turnTimeLimit: devSeconds(env, env.DEV_TURN_SECONDS, turnTimeLimit),
       auctionTimeLimit: devSeconds(env, env.DEV_AUCTION_SECONDS, auctionTimeLimit),
-      botPaceMs: devMillis(env, env.DEV_BOT_PACE_MS, 1000),
+      botPaceMs: devMillis(env, env.DEV_BOT_PACE_MS, DEFAULT_BOT_PACE_MS),
       events: {
         send: (event, payload) => this.broadcastServerEvent(event, payload),
         sendDelayed: (delayMs, event, payload) =>
@@ -165,10 +173,21 @@ export class GameRoom extends DurableObject<Env> {
 
   /** bot steps taken since the turn last changed hands, per bot */
   private botSteps = new Map<string, number>();
+  /** per bot: when its piece will have landed and it may act again (ms) */
+  private botBusyUntil = new Map<string, number>();
   private lastTurnPlayer: string | null = null;
 
   private pace(factor: number): number {
     return Math.round(this.gameCtx.botPaceMs * factor);
+  }
+
+  /**
+   * A real-time duration (like a piece animation) at the current bot pace:
+   * unchanged at the normal pace, shrunk when DEV_BOT_PACE_MS speeds bots up
+   * for tests.
+   */
+  private scaledToPace(ms: number): number {
+    return Math.round((ms * this.gameCtx.botPaceMs) / DEFAULT_BOT_PACE_MS);
   }
 
   // ---------------------------------------------------------------------
@@ -731,13 +750,24 @@ export class GameRoom extends DurableObject<Env> {
             console.log("bot step limit reached for", job.botId);
             return;
           }
+          // the bot's piece is still moving: its next step is already booked
+          // for after it lands, so a stray earlier step must not act now
+          if (job.at < (this.botBusyUntil.get(job.botId) ?? 0)) {
+            return;
+          }
           const result = await BotPlayer.step(this.gameCtx, job.botId);
-          if (result === "rolled") {
-            // let the clients animate the move before the bot continues
-            await this.scheduleJob({ kind: "refresh", at: Date.now() + this.pace(7) });
-            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(7.5) });
+          if (typeof result === "object" && result.kind === "rolled") {
+            // let everyone watch: the dice spin (one pace), the piece moves
+            // (as long as the board animation takes), then a beat to see where
+            // it landed before the bot does anything else
+            const landed = Date.now() + this.pace(1) + this.scaledToPace(movementDurationMs(result.frames));
+            const nextStep = landed + this.pace(1.25);
+            this.botBusyUntil.set(job.botId, nextStep);
+            await this.scheduleJob({ kind: "refresh", at: landed + this.pace(0.25) });
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: nextStep });
           } else if (result === "acted") {
-            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(1) });
+            // one thing at a time (a purchase, a house, a mortgage), each easy to spot
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(1.25) });
           }
           await this.syncIndex();
           await this.afterAction();
@@ -813,7 +843,8 @@ export class GameRoom extends DurableObject<Env> {
           console.log("bot", next.name, "is stuck; not rescheduling");
           return;
         }
-        await this.scheduleOnce({ kind: "botStep", botId: next._id, at: Date.now() + this.pace(1) });
+        // a beat after the turn reaches the bot, so it's clear whose turn it is
+        await this.scheduleOnce({ kind: "botStep", botId: next._id, at: Date.now() + this.pace(1.25) });
       }
     } catch (e) {
       console.log("afterAction failed", e);

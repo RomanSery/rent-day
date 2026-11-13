@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { PiecePosition } from "../../core/types/PiecePosition";
 import { getMovementKeyFrames, getNumPlayersOnSquare, getPiecePosition } from "../uiHelpers";
 import { motion, useReducedMotion } from "framer-motion";
+import { movementStepKinds, movementStepSeconds } from "../../core/movementTiming";
 import { GameEvent } from "../../core/types/GameEvent";
 import { getObjectIdAsHexString, getIconProp } from "../helpers";
 import { SocketService } from "../sockets/SocketService";
@@ -14,29 +15,19 @@ interface Props {
   socketService: SocketService;
 }
 
-/** seconds per square; long walks speed up so none takes much over MAX_TRIP */
-const STEP_SECONDS = 0.45;
-const MAX_TRIP_SECONDS = 10;
 /** how high a piece lifts between neighbouring squares, in px */
 const HOP_HEIGHT = 12;
-/** a leap between squares that aren't neighbours (a subway ride) */
-const JUMP_SECONDS = 1.1;
+/** how high it arcs on a leap between squares that aren't neighbours (a subway ride) */
 const JUMP_HEIGHT = 56;
 
 type Ease = "easeOut" | "easeIn" | "linear";
 
-/** next to each other on the board (either direction, wrapping at 40) */
-const areNeighbours = (a: number, b: number) => {
-  const d = (b - a + 40) % 40;
-  return d === 1 || d === 39;
-};
-
 /**
  * Keyframes for a piece moving along the server's path (every square passed,
- * the start included). Neighbouring squares are a small hop each; a square
- * repeated in a row is a pause (the beat on a Chance square before a card
- * moves the piece); two squares that aren't neighbours, like the two stations
- * of a subway ride, are one big leap across the board.
+ * the start included). Step kinds and timings come from core/movementTiming,
+ * which the server also uses to wait for a bot's piece to land: a small hop
+ * per neighbouring square, a pause for a repeated square, one big leap
+ * between squares that aren't neighbours.
  */
 const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduceMotion: boolean) => {
   if (positions.length < 2) {
@@ -48,11 +39,8 @@ const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduce
   }
 
   const steps = positions.length - 1;
-  const kinds = Array.from({ length: steps }, (_, i) =>
-    squares[i] === squares[i + 1] ? "pause" : areNeighbours(squares[i], squares[i + 1]) ? "hop" : "jump");
-  const walkSteps = kinds.filter((k) => k !== "jump").length;
-  const step = walkSteps > 0 ? Math.min(STEP_SECONDS, MAX_TRIP_SECONDS / walkSteps) : STEP_SECONDS;
-  const durations = kinds.map((k) => (k === "jump" ? JUMP_SECONDS : step));
+  const kinds = movementStepKinds(squares);
+  const durations = movementStepSeconds(squares);
   const total = durations.reduce((a, b) => a + b, 0);
 
   const top: number[] = [positions[0].top];

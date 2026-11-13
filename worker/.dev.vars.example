@@ -11,5 +11,5 @@ DEV_PREOWN_PROPERTIES=false
 # DEV_TURN_SECONDS=6
 # DEV_AUCTION_SECONDS=6
 
-# Development only: base delay between computer player actions (ms, default 1000)
+# Development only: base delay between computer player actions (ms, default 1600)
 # DEV_BOT_PACE_MS=30

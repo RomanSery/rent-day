@@ -44,7 +44,11 @@ export const BOT_NAMES = [
 ];
 
 /** What the Durable Object should do after a bot step. */
-export type BotStepResult = "rolled" | "acted" | "idle";
+export type BotStepResult =
+  /** dice thrown or a subway ride taken: wait for the piece to land, then continue */
+  | { kind: "rolled"; frames: number[] }
+  | "acted"
+  | "idle";
 
 export const isBotId = (game: GameInstanceDocument, id: string | null | undefined): boolean =>
   !!game.players.find((p) => areIdsEqual(p._id, id))?.isBot;
@@ -94,8 +98,9 @@ export const createBotPlayer = (game: GameInstanceDocument, level: BotLevel): Pl
 
 export class BotPlayer {
   /**
-   * One step of the bot's turn. Returns "rolled" when dice were thrown (the
-   * caller waits for the animation before the next step), "acted" when
+   * One step of the bot's turn. Returns "rolled" with the movement path when
+   * the piece moves (the caller waits for the dice and the move to play out
+   * before the next step), "acted" when
    * something else happened and the bot should continue shortly, and "idle"
    * when there is nothing to do right now.
    */
@@ -196,8 +201,9 @@ export class BotPlayer {
         const trip = new RollProcessor(ctx, botId, null, null);
         const errMsg = await trip.travel(destination);
         if (!errMsg) {
-          ctx.events.broadcast(GameEvent.STOP_ANIMATE_DICE, botId, null, trip.getMovementKeyFrames());
-          return "rolled"; // let the piece animate; the roll follows next step
+          const tripFrames = trip.getMovementKeyFrames();
+          ctx.events.broadcast(GameEvent.STOP_ANIMATE_DICE, botId, null, tripFrames);
+          return { kind: "rolled", frames: tripFrames }; // let the piece animate; the roll follows next step
         }
       }
 
@@ -211,12 +217,13 @@ export class BotPlayer {
       const dice = roll.getLastDiceRoll();
       const frames = roll.getMovementKeyFrames();
       ctx.events.broadcast(GameEvent.ANIMATE_DICE);
-      await ctx.events.broadcastDelayed(ctx.botPaceMs * 1.5, GameEvent.STOP_ANIMATE_DICE, [
+      // the dice spin for one pace, about as long as a human roll
+      await ctx.events.broadcastDelayed(ctx.botPaceMs, GameEvent.STOP_ANIMATE_DICE, [
         botId,
         { die1: dice.die1, die2: dice.die2 },
         frames,
       ]);
-      return "rolled";
+      return { kind: "rolled", frames };
     }
 
     // already rolled: settle any debt from rent, then finish the turn
@@ -237,7 +244,10 @@ export class BotPlayer {
       return "idle";
     }
     await ctx.events.refreshGameState();
-    return "acted";
+    // the turn has moved on: nothing more for this bot to do (scheduling another
+    // step here used to land in the same alarm batch as the next bot's first
+    // step and end that bot's turn mid-move)
+    return "idle";
   }
 
   /** Every bot that still owes a bid in the open auction places one. */
