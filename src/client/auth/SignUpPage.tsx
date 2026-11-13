@@ -4,7 +4,8 @@ import API from '../api';
 import { Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { BackLink } from "../components/BackLink";
-import { handleApiError, setCurrSessionInfo } from "../helpers";
+import { handleApiError, hasPendingInvite, setCurrSessionInfo, takeReturnTo } from "../helpers";
+import { InviteNote } from "./InviteNote";
 import _ from "lodash/fp";
 
 
@@ -35,7 +36,7 @@ export const SignUpPage: React.FC<Props> = () => {
     API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email })
       .then(function (response) {
         setCurrSessionInfo(response.data);
-        navigate("/dashboard");
+        navigate(takeReturnTo());
       })
       .catch(handleApiError);
   };
@@ -45,6 +46,8 @@ export const SignUpPage: React.FC<Props> = () => {
     <React.Fragment>
 
       <BackLink to="/auth" label="Back" />
+
+      {hasPendingInvite() && <InviteNote />}
 
       <Typography component="h2" variant="h5">Create Account</Typography>
       

@@ -2,7 +2,8 @@ import React from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, handleApiError, isLoggedIn, logOut, redirectToHomeIfGameNotFound, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { getMyGameId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { InviteNote } from './auth/InviteNote';
 import {
   Routes, Route, Navigate, useNavigate, useLocation, Link
 } from "react-router-dom";
@@ -178,6 +179,8 @@ const AuthDisplay: React.FC = () => {
             <img src="/logo_transparent_small.png" alt="Block Barons"></img>
           </div>
 
+          {hasPendingInvite() && <InviteNote />}
+
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
             onClick={() => navigate("/newuser")}> CREATE Account</Button>
 
@@ -301,8 +304,10 @@ export const App: React.FC = () => {
         });
       })
       .catch(function (error) {
-        // handle error
+        // no session: sign in first, then come back to the page they opened
+        // (an invite link to a game, typically)
         logOut();
+        rememberReturnTo(location.pathname + location.search);
         navigate("/auth");
       })
       .finally(() => {

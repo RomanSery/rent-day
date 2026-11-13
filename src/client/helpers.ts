@@ -143,6 +143,53 @@ export const logOut = (): void => {
   localStorage.clear();
 };
 
+/*
+ * Where a signed-out visitor was going (an invite link to /join?gid=...), so
+ * that signing up or logging in takes them there instead of to the lobby.
+ * Kept in sessionStorage: it belongs to this tab and the visit.
+ */
+const RETURN_TO_KEY = "returnTo";
+const AUTH_PAGES = ["/", "/auth", "/login", "/newuser", "/dashboard"];
+
+const isSafeReturnPath = (path: string | null): path is string =>
+  !!path && path.startsWith("/") && !path.startsWith("//") &&
+  !AUTH_PAGES.includes(path.split("?")[0]);
+
+export const rememberReturnTo = (path: string): void => {
+  if (!isSafeReturnPath(path)) {
+    return;
+  }
+  try {
+    sessionStorage.setItem(RETURN_TO_KEY, path);
+  } catch (e) {
+    // storage blocked: they land in the lobby as before
+  }
+};
+
+/** The remembered page without forgetting it (for the "you've been invited" note). */
+export const peekReturnTo = (): string | null => {
+  try {
+    const path = sessionStorage.getItem(RETURN_TO_KEY);
+    return isSafeReturnPath(path) ? path : null;
+  } catch (e) {
+    return null;
+  }
+};
+
+/** Where to go after signing up or logging in: the remembered page, once, else the lobby. */
+export const takeReturnTo = (): string => {
+  const path = peekReturnTo();
+  try {
+    sessionStorage.removeItem(RETURN_TO_KEY);
+  } catch (e) {
+    // nothing to clear
+  }
+  return path ?? "/dashboard";
+};
+
+/** True when the visitor followed an invite link to a game. */
+export const hasPendingInvite = (): boolean => (peekReturnTo() ?? "").startsWith("/join?");
+
 export const tryToRedirectToGame = async (
   pageType: PageType,
   myGameId: string | null,

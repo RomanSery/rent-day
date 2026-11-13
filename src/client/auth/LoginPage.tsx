@@ -4,7 +4,8 @@ import API from '../api';
 import { Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { BackLink } from "../components/BackLink";
-import { handleApiError, setCurrSessionInfo } from "../helpers";
+import { handleApiError, hasPendingInvite, setCurrSessionInfo, takeReturnTo } from "../helpers";
+import { InviteNote } from "./InviteNote";
 import _ from "lodash/fp";
 
 interface Props {
@@ -32,7 +33,7 @@ export const LoginPage: React.FC<Props> = () => {
     API.post("logIn", { username: data.username, password: data.password })
       .then(function (response) {
         setCurrSessionInfo(response.data);
-        navigate("/dashboard");
+        navigate(takeReturnTo());
       })
       .catch(handleApiError);
   };
@@ -42,6 +43,8 @@ export const LoginPage: React.FC<Props> = () => {
     <React.Fragment>
 
       <BackLink to="/auth" label="Back" />
+
+      {hasPendingInvite() && <InviteNote />}
 
       <Typography component="h2" variant="h5">Log In</Typography>
 
