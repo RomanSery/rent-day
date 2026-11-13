@@ -29,8 +29,11 @@ export const SquareViewer: React.FC = () => {
     return null;
   }
 
-  const name = gameState.theme ? gameState.theme[squareToView].name : "";
-  const themeIcon = gameState.theme ? gameState.theme[squareToView].icon : "";
+  // the theme only names properties, stations and utilities; the other
+  // squares (chance, lotto, corners) have no entry
+  const themeEntry = gameState.theme?.[squareToView];
+  const name = themeEntry?.name ?? "";
+  const themeIcon = themeEntry?.icon ?? "";
   const owner = data.owner ? gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner)) : undefined;
   const money = (v: number | undefined | null) => (v ? dollarFormatter.format(v) : "–");
 
