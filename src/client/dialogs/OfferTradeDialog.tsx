@@ -5,21 +5,15 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
 import API from '../api';
-import { getGameContextFromLocalStorage, getMyUserId, handleApiError, areObjectIdsEqual, getIconProp } from "../helpers";
+import { getGameContextFromLocalStorage, getMyUserId, handleApiError, areObjectIdsEqual } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
-import Grid from '@mui/material/Grid';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import Checkbox from '@mui/material/Checkbox';
-import Paper from '@mui/material/Paper';
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { getSquareTxt } from "../squares/squareHelpers";
-import { ListSubheader, TextField } from "@mui/material";
-import { Player } from "../../core/types/Player";
+import { InputAdornment, TextField } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowDown, faArrowUp } from "@fortawesome/free-solid-svg-icons";
 import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
@@ -27,6 +21,7 @@ import { SquareConfigData } from "../../core/types/SquareConfigData";
 import { SquareType } from "../../core/enums/SquareType";
 import useGameStateStore from "../stores/gameStateStore";
 import useTradeStateStore from "../stores/tradeStateStore";
+import { TradePlayer, TradeSquare } from "./TradeSummary";
 
 
 interface Props {
@@ -120,28 +115,6 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
     return hasHouses;
   };
 
-  const getPlayerHeader = (mine: boolean): React.ReactElement => {
-    if (!gameState) {
-      return <div></div>;
-    }
-
-    const playerId = mine ? getMyUserId() : tradingWithPlayerId;
-    const p = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerId));
-    if (!p) {
-      return <div></div>;
-    }
-
-
-    return (
-      <ListSubheader component="div" style={{ color: p.color }}>
-        <FontAwesomeIcon icon={getIconProp(p.type)} size="2x" color={p.color} />
-        &nbsp;&nbsp;
-        {p.name}
-      </ListSubheader>
-    );
-  }
-
-
   const handleToggle = (mine: boolean, value: number) => () => {
     const currentIndex = mine ? myChecked.indexOf(value) : theirChecked.indexOf(value);
     const newChecked = mine ? [...myChecked] : [...theirChecked];
@@ -164,49 +137,64 @@ export const OfferTradeDialog: React.FC<Props> = ({ socketService }) => {
     clearTrade();
   }
 
-  const propertyList = (mine: boolean) => {
+  const toAmount = (raw: string) => {
+    const n = parseInt(raw);
+    return Number.isNaN(n) || n < 0 ? 0 : n;
+  };
+
+  /** one side of the offer: cash plus checkboxes for the tradeable squares */
+  const side = (mine: boolean) => {
     const items: number[] = getPlayerTradeableProperties(mine);
+    const checked = mine ? myChecked : theirChecked;
+    const amount = mine ? myAmount : theirAmount;
 
     return (
-      <Paper>
-        <List dense disablePadding component="div" role="list" subheader={getPlayerHeader(mine)}>
+      <div className={"trade-side " + (mine ? "give" : "get")}>
+        <div className="trade-side-head">
+          <FontAwesomeIcon icon={mine ? faArrowUp : faArrowDown} />
+          {mine ? "You give" : "You ask for"}
+        </div>
 
-          <TextField label="Amount ($)" type="number"
-            value={mine ? myAmount : theirAmount}
-            onChange={(e) => mine ? setMyAmount(parseInt(e.currentTarget.value)) : setTheirAmount(parseInt(e.currentTarget.value))}
-            name={mine ? "myAmount" : "theirAmount"} />
+        <TextField size="small" fullWidth label="Cash" type="number" name={mine ? "myAmount" : "theirAmount"}
+          value={amount ? amount : ""}
+          onChange={(e) => mine ? setMyAmount(toAmount(e.currentTarget.value)) : setTheirAmount(toAmount(e.currentTarget.value))}
+          slotProps={{
+            htmlInput: { min: 0, step: 10 },
+            input: { startAdornment: <InputAdornment position="start">$</InputAdornment> },
+          }}
+          sx={{ mb: 1 }} />
 
-          {items.map((squareId: number) => {
-            const labelId = `transfer-list-item-${squareId}-label`;
-
-            return (
-              <ListItemButton key={squareId} role="listitem" onClick={handleToggle(mine, squareId)} className="trade-item">
-                <ListItemIcon>
-                  <Checkbox checked={mine ? (myChecked.indexOf(squareId) !== -1) : (theirChecked.indexOf(squareId) !== -1)} tabIndex={-1} disableRipple slotProps={{ input: { 'aria-labelledby': labelId } }} />
-                </ListItemIcon>
-                <ListItemText id={labelId} primary={getSquareTxt(gameState, squareId)} />
+        {items.length === 0
+          ? <div className="trade-nothing">No properties to trade</div>
+          : <List dense disablePadding>
+            {items.map((squareId: number) => (
+              <ListItemButton key={squareId} onClick={handleToggle(mine, squareId)} className="trade-pick" dense>
+                <Checkbox edge="start" size="small" checked={checked.indexOf(squareId) !== -1} tabIndex={-1} disableRipple />
+                <TradeSquare squareId={squareId} />
               </ListItemButton>
-            );
-          })}
-          <ListItem />
-        </List>
-      </Paper>
+            ))}
+          </List>}
+      </div>
     );
   };
 
+  const nothingInDeal = myChecked.length === 0 && theirChecked.length === 0 && !myAmount && !theirAmount;
+
   return (
     <Dialog fullWidth={true} maxWidth="sm" onClose={() => closeDialog()} aria-labelledby="offer-trade-dialog-title" open={offerTradeOpen}>
-      <DialogTitle id="offer-trade-dialog-title">Trade</DialogTitle>
+      <DialogTitle id="offer-trade-dialog-title">
+        Trade with {tradingWithPlayerId ? <TradePlayer playerId={tradingWithPlayerId} /> : null}
+      </DialogTitle>
       <DialogContent>
-        <Grid container spacing={2} sx={{ justifyContent: "center", alignItems: "center" }} className="trade-dialog-cont">
-          <Grid className="trade-left">{propertyList(true)}</Grid>
-          <Grid className="trade-right">{propertyList(false)}</Grid>
-        </Grid>
-
+        <div className="trade-summary">
+          {side(true)}
+          {side(false)}
+        </div>
+        <p className="trade-hint">Properties in a colour group with houses can't be traded.</p>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => closeDialog()} color="primary">Cancel</Button>
-        <Button onClick={onOfferTrade} color="primary">Offer Trade</Button>
+        <Button onClick={() => closeDialog()} color="inherit">Cancel</Button>
+        <Button onClick={onOfferTrade} variant="contained" color="primary" disabled={nothingInDeal}>Offer trade</Button>
       </DialogActions>
     </Dialog>
   );

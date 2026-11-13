@@ -524,3 +524,151 @@
   background: #2e7d32;
   color: #fff;
 }
+
+/* ---- trades: "You get" / "You give" ------------------------------------ */
+
+.trade-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 520px) {
+  .trade-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.trade-side {
+  border: 1px solid #dde1e5;
+  border-top-width: 4px;
+  border-radius: 8px;
+  padding: 8px 10px 10px;
+  min-width: 0;
+}
+
+.trade-side.get {
+  border-top-color: #2e7d32;
+}
+
+.trade-side.give {
+  border-top-color: #c62828;
+}
+
+.trade-side-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  margin-bottom: 6px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.trade-side.get .trade-side-head > svg {
+  color: #2e7d32;
+}
+
+.trade-side.give .trade-side-head > svg {
+  color: #c62828;
+}
+
+.trade-from {
+  font-weight: 400;
+  font-size: 13px;
+  color: #5f6b76;
+}
+
+.trade-player {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.trade-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.trade-items li {
+  padding: 4px 0;
+  font-size: 14px;
+}
+
+.trade-items li + li {
+  border-top: 1px solid #f0f2f4;
+}
+
+.trade-cash {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.trade-cash svg {
+  color: #b8860b;
+}
+
+.trade-nothing {
+  color: #8a949d;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.trade-square {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.trade-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  flex: none;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+
+.trade-square-icon {
+  color: #37474f;
+  flex: none;
+}
+
+.trade-tag {
+  font-size: 11px;
+  color: #8a949d;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  padding: 0 6px;
+}
+
+.trade-net {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: right;
+}
+
+.trade-net.plus {
+  color: #2e7d32;
+}
+
+.trade-net.minus {
+  color: #c62828;
+}
+
+.trade-outcome {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.trade-pick {
+  padding: 0 4px !important;
+  border-radius: 6px;
+}
+
+.trade-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: #8a949d;
+}
