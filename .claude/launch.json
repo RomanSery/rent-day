@@ -8,6 +8,12 @@
       "port": 8787
     },
     {
+      "name": "worker-fastbots",
+      "runtimeExecutable": "C:\\Users\\Roman\\tools\\node\\npm.cmd",
+      "runtimeArgs": ["--prefix", "worker", "run", "dev", "--", "--var", "DEV_BOT_PACE_MS:30"],
+      "port": 8787
+    },
+    {
       "name": "client",
       "runtimeExecutable": "C:\\Users\\Roman\\tools\\node\\npm.cmd",
       "runtimeArgs": ["run", "dev:client"],

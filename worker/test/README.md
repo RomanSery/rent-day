@@ -92,3 +92,9 @@ check, a reconnecting socket immediately receives the current game state
 (and any open auction), and the others see "disconnected" / "re-connected".
 It uses a development-only `devDropConnection` socket message to force a
 server-side disconnect.
+
+`npm run test:api:history` checks that finished games are kept in the D1
+history and summed up into profiles (`/api/getProfile`): win and loss by
+class, head-to-head records, the line for computer players, favourite
+properties, and that a game is recorded once. Start the Worker with
+`npx wrangler dev --var DEV_BOT_PACE_MS:30`.

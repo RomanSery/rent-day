@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { getMyGameId, getMyUserId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
 import { InviteNote } from './auth/InviteNote';
 import {
   Routes, Route, Navigate, useNavigate, useLocation, Link
@@ -12,6 +12,7 @@ import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
 import { DisplayAllPlayers } from "./join/DisplayAllPlayers";
+import { PlayerProfilePage } from "./join/PlayerProfilePage";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
 import { Button, Container } from "@mui/material";
@@ -151,6 +152,7 @@ const DashboardDisplay: React.FC = () => {
           <MenuLink to="/create">CREATE NEW GAME</MenuLink>
           <MenuLink to="/find">JOIN GAME</MenuLink>
           <MenuLink to="/players">PLAYERS</MenuLink>
+          {getMyUserId() && <MenuLink to={"/profile/" + getMyUserId()}>MY PROFILE</MenuLink>}
           <MenuLink to="/help">HELP / RULES</MenuLink>
           <MenuLink to="/contact">CONTACT US</MenuLink>
 
@@ -228,6 +230,18 @@ const DisplayPlayersPage: React.FC = () => {
     <Page>
       <QueryClientProvider client={queryClient}>
         <DisplayAllPlayers />
+      </QueryClientProvider>
+    </Page>
+  );
+};
+
+const ProfilePage: React.FC = () => {
+  useRedirectToGame(PageType.Find);
+
+  return (
+    <Page>
+      <QueryClientProvider client={queryClient}>
+        <PlayerProfilePage />
       </QueryClientProvider>
     </Page>
   );
@@ -335,6 +349,7 @@ export const App: React.FC = () => {
       <Route path="/gameinstance" element={<GameDisplay />} />
       <Route path="/join" element={<DisplayJoinGamePage />} />
       <Route path="/players" element={<DisplayPlayersPage />} />
+      <Route path="/profile/:playerId" element={<ProfilePage />} />
       <Route path="/find" element={<FindGamesPage />} />
       <Route path="/create" element={<CreateGamePage />} />
       <Route path="/help" element={<HelpPage />} />

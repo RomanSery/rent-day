@@ -13,6 +13,8 @@ import { auctionTimeLimit, turnTimeLimit } from "@core/constants";
 import { Env, isDevEnv } from "../env";
 import { UsersRepo } from "../db/users";
 import { GamesIndexRepo } from "../db/gamesIndex";
+import { HistoryRepo } from "../db/history";
+import { summariseGame } from "./history";
 import { GameContext } from "./GameContext";
 import { DurableObjectGameStore } from "./DurableObjectGameStore";
 import {
@@ -116,6 +118,8 @@ const DEFAULT_BOT_PACE_MS = 1600;
 
 const PENDING_EVENTS_KEY = "pendingEvents";
 const INDEX_STATE_KEY = "indexState";
+/** set once the finished game is in the D1 history */
+const HISTORY_RECORDED_KEY = "historyRecorded";
 const MAX_CHAT_LENGTH = 200;
 /** chat kept on the game document; older messages are dropped */
 const MAX_STORED_CHAT = 100;
@@ -182,6 +186,7 @@ const toDiceResult = (roll: DiceRoll | undefined): DiceRollResult | null =>
 export class GameRoom extends DurableObject<Env> {
   private readonly store: DurableObjectGameStore;
   private readonly gamesIndex: GamesIndexRepo;
+  private readonly history: HistoryRepo;
   private readonly gameCtx: GameContext;
   private readonly purgeAfterMs: number;
   /** ctx.storage, metered in development (see dev/usage.ts) */
@@ -202,6 +207,7 @@ export class GameRoom extends DurableObject<Env> {
     }
     this.store = new DurableObjectGameStore(this.storage, new UsersRepo(db));
     this.gamesIndex = new GamesIndexRepo(db);
+    this.history = new HistoryRepo(db);
     this.purgeAfterMs = devSeconds(env, env.DEV_PURGE_SECONDS, PURGE_FINISHED_AFTER_SECONDS) * 1000;
     this.gameCtx = {
       store: this.store,
@@ -1110,7 +1116,7 @@ export class GameRoom extends DurableObject<Env> {
         await this.dropNonPlayers(game);
       }
       if (game && game.status === GameStatus.FINISHED) {
-        await this.schedulePurge();
+        await this.onFinished(game);
         return;
       }
       if (!game || game.status !== GameStatus.ACTIVE) {
@@ -1123,7 +1129,7 @@ export class GameRoom extends DurableObject<Env> {
         await BotPlayer.finishWithoutHumans(this.gameCtx, game);
         await this.gameCtx.events.refreshGameState();
         await this.syncIndex();
-        await this.schedulePurge();
+        await this.onFinished(game);
         return;
       }
 
@@ -1155,6 +1161,33 @@ export class GameRoom extends DurableObject<Env> {
       }
     } catch (e) {
       console.log("afterAction failed", e);
+    }
+  }
+
+  /** A finished game: keep its summary in the history, then book its deletion. */
+  private async onFinished(game: GameInstanceDocument): Promise<void> {
+    await this.recordHistory(game);
+    await this.schedulePurge();
+  }
+
+  /**
+   * Summarise a finished game into the D1 history (once). Bots-only
+   * simulations are not kept. A failure is retried by the next action on the
+   * game, since the marker is only written once the rows are stored.
+   */
+  private async recordHistory(game: GameInstanceDocument): Promise<void> {
+    if (game.settings.botsOnly || !game.players.some((p) => !p.isBot)) {
+      return;
+    }
+    if (await this.storage.get(HISTORY_RECORDED_KEY)) {
+      return;
+    }
+    try {
+      const record = summariseGame(game, await this.getSnapshots());
+      await this.history.record(record);
+      await this.storage.put(HISTORY_RECORDED_KEY, true);
+    } catch (e) {
+      console.log("recording the game history failed", e);
     }
   }
 

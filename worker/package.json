@@ -21,7 +21,8 @@
     "usage": "node test/usage.mjs",
     "test:api:rejoin": "node test/rejoin.mjs",
     "test:api:snapshots": "node test/snapshots.mjs",
-    "test:api:seeded": "node test/seeded.mjs"
+    "test:api:seeded": "node test/seeded.mjs",
+    "test:api:history": "node test/history.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

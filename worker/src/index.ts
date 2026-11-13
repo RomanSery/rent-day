@@ -13,6 +13,8 @@ import { allowByIp, clearFailures, lockedForSeconds, recordFailure, tooManyReque
 import { DEFAULT_ITERATIONS, hashPassword, isLegacyHash, verifyPassword } from "./auth/password";
 import { UsersRepo } from "./db/users";
 import { GamesIndexRepo } from "./db/gamesIndex";
+import { HistoryRepo } from "./db/history";
+import { PlayerProfile } from "@core/types/PlayerProfile";
 import { isValidId, newId } from "./game/ids";
 import { UserDocument } from "./game/model";
 import { ActionResult, GameRoom } from "./game/GameRoom";
@@ -351,6 +353,39 @@ app.post("/api/findPlayers", async (c) => {
     currGame: u.currGameName,
   }));
   return c.json({ players });
+});
+
+// A player's profile: their account totals plus what their finished games
+// show (win rate by class, favourite properties, head-to-head records,
+// biggest comeback, recent games). Any signed-in player may look, like the
+// leaderboard.
+app.post("/api/getProfile", async (c) => {
+  if (!(await requireUserId(c))) {
+    return invalidAuth(c);
+  }
+  const body = await readBody(c);
+  const playerId = typeof body.playerId === "string" ? body.playerId : "";
+  const user = isValidId(playerId) ? await new UsersRepo(c.env.DB).findById(playerId) : null;
+  if (!user) {
+    return c.json({ message: "Player not found" }, 404);
+  }
+  const stats = await new HistoryRepo(c.env.DB).statsFor(user._id);
+  const profile: PlayerProfile = {
+    playerId: user._id,
+    name: user.username,
+    memberSince: user.createdAt,
+    wins: user.wins,
+    losses: user.losses,
+    gamesPlayed: user.gamesPlayed,
+    currentStreak: user.currentStreak,
+    bestStreak: user.bestStreak,
+    bestWinWorth: user.bestWinWorth,
+    rentCollected: user.rentCollected,
+    auctionsWon: user.auctionsWon,
+    currGame: user.currGameName,
+    ...stats,
+  };
+  return c.json({ profile });
 });
 
 app.post("/api/createGame", async (c) => {

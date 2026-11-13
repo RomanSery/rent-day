@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import API from '../api';
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFire, faTrophy, faCirclePlay } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../components/BackLink";
@@ -106,7 +107,7 @@ export const DisplayAllPlayers: React.FC = () => {
           {podium.map(({ p, rank }) => (
             <li key={p.playerId} className={"lb-podium-item " + medal(rank)}>
               <span className="lb-medal" aria-label={"Rank " + rank}><FontAwesomeIcon icon={faTrophy} /> {rank}</span>
-              <span className="lb-podium-name">{p.name}{areObjectIdsEqual(p.playerId, me) && <span className="lb-you">you</span>}</span>
+              <span className="lb-podium-name"><Link to={"/profile/" + p.playerId}>{p.name}</Link>{areObjectIdsEqual(p.playerId, me) && <span className="lb-you">you</span>}</span>
               <span className="lb-podium-wins"><b>{p.wins}</b> {p.wins === 1 ? "win" : "wins"}</span>
               <span className="lb-podium-rate">{pct(winRate(p))} win rate · {p.gamesPlayed} games</span>
             </li>
@@ -141,7 +142,7 @@ export const DisplayAllPlayers: React.FC = () => {
                   <td className={"lb-rank " + (ranked ? medal(rank) : "")}>{ranked ? rank : "–"}</td>
                   <td className="lb-player">
                     <span className="lb-name">
-                      {p.name}
+                      <Link to={"/profile/" + p.playerId}>{p.name}</Link>
                       {isMe && <span className="lb-you">you</span>}
                       {p.currentStreak >= 2 &&
                         <span className="lb-streak" title={`${p.currentStreak} wins in a row`}><FontAwesomeIcon icon={faFire} /> {p.currentStreak}</span>}
