@@ -37,9 +37,9 @@ class Client {
 
 const suffix = Date.now().toString(36).slice(-5);
 const a = new Client("a"), b = new Client("b");
-let r = await a.post("createAccount", { email: `ca${suffix}@t.com`, username: `ca${suffix}`, password: "x", confirmPassword: "x" });
+let r = await a.post("createAccount", { email: `ca${suffix}@t.com`, username: `ca${suffix}`, password: "pw-test-1", confirmPassword: "pw-test-1" });
 a.id = r.data.id;
-r = await b.post("createAccount", { email: `cb${suffix}@t.com`, username: `cb${suffix}`, password: "x", confirmPassword: "x" });
+r = await b.post("createAccount", { email: `cb${suffix}@t.com`, username: `cb${suffix}`, password: "pw-test-1", confirmPassword: "pw-test-1" });
 b.id = r.data.id;
 
 r = await a.post("createGame", { data: { gameName: "Chance", maxPlayers: 2, initialMoney: 1500, initialSkillPoints: 5, useTimers: true }, context: {} });

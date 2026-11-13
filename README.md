@@ -10,7 +10,7 @@ runs entirely on Cloudflare's free tier: no server to keep running.
 | Piece | Where it runs | Notes |
 | --- | --- | --- |
 | React client (`src/client`, `src/core`) | Cloudflare Workers static assets | React 19 + MUI, built with Vite into `build/` and served by the Worker with SPA fallback. |
-| REST API (`worker/src/index.ts`) | Cloudflare Worker (Hono) | Same `/api/*` routes the old Express server exposed. Auth is a signed JWT in an HttpOnly cookie. |
+| REST API (`worker/src/index.ts`) | Cloudflare Worker (Hono) | Same `/api/*` routes the old Express server exposed. Auth is a random session token in an HttpOnly cookie, backed by a revocable `sessions` row in D1. |
 | Game state + realtime (`worker/src/game/GameRoom.ts`) | One Durable Object per game | Holds the game, its auctions, lottos and trades in the object's storage and fans out events to the players over WebSockets (`/ws?gameId=...`). Replaces MongoDB + socket.io. |
 | Accounts and lobby (`worker/migrations`) | D1 (SQLite) | `users` table and a small `games` index for the lobby list. |
 | Game rules (`worker/src/game/controllers`) | inside the Durable Object | The original processors, ported from mongoose to plain objects. |
@@ -58,7 +58,7 @@ From the repository root (the VS Code terminal works fine):
 
 ```bash
 npm install                                    # also installs worker/ dependencies
-cp worker/.dev.vars.example worker/.dev.vars   # then set JWT_SECRET to any long random string
+cp worker/.dev.vars.example worker/.dev.vars
 npm --prefix worker run db:migrate:local       # creates the local D1 tables
 ```
 
@@ -111,6 +111,11 @@ These only apply with `ENVIRONMENT=development` in `worker/.dev.vars`:
   auction timers. They can be set in `.dev.vars` or passed on the command line,
   for example from `worker/`:
   `npx wrangler dev --var DEV_BOT_PACE_MS:200 --var DEV_TURN_SECONDS:10`.
+- The per-IP login and sign-up rate limits are off (the tests create many
+  accounts quickly); `DEV_RATE_LIMIT=true` turns them on. The per-email
+  lockout after 10 failed logins stays on.
+- `DEV_LOBBY_SECONDS` shortens how long a lobby waits to fill before it is
+  deleted (24 hours otherwise).
 - `DEV_PREOWN_PROPERTIES=true` restores the old server's shortcut where the
   second player starts owning every property.
 
@@ -138,7 +143,6 @@ cd worker
 npm run db:create                 # prints a database_id
 # paste the database_id into worker/wrangler.jsonc
 npm run db:migrate:remote
-npm run secret:jwt                # paste a long random string
 ```
 
 Then, from the repo root, every deploy is:

@@ -51,6 +51,15 @@ export class GamesIndexRepo {
     await this.db.prepare(`DELETE FROM games WHERE id = ?`).bind(id).run();
   }
 
+  /** Lobbies this user created that are still waiting for players. */
+  async countOpenLobbies(userId: string): Promise<number> {
+    const row = await this.db
+      .prepare(`SELECT COUNT(*) AS n FROM games WHERE created_by = ? AND status = ?`)
+      .bind(userId, GameStatus.JOINING)
+      .first<{ n: number }>();
+    return row?.n ?? 0;
+  }
+
   async listJoining(createdAfterIso: string): Promise<GameToJoin[]> {
     const result = await this.db
       .prepare(
@@ -58,7 +67,8 @@ export class GamesIndexRepo {
                 u.username AS host_name
          FROM games g LEFT JOIN users u ON u.id = g.created_by
          WHERE g.status = ? AND julianday(g.created_at) > julianday(?)
-         ORDER BY julianday(g.created_at) DESC`
+         ORDER BY julianday(g.created_at) DESC
+         LIMIT 100`
       )
       .bind(GameStatus.JOINING, createdAfterIso)
       .all<{

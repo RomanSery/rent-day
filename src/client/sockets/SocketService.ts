@@ -14,6 +14,8 @@ interface WireMessage {
 }
 
 const MAX_RECONNECT_DELAY_MS = 15000;
+/** close codes the server uses on purpose (GameRoom.ts): do not reconnect */
+const STOP_RECONNECT_CODES = [4003, 4004, 4008, 4029];
 const MAX_OUTBOX = 50;
 
 /**
@@ -122,9 +124,15 @@ export class SocketService {
       this.dispatch(ev.data);
     };
 
-    ws.onclose = () => {
+    ws.onclose = (ev: CloseEvent) => {
       if (this.ws === ws) {
         this.ws = null;
+      }
+      // the server closed it on purpose (not a player in this game, too many
+      // tabs open, too many messages): reconnecting would only repeat that
+      if (STOP_RECONNECT_CODES.includes(ev.code)) {
+        this.closedByUser = true;
+        return;
       }
       if (!this.closedByUser) {
         this.scheduleReconnect();

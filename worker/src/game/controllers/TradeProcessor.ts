@@ -98,6 +98,15 @@ export class TradeProcessor {
       return "Can't get more than they have";
     }
 
+    // each property once: a repeated id would be counted (and valued by
+    // the bots) several times but change hands only once
+    if (new Set(this.mines).size !== this.mines.length || new Set(this.theirs).size !== this.theirs.length) {
+      return "Each property can only be listed once";
+    }
+    if (areIdsEqual(this.me._id, this.otherPlayer._id)) {
+      return "You can't trade with yourself";
+    }
+
     if (this.mines.length === 0 && this.myAmount === 0) {
       return "You must offer something";
     }

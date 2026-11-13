@@ -1,7 +1,7 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
-import { Button, TextField, Typography } from "@mui/material";
+import { Button, Checkbox, FormControlLabel, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { BackLink } from "../components/BackLink";
 import { handleApiError, hasPendingInvite, setCurrSessionInfo, takeReturnTo } from "../helpers";
@@ -18,6 +18,7 @@ type Inputs = {
   username: string;
   password: string;
   confirmPassword: string;
+  remember: boolean;
 };
 
 export const SignUpPage: React.FC<Props> = () => {
@@ -33,7 +34,7 @@ export const SignUpPage: React.FC<Props> = () => {
 
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email })
+    API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email, remember: !!data.remember })
       .then(function (response) {
         setCurrSessionInfo(response.data);
         navigate(takeReturnTo());
@@ -76,9 +77,16 @@ export const SignUpPage: React.FC<Props> = () => {
         )}
 
         <TextField label="Password" type="password" fullWidth={true} id="password" required={true}
-          {...field("password", { required: true })} />
+          helperText="At least 8 characters"
+          {...field("password", { required: true, minLength: 8, maxLength: 128 })} />
         {_.get("password.type", errors) === "required" && (
           <p className="field-error">Password is required</p>
+        )}
+        {_.get("password.type", errors) === "minLength" && (
+          <p className="field-error">Password must be at least 8 characters</p>
+        )}
+        {_.get("password.type", errors) === "maxLength" && (
+          <p className="field-error">Password must be 128 characters or less</p>
         )}
 
         <TextField label="Confirm Password" type="password" fullWidth={true} id="confirmPassword" required={true}
@@ -87,8 +95,10 @@ export const SignUpPage: React.FC<Props> = () => {
           <p className="field-error">Password is required</p>
         )}
 
-
-
+        <FormControlLabel
+          control={<Checkbox {...register("remember")} defaultChecked={false} />}
+          label="Remember me"
+        />
 
         <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit">Create</Button>
       </form>

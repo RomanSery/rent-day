@@ -116,6 +116,15 @@ export class RollProcessor {
       return "You already rolled this turn";
     }
 
+    // after a double the player rolls again, but not while the auction or
+    // lotto from the last roll is still open: a new one would replace it
+    if (this.game.auctionId) {
+      return "Wait for the auction to finish before rolling again";
+    }
+    if (this.game.lottoId && !andCompleteTurn) {
+      return "Pick a lotto prize before rolling again";
+    }
+
     if (this.player.money < 0) {
       return (await this.handleNegativeMoney()) ?? "you cant roll with negative money;";
     }
@@ -266,6 +275,13 @@ export class RollProcessor {
 
     if (this.player.hasTraveled) {
       return "You already traveled this turn";
+    }
+
+    if (this.game.auctionId) {
+      return "Wait for the auction to finish first";
+    }
+    if (this.game.lottoId) {
+      return "Pick a lotto prize first";
     }
 
     if (squareId === this.player.position) {

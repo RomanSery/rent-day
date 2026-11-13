@@ -79,7 +79,7 @@ class Client {
 const suffix = Date.now().toString(36).slice(-5);
 const alice = new Client("alice");
 const bob = new Client("bob");
-const pw = "pw1234";
+const pw = "pw-test-1234";
 
 console.log("== accounts");
 let r = await alice.post("createAccount", {

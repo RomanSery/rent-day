@@ -8,7 +8,8 @@ import { SkillType } from "@core/enums/SkillType";
 import { BotLevel } from "@core/enums/BotLevel";
 import { PlayerInfo } from "@core/types/PlayerInfo";
 import { Env, isDevEnv } from "./env";
-import { clearSession, createSession, getSession } from "./auth/session";
+import { clearSessionCookie, createSession, endAllSessions, endSession, getSession } from "./auth/session";
+import { allowByIp, clearFailures, lockedForSeconds, recordFailure, tooManyRequests } from "./auth/throttle";
 import { DEFAULT_ITERATIONS, hashPassword, isLegacyHash, verifyPassword } from "./auth/password";
 import { UsersRepo } from "./db/users";
 import { GamesIndexRepo } from "./db/gamesIndex";
@@ -55,9 +56,25 @@ const gameIdFromContext = (body: Body): string | null => {
   return isValidId(gameId) ? gameId : null;
 };
 
+/** A whole number from a JSON number or a digits-only string; anything else is null. */
 const toInt = (value: unknown): number | null => {
-  const n = typeof value === "number" ? value : parseInt(String(value), 10);
-  return Number.isFinite(n) ? n : null;
+  const n =
+    typeof value === "number"
+      ? value
+      : typeof value === "string" && /^\s*-?\d{1,15}\s*$/.test(value)
+        ? Number(value)
+        : NaN;
+  return Number.isSafeInteger(n) ? n : null;
+};
+
+/** The same limits as the create-game form. */
+const GAME_LIMITS = {
+  minMoney: 500,
+  maxMoney: 5000,
+  maxSkillPoints: 10,
+  maxPasswordLength: 64,
+  /** lobbies one user may have waiting for players at once */
+  maxOpenLobbies: 3,
 };
 
 const cleanText = (value: unknown, max: number): string =>
@@ -128,14 +145,24 @@ app.get("/api/health", (c) => c.json({ status: "UP" }));
 // auth
 // ---------------------------------------------------------------------------
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 128;
+
+const wantsRemember = (body: Body): boolean => body.remember === true;
+
 app.post("/api/createAccount", async (c) => {
+  if (!(await allowByIp(c, c.env.SIGNUP_LIMITER, "signup"))) {
+    return tooManyRequests(c, 60, "Too many new accounts from your network. Please try again in a minute.");
+  }
+
   const body = await readBody(c);
   const email = String(body.email ?? "").toLowerCase().trim();
   const username = String(body.username ?? "").trim();
   const password = String(body.password ?? "");
   const confirmPassword = String(body.confirmPassword ?? "");
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
     return validationError(c, "Email is not valid", "email");
   }
   if (!/^[A-Za-z0-9]{4,10}$/.test(username)) {
@@ -143,6 +170,12 @@ app.post("/api/createAccount", async (c) => {
   }
   if (password.length === 0) {
     return validationError(c, "Password missing", "password");
+  }
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return validationError(c, `Password must be at least ${MIN_PASSWORD_LENGTH} characters`, "password");
+  }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return validationError(c, `Password must be ${MAX_PASSWORD_LENGTH} characters or less`, "password");
   }
   if (password !== confirmPassword) {
     return validationError(c, "Passwords do not match", "confirmPassword");
@@ -174,28 +207,58 @@ app.post("/api/createAccount", async (c) => {
   };
   await users.create(user);
 
-  await createSession(c, { id: user._id, userName: user.username });
+  await createSession(c, user._id, wantsRemember(body));
   return c.json(sessionResponse(user, null));
 });
 
+// Checked when the email has no account, so a wrong email takes as long as a
+// wrong password and the response time does not reveal which emails exist.
+let dummyHash: Promise<string> | null = null;
+const dummyPasswordCheck = (env: Env, password: string): Promise<boolean> => {
+  dummyHash ??= hashPassword("not-a-real-password", pbkdf2Iterations(env));
+  return dummyHash.then((hash) => verifyPassword(password, hash));
+};
+
 const login = async (c: AppContext) => {
+  if (!(await allowByIp(c, c.env.LOGIN_LIMITER, "login"))) {
+    return tooManyRequests(c, 60, "Too many login attempts from your network. Please try again in a minute.");
+  }
+
   const body = await readBody(c);
   // the login form sends the email in the "username" field
   const email = String(body.username ?? "").toLowerCase().trim();
   const password = String(body.password ?? "");
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
     return validationError(c, "Username missing", "username");
   }
   if (password.length === 0) {
     return validationError(c, "Password missing", "password");
   }
+  if (password.length > MAX_PASSWORD_LENGTH) {
+    return c.text("Invalid username/password", 400);
+  }
+
+  const lockedFor = await lockedForSeconds(c, email);
+  if (lockedFor > 0) {
+    const minutes = Math.ceil(lockedFor / 60);
+    return tooManyRequests(
+      c,
+      lockedFor,
+      `Too many failed logins for this account. Please try again in ${minutes} minute${minutes === 1 ? "" : "s"}.`
+    );
+  }
 
   const users = new UsersRepo(c.env.DB);
   const user = await users.findByEmail(email);
-  if (!user || !(await verifyPassword(password, user.password))) {
+  const passwordOk = user
+    ? await verifyPassword(password, user.password)
+    : await dummyPasswordCheck(c.env, password).then(() => false);
+  if (!user || !passwordOk) {
+    await recordFailure(c, email);
     return c.text("Invalid username/password", 400);
   }
+  await clearFailures(c, email);
 
   if (isLegacyHash(user.password)) {
     // upgrade a bcrypt hash imported from the old database
@@ -204,26 +267,38 @@ const login = async (c: AppContext) => {
   }
 
   const currGameId = await resolveCurrentGame(c, users, user);
-  await createSession(c, { id: user._id, userName: user.username });
+  await createSession(c, user._id, wantsRemember(body));
   return c.json(sessionResponse(user, currGameId));
 };
 app.post("/api/login", login);
 app.post("/api/logIn", login); // the React client calls this spelling
 
+/** Log out this browser. */
 app.post("/api/logout", async (c) => {
-  clearSession(c);
+  await endSession(c);
+  return c.json({});
+});
+
+/** Log out on every device: revokes all of the user's sessions. */
+app.post("/api/logoutAll", async (c) => {
+  const userId = await requireUserId(c);
+  if (!userId) {
+    return invalidAuth(c);
+  }
+  await endAllSessions(c, userId);
   return c.json({});
 });
 
 app.post("/api/current-session", async (c) => {
   const session = await getSession(c);
   if (!session) {
+    clearSessionCookie(c);
     return c.body(null, 401);
   }
   const users = new UsersRepo(c.env.DB);
   const user = await users.findById(session.id);
   if (!user) {
-    clearSession(c);
+    await endSession(c);
     return c.body(null, 401);
   }
   const currGameId = await resolveCurrentGame(c, users, user);
@@ -247,7 +322,7 @@ app.post("/api/findPlayers", async (c) => {
   if (!(await requireUserId(c))) {
     return invalidAuth(c);
   }
-  const users = await new UsersRepo(c.env.DB).listAll();
+  const users = await new UsersRepo(c.env.DB).listTop(500);
   const players: PlayerInfo[] = users.map((u) => ({
     playerId: u._id,
     name: u.username,
@@ -285,11 +360,33 @@ app.post("/api/createGame", async (c) => {
   if (maxPlayers == null || maxPlayers < 2 || maxPlayers > 6) {
     return validationError(c, "# of players missing", "data.maxPlayers");
   }
-  if (initialMoney == null || initialMoney < 0) {
-    return validationError(c, "Starting amount is not valid", "data.initialMoney");
+  if (initialMoney == null || initialMoney < GAME_LIMITS.minMoney || initialMoney > GAME_LIMITS.maxMoney) {
+    return validationError(
+      c,
+      `Starting money must be $${GAME_LIMITS.minMoney} to $${GAME_LIMITS.maxMoney}`,
+      "data.initialMoney"
+    );
   }
-  if (initialSkillPoints == null || initialSkillPoints < 0) {
-    return validationError(c, "Initial Skill Points is not valid", "data.initialSkillPoints");
+  if (initialSkillPoints == null || initialSkillPoints < 0 || initialSkillPoints > GAME_LIMITS.maxSkillPoints) {
+    return validationError(
+      c,
+      `Starting skill points must be 0 to ${GAME_LIMITS.maxSkillPoints}`,
+      "data.initialSkillPoints"
+    );
+  }
+  const gamePwd = data.gamePwd ? String(data.gamePwd) : null;
+  if (gamePwd && gamePwd.length > GAME_LIMITS.maxPasswordLength) {
+    return validationError(
+      c,
+      `Game password must be ${GAME_LIMITS.maxPasswordLength} characters or less`,
+      "data.gamePwd"
+    );
+  }
+  if ((await new GamesIndexRepo(c.env.DB).countOpenLobbies(userId)) >= GAME_LIMITS.maxOpenLobbies) {
+    return c.text(
+      `You already have ${GAME_LIMITS.maxOpenLobbies} games waiting for players. Start one of them or wait for it to expire.`,
+      429
+    );
   }
 
   const numBots = toInt(data.numBots) ?? 0;
@@ -308,7 +405,7 @@ app.post("/api/createGame", async (c) => {
       initialMoney,
       initialSkillPoints,
       userId,
-      password: data.gamePwd ? String(data.gamePwd) : null,
+      password: gamePwd,
       useTimers: !!data.useTimers,
       // development only: a fixed seed replays the same dice (tests, bug reports)
       seed: isDevEnv(c.env) ? toSeed(data.seed) : undefined,
@@ -390,10 +487,14 @@ app.post("/api/getGame", async (c) => {
   if (!isValidId(body.gameId)) {
     return validationError(c, "invalid gameId", "gameId");
   }
-  if (!(await requireUserId(c))) {
+  const userId = await requireUserId(c);
+  if (!userId) {
     return invalidAuth(c);
   }
-  const game = await roomFor(c, body.gameId).getGame();
+  const { game, forbidden } = await roomFor(c, body.gameId).getGameFor(userId);
+  if (forbidden) {
+    return c.text("You are not a player in this game", 403);
+  }
   return c.json({ game });
 });
 
@@ -403,10 +504,14 @@ app.post("/api/getSnapshots", async (c) => {
   if (!isValidId(body.gameId)) {
     return validationError(c, "invalid gameId", "gameId");
   }
-  if (!(await requireUserId(c))) {
+  const userId = await requireUserId(c);
+  if (!userId) {
     return invalidAuth(c);
   }
-  const snapshots = await roomFor(c, body.gameId).getSnapshots();
+  const { snapshots, forbidden } = await roomFor(c, body.gameId).getSnapshotsFor(userId);
+  if (forbidden) {
+    return c.text("You are not a player in this game", 403);
+  }
   return c.json({ snapshots });
 });
 
@@ -457,14 +562,15 @@ app.post("/api/getLotto", async (c) => {
   if (!isValidId(body.lottoId)) {
     return c.text("missing lottoId", 400);
   }
-  if (!(await requireUserId(c))) {
+  const userId = await requireUserId(c);
+  if (!userId) {
     return invalidAuth(c);
   }
   const gameId = gameIdFromContext(body);
   if (!gameId) {
     return c.text("missing gameId", 400);
   }
-  const lotto = await roomFor(c, gameId).getLotto(body.lottoId);
+  const lotto = await roomFor(c, gameId).getLotto(body.lottoId, userId);
   return c.json({ lotto });
 });
 

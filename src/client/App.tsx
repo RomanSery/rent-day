@@ -127,8 +127,11 @@ const DashboardDisplay: React.FC = () => {
     return <Navigate to="/auth" replace />;
   }
 
-  const onLogout = async () => {
-    API.post("logout")
+  const onLogout = async (everywhere: boolean) => {
+    if (everywhere && !window.confirm("Log out on every device where you are signed in?")) {
+      return;
+    }
+    API.post(everywhere ? "logoutAll" : "logout")
       .then(function (response) {
         logOut();
         navigate("/auth");
@@ -151,7 +154,8 @@ const DashboardDisplay: React.FC = () => {
           <MenuLink to="/help">HELP / RULES</MenuLink>
           <MenuLink to="/contact">CONTACT US</MenuLink>
 
-          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
+          <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={() => onLogout(false)}> LOG OUT</Button>
+          <Button fullWidth size="small" sx={{ mb: "10px" }} color="inherit" onClick={() => onLogout(true)}>Log out on all devices</Button>
           <div className="fat-cat-logo">
             <img src="/fat-cat1.png" alt="Block Barons"></img>
           </div>

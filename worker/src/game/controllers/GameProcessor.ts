@@ -2,7 +2,7 @@ import _ from "lodash";
 import { emptyPlayerStats } from "@core/types/PlayerStats";
 import { SquareThemeData } from "@core/types/SquareThemeData";
 import { NyThemeData } from "@core/config/NyTheme";
-import { newSeed, shuffled } from "../random";
+import { newRngKey, shuffled } from "../random";
 import { GameStatus } from "@core/enums/GameStatus";
 import { PlayerState } from "@core/enums/PlayerState";
 import { JoinResult } from "@core/types/JoinResult";
@@ -88,7 +88,6 @@ export class GameProcessor {
         : null;
 
     const now = formatISO(new Date());
-    const seed = params.seed ?? newSeed();
     const newGame: GameInstanceDocument = {
       _id: params.gameId,
       name: params.gameName,
@@ -117,8 +116,10 @@ export class GameProcessor {
       gameLength: null,
       winner: null,
       turnNumber: 0,
-      seed,
-      rngState: seed,
+      // a seeded game replays exactly; an unseeded one gets a secret random key
+      seed: params.seed,
+      rngKey: newRngKey(params.seed),
+      rngState: 0,
       createdAt: now,
       updatedAt: now,
     };

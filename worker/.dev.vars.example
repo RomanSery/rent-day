@@ -1,6 +1,5 @@
 # Copy to .dev.vars for local development with `npm run dev`.
 # .dev.vars is read by wrangler and must not be committed.
-JWT_SECRET=change-me-to-a-long-random-string
 ENVIRONMENT=development
 PBKDF2_ITERATIONS=100000
 
@@ -13,3 +12,7 @@ DEV_PREOWN_PROPERTIES=false
 
 # Development only: base delay between computer player actions (ms, default 1600)
 # DEV_BOT_PACE_MS=30
+
+# Development only: the per-IP login/sign-up rate limits are off in
+# development (the tests create many accounts); set to true to try them
+# DEV_RATE_LIMIT=true

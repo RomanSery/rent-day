@@ -29,7 +29,7 @@ const post = async (path, body) => {
 };
 
 const u = ("seed" + Date.now().toString(36)).slice(0, 10);
-const acct = await post("createAccount", { email: `${u}@t.com`, username: u, password: "pw", confirmPassword: "pw" });
+const acct = await post("createAccount", { email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1" });
 if (acct.status !== 200) throw new Error("createAccount failed: " + JSON.stringify(acct.data));
 
 const LEVELS = ["Normal", "Normal", "Easy", "Easy"];

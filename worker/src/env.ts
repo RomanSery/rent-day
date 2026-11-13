@@ -4,9 +4,13 @@ export interface Env {
   DB: D1Database;
   GAME_ROOM: DurableObjectNamespace<GameRoom>;
   ASSETS: Fetcher;
-  JWT_SECRET: string;
+  /** per-IP limits on the login and sign-up endpoints (wrangler.jsonc "ratelimits") */
+  LOGIN_LIMITER?: RateLimit;
+  SIGNUP_LIMITER?: RateLimit;
   ENVIRONMENT?: string;
   PBKDF2_ITERATIONS?: string;
+  /** development only: "true" turns the per-IP rate limits on (they are off in development) */
+  DEV_RATE_LIMIT?: string;
   /** "true" to give the second player every property when a dev game starts */
   DEV_PREOWN_PROPERTIES?: string;
   /** development only: shorten the turn / auction timers (seconds) */
@@ -16,7 +20,13 @@ export interface Env {
   DEV_BOT_PACE_MS?: string;
   /** development only: delete finished games after this many seconds */
   DEV_PURGE_SECONDS?: string;
+  /** development only: delete lobbies that haven't filled after this many seconds (default 24h) */
+  DEV_LOBBY_SECONDS?: string;
 }
 
-export const isDevEnv = (env: Env): boolean =>
-  !env.ENVIRONMENT || env.ENVIRONMENT === "development";
+/**
+ * Development shortcuts (forced dice, /api/dev/*, non-Secure cookies) are
+ * opt-in: only an explicit ENVIRONMENT=development turns them on, so a
+ * deploy that loses its vars fails safe as production.
+ */
+export const isDevEnv = (env: Env): boolean => env.ENVIRONMENT === "development";

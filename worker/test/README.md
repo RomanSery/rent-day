@@ -21,6 +21,21 @@ scenarios need `ENVIRONMENT=development` (forced dice) and
 The tests create throwaway accounts on every run; the local D1 database in
 `.wrangler/state` keeps them, which is harmless.
 
+`npm run test:api:auth` checks the account rules: the 8-character password
+minimum, "remember me" cookies, that logging out (and "log out on all
+devices") revokes the session server-side, and the per-email lockout after 10
+failed logins. The per-IP rate limits are off in development; to check them,
+start the Worker with `npx wrangler dev --var DEV_RATE_LIMIT:true` and run
+`RATE_LIMIT=1 npm run test:api:auth`.
+
+`npm run test:api:abuse` plays the cheater: watching or chatting in games
+you are not in, faking dice for everyone, rolling away an open auction,
+listing one property several times in a trade, and creating games outside
+the form limits (or more than 3 open lobbies). Start the Worker with
+`npx wrangler dev --var DEV_LOBBY_SECONDS:4` and run
+`LOBBY_EXPIRY=1 npm run test:api:abuse` to also check that unfilled lobbies
+are deleted.
+
 `npm run test:api:timers` covers the turn-timer flows (three timeouts
 eliminate a player, a timed-out player in debt mortgages assets). It needs
 the Worker started with short timers:

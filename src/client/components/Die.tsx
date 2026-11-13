@@ -11,7 +11,8 @@ export const Die: React.FC<Props> = ({ value, land }) => {
 
   const reduceMotion = useReducedMotion();
 
-  const pips = Number.isInteger(value)
+  // a die only ever shows 1 to 6; anything else draws a blank face
+  const pips = Number.isInteger(value) && value >= 1 && value <= 6
     ? Array(value).fill(0).map((_, i) => <span key={i} className="pip" />)
     : null;
 

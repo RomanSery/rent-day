@@ -67,7 +67,7 @@ let userCounter = 0;
 const newUser = async (label) => {
   const c = new Client(label);
   const u = `${label}${suffix}${userCounter++}`.slice(0, 10);
-  const r = await c.post("createAccount", { email: `${u}@t.com`, username: u, password: "pw", confirmPassword: "pw" });
+  const r = await c.post("createAccount", { email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1" });
   if (r.status !== 200) throw new Error("createAccount failed: " + JSON.stringify(r.data));
   c.id = r.data.id;
   c.username = u;
@@ -214,13 +214,13 @@ const A = await newUser("ba"); // Banker
 const O = await newUser("ga"); // Gambler (property owner in the scenario)
 const C = await newUser("co"); // Conductor
 
-let r = await A.post("createAccount", { email: `x${suffix}@t.com`, username: A.username, password: "pw", confirmPassword: "pw" });
+let r = await A.post("createAccount", { email: `x${suffix}@t.com`, username: A.username, password: "pw-test-1", confirmPassword: "pw-test-1" });
 check(r.status === 403, "duplicate username rejected -> " + r.status);
-r = await A.post("createAccount", { email: `y${suffix}@t.com`, username: "ab!", password: "pw", confirmPassword: "pw" });
+r = await A.post("createAccount", { email: `y${suffix}@t.com`, username: "ab!", password: "pw-test-1", confirmPassword: "pw-test-1" });
 check(r.status === 400, "non-alphanumeric username rejected -> " + r.status);
-r = await A.post("createAccount", { email: `z${suffix}@t.com`, username: "abcdefghijk", password: "pw", confirmPassword: "pw" });
+r = await A.post("createAccount", { email: `z${suffix}@t.com`, username: "abcdefghijk", password: "pw-test-1", confirmPassword: "pw-test-1" });
 check(r.status === 400, "11-char username rejected -> " + r.status);
-r = await A.post("createAccount", { email: `w${suffix}@t.com`, username: `w${suffix}`, password: "pw", confirmPassword: "pw2" });
+r = await A.post("createAccount", { email: `w${suffix}@t.com`, username: `w${suffix}`, password: "pw-test-1", confirmPassword: "pw-test-2" });
 check(r.status === 400 && r.data.errors?.[0]?.param === "confirmPassword", "password mismatch flagged on confirmPassword");
 
 section("lobby rules");

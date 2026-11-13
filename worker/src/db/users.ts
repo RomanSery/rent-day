@@ -134,9 +134,14 @@ export class UsersRepo {
       .run();
   }
 
-  async listAll(): Promise<UserDocument[]> {
+  /** The leaderboard: the top players by wins, without password hashes. */
+  async listTop(limit: number): Promise<UserDocument[]> {
     const result = await this.db
-      .prepare(`SELECT ${COLUMNS} FROM users ORDER BY wins DESC, username ASC`)
+      .prepare(
+        `SELECT ${COLUMNS.replace("password", "'' AS password")}
+           FROM users ORDER BY wins DESC, username ASC LIMIT ?`
+      )
+      .bind(limit)
       .all<UserRow>();
     return (result.results ?? []).map(toDoc);
   }

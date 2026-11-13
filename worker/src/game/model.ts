@@ -37,9 +37,11 @@ export interface GameInstanceDocument {
   lastAuction?: AuctionResult;
   /** the last rent paid, for the rent pop and sound on every screen */
   lastRent?: RentPaid;
-  /** seed of the game's random generator (see random.ts) */
+  /** seed the game was created with, if any (see random.ts) */
   seed?: number;
-  /** the generator's current state; never sent to players */
+  /** the generator's secret 256-bit key, hex; never sent to players */
+  rngKey?: string;
+  /** draws taken from the generator so far (legacy games: mulberry32 state); never sent to players */
   rngState?: number;
   /** completed turns so far (missing on games created before it existed) */
   turnNumber?: number;

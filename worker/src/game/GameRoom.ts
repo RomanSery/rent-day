@@ -56,7 +56,13 @@ type Job = { attempts?: number } & (
   | { kind: "botBids"; at: number }
   | { kind: "botTrade"; at: number; tradeId: string }
   | { kind: "purge"; at: number }
+  | { kind: "expireLobby"; at: number }
 );
+
+/** A lobby that hasn't filled up after this long is deleted. */
+const LOBBY_LIFETIME_SECONDS = 24 * 60 * 60;
+/** close code for "this lobby expired" (the client stops reconnecting) */
+export const WS_CLOSE_LOBBY_EXPIRED = 4004;
 
 const MAX_JOB_ATTEMPTS = 3;
 
@@ -107,6 +113,29 @@ const DEFAULT_BOT_PACE_MS = 1600;
 const PENDING_EVENTS_KEY = "pendingEvents";
 const INDEX_STATE_KEY = "indexState";
 const MAX_CHAT_LENGTH = 200;
+/** chat kept on the game document; older messages are dropped */
+const MAX_STORED_CHAT = 100;
+/** sockets one user may hold open to one game (tabs, reconnects) */
+const MAX_SOCKETS_PER_USER = 4;
+/** incoming WebSocket messages larger than this are ignored */
+const MAX_WS_MESSAGE_BYTES = 4096;
+/** per socket: messages allowed per window, chat messages per window */
+const WS_WINDOW_MS = 10_000;
+const WS_MAX_MESSAGES = 40;
+const WS_MAX_CHAT = 6;
+/** close sockets that keep sending far past the limit */
+const WS_ABUSE_FACTOR = 3;
+/** close code for "you are not a player in this game" (the client stops reconnecting) */
+export const WS_CLOSE_NOT_A_PLAYER = 4003;
+const WS_CLOSE_TOO_MANY = 4008;
+const WS_CLOSE_ABUSE = 4029;
+
+/** Counts one socket's messages in the current window (kept in memory only). */
+interface SocketBudget {
+  windowStart: number;
+  messages: number;
+  chat: number;
+}
 
 /** Replace the game password hash before a game leaves the server. */
 export const toClientGame = (
@@ -115,9 +144,9 @@ export const toClientGame = (
   if (!game) {
     return null;
   }
-  // the generator's state would let a player predict the dice; the seed is
-  // shown once the game is over (for bug reports and replays)
-  const { rngState: _rngState, seed, ...rest } = game;
+  // the generator's key and state would let a player predict the dice; the
+  // seed (seeded games only) is shown once the game is over, for replays
+  const { rngState: _rngState, rngKey: _rngKey, seed, ...rest } = game;
   return {
     ...rest,
     seed: game.status === GameStatus.FINISHED ? seed : undefined,
@@ -127,6 +156,9 @@ export const toClientGame = (
     },
   };
 };
+
+/** WebSocket tag that groups one user's sockets. */
+const userTag = (userId: string): string => "u:" + userId;
 
 const escapeTags = (s: string): string =>
   s.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -184,6 +216,12 @@ export class GameRoom extends DurableObject<Env> {
     };
   }
 
+  /**
+   * The last human roll or trip, kept until the roller's client asks for it
+   * to be shown to everyone (STOP_ANIMATE_DICE).
+   */
+  private lastMove: { playerId: string; diceRoll: DiceRollResult | null; frames: number[] } | null = null;
+
   /** bot steps taken since the turn last changed hands, per bot */
   private botSteps = new Map<string, number>();
   /** per bot: when its piece will have landed and it may act again (ms) */
@@ -240,6 +278,11 @@ export class GameRoom extends DurableObject<Env> {
         status: game.status,
         playersJoined: game.players.length,
       });
+      if (game.status === GameStatus.JOINING) {
+        // lobbies nobody fills would otherwise stay in storage forever
+        const lifetimeMs = devSeconds(this.env, this.env.DEV_LOBBY_SECONDS, LOBBY_LIFETIME_SECONDS) * 1000;
+        await this.scheduleJob({ kind: "expireLobby", at: Date.now() + lifetimeMs });
+      }
       return game._id;
     });
   }
@@ -258,6 +301,41 @@ export class GameRoom extends DurableObject<Env> {
     return Array.from(stored, ([key, raw]) => unpackSnapshot(game, raw, key === FINAL_SNAPSHOT_KEY));
   }
 
+  /**
+   * What a user may see: a game's players see everything; anyone may look
+   * at a lobby (to decide whether to join); nobody else sees the game.
+   */
+  private canView(game: GameInstanceDocument, userId: string): boolean {
+    return (
+      game.status === GameStatus.JOINING ||
+      // bots-only simulations (development only) have no players to restrict to
+      !!game.settings.botsOnly ||
+      game.players.some((p) => areIdsEqual(p._id, userId))
+    );
+  }
+
+  private isPlayer(game: GameInstanceDocument | null, userId: string): boolean {
+    return !!game && game.players.some((p) => areIdsEqual(p._id, userId));
+  }
+
+  /** The game as this user may see it; forbidden when they're not in it. */
+  async getGameFor(userId: string): Promise<{ game: GameInstanceDocument | null; forbidden: boolean }> {
+    const game = await this.store.getGame();
+    if (game && !this.canView(game, userId)) {
+      return { game: null, forbidden: true };
+    }
+    return { game: toClientGame(game), forbidden: false };
+  }
+
+  /** Snapshots for the game's players only. */
+  async getSnapshotsFor(userId: string): Promise<{ snapshots: TurnSnapshot[]; forbidden: boolean }> {
+    const game = await this.store.getGame();
+    if (game && !game.settings.botsOnly && !this.isPlayer(game, userId)) {
+      return { snapshots: [], forbidden: true };
+    }
+    return { snapshots: await this.getSnapshots(), forbidden: false };
+  }
+
   async getStatus(): Promise<GameStatus | null> {
     const game = await this.store.getGame();
     return game ? game.status : null;
@@ -269,10 +347,16 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   async getAuction(auctionId: string, userId: string): Promise<AuctionDocument | null> {
+    if (!this.isPlayer(await this.store.getGame(), userId)) {
+      return null;
+    }
     return AuctionProcessor.getAuction(this.gameCtx, auctionId, userId);
   }
 
-  async getLotto(lottoId: string): Promise<LottoDocument | null> {
+  async getLotto(lottoId: string, userId: string): Promise<LottoDocument | null> {
+    if (!this.isPlayer(await this.store.getGame(), userId)) {
+      return null;
+    }
     return LottoProcessor.getLotto(this.gameCtx, lottoId);
   }
 
@@ -343,6 +427,7 @@ export class GameRoom extends DurableObject<Env> {
         processor.getOrigPosition() !== processor.getNewPosition() &&
         frames &&
         frames.length > 0;
+      this.lastMove = { playerId: userId, diceRoll: toDiceResult(processor.getLastDiceRoll()), frames: frames ?? [] };
       return ok({
         needToAnimate,
         playerId: userId,
@@ -359,6 +444,11 @@ export class GameRoom extends DurableObject<Env> {
       if (errMsg) {
         return fail(errMsg);
       }
+      this.lastMove = {
+        playerId: userId,
+        diceRoll: toDiceResult(processor.getLastDiceRoll()),
+        frames: processor.getMovementKeyFrames() ?? [],
+      };
       return ok({
         needToAnimate: true,
         playerId: userId,
@@ -517,18 +607,88 @@ export class GameRoom extends DurableObject<Env> {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    // Players only, except that anyone may watch a lobby (the join page
+    // listens for "X has joined" before its user has taken a seat). Watchers
+    // are disconnected when the game starts; see dropNonPlayers().
+    const game = await this.store.getGame();
+    if (!game) {
+      return new Response("Game not found", { status: 404 });
+    }
+    const isPlayer = game.players.some((p) => areIdsEqual(p._id, userId));
+    if (!isPlayer && game.status !== GameStatus.JOINING) {
+      return new Response("Not a player in this game", { status: 403 });
+    }
+
+    // one user, a handful of sockets: close the oldest beyond the cap
+    const tag = userTag(userId);
+    const existing = this.ctx.getWebSockets(tag);
+    for (let i = 0; i <= existing.length - MAX_SOCKETS_PER_USER; i++) {
+      try {
+        existing[i].close(WS_CLOSE_TOO_MANY, "too many connections");
+      } catch (e) {
+        // already closing
+      }
+    }
+
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
 
-    this.ctx.acceptWebSocket(server);
+    this.ctx.acceptWebSocket(server, [tag]);
     const attachment: WsAttachment = { userId, playerName };
     server.serializeAttachment(attachment);
 
     return new Response(null, { status: 101, webSocket: client });
   }
 
+  /** Per-socket message budgets; lost on hibernation, which only resets them. */
+  private socketBudgets = new WeakMap<WebSocket, SocketBudget>();
+
+  /** False when the socket is over its budget (the message is dropped). */
+  private withinBudget(ws: WebSocket, isChat: boolean): boolean {
+    const now = Date.now();
+    let budget = this.socketBudgets.get(ws);
+    if (!budget || now - budget.windowStart >= WS_WINDOW_MS) {
+      budget = { windowStart: now, messages: 0, chat: 0 };
+      this.socketBudgets.set(ws, budget);
+    }
+    budget.messages++;
+    if (isChat) {
+      budget.chat++;
+    }
+    if (budget.messages > WS_MAX_MESSAGES * WS_ABUSE_FACTOR) {
+      try {
+        ws.close(WS_CLOSE_ABUSE, "too many messages");
+      } catch (e) {
+        // already closing
+      }
+      return false;
+    }
+    if (budget.messages > WS_MAX_MESSAGES) {
+      return false;
+    }
+    // the chat limit only holds back chat, not game messages
+    return !isChat || budget.chat <= WS_MAX_CHAT;
+  }
+
+  /** Once a game has started, only its players may stay connected. */
+  private async dropNonPlayers(game: GameInstanceDocument): Promise<void> {
+    if (game.status === GameStatus.JOINING) {
+      return;
+    }
+    for (const socket of this.ctx.getWebSockets()) {
+      const { userId } = this.attachmentOf(socket);
+      if (!game.players.some((p) => areIdsEqual(p._id, userId))) {
+        try {
+          socket.close(WS_CLOSE_NOT_A_PLAYER, "not a player in this game");
+        } catch (e) {
+          // already closing
+        }
+      }
+    }
+  }
+
   async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
-    if (typeof message !== "string") {
+    if (typeof message !== "string" || message.length > MAX_WS_MESSAGE_BYTES) {
       return;
     }
 
@@ -545,6 +705,25 @@ export class GameRoom extends DurableObject<Env> {
     }
 
     const me = this.attachmentOf(ws);
+
+    if (!this.withinBudget(ws, event === GameEvent.SEND_CHAT_MSG)) {
+      return;
+    }
+
+    // A lobby watcher who hasn't joined may only ask for the current state;
+    // everything else (chat, announcements, refresh requests) is for players.
+    const current = await this.store.getGame();
+    const isPlayer = !!current && current.players.some((p) => areIdsEqual(p._id, me.userId));
+    if (!isPlayer) {
+      if (current && current.status !== GameStatus.JOINING) {
+        // the game started after this socket connected
+        await this.dropNonPlayers(current);
+        return;
+      }
+      if (event !== GameEvent.JOIN_GAME_ROOM) {
+        return;
+      }
+    }
 
     switch (event) {
       case GameEvent.JOINED_GAME: {
@@ -569,7 +748,9 @@ export class GameRoom extends DurableObject<Env> {
           const auction = await this.store.getAuction(game.auctionId);
           this.sendTo(ws, GameEvent.AUCTION_UPDATE, AuctionProcessor.viewFor(auction, me.userId));
         }
-        this.broadcastOthers(ws, GameEvent.SHOW_SNACK_MSG, me.playerName + " re-connected");
+        if (isPlayer) {
+          this.broadcastOthers(ws, GameEvent.SHOW_SNACK_MSG, me.playerName + " re-connected");
+        }
         return;
       }
 
@@ -604,8 +785,13 @@ export class GameRoom extends DurableObject<Env> {
       }
 
       case GameEvent.STOP_ANIMATE_DICE: {
-        const [, playerId, diceRoll, frames] = args;
-        this.broadcastAll(GameEvent.STOP_ANIMATE_DICE, playerId, diceRoll, frames);
+        // The roller's client says "show the result now"; the result itself
+        // is the one the server rolled, never what the client sent.
+        const move = this.lastMove;
+        if (move && areIdsEqual(move.playerId, me.userId)) {
+          this.lastMove = null;
+          this.broadcastAll(GameEvent.STOP_ANIMATE_DICE, move.playerId, move.diceRoll, move.frames);
+        }
         return;
       }
 
@@ -647,6 +833,9 @@ export class GameRoom extends DurableObject<Env> {
           const game = await this.store.getGame();
           if (game) {
             game.messages.push(newMsg);
+            if (game.messages.length > MAX_STORED_CHAT) {
+              game.messages.splice(0, game.messages.length - MAX_STORED_CHAT);
+            }
             await this.store.saveGame(game);
           }
         });
@@ -670,11 +859,14 @@ export class GameRoom extends DurableObject<Env> {
 
   async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): Promise<void> {
     const me = this.attachmentOf(ws);
-    this.broadcastOthers(
-      ws,
-      GameEvent.SHOW_SNACK_MSG,
-      me.playerName + " disconnected: " + (reason || (wasClean ? "closed" : "connection lost"))
-    );
+    const game = await this.store.getGame();
+    if (game && game.players.some((p) => areIdsEqual(p._id, me.userId))) {
+      this.broadcastOthers(
+        ws,
+        GameEvent.SHOW_SNACK_MSG,
+        me.playerName + " disconnected: " + (reason || (wasClean ? "closed" : "connection lost"))
+      );
+    }
     try {
       ws.close(code, "closing");
     } catch (e) {
@@ -833,6 +1025,24 @@ export class GameRoom extends DurableObject<Env> {
           await this.ctx.storage.deleteAll();
         });
         return;
+      case "expireLobby":
+        await this.run(async () => {
+          const game = await this.store.getGame();
+          if (!game || game.status !== GameStatus.JOINING) {
+            return; // it started (or is gone): nothing to do
+          }
+          await this.gamesIndex.remove(game._id);
+          for (const socket of this.ctx.getWebSockets()) {
+            try {
+              socket.close(WS_CLOSE_LOBBY_EXPIRED, "this game expired before it filled up");
+            } catch (e) {
+              // already closing
+            }
+          }
+          await this.ctx.storage.deleteAlarm();
+          await this.ctx.storage.deleteAll();
+        });
+        return;
       default:
         return;
     }
@@ -845,6 +1055,9 @@ export class GameRoom extends DurableObject<Env> {
   private async afterAction(): Promise<void> {
     try {
       const game = await this.store.getGame();
+      if (game) {
+        await this.dropNonPlayers(game);
+      }
       if (game && game.status === GameStatus.FINISHED) {
         await this.schedulePurge();
         return;
