@@ -17,10 +17,10 @@ body {
   flex-grow: 3;
 }
 
+/* Stacked menu column. Older MUI Containers forced display: block over a
+   display: flex that used to sit here; MUI 9 no longer does, so say it outright. */
 .home-page-options {
-  align-items: center;
-  flex-direction: row;
-  display: flex;  
+  display: block;
   margin-top: 3%;
 }
 
@@ -117,10 +117,6 @@ body {
   padding-left: 10px;
 }
 
-.dashboard-btn {
-  margin-top: 10px !important;
-  margin-bottom: 10px !important;
-}
 
 
 

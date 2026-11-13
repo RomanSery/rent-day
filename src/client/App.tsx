@@ -28,7 +28,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-const btnClasses = "MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-fullWidth dashboard-btn";
+/** Dashboard menu entry: a router link drawn as a full-width MUI button. */
+const MenuLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => (
+  <Button component={Link} to={to} fullWidth variant="contained" color="primary" sx={{ my: "10px" }}>{children}</Button>
+);
 
 /** Game id from the ?gid query parameter, falling back to the stored one. */
 const useGameIdFromQuery = (): string | null => {
@@ -67,7 +70,7 @@ const Page: React.FC<{ maxWidth?: "xs" | "sm" | "md" | "lg"; children?: React.Re
 
 const Blurb: React.FC = () => (
   <Container maxWidth="xs" className="home-page-options home-page-left">
-    <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the fattest cat!</p>
+    <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the top baron in town!</p>
     <hr />
     <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>
     <hr />
@@ -75,13 +78,6 @@ const Blurb: React.FC = () => (
     <hr />
     <p>Manage your finances carefully, you must now <strong>think about the tax implications of your decisions.</strong></p>
   </Container>
-);
-
-const ForumsButton: React.FC = () => (
-  <Button fullWidth variant="contained" sx={{ my: "10px", backgroundColor: "green" }} color="primary"
-    onClick={() => {
-      window.location.href = "https://www.coderdreams.com/fatcats/";
-    }}> FORUMS</Button>
 );
 
 const Home: React.FC = () => {
@@ -148,13 +144,11 @@ const DashboardDisplay: React.FC = () => {
             <img src="/logo_transparent_small.png" alt="Block Barons"></img>
           </div>
 
-          <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
-          <Link to="/find" className={btnClasses} color="primary">JOIN GAME</Link>
-          <Link to="/players" className={btnClasses} color="primary">PLAYERS</Link>
-          <Link to="/help" className={btnClasses} color="primary">HELP / RULES</Link>
-          <Link to="/contact" className={btnClasses} color="primary">CONTACT US</Link>
-
-          <ForumsButton />
+          <MenuLink to="/create">CREATE NEW GAME</MenuLink>
+          <MenuLink to="/find">JOIN GAME</MenuLink>
+          <MenuLink to="/players">PLAYERS</MenuLink>
+          <MenuLink to="/help">HELP / RULES</MenuLink>
+          <MenuLink to="/contact">CONTACT US</MenuLink>
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
           <div className="fat-cat-logo">
@@ -195,8 +189,6 @@ const AuthDisplay: React.FC = () => {
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
             onClick={() => navigate("/contact")}> CONTACT US</Button>
-
-          <ForumsButton />
 
           <div className="fat-cat-logo">
             <img src="/fat-cat1.png" alt="Block Barons"></img>
