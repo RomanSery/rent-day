@@ -1,5 +1,5 @@
 {
-  // Cloudflare Workers configuration for the Rent Day backend.
+  // Cloudflare Workers configuration for the Block Barons backend.
   // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rent-day",

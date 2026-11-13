@@ -1,4 +1,4 @@
-# Fat cats boardgame (Rent Day)
+# Block Barons board game (formerly Fat Cats / Rent Day)
 
 Code for https://rentdaygame.coderdreams.com
 

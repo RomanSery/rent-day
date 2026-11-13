@@ -2,7 +2,7 @@
   "name": "rent-day-worker",
   "version": "0.1.0",
   "private": true,
-  "description": "Rent Day backend on Cloudflare Workers, Durable Objects and D1",
+  "description": "Block Barons backend on Cloudflare Workers, Durable Objects and D1",
   "scripts": {
     "dev": "node -e \"require('fs').mkdirSync('../build',{recursive:true})\" && wrangler dev",
     "deploy": "wrangler deploy",

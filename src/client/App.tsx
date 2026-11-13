@@ -145,7 +145,7 @@ const DashboardDisplay: React.FC = () => {
 
         <Container maxWidth="xs" className="home-page-options">
           <div>
-            <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+            <img src="/logo_transparent_small.png" alt="Block Barons"></img>
           </div>
 
           <Link to="/create" className={btnClasses} color="primary">CREATE NEW GAME</Link>
@@ -158,7 +158,7 @@ const DashboardDisplay: React.FC = () => {
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={onLogout}> LOG OUT</Button>
           <div className="fat-cat-logo">
-            <img src="/fat-cat1.png" alt="Fat Cats"></img>
+            <img src="/fat-cat1.png" alt="Block Barons"></img>
           </div>
         </Container>
 
@@ -181,7 +181,7 @@ const AuthDisplay: React.FC = () => {
 
         <Container maxWidth="xs" className="home-page-options">
           <div>
-            <img src="/logo_transparent_small.png" alt="Fat Cats"></img>
+            <img src="/logo_transparent_small.png" alt="Block Barons"></img>
           </div>
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
@@ -199,7 +199,7 @@ const AuthDisplay: React.FC = () => {
           <ForumsButton />
 
           <div className="fat-cat-logo">
-            <img src="/fat-cat1.png" alt="Fat Cats"></img>
+            <img src="/fat-cat1.png" alt="Block Barons"></img>
           </div>
         </Container>
 
