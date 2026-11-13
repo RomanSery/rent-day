@@ -307,11 +307,14 @@ export class RollProcessor {
       return "you cant travel from there (2)";
     }
 
+    const fromStation = this.player.position;
     this.player.hasTraveled = true;
     this.player.position = squareId;
     this.newPosition = squareId;
 
-    this.setMovementKeyFrames(false, false);
+    // a subway ride is one jump from station to station, not a walk round
+    // the board; the client animates non-adjacent squares as a single leap
+    this.movementKeyframes = [fromStation, squareId];
 
     let muggingMsg: ServerMsg | null = null;
     if (this.wasMuggedWhileTraveling()) {

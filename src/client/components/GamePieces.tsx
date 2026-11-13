@@ -14,18 +14,29 @@ interface Props {
   socketService: SocketService;
 }
 
-/** seconds per square; long trips speed up so none takes much over MAX_TRIP */
+/** seconds per square; long walks speed up so none takes much over MAX_TRIP */
 const STEP_SECONDS = 0.45;
 const MAX_TRIP_SECONDS = 10;
-/** how high a piece lifts between squares, in px */
+/** how high a piece lifts between neighbouring squares, in px */
 const HOP_HEIGHT = 12;
+/** a leap between squares that aren't neighbours (a subway ride) */
+const JUMP_SECONDS = 1.1;
+const JUMP_HEIGHT = 56;
+
+type Ease = "easeOut" | "easeIn" | "linear";
+
+/** next to each other on the board (either direction, wrapping at 40) */
+const areNeighbours = (a: number, b: number) => {
+  const d = (b - a + 40) % 40;
+  return d === 1 || d === 39;
+};
 
 /**
- * Keyframes for a piece hopping square by square. `squares` is the server's
- * path (every square passed, the start included); a square repeated in a row
- * is a pause, e.g. the beat on a Chance square before a card moves the piece.
- * Each step has a midpoint keyframe where the piece is lifted and slightly
- * bigger, so it hops rather than slides.
+ * Keyframes for a piece moving along the server's path (every square passed,
+ * the start included). Neighbouring squares are a small hop each; a square
+ * repeated in a row is a pause (the beat on a Chance square before a card
+ * moves the piece); two squares that aren't neighbours, like the two stations
+ * of a subway ride, are one big leap across the board.
  */
 const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduceMotion: boolean) => {
   if (positions.length < 2) {
@@ -37,44 +48,58 @@ const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduce
   }
 
   const steps = positions.length - 1;
-  const step = Math.min(STEP_SECONDS, MAX_TRIP_SECONDS / steps);
+  const kinds = Array.from({ length: steps }, (_, i) =>
+    squares[i] === squares[i + 1] ? "pause" : areNeighbours(squares[i], squares[i + 1]) ? "hop" : "jump");
+  const walkSteps = kinds.filter((k) => k !== "jump").length;
+  const step = walkSteps > 0 ? Math.min(STEP_SECONDS, MAX_TRIP_SECONDS / walkSteps) : STEP_SECONDS;
+  const durations = kinds.map((k) => (k === "jump" ? JUMP_SECONDS : step));
+  const total = durations.reduce((a, b) => a + b, 0);
+
   const top: number[] = [positions[0].top];
   const left: number[] = [positions[0].left];
   const y: number[] = [0];
   const scale: number[] = [1];
   const times: number[] = [0];
-  const yEase: Array<"easeOut" | "easeIn" | "linear"> = [];
+  const yEase: Ease[] = [];
+  const posEase: Ease[] = [];
 
+  let elapsed = 0;
   for (let i = 0; i < steps; i++) {
     const from = positions[i];
     const to = positions[i + 1];
-    const moves = squares[i] !== squares[i + 1];
-    const lift = moves && !reduceMotion;
+    const kind = kinds[i];
+    const lift = kind !== "pause" && !reduceMotion;
+    const height = kind === "jump" ? JUMP_HEIGHT : HOP_HEIGHT;
+    const grow = kind === "jump" ? 1.45 : 1.2;
 
     // midpoint: halfway there, in the air
     top.push((from.top + to.top) / 2);
     left.push((from.left + to.left) / 2);
-    y.push(lift ? -HOP_HEIGHT : 0);
-    scale.push(lift ? 1.2 : 1);
-    times.push((i + 0.5) / steps);
+    y.push(lift ? -height : 0);
+    scale.push(lift ? grow : 1);
+    times.push((elapsed + durations[i] / 2) / total);
     yEase.push(lift ? "easeOut" : "linear");
+    // a leap speeds up and slows down along the way; hops move evenly
+    posEase.push(kind === "jump" ? "easeIn" : "linear");
 
     // landed on the next square
+    elapsed += durations[i];
     top.push(to.top);
     left.push(to.left);
     y.push(0);
     scale.push(1);
-    times.push((i + 1) / steps);
+    times.push(elapsed / total);
     yEase.push(lift ? "easeIn" : "linear");
+    posEase.push(kind === "jump" ? "easeOut" : "linear");
   }
 
-  const duration = steps * step;
   return {
     animate: { top, left, y, scale },
     transition: {
-      default: { duration, times, ease: "linear" as const },
-      y: { duration, times, ease: yEase },
-      scale: { duration, times, ease: yEase },
+      top: { duration: total, times, ease: posEase },
+      left: { duration: total, times, ease: posEase },
+      y: { duration: total, times, ease: yEase },
+      scale: { duration: total, times, ease: yEase },
     },
   };
 };
