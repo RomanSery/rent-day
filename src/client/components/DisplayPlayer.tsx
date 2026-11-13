@@ -13,8 +13,9 @@ interface Props {
 }
 
 /**
- * One row of the player list: piece, name and money, with class (and your own
- * per-turn costs) underneath. The player whose turn it is gets a coloured edge.
+ * One row of the player list: piece, name and money, with class and what they
+ * pay each turn (tax + electricity, when above $0) underneath. The player
+ * whose turn it is gets a coloured edge.
  */
 export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer }) => {
 
@@ -23,6 +24,7 @@ export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer
   const isTheirTurn = !!(gameState?.nextPlayerToAct && areObjectIdsEqual(player._id, gameState.nextPlayerToAct));
   const isMe = areObjectIdsEqual(player._id, getMyUserId());
   const bankrupt = player.state === PlayerState.BANKRUPT;
+  const perTurn = player.taxesPerTurn + player.electricityCostsPerTurn;
 
   const className = ["player-info", isTheirTurn ? "their-turn" : "", isMe ? "is-me" : "", bankrupt ? "bankrupt" : ""]
     .filter(Boolean).join(" ");
@@ -44,9 +46,9 @@ export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer
         {player.state === PlayerState.IN_ISOLATION && <FontAwesomeIcon icon={faBiohazard} color="#c62828" title="In quarantine" />}
         {player.isBot && <FontAwesomeIcon icon={faRobot} title="Computer player" />}
         <span>{player.playerClass}</span>
-        {isMe && !bankrupt && player.taxesPerTurn + player.electricityCostsPerTurn > 0 &&
-          <span className="player-costs" title="Tax and electricity you pay each turn">
-            −{dollarFormatter.format(player.taxesPerTurn + player.electricityCostsPerTurn)}/turn
+        {!bankrupt && perTurn > 0 &&
+          <span className="player-costs" title={(isMe ? "Tax and electricity you pay" : "Tax and electricity " + player.name + " pays") + " each turn"}>
+            −{dollarFormatter.format(perTurn)}/turn
           </span>}
       </div>
     </div>
