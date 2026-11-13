@@ -164,6 +164,11 @@ app.post("/api/createAccount", async (c) => {
     wins: 0,
     losses: 0,
     gamesPlayed: 0,
+    currentStreak: 0,
+    bestStreak: 0,
+    bestWinWorth: 0,
+    rentCollected: 0,
+    auctionsWon: 0,
     createdAt: now,
     updatedAt: now,
   };
@@ -247,7 +252,15 @@ app.post("/api/findPlayers", async (c) => {
     playerId: u._id,
     name: u.username,
     wins: u.wins,
+    losses: u.losses,
     gamesPlayed: u.gamesPlayed,
+    currentStreak: u.currentStreak,
+    bestStreak: u.bestStreak,
+    bestWinWorth: u.bestWinWorth,
+    rentCollected: u.rentCollected,
+    auctionsWon: u.auctionsWon,
+    lastPlayedAt: u.lastPlayedAt,
+    memberSince: u.createdAt,
     currGame: u.currGameName,
   }));
   return c.json({ players });

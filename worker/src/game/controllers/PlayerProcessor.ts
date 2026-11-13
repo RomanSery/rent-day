@@ -89,6 +89,11 @@ export class PlayerProcessor {
     return "";
   }
 
+  /**
+   * The player left the game. Leaving an active game bankrupts them first,
+   * which already records the loss (updateLosses), so this only clears their
+   * current game.
+   */
   public static async updateLossesAndLeaveGame(
     ctx: GameContext,
     game: GameInstanceDocument,
@@ -96,9 +101,6 @@ export class PlayerProcessor {
   ): Promise<void> {
     const ud: UserDocument | null = await ctx.store.getUser(userId);
     if (ud) {
-      if (game.status === GameStatus.ACTIVE) {
-        ud.losses++;
-      }
       ud.currGameId = undefined;
       ud.currGameName = undefined;
       await ctx.store.saveUser(ud);
@@ -114,6 +116,7 @@ export class PlayerProcessor {
     if (ud) {
       if (game.status === GameStatus.ACTIVE) {
         ud.losses++;
+        PlayerProcessor.recordGameEnd(ud, game, userId, false);
       }
       await ctx.store.saveUser(ud);
     }
@@ -121,12 +124,34 @@ export class PlayerProcessor {
 
   public static async updateWins(
     ctx: GameContext,
-    userId: string
+    userId: string,
+    game?: GameInstanceDocument
   ): Promise<void> {
     const ud: UserDocument | null = await ctx.store.getUser(userId);
     if (ud) {
       ud.wins++;
+      if (game) {
+        PlayerProcessor.recordGameEnd(ud, game, userId, true);
+      }
       await ctx.store.saveUser(ud);
     }
+  }
+
+  /** Leaderboard records for a game that just ended for this player. */
+  private static recordGameEnd(
+    ud: UserDocument,
+    game: GameInstanceDocument,
+    userId: string,
+    won: boolean
+  ): void {
+    const player = game.players.find((p) => areIdsEqual(p._id, userId));
+    ud.currentStreak = won ? (ud.currentStreak ?? 0) + 1 : 0;
+    ud.bestStreak = Math.max(ud.bestStreak ?? 0, ud.currentStreak);
+    if (won && player) {
+      ud.bestWinWorth = Math.max(ud.bestWinWorth ?? 0, Math.round(player.totalAssets));
+    }
+    ud.rentCollected = (ud.rentCollected ?? 0) + (player?.stats?.rentCollected ?? 0);
+    ud.auctionsWon = (ud.auctionsWon ?? 0) + (player?.stats?.auctionsWon ?? 0);
+    ud.lastPlayedAt = new Date().toISOString();
   }
 }

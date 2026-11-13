@@ -100,6 +100,16 @@ export interface UserDocument {
   wins: number;
   losses: number;
   gamesPlayed: number;
+  /** wins in a row, and the most ever (leaderboard) */
+  currentStreak: number;
+  bestStreak: number;
+  /** net worth at the end of their best win */
+  bestWinWorth: number;
+  /** lifetime totals across finished games */
+  rentCollected: number;
+  auctionsWon: number;
+  /** when a game last ended for them */
+  lastPlayedAt?: string;
   currGameId?: string;
   currGameName?: string;
   createdAt: string;

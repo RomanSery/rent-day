@@ -54,12 +54,17 @@ export class GamesIndexRepo {
   async listJoining(createdAfterIso: string): Promise<GameToJoin[]> {
     const result = await this.db
       .prepare(
-        `SELECT id, name, max_players, players_joined, bots FROM games
-         WHERE status = ? AND created_at > ?
-         ORDER BY created_at DESC`
+        `SELECT g.id, g.name, g.max_players, g.players_joined, g.bots, g.has_password, g.created_at,
+                u.username AS host_name
+         FROM games g LEFT JOIN users u ON u.id = g.created_by
+         WHERE g.status = ? AND julianday(g.created_at) > julianday(?)
+         ORDER BY julianday(g.created_at) DESC`
       )
       .bind(GameStatus.JOINING, createdAfterIso)
-      .all<{ id: string; name: string; max_players: number; players_joined: number; bots: number }>();
+      .all<{
+        id: string; name: string; max_players: number; players_joined: number; bots: number;
+        has_password: number; created_at: string; host_name: string | null;
+      }>();
 
     return (result.results ?? []).map((r) => ({
       gameId: r.id,
@@ -67,6 +72,9 @@ export class GamesIndexRepo {
       maxPlayers: r.max_players,
       playersJoined: r.players_joined,
       bots: r.bots,
+      hasPassword: r.has_password === 1,
+      createdAt: r.created_at,
+      hostName: r.host_name ?? undefined,
     }));
   }
 }

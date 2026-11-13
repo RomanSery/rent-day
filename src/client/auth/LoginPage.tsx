@@ -2,7 +2,8 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import API from '../api';
 import { Button, TextField, Typography } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { BackLink } from "../components/BackLink";
 import { handleApiError, setCurrSessionInfo } from "../helpers";
 import _ from "lodash/fp";
 
@@ -40,6 +41,8 @@ export const LoginPage: React.FC<Props> = () => {
   return (
     <React.Fragment>
 
+      <BackLink to="/auth" label="Back" />
+
       <Typography component="h2" variant="h5">Log In</Typography>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -59,10 +62,6 @@ export const LoginPage: React.FC<Props> = () => {
 
         <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit">Log In</Button>
       </form>
-
-      <br />
-
-      <Link to="/auth">GO BACK</Link>
 
     </React.Fragment>
   );

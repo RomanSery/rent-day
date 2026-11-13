@@ -1,4 +1,5 @@
 import { SquareConfigDataMap } from "@core/config/SquareData";
+import { addStat } from "../stats";
 import { SquareType } from "@core/enums/SquareType";
 import { Player } from "@core/types/Player";
 import { SquareGameData } from "@core/types/SquareGameData";
@@ -111,6 +112,8 @@ export class MoneyCalculator {
 
     player.money -= Math.round(finalRentToPay);
     owner!.money += Math.round(finalRentToPay);
+    addStat(player, "rentPaid", finalRentToPay);
+    addStat(owner!, "rentCollected", finalRentToPay);
     game.lastRent = {
       seq: (game.lastRent?.seq ?? 0) + 1,
       squareId,

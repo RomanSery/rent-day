@@ -1,4 +1,5 @@
 import { Player } from "@core/types/Player";
+import { addStat } from "../stats";
 import { DiceRoll } from "@core/types/DiceRoll";
 import { PlayerState } from "@core/enums/PlayerState";
 import {
@@ -166,6 +167,7 @@ export class RollProcessor {
 
     if (this.playerPassedPayDay === true) {
       MoneyCalculator.collectSalary(this.player);
+      addStat(this.player, "paydays", 1);
       this.player.numAbilityPoints++;
     }
 

@@ -1,4 +1,5 @@
 import { Bidder } from "@core/types/Bidder";
+import { addStat } from "../stats";
 import { Player } from "@core/types/Player";
 import { PlayerState } from "@core/enums/PlayerState";
 import { SquareConfigDataMap } from "@core/config/SquareData";
@@ -182,6 +183,10 @@ export class AuctionProcessor {
       const playerWinner = this.game.players.find(
         (p) => p._id && areIdsEqual(p._id, this.auction!.winnerId)
       );
+      if (playerWinner) {
+        addStat(playerWinner, "auctionsWon", 1);
+        addStat(playerWinner, "auctionSpend", priceToPay);
+      }
       if (playerWinner && priceToPay) {
         playerWinner.money = Math.round(playerWinner.money - priceToPay);
         PlayerCostsCalculator.updatePlayerCosts(this.game, playerWinner);

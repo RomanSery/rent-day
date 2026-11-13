@@ -3,6 +3,7 @@ import { PlayerClass } from "../enums/PlayerClass";
 import { PlayerState } from "../enums/PlayerState";
 import { DiceRoll } from "./DiceRoll";
 import { BotLevel } from "../enums/BotLevel";
+import { PlayerStats } from "./PlayerStats";
 
 export interface Player {
   _id: string;
@@ -44,4 +45,7 @@ export interface Player {
   rollHistory: Array<DiceRoll>;
   numTurnsInIsolation: number;
   numTimeouts: number;
+
+  /** running totals: rent, auctions, paydays, lotto */
+  stats?: PlayerStats;
 }

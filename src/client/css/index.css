@@ -252,3 +252,429 @@ body {
   font-size: 14px;
   margin: 8px 0 16px;
 }
+
+/* players dialog (dialogs/StatsDialog.tsx) */
+.pstat-turn {
+  margin-left: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5f6b76;
+  font-variant-numeric: tabular-nums;
+}
+.pstat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7681;
+}
+.pstat-share { margin-bottom: 16px; }
+.pstat-share-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 6px 0;
+  gap: 2px;
+  background: #eef1f4;
+}
+.pstat-share-bar span { flex-basis: 0; min-width: 3px; }
+.pstat-share-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 13px;
+}
+.pstat-share-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.pstat-share-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.pstat-share-legend b { font-variant-numeric: tabular-nums; }
+
+.pstat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(290px, 100%), 1fr));
+  gap: 14px;
+}
+.pstat-card {
+  border: 1px solid #dde1e5;
+  border-top: 4px solid #999;
+  border-radius: 8px;
+  padding: 12px 14px 14px;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  background: #fff;
+}
+.pstat-card.is-me { box-shadow: 0 0 0 2px #e3ecf7; }
+.pstat-card.bankrupt { opacity: 0.6; }
+.pstat-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pstat-rank {
+  font-size: 12px;
+  font-weight: 700;
+  color: #44505b;
+  background: #eef1f4;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-variant-numeric: tabular-nums;
+}
+.pstat-name { display: flex; flex-direction: column; min-width: 0; flex: 1; font-weight: 600; line-height: 1.25; }
+.pstat-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pstat-name small { font-weight: 400; font-size: 12px; color: #6b7681; }
+.pstat-you {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #2f5d8f;
+  background: #e3ecf7;
+  border-radius: 999px;
+  padding: 1px 6px;
+  align-self: flex-start;
+  margin-top: 2px;
+}
+.pstat-trade { flex-shrink: 0; }
+
+.pstat-worth { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.pstat-big { font-size: 24px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.pstat-change { font-size: 12px; font-variant-numeric: tabular-nums; }
+.pstat-change.up { color: #2e7d32; }
+.pstat-change.down { color: #c62828; }
+.pstat-change.flat { color: #6b7681; }
+.pstat-spark { width: 120px; height: 34px; flex-shrink: 0; }
+
+.pstat-row3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid #eef1f4;
+  border-bottom: 1px solid #eef1f4;
+}
+.pstat-row3 dt, .pstat-record dt { font-size: 12px; color: #6b7681; }
+.pstat-row3 dd, .pstat-record dd { margin: 0; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pstat-plus { color: #9aa4ad; font-weight: 400; }
+
+.pstat-section { display: grid; gap: 6px; }
+.pstat-groups { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pstat-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 4px;
+  border-radius: 5px;
+  background: #f5f7f9;
+  font-size: 11px;
+  color: #2e7d32;
+}
+.pstat-group.full { background: #e8f3e6; }
+.pstat-group i { width: 9px; height: 12px; border-radius: 2px; display: inline-block; }
+.pstat-group i.empty { background: transparent; box-shadow: inset 0 0 0 1px #c9d0d6; }
+.pstat-group.icons { color: #44505b; gap: 4px; padding: 3px 6px; font-variant-numeric: tabular-nums; }
+.pstat-summary { margin: 0; font-size: 13px; color: #44505b; }
+
+.pstat-record {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  margin: 0;
+}
+.pstat-record > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  border-bottom: 1px dotted #e3e7eb;
+  padding-bottom: 3px;
+}
+.pstat-record dd { white-space: nowrap; }
+.pstat-foot { margin: 14px 0 0; font-size: 12px; color: #6b7681; }
+
+/* phones: a one-line summary and a Details toggle per card */
+.pstat-brief { margin: 0; font-size: 13px; color: #44505b; font-variant-numeric: tabular-nums; }
+.pstat-more {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 0;
+  background: transparent;
+  color: #2f5d8f;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.pstat-more svg { font-size: 11px; transition: transform 150ms ease; }
+.pstat-more svg.flip { transform: rotate(180deg); }
+.pstat-more:focus-visible { outline: 2px solid #3478c8; outline-offset: 2px; border-radius: 4px; }
+
+/* phones: the dialog fills the screen (StatsDialog), with tighter padding */
+@media (max-width: 600px) {
+  .pstat-dialog .MuiDialogTitle-root {
+    padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 8px max(16px, env(safe-area-inset-left, 0px));
+  }
+  .pstat-dialog .MuiDialogContent-root {
+    padding: 4px max(12px, env(safe-area-inset-right, 0px)) 12px max(12px, env(safe-area-inset-left, 0px));
+  }
+  .pstat-dialog .MuiDialogActions-root {
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  }
+  .pstat-card { padding: 10px 12px 10px; gap: 8px; }
+  .pstat-grid { gap: 10px; }
+  .pstat-big { font-size: 20px; }
+  .pstat-worth .pstat-label { display: none; }
+  .pstat-share { margin-bottom: 12px; }
+}
+@media (max-width: 480px) {
+  .pstat-record { grid-template-columns: 1fr; }
+}
+
+/* lobby leaderboard (join/DisplayAllPlayers.tsx). Sized by its own width, so
+   it reads well in the middle of the board on a laptop and on a phone. */
+.leaderboard {
+  container-type: inline-size;
+  /* the board's centre is a flex row, and a size container can't size itself
+     from its content: take the whole width (up to a comfortable maximum)
+     instead of collapsing, and only as much height as the rows need */
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  align-self: flex-start;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  padding: 16px 18px 14px;
+  text-align: left;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.lb-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 16px; }
+.lb-head h1 { margin: 0; font-size: 22px; line-height: 1.15; }
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #2f5d8f;
+  text-decoration: none;
+  background: #f1f6fc;
+  border: 1px solid #cfdcec;
+  border-radius: 8px;
+  padding: 7px 14px 7px 12px;
+  margin-bottom: 8px;
+}
+.back-link:hover { background: #e3edf9; border-color: #b4c9e2; }
+.back-link:focus-visible { outline: 2px solid #3478c8; outline-offset: 2px; }
+.lb-sub { margin: 2px 0 0; font-size: 13px; color: #5f6b76; font-variant-numeric: tabular-nums; }
+.lb-sorts { display: inline-flex; background: #eef1f4; border-radius: 8px; padding: 3px; gap: 2px; }
+.lb-sorts button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: #44505b;
+  cursor: pointer;
+}
+.lb-sorts button[aria-pressed="true"] { background: #fff; color: #1f2933; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+.lb-sorts button:focus-visible, .lb-foot a:focus-visible { outline: 2px solid #3478c8; outline-offset: 2px; }
+
+.lb-podium {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.lb-podium-item {
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 2px;
+  background: #f5f7f9;
+  border-top: 4px solid #c9d0d6;
+  min-width: 0;
+}
+.lb-podium-item.gold { border-top-color: #d4a017; background: #fbf6e6; }
+.lb-podium-item.silver { border-top-color: #9aa3ab; background: #f3f5f7; }
+.lb-podium-item.bronze { border-top-color: #b87333; background: #f8efe7; }
+.lb-medal { font-size: 12px; font-weight: 700; color: #6b7681; }
+.gold .lb-medal { color: #a77d07; }
+.silver .lb-medal { color: #6f7880; }
+.bronze .lb-medal { color: #8d5420; }
+.lb-podium-name { font-weight: 700; font-size: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-podium-wins { font-size: 14px; }
+.lb-podium-wins b { font-size: 20px; font-variant-numeric: tabular-nums; }
+.lb-podium-rate { font-size: 12px; color: #5f6b76; font-variant-numeric: tabular-nums; }
+
+.lb-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.lb-table th {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7681;
+  text-align: left;
+  padding: 0 8px 6px;
+  border-bottom: 1px solid #dde1e5;
+  white-space: nowrap;
+}
+.lb-table td { padding: 8px; border-bottom: 1px solid #eef1f4; vertical-align: middle; }
+.lb-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lb-table tr.is-me td { background: #f2f7fd; }
+.lb-rank { width: 2.5em; font-weight: 700; color: #6b7681; font-variant-numeric: tabular-nums; }
+td.lb-rank.gold { color: #a77d07; }
+td.lb-rank.silver { color: #6f7880; }
+td.lb-rank.bronze { color: #8d5420; }
+.lb-player { min-width: 0; }
+.lb-name { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; flex-wrap: wrap; }
+.lb-you {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #2f5d8f;
+  background: #e3ecf7;
+  border-radius: 999px;
+  padding: 1px 6px;
+  margin-left: 6px;
+}
+.lb-name .lb-you { margin-left: 0; }
+.lb-streak { font-size: 12px; font-weight: 700; color: #d9480f; }
+.lb-live { display: block; font-size: 12px; color: #2e7d32; margin-top: 1px; }
+.lb-brief { display: none; font-size: 12px; color: #6b7681; margin-top: 1px; font-variant-numeric: tabular-nums; }
+.lb-wins { font-weight: 700; }
+.lb-rate { white-space: nowrap; }
+.lb-bar { display: inline-block; vertical-align: middle; width: 64px; height: 6px; border-radius: 999px; background: #eef1f4; overflow: hidden; margin-right: 8px; }
+.lb-bar i { display: block; height: 100%; background: #3478c8; border-radius: 999px; }
+.lb-rate-num { font-variant-numeric: tabular-nums; }
+.lb-when { color: #5f6b76; white-space: nowrap; }
+.lb-table td.lb-when, .lb-table th:last-child { padding-left: 18px; }
+.lb-note { margin: 0; font-size: 13px; color: #5f6b76; }
+.lb-more {
+  justify-self: center;
+  border: 1px solid #dde1e5;
+  background: #fff;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f5d8f;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+.lb-more:hover { background: #f5f7f9; }
+.lb-more:focus-visible { outline: 2px solid #3478c8; outline-offset: 2px; }
+.lb-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; font-size: 12px; color: #6b7681; }
+.lb-foot a { font-size: 14px; font-weight: 600; color: #2f5d8f; }
+
+/* narrow (a phone, or a small window): rank, name and wins, with one short line */
+@container (max-width: 640px) {
+  .lb-wide, .lb-podium { display: none; }
+  .lb-brief { display: block; }
+  .lb-bar { display: none; }
+  .lb-table th.lb-rate, .lb-table td.lb-rate { display: none; }
+  .lb-sorts { width: 100%; }
+  .lb-sorts button { flex: 1; padding: 6px 4px; }
+  .lb-head h1 { font-size: 20px; }
+}
+
+/* Join a game (join/DisplayAllGames.tsx): one card per open game */
+.game-list {
+  container-type: inline-size;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+  align-self: flex-start;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  padding: 16px 18px 18px;
+  text-align: left;
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.gl-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 16px; }
+.gl-head h1 { margin: 0; font-size: 22px; line-height: 1.15; }
+.gl-sub { margin: 2px 0 0; font-size: 13px; color: #5f6b76; }
+.gl-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.gl-note { margin: 0; font-size: 14px; color: #5f6b76; }
+
+.gl-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.gl-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
+  background: #fafbfc;
+  min-width: 0;
+}
+.gl-card:hover { border-color: #b4c9e2; background: #f6f9fd; }
+.gl-main { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.gl-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; }
+.gl-name { font-size: 16px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.gl-lock {
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a5a00;
+  background: #fdf1d8;
+  border-radius: 999px;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.gl-meta { font-size: 13px; color: #5f6b76; }
+.gl-meta b { color: #2b333b; font-weight: 600; }
+.gl-seat-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 2px; }
+.gl-seats { display: inline-flex; gap: 4px; }
+.gl-seat {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11px;
+}
+.gl-seat.human { background: #3478c8; color: #fff; }
+.gl-seat.bot { background: #e2e6ea; color: #55606b; }
+.gl-seat.open { border: 2px dashed #b9c2ca; box-sizing: border-box; }
+.gl-seat-text { font-size: 13px; color: #44505b; }
+.gl-join { flex-shrink: 0; min-width: 88px !important; }
+
+.gl-empty {
+  text-align: center;
+  padding: 28px 16px;
+  border: 1px dashed #cfd6dc;
+  border-radius: 8px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.gl-empty p { margin: 0; color: #44505b; max-width: 42ch; }
+.gl-empty .MuiButton-root { margin-top: 8px; }
+
+/* narrow: the Join button moves under the details, full width */
+@container (max-width: 480px) {
+  .gl-card { flex-direction: column; align-items: stretch; gap: 10px; }
+  .gl-join { width: 100%; }
+  .gl-actions { width: 100%; }
+  .gl-head h1 { font-size: 20px; }
+}

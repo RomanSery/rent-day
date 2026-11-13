@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { emptyPlayerStats } from "@core/types/PlayerStats";
 import { SquareThemeData } from "@core/types/SquareThemeData";
 import { NyThemeData } from "@core/config/NyTheme";
 import { newSeed, shuffled } from "../random";
@@ -181,6 +182,7 @@ export class GameProcessor {
       rollHistory: [],
       numTurnsInIsolation: 0,
       numTimeouts: 0,
+      stats: emptyPlayerStats(),
     };
 
     game.players.push(newPlayer);
@@ -464,7 +466,7 @@ export class GameProcessor {
       )[0];
       if (winner) {
         winner.finishedRank = 1;
-        await PlayerProcessor.updateWins(ctx, winner._id);
+        await PlayerProcessor.updateWins(ctx, winner._id, game);
 
         game.winner = winner.name;
       }

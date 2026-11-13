@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, TextField, FormControl, InputLabel, NativeSelect, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { BackLink } from "./components/BackLink";
 
 
 
@@ -20,6 +20,8 @@ export const ContactUsPage: React.FC<Props> = () => {
 
   return (
     <React.Fragment>
+
+      <BackLink to="/dashboard" label="Lobby" />
 
       <Typography component="h2" variant="h5">Contact Us</Typography>
 
@@ -54,10 +56,6 @@ export const ContactUsPage: React.FC<Props> = () => {
 
         <Button variant="contained" color="primary" type="submit">Submit</Button>
       </form>
-
-      <br />
-
-      <Link to="/dashboard">GO BACK</Link>
 
     </React.Fragment>
   );

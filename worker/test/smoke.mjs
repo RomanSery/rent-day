@@ -212,6 +212,8 @@ for (let turn = 0; turn < 10 && game.status === "Active"; turn++) {
       check(game.auctionId === null, "auction cleared from game");
       const result = game.lastAuction;
       check(result && result.auctionId === au._id && result.winnerId === bob.id, "game keeps the auction result for every screen");
+      const bobNow = game.players.find((p) => p._id === bob.id);
+      check(bobNow.stats && bobNow.stats.auctionsWon >= 1, "bob's auction wins are counted (" + (bobNow.stats?.auctionsWon ?? "none") + ")");
       // alice bid $0, so bob pays the second-highest bid: $0
       check(result && result.price === 0 && result.bids.length === 2 &&
         result.bids[0].playerId === bob.id && result.bids[0].bid === 35 && result.bids[1].bid === 0,
@@ -321,6 +323,11 @@ r = await alice.post("findPlayers");
 const aliceInfo = r.data.players.find((p) => p.playerId === alice.id);
 const bobInfo = r.data.players.find((p) => p.playerId === bob.id);
 check(aliceInfo?.wins === 1 && bobInfo?.wins === 0 && aliceInfo.gamesPlayed === 1, "findPlayers shows win/loss stats: " + JSON.stringify([aliceInfo, bobInfo]));
+check(bobInfo?.losses === 1 && aliceInfo?.losses === 0, "one loss recorded for bob, none for alice");
+check(aliceInfo?.currentStreak === 1 && aliceInfo.bestStreak === 1 && bobInfo?.currentStreak === 0,
+  "win streaks: alice 1, bob 0");
+check(aliceInfo?.bestWinWorth > 0 && !!aliceInfo.lastPlayedAt && !!bobInfo?.lastPlayedAt,
+  "best win net worth and last played recorded");
 
 console.log("== websocket close");
 alice.clearEvents();

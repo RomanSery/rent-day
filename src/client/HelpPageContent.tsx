@@ -1,6 +1,6 @@
 import { Typography } from "@mui/material";
 import React from "react";
-import { Link } from "react-router-dom";
+import { BackLink } from "./components/BackLink";
 import { getHelpContent } from "./uiHelpers";
 
 
@@ -14,13 +14,11 @@ export const HelpPageContent: React.FC<Props> = () => {
   return (
     <div className="help-page-cont">
 
+      <BackLink to="/dashboard" label="Lobby" />
+
       <Typography component="h2" variant="h2">Help</Typography>
 
-      <Link to="/dashboard">GO BACK</Link>
-
       {getHelpContent()}
-
-      <Link to="/dashboard">GO BACK</Link>
 
     </div>
   );

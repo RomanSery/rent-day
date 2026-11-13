@@ -1,4 +1,5 @@
 import { SquareConfigDataMap } from "@core/config/SquareData";
+import { addStat } from "../stats";
 import { SquareType } from "@core/enums/SquareType";
 import { Player } from "@core/types/Player";
 import { GameStatus } from "@core/enums/GameStatus";
@@ -88,6 +89,7 @@ export class LottoProcessor {
       this.lotto.prize = this.getPrizeAmount();
       if (this.player) {
         this.player.money = Math.round(this.player.money + this.lotto.prize);
+        addStat(this.player, "lottoWinnings", this.lotto.prize);
         PlayerCostsCalculator.updatePlayerCosts(this.game, this.player);
       }
     } else {

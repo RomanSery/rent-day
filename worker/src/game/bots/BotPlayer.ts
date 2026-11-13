@@ -1,4 +1,5 @@
 // Computer players. A bot is an ordinary entry in game.players flagged with
+import { emptyPlayerStats } from "@core/types/PlayerStats";
 // isBot; the Durable Object schedules the calls in this file through its
 // alarm so bots act on their own, with a pacing delay humans can follow.
 
@@ -94,6 +95,7 @@ export const createBotPlayer = (game: GameInstanceDocument, level: BotLevel): Pl
     rollHistory: [],
     numTurnsInIsolation: 0,
     numTimeouts: 0,
+    stats: emptyPlayerStats(),
   };
 };
 

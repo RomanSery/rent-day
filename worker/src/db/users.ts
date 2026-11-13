@@ -9,6 +9,12 @@ interface UserRow {
   wins: number;
   losses: number;
   games_played: number;
+  current_streak: number;
+  best_streak: number;
+  best_win_worth: number;
+  rent_collected: number;
+  auctions_won: number;
+  last_played_at: string | null;
   curr_game_id: string | null;
   curr_game_name: string | null;
   created_at: string;
@@ -24,6 +30,12 @@ const toDoc = (row: UserRow): UserDocument => ({
   wins: row.wins,
   losses: row.losses,
   gamesPlayed: row.games_played,
+  currentStreak: row.current_streak ?? 0,
+  bestStreak: row.best_streak ?? 0,
+  bestWinWorth: row.best_win_worth ?? 0,
+  rentCollected: row.rent_collected ?? 0,
+  auctionsWon: row.auctions_won ?? 0,
+  lastPlayedAt: row.last_played_at ?? undefined,
   currGameId: row.curr_game_id ?? undefined,
   currGameName: row.curr_game_name ?? undefined,
   createdAt: row.created_at,
@@ -31,7 +43,7 @@ const toDoc = (row: UserRow): UserDocument => ({
 });
 
 const COLUMNS =
-  "id, email, username, modified_username, password, wins, losses, games_played, curr_game_id, curr_game_name, created_at, updated_at";
+  "id, email, username, modified_username, password, wins, losses, games_played, current_streak, best_streak, best_win_worth, rent_collected, auctions_won, last_played_at, curr_game_id, curr_game_name, created_at, updated_at";
 
 export class UsersRepo {
   constructor(private readonly db: D1Database) {}
@@ -69,7 +81,7 @@ export class UsersRepo {
   async create(user: UserDocument): Promise<void> {
     await this.db
       .prepare(
-        `INSERT INTO users (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO users (${COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
       .bind(
         user._id,
@@ -80,6 +92,12 @@ export class UsersRepo {
         user.wins,
         user.losses,
         user.gamesPlayed,
+        user.currentStreak,
+        user.bestStreak,
+        user.bestWinWorth,
+        user.rentCollected,
+        user.auctionsWon,
+        user.lastPlayedAt ?? null,
         user.currGameId ?? null,
         user.currGameName ?? null,
         user.createdAt,
@@ -92,6 +110,8 @@ export class UsersRepo {
     await this.db
       .prepare(
         `UPDATE users SET password = ?, wins = ?, losses = ?, games_played = ?,
+           current_streak = ?, best_streak = ?, best_win_worth = ?, rent_collected = ?,
+           auctions_won = ?, last_played_at = ?,
            curr_game_id = ?, curr_game_name = ?, updated_at = ?
          WHERE id = ?`
       )
@@ -100,6 +120,12 @@ export class UsersRepo {
         user.wins,
         user.losses,
         user.gamesPlayed,
+        user.currentStreak,
+        user.bestStreak,
+        user.bestWinWorth,
+        user.rentCollected,
+        user.auctionsWon,
+        user.lastPlayedAt ?? null,
         user.currGameId ?? null,
         user.currGameName ?? null,
         new Date().toISOString(),
