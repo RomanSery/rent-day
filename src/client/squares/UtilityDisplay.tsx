@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLightbulb, faTrain } from '@fortawesome/free-solid-svg-icons'
-import { getSquareStyle, getSquareTxt } from "./squareHelpers";
+import { getSquareTxt } from "./squareHelpers";
 import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
@@ -27,7 +27,7 @@ export const UtilityDisplay: React.FC<Props> = ({ id }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={getUtilityIcon()} size="3x" color="blue" />
             </div>
-            <div className="square-name" style={getSquareStyle(gameState, id)}>
+            <div className="square-name">
                 {getSquareTxt(gameState, id)}
             </div>
         </React.Fragment>

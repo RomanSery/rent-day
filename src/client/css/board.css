@@ -523,3 +523,59 @@
 .board > div:nth-child(40) {
   grid-row: 10;
 }
+
+/* ---- ownership ----------------------------------------------------------
+   An owned square gets a solid stripe in the owner's colour along its OUTER
+   edge (the property colour bar is on the inner edge, so they never meet) and
+   a badge with the owner's piece in an outer corner. Drawn as overlays so a
+   mortgaged square's striped background can't cover them. --owner is set
+   inline by GameSquare. */
+
+.square.owned::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  background: var(--owner);
+  pointer-events: none;
+}
+
+.square.owned-bottom::after { left: 0; right: 0; bottom: 0; height: 5px; }
+.square.owned-top::after { left: 0; right: 0; top: 0; height: 5px; }
+.square.owned-left::after { top: 0; bottom: 0; left: 0; width: 5px; }
+.square.owned-right::after { top: 0; bottom: 0; right: 0; width: 5px; }
+
+.owner-badge {
+  position: absolute;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 11px;
+  box-shadow: 0 0 0 1.5px #fff, 0 1px 2px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* in the outer corner, clear of the stripe */
+.owned-bottom .owner-badge { bottom: 8px; right: 3px; }
+.owned-top .owner-badge { top: 8px; right: 3px; }
+.owned-left .owner-badge { left: 8px; top: 3px; }
+.owned-right .owner-badge { right: 8px; top: 3px; }
+
+/* hovering or tapping a player in the list: their squares light up, the rest dim */
+.board .square {
+  transition: opacity 0.15s, filter 0.15s, box-shadow 0.15s;
+}
+
+.board .square.dimmed {
+  opacity: 0.35;
+  filter: grayscale(0.7);
+}
+
+.board .square.spotlit {
+  z-index: 3;
+  box-shadow: 0 0 0 3px var(--owner), 0 3px 10px rgba(0, 0, 0, 0.3);
+}

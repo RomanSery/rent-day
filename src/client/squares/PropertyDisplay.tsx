@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import useGameStateStore from "../stores/gameStateStore";
 import { ColorBar } from "./ColorBar";
-import { getSquareStyle, getSquareTxt, isBeingAuctioned } from "./squareHelpers";
+import { getSquareTxt, isBeingAuctioned } from "./squareHelpers";
 
 interface Props {
     id: number;
@@ -15,7 +15,7 @@ export const PropertyDisplay: React.FC<Props> = ({ id }) => {
     const getNormalSquare = () => {
         return (
             <div className="square-name">
-                <div className="square-title" style={getSquareStyle(gameState, id)}>
+                <div className="square-title">
                     {getSquareTxt(gameState, id)}
                 </div>
             </div>
@@ -29,7 +29,7 @@ export const PropertyDisplay: React.FC<Props> = ({ id }) => {
                 repeat: Infinity,
                 repeatDelay: 0
             }} className="square-name">
-                <div className="square-title" style={getSquareStyle(gameState, id)}>
+                <div className="square-title">
                     {getSquareTxt(gameState, id)}
                 </div>
             </motion.div>

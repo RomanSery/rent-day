@@ -161,3 +161,27 @@
     max-height: 14rem;
   }
 }
+
+/* Portrait phones: squares are ~32px, so the owner badge shrinks to a dot
+   and the owner stripe gets thinner. */
+@media (max-width: 700px) and (orientation: portrait) {
+  .game-board .owner-badge {
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 0 1px #fff;
+  }
+
+  .game-board .owner-badge svg {
+    display: none;
+  }
+
+  .game-board .owned-bottom .owner-badge { bottom: 5px; right: 2px; }
+  .game-board .owned-top .owner-badge { top: 5px; right: 2px; }
+  .game-board .owned-left .owner-badge { left: 5px; top: 2px; }
+  .game-board .owned-right .owner-badge { right: 5px; top: 2px; }
+
+  .game-board .square.owned-bottom::after,
+  .game-board .square.owned-top::after { height: 3px; }
+  .game-board .square.owned-left::after,
+  .game-board .square.owned-right::after { width: 3px; }
+}

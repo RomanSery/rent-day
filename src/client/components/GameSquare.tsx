@@ -4,8 +4,9 @@ import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { SquareInfo } from "./SquareInfo";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
-import { player_colors_to_rgb } from "../../core/constants";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyUserId, handleApiError } from "../helpers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Player } from "../../core/types/Player";
 import { ActionMode } from "../../core/enums/ActionMode";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
@@ -27,6 +28,9 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
 
   const gameState = useGameStateStore(state => state.data);
   const actionMode = useGameStateStore(state => state.actionMode);
+  const infoFocus = useGameStateStore(state => state.infoFocus);
+  const playerToView = useGameStateStore(state => state.playerToView);
+  const spotlightPlayerId = infoFocus === "player" ? playerToView : undefined;
 
   const sectionMap = new Map<BoardSection, string>([
     [BoardSection.Top, "top"], [BoardSection.Right, "right"], [BoardSection.Left, "left"], [BoardSection.Bottom, "bottom"]
@@ -44,11 +48,19 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
 
 
   const getSquareClassName = () => {
-    const css = "square " + squareTypeClass.get(squareType);
+    const owner = getOwner();
+    const classes = ["square", squareTypeClass.get(squareType) ?? ""];
     if (isMortgaged()) {
-      return css + " mortgaged";
+      classes.push("mortgaged");
     }
-    return css;
+    if (owner) {
+      classes.push("owned", "owned-" + sectionMap.get(section));
+    }
+    // a player is being pointed at in the player list: light up what they own
+    if (spotlightPlayerId) {
+      classes.push(owner && areObjectIdsEqual(owner._id, spotlightPlayerId) ? "spotlit" : "dimmed");
+    }
+    return classes.join(" ");
   };
 
   const getSquareId = () => {
@@ -174,34 +186,32 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
     return data && data.isMortgaged ? true : false;
   };
 
-  const isOwned = (): boolean => {
+
+  const getOwner = (): Player | undefined => {
     const data = getSquareGameData();
-    return data && data.owner ? true : false;
-  };
-
-  const getOwnedStyle = (): React.CSSProperties => {
-    if (isOwned() && gameState) {
-      const data = getSquareGameData();
-      if (data) {
-        const owner = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
-        if (owner) {
-          const fromColor = player_colors_to_rgb.get(owner.color);
-          return { background: "linear-gradient(to bottom, " + fromColor + ", rgba(255, 0, 0, 0))" };
-        }
-
-      }
+    if (!data?.owner || !gameState) {
+      return undefined;
     }
-    return {};
+    return gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
   };
+
+  const owner = getOwner();
+  // the owner's colour drives the stripe on the square's outer edge (board.css)
+  const ownedStyle = owner ? ({ "--owner": owner.color } as React.CSSProperties) : undefined;
 
   return (
     <React.Fragment>
-      <div className={getSquareClassName()} style={getOwnedStyle()} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}>
+      <div className={getSquareClassName()} style={ownedStyle} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}>
 
         <div className={getContainerClassName()}>
           <SquareInfo id={id} />
 
         </div>
+
+        {owner &&
+          <span className="owner-badge" style={{ background: owner.color }} title={"Owned by " + owner.name}>
+            <FontAwesomeIcon icon={getIconProp(owner.type)} />
+          </span>}
       </div>
     </React.Fragment>
 

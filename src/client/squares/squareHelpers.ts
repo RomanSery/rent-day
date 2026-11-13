@@ -22,17 +22,6 @@ export const getSquareTxt = (
   return data?.name ?? "";
 };
 
-export const getSquareStyle = (
-  gameInfo: GameState | undefined,
-  squareId: number
-): React.CSSProperties => {
-  const data = getSquareGameData(gameInfo, squareId);
-  if (data && data.owner && data.color) {
-    return { color: data.color, textDecoration: "underline" };
-  }
-
-  return {};
-};
 
 export const getOwnerPlayer = (
   gameInfo: GameState | undefined,

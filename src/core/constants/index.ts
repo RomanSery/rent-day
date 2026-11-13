@@ -21,20 +21,18 @@ export const turnTimeLimit: number = 80;
 export const auctionTimeLimit: number = 70;
 export const maxTimeoutsAllowed: number = 3;
 
+/**
+ * Player colours, handed out when a game starts. Based on the Okabe-Ito
+ * colour-blind-safe palette, darkened so each reads as text on white (4.5:1+),
+ * and kept apart from each other rather than echoing the property group
+ * colours. Ownership on the board also shows the owner's piece, so colour is
+ * never the only cue.
+ */
 export const player_colors = [
-  "#0014f3", //blue
-  "#138005", //green
-  "#17cbc9", //violat
-  "#bd0aef", //purple
-  "#c50c0c", //red
-  "#d47205", //orange
+  "#0072B2", // blue
+  "#C2410C", // vermillion
+  "#007A5A", // green
+  "#A3478F", // pink-purple
+  "#8A6100", // ochre
+  "#1D2126", // charcoal
 ];
-
-export const player_colors_to_rgb = new Map<string, string>([
-  ["#0014f3", "rgba(0, 20, 243, 0.4)"],
-  ["#138005", "rgba(19, 128, 5, 0.4)"],
-  ["#17cbc9", "rgba(23, 203, 201, 0.4)"],
-  ["#bd0aef", "rgba(189, 10, 239, 0.4)"],
-  ["#c50c0c", "rgba(197, 12, 12, 0.4)"],
-  ["#d47205", "rgba(212, 114, 5, 0.4)"],
-]);
