@@ -1,12 +1,46 @@
+/* A piece is a zero-size point at its centre on the board (see
+   getSquarePieceLayout); the icon is centred on that point, so scaling a
+   piece (crowded squares, hops) grows and shrinks it around its middle. */
 .single-piece {
   font-size: calc(0.5rem + 0.4vw + 0.4vh);
   width: 0;
   height: 0;
   position: absolute;
-  padding-left: 5px;
 
   stroke: red;
   stroke-width: 10;
+}
+
+.piece-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  line-height: 0;
+  transform: translate(-50%, -50%);
+}
+
+/* hidden twin of a piece: the layout reads its font size */
+.piece-probe {
+  visibility: hidden;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+}
+
+/* "x6" on a square too crowded to draw every piece (phones) */
+.piece-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 14px;
+  padding: 0 3px;
+  border-radius: 7px;
+  background: #1d2126;
+  color: #fff;
+  font: 700 9px/13px system-ui, sans-serif;
+  text-align: center;
+  box-shadow: 0 0 0 1px #fff;
 }
 
 /* the piece that is hopping across the board stays on top of the others */

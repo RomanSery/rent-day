@@ -58,7 +58,9 @@ const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduce
   const top: number[] = [positions[0].top];
   const left: number[] = [positions[0].left];
   const y: number[] = [0];
-  const scale: number[] = [1];
+  // each position has its own size (a crowded square shrinks pieces); hops grow on top of that
+  const sizeAt = (p: PiecePosition) => p.scale ?? 1;
+  const scale: number[] = [sizeAt(positions[0])];
   const times: number[] = [0];
   const yEase: Ease[] = [];
   const posEase: Ease[] = [];
@@ -76,7 +78,7 @@ const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduce
     top.push((from.top + to.top) / 2);
     left.push((from.left + to.left) / 2);
     y.push(lift ? -height : 0);
-    scale.push(lift ? grow : 1);
+    scale.push(((sizeAt(from) + sizeAt(to)) / 2) * (lift ? grow : 1));
     times.push((elapsed + durations[i] / 2) / total);
     yEase.push(lift ? "easeOut" : "linear");
     // a leap speeds up and slows down along the way; hops move evenly
@@ -87,7 +89,7 @@ const buildHopAnimation = (positions: PiecePosition[], squares: number[], reduce
     top.push(to.top);
     left.push(to.left);
     y.push(0);
-    scale.push(1);
+    scale.push(sizeAt(to));
     times.push(elapsed / total);
     yEase.push(lift ? "easeIn" : "linear");
     posEase.push(kind === "jump" ? "easeOut" : "linear");
@@ -159,31 +161,48 @@ export const GamePieces: React.FC<Props> = ({ socketService }) => {
 
     const pos: PiecePosition = getPiecePosition(gameState!, squareId, index);
     const animate = playerIdToMove.length > 0 && playerIdToMove === p._id;
+    const icon = <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" fixedWidth />;
 
     if (gameState && animate) {
-
-      const hop = buildHopAnimation(getMovementKeyFrames(gameState, frames), frames, !!reduceMotion);
+      // land in the spot this piece will have among the players already there
+      const dest = frames[frames.length - 1];
+      const onDest = gameState.players.filter((pl) =>
+        pl.state !== PlayerState.BANKRUPT && (pl._id === p._id || pl.position === dest));
+      const end = { index: Math.max(0, onDest.findIndex((pl) => pl._id === p._id)), count: onDest.length };
+      const hop = buildHopAnimation(getMovementKeyFrames(frames, pos, end), frames, !!reduceMotion);
 
       return (
         <motion.div className="single-piece moving" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-          style={{ top: pos.top, left: pos.left }}
+          style={{ top: pos.top, left: pos.left, scale: pos.scale ?? 1 }}
           animate={hop.animate}
           transition={hop.transition}
           onAnimationComplete={onFinishPieceMovement}
         >
-          <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
+          <span className="piece-icon">{icon}</span>
         </motion.div>);
+    }
+
+    // too crowded to show everyone (phones): the first piece carries a count
+    if (pos.hidden) {
+      return null;
     }
 
     return (
       <div className="single-piece" id={getPieceId(p)} key={getObjectIdAsHexString(p._id)}
-        style={{ top: pos.top, left: pos.left, bottom: pos.bottom, right: pos.right }}>
-        <FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} size="2x" />
+        style={{ top: pos.top, left: pos.left, transform: `scale(${pos.scale ?? 1})` }}>
+        <span className="piece-icon">
+          {icon}
+          {pos.badge && <span className="piece-badge" title={pos.badge + " players on this square"}>×{pos.badge}</span>}
+        </span>
       </div>);
   };
 
   return (
-    displayGamePieces()
+    <React.Fragment>
+      {/* same styles as a piece, never shown: its size drives the board layout maths */}
+      <div className="single-piece piece-probe" aria-hidden="true" />
+      {displayGamePieces()}
+    </React.Fragment>
   );
 
 

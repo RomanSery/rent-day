@@ -66,7 +66,6 @@
   /* pieces live outside the board element; sized to the smaller squares */
   html:has(.game-board) .single-piece {
     font-size: min(2.6vw, 1.35svh);
-    padding-left: 2px;
   }
 
   .game-board {

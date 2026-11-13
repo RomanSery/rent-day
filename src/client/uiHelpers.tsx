@@ -316,57 +316,94 @@ export const getNumPlayersOnSquare = (gameState: GameState, squareId: number) =>
   return gameState.players.filter((p) => p.position === squareId && p.state !== PlayerState.BANKRUPT).length;
 }
 
-const getTopPosition = (rect: DOMRect, section: BoardSection) => {
-  if (section === BoardSection.Bottom) {
-    return rect.top + (rect.height / 2);
-  }
-  if (section === BoardSection.Top) {
-    return (rect.height / 4);
-  }
+/** share of a grid cell a piece may fill */
+const PIECE_FILL = 0.9;
+/** pieces drawn smaller than this (px tall) are unreadable: show one piece and a count instead */
+const MIN_PIECE_PX = 11;
 
-  return rect.top;
-}
+/**
+ * Size of a lone piece, read from the hidden probe GamePieces renders with the
+ * same CSS as the pieces (the size follows the window). Icons are drawn at 2x
+ * with a fixed width of 1.25em, so a piece is 2.5em wide and 2em tall.
+ */
+const basePieceSize = (): { w: number; h: number } => {
+  const probe = document.querySelector(".piece-probe");
+  const fontSize = probe ? parseFloat(getComputedStyle(probe).fontSize) : NaN;
+  const f = Number.isFinite(fontSize) && fontSize > 0 ? fontSize : 16;
+  return { w: 2.5 * f, h: 2 * f };
+};
 
-const getLeftPosition = (rect: DOMRect, section: BoardSection, numOnSquare: number, index: number) => {
-  let offset = 0;
-  if (numOnSquare > 1 && index > 0) {
-    const multiplier = numOnSquare === 2 ? 3 : (numOnSquare >= 4 ? 8 : 4);
-    const divisionFactor = numOnSquare * multiplier;
-    offset = (index * numOnSquare * (rect.width / divisionFactor));
-  }
-
-
-  if (section === BoardSection.Right) {
-    return rect.left + (rect.width / 8) + offset;
-  }
-
-  return rect.left + offset;
-}
-
-export const getPiecePosition = (gameState: GameState, squareId: number, index: number): PiecePosition => {
-  const numOnSquare = getNumPlayersOnSquare(gameState, squareId);
-  const section: BoardSection = SquareConfigDataMap.get(squareId)?.section!;
+/**
+ * Where piece `index` of `count` sits on a square. A crowded square is laid
+ * out as a grid (whichever columns-by-rows lets the pieces be biggest, the last
+ * row centred), shrinking the pieces only as far as needed to fit. When even
+ * that would make them unreadably small (a phone with five or six players on
+ * one square), a single piece is drawn with a "xN" badge.
+ */
+export const getSquarePieceLayout = (squareId: number, index: number, count: number): PiecePosition => {
   const square = document.getElementById('game-square-' + squareId);
   const rect: DOMRect = square!.getBoundingClientRect();
+  const pad = Math.min(rect.width, rect.height) * 0.06;
+  const w = rect.width - 2 * pad;
+  const h = rect.height - 2 * pad;
+  const base = basePieceSize();
+  const n = Math.max(1, count);
 
-
-  const bottom = rect.bottom;
-  const right = rect.right;
-
-  return {
-    top: getTopPosition(rect, section), left: getLeftPosition(rect, section, numOnSquare, index), bottom: bottom, right: right
-  };
-}
-
-export const getMovementKeyFrames = (gameState: GameState, moves: Array<number>): Array<PiecePosition> => {
-  const frames: Array<PiecePosition> = [];
-
-  for (let i = 0; i < moves.length; i++) {
-    const squareId = moves[i];
-    frames.push(getPiecePosition(gameState, squareId, 0));
+  let best = { cols: 1, rows: 1, scale: 0 };
+  for (let cols = 1; cols <= n; cols++) {
+    const rows = Math.ceil(n / cols);
+    const scale = Math.min(1, (w / cols) * PIECE_FILL / base.w, (h / rows) * PIECE_FILL / base.h);
+    if (scale > best.scale + 1e-6) {
+      best = { cols, rows, scale };
+    }
   }
 
-  return frames;
+  if (n > 1 && best.scale * base.h < MIN_PIECE_PX) {
+    const scale = Math.min(1, w * PIECE_FILL / base.w, h * PIECE_FILL / base.h);
+    return {
+      top: rect.top + rect.height / 2, left: rect.left + rect.width / 2, bottom: rect.bottom, right: rect.right,
+      scale, hidden: index > 0, badge: index === 0 ? n : undefined,
+    };
+  }
+
+  const { cols, rows, scale } = best;
+  const col = index % cols;
+  const row = Math.floor(index / cols);
+  const inThisRow = row === rows - 1 ? n - cols * (rows - 1) : cols;
+  const cellW = w / cols;
+  const cellH = h / rows;
+  const rowShift = ((cols - inThisRow) * cellW) / 2;
+
+  return {
+    top: rect.top + pad + cellH * (row + 0.5),
+    left: rect.left + pad + rowShift + cellW * (col + 0.5),
+    bottom: rect.bottom, right: rect.right, scale,
+  };
+};
+
+export const getPiecePosition = (gameState: GameState, squareId: number, index: number): PiecePosition => {
+  return getSquarePieceLayout(squareId, index, getNumPlayersOnSquare(gameState, squareId));
+}
+
+/**
+ * Keyframe positions along a move: the piece's current spot, the middle of
+ * each square it passes, and its spot among the players already on the square
+ * it lands on (so it settles straight into place at its final size).
+ */
+export const getMovementKeyFrames = (
+  moves: Array<number>,
+  start?: PiecePosition,
+  end?: { index: number; count: number }
+): Array<PiecePosition> => {
+  return moves.map((squareId, i) => {
+    if (i === 0 && start) {
+      return start;
+    }
+    if (i === moves.length - 1 && end) {
+      return getSquarePieceLayout(squareId, end.index, end.count);
+    }
+    return getSquarePieceLayout(squareId, 0, 1);
+  });
 }
 
 
