@@ -159,8 +159,11 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
     });
   };
 
-  const isDevEnv = () => {
-    return import.meta.env.DEV;
+  // Dev-only boxes to force the next roll (the server ignores them outside
+  // development). Hidden for now; set to true to bring them back in dev builds.
+  const SHOW_DEV_DICE = false;
+  const showDevDice = () => {
+    return SHOW_DEV_DICE && import.meta.env.DEV;
   }
 
   const countdownRenderer = (props: CountdownRenderProps) => {
@@ -198,7 +201,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
           </div>
 
 
-          {isDevEnv() &&
+          {showDevDice() &&
             <div>
               <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die1" />
               <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die2" />
