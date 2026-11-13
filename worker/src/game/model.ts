@@ -10,6 +10,8 @@ import { Settings } from "@core/types/Settings";
 import { SquareGameData } from "@core/types/SquareGameData";
 import { SquareThemeData } from "@core/types/SquareThemeData";
 import { TradeParticipant } from "@core/types/TradeParticipant";
+import { RentPaid } from "@core/types/RentPaid";
+import { AuctionResult } from "@core/types/AuctionResult";
 
 export interface GameInstanceDocument {
   _id: string;
@@ -31,6 +33,10 @@ export interface GameInstanceDocument {
   log: ChatMsg[];
   gameLength: number | null;
   winner: string | null;
+  /** how the last auction ended, shown on every screen for a while */
+  lastAuction?: AuctionResult;
+  /** the last rent paid, for the rent pop and sound on every screen */
+  lastRent?: RentPaid;
   /** seed of the game's random generator (see random.ts) */
   seed?: number;
   /** the generator's current state; never sent to players */

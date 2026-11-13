@@ -16,6 +16,7 @@ import useGameStateStore from "../stores/gameStateStore";
 import { ActionEligibility, getActionEligibility } from "../squares/actionEligibility";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { SquarePops } from "../juice/SquarePops";
 
 /** icon on the squares a click would work on, per action mode */
 const ACTION_ICONS: Partial<Record<ActionMode, IconDefinition>> = {
@@ -238,6 +239,8 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
 
         {actionTarget?.eligible && actionIcon &&
           <span className="action-chip" aria-hidden="true"><FontAwesomeIcon icon={actionIcon} /></span>}
+
+        <SquarePops squareId={id} />
       </div>
     </React.Fragment>
 

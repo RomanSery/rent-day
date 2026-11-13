@@ -10,6 +10,7 @@ import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, List, ListItem, ListItemText } from "@mui/material";
 import useGameStateStore from "../stores/gameStateStore";
+import { NetWorthChart } from "../juice/NetWorthChart";
 
 
 interface Props {
@@ -112,6 +113,8 @@ export const GameOverDialog: React.FC<Props> = ({ open, onLeaveGame }) => {
           </List>
         </Container>
 
+
+        {open && gameState && <NetWorthChart gameId={gameState._id} players={gameState.players} />}
 
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} pageSizeOptions={[10]} autoHeight={true} density="compact"

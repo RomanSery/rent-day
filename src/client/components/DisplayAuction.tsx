@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { celebrateAuctionWin } from "../juice/confetti";
 import { AuctionState } from "../../core/types/AuctionState";
 import { GameContext } from "../../core/types/GameContext";
 import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, getObjectIdAsHexString, handleApiError } from "../helpers";
@@ -52,6 +53,9 @@ export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
     if (isMountedRef.current) {
       socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: AuctionState) => {
         setAuctionState(data);
+        if (data && data.finished && !data.isTie && data.winnerId && areObjectIdsEqual(data.winnerId, getMyUserId())) {
+          celebrateAuctionWin(data._id);
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

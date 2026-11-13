@@ -164,12 +164,14 @@ export class AuctionProcessor {
     this.auction.bidders.sort((a, b) => (a.bid! > b.bid! ? -1 : 1));
 
     const winner = this.auction.bidders[0];
+    let price = 0;
     if (this.isTie(winner.bid!)) {
       this.auction.isTie = true;
     } else {
       this.auction.winnerId = winner._id;
 
       const priceToPay: number = this.getPriceToPay();
+      price = priceToPay;
       PropertyProcessor.purchaseSquare(
         this.game,
         this.auction.squareId,
@@ -200,6 +202,23 @@ export class AuctionProcessor {
         }
       }
     }
+
+    // a summary every screen can show after the auction closes
+    this.game.lastAuction = {
+      auctionId: this.auction._id,
+      squareId: this.auction.squareId,
+      winnerId: this.auction.isTie ? null : this.auction.winnerId,
+      isTie: !!this.auction.isTie,
+      price: Math.round(price),
+      turn: this.game.turnNumber ?? 0,
+      bids: this.auction.bidders.map((b) => ({
+        playerId: b._id,
+        name: b.name,
+        color: b.color,
+        bid: b.bid ?? 0,
+        noBid: !!b.autoBid,
+      })),
+    };
   }
 
   private getPriceToPay(): number {

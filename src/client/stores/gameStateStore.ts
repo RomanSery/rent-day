@@ -5,6 +5,9 @@ import { DiceRollResult } from "../../core/types/DiceRollResult";
 import { GameState } from "../../core/types/GameState";
 import { ServerMsg } from "../../core/types/ServerMsg";
 import { TradeOffer } from "../../core/types/TradeOffer";
+import { playEffects } from "../juice/effects";
+import { cancelMoveSounds, playMoveSounds } from "../juice/sfx";
+import { movementStepKinds, movementStepSeconds } from "../../core/movementTiming";
 
 interface GameStateStore {
   data: GameState | undefined;
@@ -164,7 +167,10 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
   },
 
   updateData: (newData: GameState): void => {
+    const prev = get().data;
     set({ data: newData });
+    // rent and building pops and sounds, from what changed
+    playEffects(prev, newData);
   },
   setSquareToView: (square: number): void => {
     set({ squareToView: square, infoFocus: "square" });
@@ -175,10 +181,15 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
 
   clearMovement: (): void => {
     set({ playerIdToMove: "", frames: [] });
+    cancelMoveSounds();
   },
 
   showMovementAnimation: (playerId: string, frames: Array<number>) => {
     set({ playerIdToMove: playerId, frames: frames });
+    // footsteps in time with the piece (GamePieces animates the same steps)
+    if (frames && frames.length > 1) {
+      playMoveSounds(movementStepKinds(frames), movementStepSeconds(frames));
+    }
   },
   setActionMode: (mode: ActionMode): void => {
     set({ actionMode: mode });

@@ -111,6 +111,13 @@ export class MoneyCalculator {
 
     player.money -= Math.round(finalRentToPay);
     owner!.money += Math.round(finalRentToPay);
+    game.lastRent = {
+      seq: (game.lastRent?.seq ?? 0) + 1,
+      squareId,
+      amount: Math.round(finalRentToPay),
+      payerId: player._id,
+      ownerId: owner!._id,
+    };
 
     PlayerCostsCalculator.updatePlayerCosts(game, player);
     PlayerCostsCalculator.updatePlayerCosts(game, owner!);

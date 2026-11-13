@@ -5,6 +5,8 @@ import { Player } from "./Player";
 import { Settings } from "./Settings";
 import { SquareGameData } from "./SquareGameData";
 import { SquareThemeData } from "./SquareThemeData";
+import { RentPaid } from "./RentPaid";
+import { AuctionResult } from "./AuctionResult";
 
 export interface GameState {
   readonly _id: string;
@@ -27,4 +29,10 @@ export interface GameState {
   readonly createdBy: string;
   /** completed turns so far */
   readonly turnNumber?: number;
+  /** how the last auction ended */
+  readonly lastAuction?: AuctionResult;
+  /** the last rent paid in the game */
+  readonly lastRent?: RentPaid;
+  /** shown once the game is over */
+  readonly seed?: number;
 }

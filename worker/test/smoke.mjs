@@ -210,6 +210,12 @@ for (let turn = 0; turn < 10 && game.status === "Active"; turn++) {
       check(au.finished && au.winnerId === bob.id, "auction finished, bob won");
       game = (await cur.post("getGame", { gameId })).data.game;
       check(game.auctionId === null, "auction cleared from game");
+      const result = game.lastAuction;
+      check(result && result.auctionId === au._id && result.winnerId === bob.id, "game keeps the auction result for every screen");
+      // alice bid $0, so bob pays the second-highest bid: $0
+      check(result && result.price === 0 && result.bids.length === 2 &&
+        result.bids[0].playerId === bob.id && result.bids[0].bid === 35 && result.bids[1].bid === 0,
+        "result has the price paid and every bid, highest first");
     }
 
     if (game.lottoId) {
