@@ -11,7 +11,7 @@ import { PieceType } from "../../core/enums/PieceType";
 import { SocketService } from "../sockets/SocketService";
 import { GameEvent } from "../../core/types/GameEvent";
 import {
-  Alert, Box, Button, Chip, Divider, FormHelperText, Paper, Snackbar, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography
+  Alert, Box, Button, Chip, FormHelperText, Paper, Snackbar, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography
 } from "@mui/material";
 import { JoinedGameMsg } from "../../core/types/messages";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -258,147 +258,169 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   return (
     <React.Fragment>
       <Paper elevation={2} className="lobby" sx={{ my: 1, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
-        <Stack spacing={1.5}>
+        {/* name and chips: stacked and centred on narrow screens, one row on wide ones */}
+        <Box sx={{
+          display: "flex", flexDirection: { xs: "column", md: "row" }, alignItems: "center",
+          justifyContent: "space-between", gap: 1,
+          pb: 1.5, mb: 1.5, borderBottom: 1, borderColor: "divider",
+        }}>
+          <Typography component="h2" variant="h5">{game.name}</Typography>
+          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", justifyContent: "center" }}>
+            <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faUsers} />}
+              label={`${game.players.length} of ${game.settings.maxPlayers} seats taken`} />
+            <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faCoins} />}
+              label={`${dollarFormatter.format(game.settings.initialMoney)} each`} />
+            {game.settings.password &&
+              <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faLock} />} label="Password" />}
+          </Stack>
+        </Box>
 
-          <Box sx={{ textAlign: "center" }}>
-            <Typography component="h2" variant="h5">{game.name}</Typography>
-            <Stack direction="row" spacing={1} useFlexGap sx={{ mt: 1, flexWrap: "wrap", justifyContent: "center" }}>
-              <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faUsers} />}
-                label={`${game.players.length} of ${game.settings.maxPlayers} seats taken`} />
-              <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faCoins} />}
-                label={`${dollarFormatter.format(game.settings.initialMoney)} each`} />
-              {game.settings.password &&
-                <Chip size="small" variant="outlined" icon={<FontAwesomeIcon icon={faLock} />} label="Password" />}
-            </Stack>
-          </Box>
+        {/* One column on narrow screens. From md up, the join form gets its
+            own column on the right so a wide, short window needs no scrolling. */}
+        <Box sx={{
+          display: "grid", columnGap: 3, alignContent: "start",
+          gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+          gridTemplateRows: { md: "auto auto 1fr" },
+          gridTemplateAreas: {
+            xs: `"table" "join" "invite" "skills"`,
+            md: `"table join" "invite join" "skills join"`,
+          },
+        }}>
 
-          <Divider />
-          <SectionTitle>At the table</SectionTitle>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1 }}>
-            {game.players.map((p) => (
-              <Seat key={getObjectIdAsHexString(p._id)} player={p} isMe={areObjectIdsEqual(p._id, myUserId)} />
-            ))}
-            {Array.from({ length: openSeats }).map((_, i) => <Seat key={"open-" + i} />)}
-          </Box>
+          <Stack spacing={1.5} sx={{ gridArea: "table", pb: 1.5 }}>
+            <SectionTitle>At the table</SectionTitle>
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 1 }}>
+              {game.players.map((p) => (
+                <Seat key={getObjectIdAsHexString(p._id)} player={p} isMe={areObjectIdsEqual(p._id, myUserId)} />
+              ))}
+              {Array.from({ length: openSeats }).map((_, i) => <Seat key={"open-" + i} />)}
+            </Box>
 
-          {canAddBot &&
-            <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
-              <TextField size="small" select label="Computer skill" id="bot-level" value={botLevel}
-                onChange={(e) => setBotLevel(e.target.value)} sx={{ minWidth: 130 }}
-                slotProps={{ select: { native: true } }}>
-                <option value="Normal">Normal</option>
-                <option value="Easy">Easy</option>
-              </TextField>
-              <Button variant="outlined" onClick={onAddBot} startIcon={<FontAwesomeIcon icon={faRobot} />}
-                sx={{ flex: 1, height: 40 }}>
-                Add computer player
-              </Button>
-            </Stack>
-          }
-
-          <Divider />
-
-          {!joined &&
-            <form onSubmit={handleSubmit(onJoinGame)} noValidate>
-              <Stack spacing={1.5}>
-                <SectionTitle>Join this game</SectionTitle>
-
-                <Box>
-                  <Typography variant="body2" sx={{ mb: 0.5 }}>Piece</Typography>
-                  <Controller name="piece" control={control} rules={{ required: true }}
-                    render={({ field }) => (
-                      <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Piece"
-                        value={field.value || null}
-                        onChange={(_e, v) => { if (v) field.onChange(v); }}>
-                        {PIECES.map((piece) => (
-                          <ToggleButton key={piece} value={piece} aria-label={piece} title={takenPieces.has(piece) ? piece + " (taken)" : piece}
-                            disabled={takenPieces.has(piece)} sx={{ py: 1, ...pickedSx }}>
-                            <FontAwesomeIcon icon={getIconProp(piece)} size="lg" />
-                          </ToggleButton>
-                        ))}
-                      </ToggleButtonGroup>
-                    )} />
-                  {errors.piece && <FormHelperText error>Pick a piece</FormHelperText>}
-                </Box>
-
-                <Box>
-                  <Typography variant="body2" sx={{ mb: 0.5 }}>Class</Typography>
-                  <Controller name="playerClass" control={control} rules={{ required: true }}
-                    render={({ field }) => (
-                      <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Class"
-                        value={field.value || null}
-                        onChange={(_e, v) => { if (v) field.onChange(v); }}
-                        sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)" } }}>
-                        {CLASSES.map((c) => (
-                          <ToggleButton key={c} value={c} sx={{ textTransform: "none", fontWeight: 600, ...pickedSx }}>{c}</ToggleButton>
-                        ))}
-                      </ToggleButtonGroup>
-                    )} />
-                  {errors.playerClass && <FormHelperText error>Pick a class</FormHelperText>}
-                </Box>
-
-                {selectedPlayerClass &&
-                  <Box className="player-class-description" sx={{ bgcolor: "action.hover", borderRadius: 1, px: 1 }}>
-                    {getPlayerClassDescription(selectedPlayerClass)}
-                  </Box>
-                }
-
-                {game.settings.password &&
-                  <TextField size="small" id="gamePwd" required fullWidth label="Game password"
-                    error={!!errors.gamePwd} helperText={errors.gamePwd ? "Password is required" : undefined}
-                    {...pwdField} />
-                }
-
-                <Button variant="contained" color="primary" type="submit" fullWidth size="large" disabled={isSubmitting}>
-                  Join game
+            {canAddBot &&
+              <Stack direction="row" spacing={1} sx={{ alignItems: "flex-start" }}>
+                <TextField size="small" select label="Computer skill" id="bot-level" value={botLevel}
+                  onChange={(e) => setBotLevel(e.target.value)} sx={{ minWidth: 130 }}
+                  slotProps={{ select: { native: true } }}>
+                  <option value="Normal">Normal</option>
+                  <option value="Easy">Easy</option>
+                </TextField>
+                <Button variant="outlined" onClick={onAddBot} startIcon={<FontAwesomeIcon icon={faRobot} />}
+                  sx={{ flex: 1, height: 40 }}>
+                  Add computer player
                 </Button>
               </Stack>
-            </form>
-          }
-
-          {joined &&
-            <Stack spacing={1.5}>
-              <Alert severity="success" icon={<FontAwesomeIcon icon={faCheck} />}>
-                You're in. The game starts when {openSeats === 1 ? "the last seat is" : `all ${openSeats} open seats are`} filled.
-              </Alert>
-              <Button variant="outlined" color="secondary" onClick={onLeaveGame} fullWidth>
-                Leave game
-              </Button>
-            </Stack>
-          }
-
-          <Divider />
-          <SectionTitle>Invite friends</SectionTitle>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
-            <Button variant="outlined" onClick={copyLink}
-              startIcon={<FontAwesomeIcon icon={copied ? faCheck : faLink} />}>
-              {copied ? "Link copied" : "Copy invite link"}
-            </Button>
-            <div className="social-share-cont">
-              <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: shareTitle }} />
-            </div>
-            <div className="social-share-cont">
-              <div id="fb-share-button">
-                <svg viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
-                  <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
-                </svg>
-                <span>Share</span>
-              </div>
-            </div>
+            }
           </Stack>
 
-          <Divider />
-          <SectionTitle>How skills work</SectionTitle>
-          <Box component="dl" className="lobby-skills" sx={{ m: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: 2, rowGap: 0.5 }}>
-            <dt>Luck</dt>
-            <dd>Each point <b>raises</b> your chance to win lotto prizes by <b>{luckAdjustment}%</b></dd>
-            <dt>Negotiation</dt>
-            <dd>Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}%</b></dd>
-            <dt>Corruption</dt>
-            <dd>Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}%</b></dd>
+          <Box sx={{
+            gridArea: "join", pb: 1.5, borderColor: "divider",
+            borderTop: { xs: 1, md: 0 }, pt: { xs: 1.5, md: 0 },
+            borderLeft: { xs: 0, md: 1 }, pl: { md: 3 },
+            }}>
+            {!joined &&
+              <form onSubmit={handleSubmit(onJoinGame)} noValidate>
+                <Stack spacing={1.5}>
+                  <SectionTitle>Join this game</SectionTitle>
+
+                  <Box>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>Piece</Typography>
+                    <Controller name="piece" control={control} rules={{ required: true }}
+                      render={({ field }) => (
+                        <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Piece"
+                          value={field.value || null}
+                          onChange={(_e, v) => { if (v) field.onChange(v); }}>
+                          {PIECES.map((piece) => (
+                            <ToggleButton key={piece} value={piece} aria-label={piece} title={takenPieces.has(piece) ? piece + " (taken)" : piece}
+                              disabled={takenPieces.has(piece)} sx={{ py: 1, ...pickedSx }}>
+                              <FontAwesomeIcon icon={getIconProp(piece)} size="lg" />
+                            </ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
+                      )} />
+                    {errors.piece && <FormHelperText error>Pick a piece</FormHelperText>}
+                  </Box>
+
+                  <Box>
+                    <Typography variant="body2" sx={{ mb: 0.5 }}>Class</Typography>
+                    <Controller name="playerClass" control={control} rules={{ required: true }}
+                      render={({ field }) => (
+                        <ToggleButtonGroup exclusive fullWidth size="small" aria-label="Class"
+                          value={field.value || null}
+                          onChange={(_e, v) => { if (v) field.onChange(v); }}
+                          sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)", md: "1fr 1fr", lg: "repeat(4, 1fr)" } }}>
+                          {CLASSES.map((c) => (
+                            <ToggleButton key={c} value={c} sx={{ textTransform: "none", fontWeight: 600, ...pickedSx }}>{c}</ToggleButton>
+                          ))}
+                        </ToggleButtonGroup>
+                      )} />
+                    {errors.playerClass && <FormHelperText error>Pick a class</FormHelperText>}
+                  </Box>
+
+                  {selectedPlayerClass &&
+                    <Box className="player-class-description" sx={{ bgcolor: "action.hover", borderRadius: 1, px: 1 }}>
+                      {getPlayerClassDescription(selectedPlayerClass)}
+                    </Box>
+                  }
+
+                  {game.settings.password &&
+                    <TextField size="small" id="gamePwd" required fullWidth label="Game password"
+                      error={!!errors.gamePwd} helperText={errors.gamePwd ? "Password is required" : undefined}
+                      {...pwdField} />
+                  }
+
+                  <Button variant="contained" color="primary" type="submit" fullWidth size="large" disabled={isSubmitting}>
+                    Join game
+                  </Button>
+                </Stack>
+              </form>
+            }
+
+            {joined &&
+              <Stack spacing={1.5}>
+                <Alert severity="success" icon={<FontAwesomeIcon icon={faCheck} />}>
+                  You're in. The game starts when {openSeats === 1 ? "the last seat is" : `all ${openSeats} open seats are`} filled.
+                </Alert>
+                <Button variant="outlined" color="secondary" onClick={onLeaveGame} fullWidth>
+                  Leave game
+                </Button>
+              </Stack>
+            }
           </Box>
 
-        </Stack>
+          <Stack spacing={1.5} sx={{ gridArea: "invite", py: 1.5, borderTop: 1, borderColor: "divider" }}>
+            <SectionTitle>Invite friends</SectionTitle>
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: "wrap", alignItems: "center" }}>
+              <Button variant="outlined" onClick={copyLink}
+                startIcon={<FontAwesomeIcon icon={copied ? faCheck : faLink} />}>
+                {copied ? "Link copied" : "Copy invite link"}
+              </Button>
+              <div className="social-share-cont">
+                <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: shareTitle }} />
+              </div>
+              <div className="social-share-cont">
+                <div id="fb-share-button">
+                  <svg viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
+                    <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
+                  </svg>
+                  <span>Share</span>
+                </div>
+              </div>
+            </Stack>
+          </Stack>
+
+          <Stack spacing={1} sx={{ gridArea: "skills", pt: 1.5, borderTop: 1, borderColor: "divider" }}>
+            <SectionTitle>How skills work</SectionTitle>
+            <Box component="dl" className="lobby-skills" sx={{ m: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: 2, rowGap: 0.5 }}>
+              <dt>Luck</dt>
+              <dd>Each point <b>raises</b> your chance to win lotto prizes by <b>{luckAdjustment}%</b></dd>
+              <dt>Negotiation</dt>
+              <dd>Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}%</b></dd>
+              <dt>Corruption</dt>
+              <dd>Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}%</b></dd>
+            </Box>
+          </Stack>
+
+        </Box>
       </Paper>
 
       <Snackbar

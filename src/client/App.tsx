@@ -206,7 +206,7 @@ const DisplayJoinGamePage: React.FC = () => {
   const socket = React.useMemo(() => new SocketService(PageType.Join, gameId), [gameId]);
 
   return (
-    <Page maxWidth="sm">
+    <Page maxWidth="lg">
       <QueryClientProvider client={queryClient}>
         <JoinGame socketService={socket} />
       </QueryClientProvider>
@@ -242,7 +242,7 @@ const CreateGamePage: React.FC = () => {
   useRedirectToGame(PageType.Find);
 
   return (
-    <Page maxWidth="xs">
+    <Page maxWidth="lg">
       <CreateGame />
     </Page>
   );

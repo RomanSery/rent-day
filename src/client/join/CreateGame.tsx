@@ -2,7 +2,7 @@ import React from "react";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useForm, SubmitHandler, FieldErrors } from "react-hook-form";
 import {
-  Button, Divider, FormControlLabel, InputAdornment, Paper, Stack, Switch, TextField, Typography
+  Box, Button, FormControlLabel, InputAdornment, Paper, Stack, Switch, TextField, Typography
 } from "@mui/material";
 import API from '../api';
 import { getGameContextFromLocalStorage, handleApiError } from "../helpers";
@@ -55,12 +55,23 @@ const errorFor = (errors: FieldErrors<Inputs>, name: keyof Inputs): string | und
 };
 
 /**
- * Two fields side by side on wider screens, stacked on phones. Flexbox, not
- * CSS grid: the board's `.board div:nth-child(n)` grid placement rules would
- * also reposition the cells of any grid nested inside the board.
+ * Two fields side by side when there is room, stacked otherwise. At md the
+ * form switches to three narrow section columns, so pairs stack again until
+ * the columns are wide enough at lg.
  */
 const Pair: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ "& > *": { flex: 1 } }}>{children}</Stack>
+  <Stack direction={{ xs: "column", sm: "row", md: "column", lg: "row" }} spacing={2} sx={{ "& > *": { flex: 1 } }}>{children}</Stack>
+);
+
+/** A section of the form: stacked with a rule above on narrow screens, a column with a rule beside it on wide ones. */
+const Section: React.FC<{ first?: boolean; children: React.ReactNode }> = ({ first, children }) => (
+  <Stack spacing={1.5} sx={first ? {} : {
+    borderColor: "divider",
+    borderTop: { xs: 1, md: 0 }, pt: { xs: 1.5, md: 0 },
+    borderLeft: { xs: 0, md: 1 }, pl: { md: 3 },
+  }}>
+    {children}
+  </Stack>
 );
 
 const SectionTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => (
@@ -102,67 +113,79 @@ export const CreateGame: React.FC = () => {
       .catch(handleApiError);
 
   return (
-    <Paper elevation={2} sx={{ my: 1, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
+    <Paper elevation={2} sx={{ my: 1, mx: "auto", maxWidth: { xs: 480, md: "none" }, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
       <Typography component="h2" variant="h5" sx={{ textAlign: "center", mb: 1 }}>Create Game</Typography>
 
       <form onSubmit={handleSubmit(onCreateGame)} noValidate>
-        <Stack spacing={1.5}>
+        {/* one column on narrow screens; Game, Players and Rules side by side
+            from md up, so a wide, short window needs no scrolling */}
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" }, columnGap: 3, rowGap: 1.5 }}>
 
-          <SectionTitle>Game</SectionTitle>
-          <TextField size="small" label="Game name" fullWidth required autoFocus id="gameName"
-            error={!!errors.gameName} helperText={errorFor(errors, "gameName")}
-            {...field("gameName", { required: true, maxLength: 30, minLength: 4 })} />
-          <TextField size="small" label="Password" fullWidth id="gamePwd"
-            helperText="Optional. Players need it to join."
-            {...field("gamePwd", { required: false })} />
+          <Section first>
+            <SectionTitle>Game</SectionTitle>
+            <TextField size="small" label="Game name" fullWidth required autoFocus id="gameName"
+              error={!!errors.gameName} helperText={errorFor(errors, "gameName")}
+              {...field("gameName", { required: true, maxLength: 30, minLength: 4 })} />
+            <TextField size="small" label="Password" fullWidth id="gamePwd"
+              helperText="Optional. Players need it to join."
+              {...field("gamePwd", { required: false })} />
+          </Section>
 
-          <Divider />
-          <SectionTitle>Players</SectionTitle>
-          <Pair>
-            <TextField size="small" label="Seats" type="number" fullWidth required id="maxPlayers"
-              slotProps={{ htmlInput: { min: 2, max: 6 } }}
-              error={!!errors.maxPlayers} helperText={errorFor(errors, "maxPlayers") ?? "2 to 6"}
-              {...field("maxPlayers", { required: true, min: 2, max: 6 })} />
-            <TextField size="small" label="Computer players" type="number" fullWidth id="numBots"
-              slotProps={{ htmlInput: { min: 0, max: 5 } }}
-              error={!!errors.numBots} helperText={errorFor(errors, "numBots") ?? "Fill the empty seats"}
-              {...field("numBots", {
-                min: 0, max: 5,
-                validate: { fitsTable: (v, all) => Number(v) <= Number(all.maxPlayers) - 1 },
-              })} />
-          </Pair>
-          <TextField size="small" select label="Computer skill" fullWidth id="botLevel" disabled={!hasBots}
-            slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
-            helperText={hasBots ? "The game starts as soon as the humans have joined" : "Add computer players to choose"}
-            {...field("botLevel")}>
-            <option value="Normal">Normal</option>
-            <option value="Easy">Easy</option>
-          </TextField>
+          <Section>
+            <SectionTitle>Players</SectionTitle>
+            <Pair>
+              <TextField size="small" label="Seats" type="number" fullWidth required id="maxPlayers"
+                slotProps={{ htmlInput: { min: 2, max: 6 } }}
+                error={!!errors.maxPlayers} helperText={errorFor(errors, "maxPlayers") ?? "2 to 6"}
+                {...field("maxPlayers", { required: true, min: 2, max: 6 })} />
+              <TextField size="small" label="Computer players" type="number" fullWidth id="numBots"
+                slotProps={{ htmlInput: { min: 0, max: 5 } }}
+                error={!!errors.numBots} helperText={errorFor(errors, "numBots") ?? "Fill the empty seats"}
+                {...field("numBots", {
+                  min: 0, max: 5,
+                  validate: { fitsTable: (v, all) => Number(v) <= Number(all.maxPlayers) - 1 },
+                })} />
+            </Pair>
+            <TextField size="small" select label="Computer skill" fullWidth id="botLevel" disabled={!hasBots}
+              slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
+              helperText={hasBots ? "The game starts as soon as the humans have joined" : "Add computer players to choose"}
+              {...field("botLevel")}>
+              <option value="Normal">Normal</option>
+              <option value="Easy">Easy</option>
+            </TextField>
+          </Section>
 
-          <Divider />
-          <SectionTitle>Rules</SectionTitle>
-          <Pair>
-            <TextField size="small" label="Starting money" fullWidth required id="initialMoney" type="number"
-              slotProps={{
-                htmlInput: { min: 500, max: 5000, step: 100 },
-                input: { startAdornment: <InputAdornment position="start">$</InputAdornment> },
-              }}
-              error={!!errors.initialMoney} helperText={errorFor(errors, "initialMoney") ?? "$500 to $5,000"}
-              {...field("initialMoney", { required: true, min: 500, max: 5000 })} />
-            <TextField size="small" label="Skill points" type="number" fullWidth required id="initialSkillPoints"
-              slotProps={{ htmlInput: { min: 0, max: 10 } }}
-              error={!!errors.initialSkillPoints} helperText={errorFor(errors, "initialSkillPoints") ?? "Per player, 0 to 10"}
-              {...field("initialSkillPoints", { required: true, min: 0, max: 10 })} />
-          </Pair>
-          <FormControlLabel
-            control={<Switch defaultChecked color="primary" id="useTimers" {...field("useTimers")} />}
-            label="Turn timers"
-          />
+          <Section>
+            <SectionTitle>Rules</SectionTitle>
+            <Pair>
+              <TextField size="small" label="Starting money" fullWidth required id="initialMoney" type="number"
+                slotProps={{
+                  htmlInput: { min: 500, max: 5000, step: 100 },
+                  input: { startAdornment: <InputAdornment position="start">$</InputAdornment> },
+                }}
+                error={!!errors.initialMoney} helperText={errorFor(errors, "initialMoney") ?? "$500 to $5,000"}
+                {...field("initialMoney", { required: true, min: 500, max: 5000 })} />
+              <TextField size="small" label="Skill points" type="number" fullWidth required id="initialSkillPoints"
+                slotProps={{ htmlInput: { min: 0, max: 10 } }}
+                error={!!errors.initialSkillPoints} helperText={errorFor(errors, "initialSkillPoints") ?? "Per player, 0 to 10"}
+                {...field("initialSkillPoints", { required: true, min: 0, max: 10 })} />
+            </Pair>
+            <FormControlLabel
+              control={<Switch defaultChecked color="primary" id="useTimers" {...field("useTimers")} />}
+              label="Turn timers"
+            />
+          </Section>
 
-          <Button variant="contained" color="primary" type="submit" fullWidth disabled={isSubmitting}>
+        </Box>
+
+        {/* full-width buttons on narrow screens; Back left, Create right on wide ones */}
+        <Stack direction={{ xs: "column", md: "row-reverse" }} spacing={1.5}
+          sx={{ mt: 2, pt: { md: 2 }, borderTop: { md: 1 }, borderColor: "divider", justifyContent: "space-between" }}>
+          <Button variant="contained" color="primary" type="submit" disabled={isSubmitting}
+            sx={{ width: { xs: "100%", md: 240 } }}>
             Create game
           </Button>
-          <Button component={RouterLink} to="/dashboard" fullWidth>Back</Button>
+          <Button component={RouterLink} to="/dashboard" sx={{ width: { xs: "100%", md: "auto" } }}>Back</Button>
         </Stack>
       </form>
     </Paper>
