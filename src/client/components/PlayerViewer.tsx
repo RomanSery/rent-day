@@ -1,211 +1,52 @@
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRobot } from "@fortawesome/free-solid-svg-icons";
 import { Player } from "../../core/types/Player";
 import { SkillType } from "../../core/enums/SkillType";
-import { PlayerClass } from "../../core/enums/PlayerClass";
-import { areObjectIdsEqual, dollarFormatter, getGameContextFromLocalStorage, getMyUserId, handleApiError } from '../helpers';
-import { faPlusSquare } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { GameContext } from '../../core/types/GameContext';
-import API from '../api';
-import { SocketService } from '../sockets/SocketService';
-import { GameEvent } from '../../core/types/GameEvent';
-import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from '../uiHelpers';
-import useGameStateStore from '../stores/gameStateStore';
-
+import { dollarFormatter, getIconProp } from "../helpers";
+import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from "../uiHelpers";
+import useGameStateStore from "../stores/gameStateStore";
 
 interface Props {
-  socketService: SocketService;
-  getPlayer: () => Player | undefined;
+  player: Player;
 }
 
-export const PlayerViewer: React.FC<Props> = ({ getPlayer, socketService }) => {
+/** One label/value cell of an info card. */
+export const InfoItem: React.FC<{ label: React.ReactNode; children: React.ReactNode; wide?: boolean }> = ({ label, children, wide }) => (
+  <div className={wide ? "info-item wide" : "info-item"}>
+    <div className="info-label">{label}</div>
+    <div className="info-value">{children}</div>
+  </div>
+);
 
-  const context: GameContext = getGameContextFromLocalStorage();
+/** A player's money, costs and skills, shown in the game screen's info card. */
+export const PlayerViewer: React.FC<Props> = ({ player }) => {
+
   const gameState = useGameStateStore(state => state.data);
 
-  const getPlayerName = () => {
-    const p = getPlayer();
-    if (p) {
-      return p.name + " - " + PlayerClass[p.playerClass];
-    }
-    return "";
-  }
-
-  const getColorStyle = (): React.CSSProperties => {
-    const p = getPlayer();
-    if (p) {
-      return { backgroundColor: p.color };
-    }
-    return {};
-  };
-
-  const getPlayerMoney = () => {
-    const p = getPlayer();
-    if (p) {
-      return dollarFormatter.format(p.money);
-    }
-    return "";
-  }
-
-  const getPlayerTotalAssets = () => {
-    const p = getPlayer();
-    if (p) {
-      return dollarFormatter.format(p.totalAssets);
-    }
-    return "";
-  }
-
-  const getPlayerPointsAvailable = () => {
-    const p = getPlayer();
-    if (p) {
-      return p.numAbilityPoints;
-    }
-    return "";
-  }
-
-  const hasPointsAvailable = () => {
-    const p = getPlayer();
-    if (p && p.numAbilityPoints > 0) {
-      return true;
-    }
-    return false;
-  }
-
-  const getPlayerTaxes = () => {
-    const p = getPlayer();
-    if (p) {
-      return dollarFormatter.format(p.taxesPerTurn);
-    }
-    return "";
-  }
-
-  const getPlayerElectricityCosts = () => {
-    const p = getPlayer();
-    if (p) {
-      return dollarFormatter.format(p.electricityCostsPerTurn);
-    }
-    return "";
-  }
-
-  const getSkill = (skillType: SkillType) => {
-    const p = getPlayer();
-    if (p) {
-      if (skillType === SkillType.Negotiation) {
-        return p.negotiation;
-      } else if (skillType === SkillType.Luck) {
-        return p.luck;
-      } else if (skillType === SkillType.Corruption) {
-        return p.corruption;
-      }
-    }
-    return 0;
-  }
-
-  const isMyTurn = () => {
-    const uid = getMyUserId();
-    return uid && gameState && gameState.nextPlayerToAct && areObjectIdsEqual(uid, gameState.nextPlayerToAct) && gameState.auctionId == null;
-  }
-
-  const upgradeSkill = async (skillType: SkillType) => {
-    API.post("actions/upgradeSkill", { skillType: skillType, context })
-      .then(function (response) {
-        if (socketService && gameState) {
-          socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
-        }
-      })
-      .catch(handleApiError);
-  };
-
-  const canUpgradeSkill = () => {
-    const p = getPlayer();
-    return p && areObjectIdsEqual(p._id, getMyUserId()) && p.numAbilityPoints > 0 && isMyTurn() ? true : false;
-  }
-
-
   return (
-    <React.Fragment>
-      <div className="player-name" style={getColorStyle()}>{getPlayerName()}</div>
-      <div className="info-tables">
-        <TableContainer component={Paper} className="rent-info">
-          <Table size="small" aria-label="a dense table">
-            <TableBody>
-              <TableRow key="playerViewer1">
-                <TableCell component="th" scope="row">
-                  <div className="row-small-name">Money</div> {getPlayerMoney()}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  <div className="row-small-name">{getTotalAssetsTooltip()}</div>
-                  {getPlayerTotalAssets()}
-                </TableCell>
-              </TableRow>
-              <TableRow key="playerViewer2">
-                <TableCell component="th" scope="row">
-                  <div className="row-small-name">{getTaxTooltip(gameState, getPlayer(), "Tax")}</div>
-                  {getTaxTooltip(gameState, getPlayer(), getPlayerTaxes())}
-                </TableCell>
-                <TableCell component="th" scope="row">
-                  <div className="row-small-name">{getElectricityTooltip(gameState, getPlayer(), "Electricity")}</div>
-                  {getElectricityTooltip(gameState, getPlayer(), getPlayerElectricityCosts())}
-                </TableCell>
-              </TableRow>
-
-              {hasPointsAvailable() && <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div><strong>Distribute your points!</strong></div>
-                </TableCell>
-              </TableRow>}
-
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <TableContainer component={Paper} className="other-info">
-          <Table size="small" aria-label="a dense table">
-            <TableBody>
-
-              <TableRow key="playerViewer4">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Negotiation)}</div>
-                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Negotiation)} /> : null}
-                  {getSkill(SkillType.Negotiation)}
-                </TableCell>
-              </TableRow>
-
-              <TableRow key="playerViewer5">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Luck)}</div>
-                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Luck)} /> : null}
-                  {getSkill(SkillType.Luck)}
-                </TableCell>
-              </TableRow>
-
-              <TableRow key="playerViewer6">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div className="row-small-name">{getSkillTypeTooltip(SkillType.Corruption)}</div>
-                  {canUpgradeSkill() ? <FontAwesomeIcon className="upgrade-skill" size="2x" icon={faPlusSquare} onClick={() => upgradeSkill(SkillType.Corruption)} /> : null}
-                  {getSkill(SkillType.Corruption)}
-                </TableCell>
-              </TableRow>
-
-              <TableRow key="playerViewer7">
-                <TableCell component="th" scope="row" colSpan={2}>
-                  <div className="row-small-name">Available</div>
-                  {getPlayerPointsAvailable()}
-                </TableCell>
-              </TableRow>
-
-            </TableBody>
-          </Table>
-        </TableContainer>
+    <div className="info-card-body">
+      <div className="info-card-header" style={{ borderColor: player.color }}>
+        <FontAwesomeIcon icon={getIconProp(player.type)} color={player.color} />
+        <span className="info-card-title">{player.name}</span>
+        <span className="info-card-sub">{player.playerClass}{player.isBot ? <> · <FontAwesomeIcon icon={faRobot} /> computer</> : null}</span>
       </div>
 
-    </React.Fragment>
+      <div className="info-grid">
+        <InfoItem label="Money">{dollarFormatter.format(player.money)}</InfoItem>
+        <InfoItem label={getTotalAssetsTooltip()}>{dollarFormatter.format(player.totalAssets)}</InfoItem>
+        <InfoItem label={getTaxTooltip(gameState, player, "Tax / turn")}>
+          {getTaxTooltip(gameState, player, dollarFormatter.format(player.taxesPerTurn))}
+        </InfoItem>
+        <InfoItem label={getElectricityTooltip(gameState, player, "Electricity / turn")}>
+          {getElectricityTooltip(gameState, player, dollarFormatter.format(player.electricityCostsPerTurn))}
+        </InfoItem>
+        <InfoItem label={getSkillTypeTooltip(SkillType.Negotiation)}>{player.negotiation}</InfoItem>
+        <InfoItem label={getSkillTypeTooltip(SkillType.Luck)}>{player.luck}</InfoItem>
+        <InfoItem label={getSkillTypeTooltip(SkillType.Corruption)}>{player.corruption}</InfoItem>
+        {player.numAbilityPoints > 0 && <InfoItem label="Unspent points">{player.numAbilityPoints}</InfoItem>}
+      </div>
+    </div>
   );
 
 };

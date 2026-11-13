@@ -90,7 +90,7 @@
     min-height: 0;
     overflow: hidden;
     padding: 4px;
-    background: #eaeaea;
+    background: #eef0f2;
   }
 
   .board-hub .players-display {
@@ -102,14 +102,27 @@
   }
 
   .board-hub .player-info {
-    margin: 0;
-    min-width: 0;
-    padding: 0 4px 4px;
+    padding: 4px 6px;
   }
 
-  .board-hub .player-info .sub-name {
+  /* hub cells are narrow: money drops under the name */
+  .board-hub .player-row-main {
     flex-wrap: wrap;
-    column-gap: 4px;
+  }
+
+  .board-hub .player-info .money {
+    width: 100%;
+    padding-left: 24px;
+    font-size: 14px;
+  }
+
+  .board-hub .player-row-sub {
+    padding-left: 24px;
+    flex-wrap: wrap;
+  }
+
+  .board-hub .player-costs {
+    margin-left: 0;
   }
 
   /* the controls panel: full width under the board, scrolling on its own */
@@ -127,62 +140,25 @@
 
   .game-board .center-left-side {
     flex-basis: 100%;
-    min-width: 0;
+    gap: 8px;
   }
 
-  .game-board .game-results {
-    justify-content: flex-start;
-    align-items: center;
-    gap: 8px;
+  .game-board .turn-bar {
+    padding: 6px 8px;
+    gap: 4px 10px;
   }
 
   .game-board .game-results .description {
-    font-size: 0.95rem;
-    min-width: 0;
-  }
-
-  .game-board .die-face {
-    width: 44px;
-    height: 44px;
-    margin: 6px;
-    padding: 6px;
-  }
-
-  .game-board .pip {
-    width: 10px;
-    height: 10px;
+    font-size: 14px;
   }
 
   /* thumb-sized buttons */
-  .game-board .player-actions {
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 0;
-  }
-
   .game-board .player-actions .MuiButton-root {
     min-height: 44px;
   }
 
-  .game-board .second-row {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .game-board .second-row .player-viewer,
-  .game-board .second-row .property-viewer {
-    flex-basis: auto;
-  }
-
-  /* the square you just tapped comes first, right under the buttons */
-  .game-board .second-row .property-viewer {
-    order: -1;
-  }
-
-  .game-board .chat-row {
-    height: auto;
-    max-height: 12rem;
-    overflow-y: auto;
+  /* the panel scrolls as a whole, so an expanded log gets a height limit */
+  .game-board .log-strip.expanded .log-strip-list {
+    max-height: 14rem;
   }
 }

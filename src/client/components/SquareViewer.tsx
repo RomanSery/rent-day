@@ -1,429 +1,146 @@
-import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain, faTree } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import React from "react";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, dollarFormatter } from "../helpers";
 import useGameStateStore from "../stores/gameStateStore";
+import { InfoItem } from "./PlayerViewer";
 
-interface Props {
+const houses = (n: number) => (
+  <span className="info-houses">{Array.from({ length: n }).map((_, i) => <FontAwesomeIcon key={i} icon={faHome} />)}</span>
+);
 
-}
-
-export const SquareViewer: React.FC<Props> = () => {
+/** The square last tapped or hovered on the board, shown in the game screen's info card. */
+export const SquareViewer: React.FC = () => {
 
   const gameState = useGameStateStore(state => state.data);
   const squareToView = useGameStateStore(state => state.squareToView);
 
-
-  const getSquareTxt = () => {
-    if (gameState && gameState.theme && squareToView) {
-      return gameState.theme[squareToView].name;
-    }
-    return "";
-  }
-
-  const getInfo = () => {
-    const config = squareToView ? SquareConfigDataMap.get(squareToView) : undefined;
-    if (config == null) {
-      return null;
-    }
-
-    const squareData = getSquareGameData();
-    if (squareData == null) {
-      return null;
-    }
-
-    if (config.type === SquareType.Property) {
-      return getPropertyView(squareData);
-    } else if (config.type === SquareType.TrainStation) {
-      return getTrainStationView(squareData);
-    } else if (config.type === SquareType.Utility) {
-      return getUtilityView();
-    } else if (config.type === SquareType.Chance) {
-      return getChanceView();
-    } else if (config.type === SquareType.Lotto) {
-      return getLottoView();
-    } else if (config.type === SquareType.CentralPark) {
-      return getCentralParkView();
-    } else if (config.type === SquareType.PayDay) {
-      return getPayDayView();
-    } else if (config.type === SquareType.Isolation) {
-      return getIsolationView();
-    } else if (config.type === SquareType.GoToIsolation) {
-      return getGoToIsolationView();
-    }
-
-
+  if (!squareToView || !gameState) {
     return null;
-  };
-
-  const getClassName = () => {
-    if (squareToView == null) {
-      return "";
-    }
-    const groupId: number = SquareConfigDataMap.get(squareToView)?.groupId!;
-    return "property-name square-color-bar " + squareGroupColorMap.get(groupId);
-  };
-
-  const getDescription = () => {
-    if (squareToView == null) {
-      return "";
-    }
-    const description = SquareConfigDataMap.get(squareToView)?.description;
-    return description;
-  };
-
-
-  const getowner = (): string => {
-    const data = getSquareGameData();
-    if (data && gameState && data.owner) {
-      const player = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
-      return player != null ? player.name : "";
-    }
-
-    return "";
-  };
-
-
-  const getNameColorStyle = (): React.CSSProperties => {
-    const data = getSquareGameData();
-    if (data && gameState && data.owner) {
-      const player = gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner));
-      return player != null ? { color: player.color } : {};
-    }
-
-    return {};
-  };
-
-  const getPurchasePrice = (): string => {
-    const data = getSquareGameData();
-    if (data && data.owner && data.purchasePrice) {
-      return dollarFormatter.format(data.purchasePrice);
-    }
-
-    return "";
-  };
-
-  const getMortgageValue = (): string => {
-    const data = getSquareGameData();
-    if (data && data.owner && data.mortgageValue) {
-      return dollarFormatter.format(data.mortgageValue);
-    }
-    return "";
-  };
-
-  const getRedeemCost = (): string => {
-    const data = getSquareGameData();
-    if (data && data.owner && data.mortgageValue) {
-      return dollarFormatter.format(Math.round(data.mortgageValue + data.mortgageValue * 0.1));
-    }
-    return "";
-  };
-
-  const isMortgaged = (): boolean => {
-    const data = getSquareGameData();
-    return data && data.isMortgaged ? true : false;
-  };
-
-  const getIcon = () => {
-    if (squareToView && gameState && gameState.theme) {
-      return gameState.theme[squareToView].icon;
-    }
-    return "";
   }
 
-
-  const getSquareGameData = (): SquareGameData | undefined => {
-    if (squareToView && gameState && gameState.squareState) {
-      return gameState.squareState.find((p: SquareGameData) => p.squareId === squareToView);
-    }
-    return undefined;
-  };
-
-
-  const getSquareTaxAmount = () => {
-    const data = getSquareGameData();
-    if (data && data.owner && data.purchasePrice && data.purchasePrice > 0 && data.tax && data.tax > 0) {
-      const taxRate = data.tax / 100.0;
-      const tax = data.purchasePrice * taxRate;
-      return " (" + dollarFormatter.format(tax) + ")";
-    }
-    return "";
+  const config = SquareConfigDataMap.get(squareToView);
+  const data: SquareGameData | undefined = gameState.squareState?.find((s: SquareGameData) => s.squareId === squareToView);
+  if (!config || !data) {
+    return null;
   }
 
-  const getPropertyView = (config: SquareGameData) => {
-    return (
-      <React.Fragment>
-        <div className={getClassName()}>{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
-        <div className="info-tables">
-          <TableContainer component={Paper} className="rent-info">
-            <Table size="small" aria-label="a dense table">
-              <TableBody>
-                <TableRow key="propertyViewer1">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Base</div> {config.rent0 ? dollarFormatter.format(config.rent0) : ""}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer2">
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /></div> {config.rent1 ? dollarFormatter.format(config.rent1) : ""}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent2 ? dollarFormatter.format(config.rent2) : ""}
-                  </TableCell>
-                </TableRow>
+  const name = gameState.theme ? gameState.theme[squareToView].name : "";
+  const themeIcon = gameState.theme ? gameState.theme[squareToView].icon : "";
+  const owner = data.owner ? gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner)) : undefined;
+  const money = (v: number | undefined | null) => (v ? dollarFormatter.format(v) : "–");
 
-                <TableRow key="propertyViewer4">
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div> {config.rent3 ? dollarFormatter.format(config.rent3) : ""}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name"><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /><FontAwesomeIcon icon={faHome} /></div>
-                    {config.rent4 ? dollarFormatter.format(config.rent4) : ""}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer6">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name"><FontAwesomeIcon icon={faHotel} /></div>
-                    {config.rent5 ? dollarFormatter.format(config.rent5) : ""}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <TableContainer component={Paper} className="other-info">
-            <Table size="small" aria-label="a dense table">
-              <TableBody>
-                <TableRow key="propertyViewer11">
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name">House</div> {config.houseCost ? dollarFormatter.format(config.houseCost) : ""}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name">Electric</div> {config.electricityCost ? dollarFormatter.format(config.electricityCost) : "$0"}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer12">
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name">Tax</div> {config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}
-                  </TableCell>
-                  <TableCell component="th" scope="row" style={getNameColorStyle()}>
-                    <div className="row-small-name">Owner</div> {getowner()}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer14">
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name">Purchase Price</div> {getPurchasePrice()}
-                  </TableCell>
-                  <TableCell component="th" scope="row">
-                    <div className="row-small-name">{isMortgaged() ? "To Redeem" : "Mortgage Value"}</div> {isMortgaged() ? getRedeemCost() : getMortgageValue()}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </React.Fragment>
-    );
+  const taxText = () => {
+    if (!data.tax) {
+      return "–";
+    }
+    if (data.owner && data.purchasePrice && data.purchasePrice > 0) {
+      return `${data.tax}% (${dollarFormatter.format(data.purchasePrice * data.tax / 100)})`;
+    }
+    return `${data.tax}%`;
   };
 
-
-  const getTrainStationView = (config: SquareGameData) => {
-    return (
-      <React.Fragment>
-        <div className="train-station-name square-color-bar">{getSquareTxt()} {isMortgaged() ? " (Mortgaged)" : ""}</div>
-        <div className="info-tables">
-          <TableContainer component={Paper} className="rent-info">
-            <Table size="small" aria-label="a dense table">
-              <TableBody>
-                <TableRow key="stationViewer1">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Base</div> {config.rent0 ? dollarFormatter.format(config.rent0) : ""}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer2">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">2 Stations</div> {config.rent1 ? dollarFormatter.format(config.rent1) : ""}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer3">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">3 Stations</div> {config.rent2 ? dollarFormatter.format(config.rent2) : ""}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer4">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">All 4 stations</div> {config.rent3 ? dollarFormatter.format(config.rent3) : ""}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <TableContainer component={Paper} className="other-info">
-            <Table size="small" aria-label="a dense table">
-              <TableBody>
-                <TableRow key="stationViewer6">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Tax</div> {config.tax ? config.tax + "%" : ""} {getSquareTaxAmount()}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer7">
-                  <TableCell component="th" scope="row" colSpan={2} style={getNameColorStyle()}>
-                    <div className="row-small-name">Owner</div> {getowner()}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer8">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Purchase Price</div> {getPurchasePrice()}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="stationViewer5">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">{isMortgaged() ? "To Redeem" : "Mortgage Value"}</div> {isMortgaged() ? getRedeemCost() : getMortgageValue()}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </React.Fragment>
-    );
-  };
-
-
-  const getUtilityView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">{getSquareTxt()}</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={getIcon() === "subway" ? faTrain : faLightbulb} size="3x" color="blue" />
-        </div>
-        <div className="utility-description">
-          {getDescription()}
-        </div>
-        <div className="info-tables">
-          <TableContainer component={Paper} className="other-info">
-            <Table size="small" aria-label="a dense table">
-              <TableBody>
-                <TableRow key="propertyViewer13">
-                  <TableCell component="th" scope="row" colSpan={2} style={getNameColorStyle()}>
-                    <div className="row-small-name">Owner</div> {getowner()}
-                  </TableCell>
-                </TableRow>
-                <TableRow key="propertyViewer14">
-                  <TableCell component="th" scope="row" colSpan={2}>
-                    <div className="row-small-name">Purchase Price</div> {getPurchasePrice()}
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getChanceView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">Chance</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={faQuestion} size="3x" color="orange" />
-        </div>
-        <div className="utility-description">
-          Take a chance.  <br />Maybe something good will happen.  <br />Or you might regret coming here.
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getLottoView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">NY Lotto</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
-        </div>
-        <div className="utility-description">
-          Play the lotto for a chance to win great prizes!
-          <br />
-          But be careful, it can be very addicting.
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getCentralParkView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">Central park</div>
-        <div className="utility-description">
-          Enjoy a relaxing rent-free day strolling around in the park!
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getPayDayView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">Pay Day</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={faHandHoldingUsd} size="3x" color="green" />
-        </div>
-        <div className="utility-description">
-          It's pay day!
-          <br />
-          Collect your salary plus an additional skill point.
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getIsolationView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">Quarantine</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={faBiohazard} size="4x" color="red" />
-        </div>
-        <div className="utility-description">
-          You don't want to end up here.
-          <br />
-          Unless you are just visiting a friend.
-        </div>
-      </React.Fragment>
-    );
-  };
-
-  const getGoToIsolationView = () => {
-    return (
-      <React.Fragment>
-        <div className="utility-name square-color-bar">Big Brother</div>
-        <div className="utility-icon">
-          <FontAwesomeIcon icon={faEye} size="3x" color="black" />
-        </div>
-        <div className="utility-description">
-          You've been caught violating lockdown rules.
-          <br />
-          If you land here, be ready for forced quarantine.
-        </div>
-      </React.Fragment>
-    );
-  };
-
-
-  return (
-    getInfo()
+  const ownerItems = () => (
+    <React.Fragment>
+      <InfoItem label="Owner">
+        {owner ? <span style={{ color: owner.color, fontWeight: 600 }}>{owner.name}</span> : "For sale"}
+      </InfoItem>
+      <InfoItem label="Bought for">{data.owner ? money(data.purchasePrice) : "–"}</InfoItem>
+      <InfoItem label={data.isMortgaged ? "To redeem" : "Mortgage value"}>
+        {data.owner && data.mortgageValue
+          ? dollarFormatter.format(data.isMortgaged ? Math.round(data.mortgageValue * 1.1) : data.mortgageValue)
+          : "–"}
+      </InfoItem>
+    </React.Fragment>
   );
+
+  /** coloured header bar; properties use their group colour */
+  const header = (className: string, icon?: IconDefinition) => (
+    <div className={"info-card-header square-header " + className}>
+      {icon && <FontAwesomeIcon icon={icon} />}
+      <span className="info-card-title">{name}</span>
+      {data.isMortgaged && <span className="info-card-sub">mortgaged</span>}
+    </div>
+  );
+
+  /** squares that are only a name, an icon and a line of text */
+  const simple = (title: string, icon: IconDefinition, color: string, text: React.ReactNode) => (
+    <div className="info-card-body">
+      <div className="info-card-header square-header plain">
+        <FontAwesomeIcon icon={icon} color={color} />
+        <span className="info-card-title">{title}</span>
+      </div>
+      <p className="info-card-text">{text}</p>
+    </div>
+  );
+
+  switch (config.type) {
+    case SquareType.Property:
+      return (
+        <div className="info-card-body">
+          {header(squareGroupColorMap.get(config.groupId!) ?? "")}
+          <div className="info-grid">
+            <InfoItem label="Rent">{money(data.rent0)}</InfoItem>
+            <InfoItem label={houses(1)}>{money(data.rent1)}</InfoItem>
+            <InfoItem label={houses(2)}>{money(data.rent2)}</InfoItem>
+            <InfoItem label={houses(3)}>{money(data.rent3)}</InfoItem>
+            <InfoItem label={houses(4)}>{money(data.rent4)}</InfoItem>
+            <InfoItem label={<FontAwesomeIcon icon={faHotel} />}>{money(data.rent5)}</InfoItem>
+            <InfoItem label="House cost">{money(data.houseCost)}</InfoItem>
+            <InfoItem label="Electricity">{data.electricityCost ? dollarFormatter.format(data.electricityCost) : "$0"}</InfoItem>
+            <InfoItem label="Tax">{taxText()}</InfoItem>
+            {ownerItems()}
+          </div>
+        </div>
+      );
+
+    case SquareType.TrainStation:
+      return (
+        <div className="info-card-body">
+          {header("station", faTrain)}
+          <div className="info-grid">
+            <InfoItem label="Rent">{money(data.rent0)}</InfoItem>
+            <InfoItem label="2 stations">{money(data.rent1)}</InfoItem>
+            <InfoItem label="3 stations">{money(data.rent2)}</InfoItem>
+            <InfoItem label="All 4">{money(data.rent3)}</InfoItem>
+            <InfoItem label="Tax">{taxText()}</InfoItem>
+            {ownerItems()}
+          </div>
+        </div>
+      );
+
+    case SquareType.Utility:
+      return (
+        <div className="info-card-body">
+          {header("station", themeIcon === "subway" ? faTrain : faLightbulb)}
+          <p className="info-card-text">{config.description}</p>
+          <div className="info-grid">
+            <InfoItem label="Owner">
+              {owner ? <span style={{ color: owner.color, fontWeight: 600 }}>{owner.name}</span> : "For sale"}
+            </InfoItem>
+            <InfoItem label="Bought for">{data.owner ? money(data.purchasePrice) : "–"}</InfoItem>
+          </div>
+        </div>
+      );
+
+    case SquareType.Chance:
+      return simple("Chance", faQuestion, "orange", "Take a chance. Maybe something good will happen, or you might regret coming here.");
+    case SquareType.Lotto:
+      return simple("NY Lotto", faDollarSign, "green", "Play the lotto for a chance to win great prizes. Careful, it can be addictive.");
+    case SquareType.CentralPark:
+      return simple("Central Park", faTree, "green", "Enjoy a relaxing rent-free day strolling around the park.");
+    case SquareType.PayDay:
+      return simple("Pay Day", faHandHoldingUsd, "green", "Collect your salary plus an extra skill point.");
+    case SquareType.Isolation:
+      return simple("Quarantine", faBiohazard, "red", "You don't want to end up here, unless you're just visiting a friend.");
+    case SquareType.GoToIsolation:
+      return simple("Big Brother", faEye, "black", "Caught breaking lockdown rules: land here and you're off to quarantine.");
+    default:
+      return null;
+  }
 
 };

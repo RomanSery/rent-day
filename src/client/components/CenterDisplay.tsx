@@ -4,12 +4,11 @@ import { DisplayPlayers } from "./DisplayPlayers";
 import { DisplayActions } from "./DisplayActions";
 import { SocketService } from "../sockets/SocketService";
 import { DisplayResults } from "./DisplayResults";
-import { PlayerViewer } from "./PlayerViewer";
+import { InfoCard } from "./InfoCard";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
-import { SquareViewer } from "./SquareViewer";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
@@ -48,7 +47,6 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   const setForceDie1 = useGameStateStore(state => state.setForceDie1);
   const setForceDie2 = useGameStateStore(state => state.setForceDie2);
   const setTravelOpen = useGameStateStore(state => state.setTravelOpen);
-  const playerToView = useGameStateStore(state => state.playerToView);
   const setOfferTradeOpen = useGameStateStore(state => state.setOfferTradeOpen);
   const setTradingWithPlayerId = useGameStateStore(state => state.setTradingWithPlayerId);
 
@@ -115,21 +113,8 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
   };
 
-  const getPlayerToView = (): Player | undefined => {
-    if (playerToView && gameState) {
-      return gameState.players.find((p: Player) => areObjectIdsEqual(p._id, playerToView));
-    }
-    if (gameState && gameState.players) {
-      const myUserId = getMyUserId();
-      if (myUserId) {
-        return gameState.players.find((p) => areObjectIdsEqual(p._id, myUserId));
-      }
-      return undefined;
-    }
-    return undefined;
-  }
-
-  const getGameResultsDisplayComp = () => {
+  /** auctions and the lotto need room, so they get a panel under the turn bar */
+  const getStageComp = () => {
     if (!isMountedRef.current) {
       return null;
     }
@@ -139,7 +124,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
     if (gameState?.lottoId) {
       return (<DisplayLotto socketService={socketService} />);
     }
-    return (<DisplayResults socketService={socketService} />);
+    return null;
   }
 
   const tradeWithPlayer = (player: Player) => {
@@ -166,11 +151,23 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
     return SHOW_DEV_DICE && import.meta.env.DEV;
   }
 
+  // The server doesn't send the turn length, so the timer bar measures from
+  // whatever was left when this deadline first arrived (a full turn, normally).
+  const actBy = gameState?.nextPlayerActBy;
+  const turnTotalMs = React.useMemo(
+    () => (actBy ? Math.max(1000, Date.parse(actBy) - Date.now()) : 1),
+    [actBy]
+  );
+
   const countdownRenderer = (props: CountdownRenderProps) => {
-    if (props.minutes > 0) {
-      return <div className="countdown-timer">{props.minutes}:{props.seconds}</div>;
-    }
-    return <div className="countdown-timer">{props.seconds} seconds</div>;
+    const pct = Math.max(0, Math.min(100, (props.total / turnTotalMs) * 100));
+    const low = props.total <= 10000;
+    return (
+      <div className={"turn-timer" + (low ? " low" : "")} title="Time left this turn">
+        <div className="turn-timer-track"><div className="turn-timer-fill" style={{ width: pct + "%" }} /></div>
+        <span className="turn-timer-text">{props.minutes}:{String(props.seconds).padStart(2, "0")}</span>
+      </div>
+    );
   };
 
   const onCountdownComplete = (timeDelta: CountdownTimeDelta) => {
@@ -196,38 +193,39 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
     <React.Fragment>
       <div className="center-square square">
         <div className="center-left-side">
-          <div className="game-results">
-            {getGameResultsDisplayComp()}
-          </div>
 
-
-          {showDevDice() &&
-            <div>
-              <TextField label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die1" />
-              <TextField label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die2" />
+          {/* turn bar: dice and what happened, the buttons, and the turn timer.
+              DisplayResults stays mounted through auctions so its socket
+              listeners are registered once. */}
+          <div className="turn-bar">
+            <div className="game-results">
+              <DisplayResults socketService={socketService} />
             </div>
-          }
 
-
-
-          <div className="player-actions">
-            <DisplayActions tradeWithPlayer={tradeWithPlayer} onRollAction={onRollDice} onTravelAction={onTravel}
-              socketService={socketService}
-            />
+            <div className="player-actions">
+              <DisplayActions tradeWithPlayer={tradeWithPlayer} onRollAction={onRollDice} onTravelAction={onTravel}
+                socketService={socketService}
+              />
+            </div>
 
             {gameState && gameState.settings.useTimers &&
               <Countdown ref={countdownEl} date={gameState?.nextPlayerActBy} renderer={countdownRenderer} onComplete={onCountdownComplete} key={gameState?.nextPlayerActBy} />}
           </div>
 
-          <div className="second-row">
-            <div className="player-viewer">
-              <PlayerViewer socketService={socketService} getPlayer={getPlayerToView} />
+          {showDevDice() &&
+            <div className="dev-dice">
+              <TextField size="small" label="Die1" type="number" onChange={(e) => setForceDie1(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die1" />
+              <TextField size="small" label="Die2" type="number" onChange={(e) => setForceDie2(parseInt(e.currentTarget.value))} slotProps={{ htmlInput: { min: 1, max: 6 } }} name="die2" />
             </div>
-            <div className="property-viewer">
-              <SquareViewer />
-            </div>
+          }
 
-          </div>
+          {(gameState?.auctionId || gameState?.lottoId) &&
+            <div className="turn-stage">
+              {getStageComp()}
+            </div>
+          }
+
+          <InfoCard />
 
           <ChatWindow socketService={socketService} />
 

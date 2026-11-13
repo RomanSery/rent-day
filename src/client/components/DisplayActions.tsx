@@ -16,6 +16,7 @@ import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
+import { SkillPointsButton } from "./SkillPointsButton";
 import useGameStateStore from "../stores/gameStateStore";
 
 
@@ -211,7 +212,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const getRollBtn = () => {
     if (canRoll() && !rollBtnHidden) {
       return (
-        <motion.div animate={{ scale: 1.1 }} transition={{
+        <motion.div animate={{ scale: 1.05 }} transition={{
           duration: 1.0,
           repeat: Infinity,
           repeatDelay: 0
@@ -227,7 +228,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const getCompleteTurnBtn = () => {
     if (canCompleteTurn()) {
       return (
-        <motion.div animate={{ scale: 1.1 }} transition={{
+        <motion.div animate={{ scale: 1.05 }} transition={{
           duration: 1.0,
           repeat: Infinity,
           repeatDelay: 0
@@ -258,23 +259,27 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
 
   const getActionDescription = () => {
     if (actionMode === ActionMode.Mortgage) {
-      return "Click on a property to mortgage it. When done click here";
+      return "Tap a property to mortgage it";
     } else if (actionMode === ActionMode.Redeem) {
-      return "Click on a property to redeem it. When done click here";
+      return "Tap a property to redeem it";
     } else if (actionMode === ActionMode.Build) {
-      return "Click on a property to build houses on. When done click here";
+      return "Tap a property to build a house";
     } else if (actionMode === ActionMode.Sell) {
-      return "Click on a property to sell houses. When done click here";
+      return "Tap a property to sell a house";
     }
   }
 
 
   const getMyActions = () => {
-    const myTurn = isMyTurn();
+    const myTurn = !!isMyTurn();
+    const me = getMyPlayer();
 
     if (actionMode !== ActionMode.None) {
       return (
-        <Button variant="contained" color="primary" onClick={onFinishAction}>{getActionDescription()}</Button>
+        <div className="action-mode-hint">
+          <span>{getActionDescription()}</span>
+          <Button variant="contained" color="primary" size="small" onClick={onFinishAction}>Done</Button>
+        </div>
       );
     }
 
@@ -294,7 +299,9 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
 
         {myTurn ? getCompleteTurnBtn() : null}
 
-        <Button startIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="contained" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
+        {me && <SkillPointsButton socketService={socketService} me={me} myTurn={myTurn} />}
+
+        <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
         <Menu id="my-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Mortgage)}>Mortgage</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>}

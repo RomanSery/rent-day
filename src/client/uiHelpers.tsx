@@ -198,7 +198,7 @@ export const getSkillTypeTooltip = (skill: SkillType) => {
   </HtmlTooltip>);
 }
 
-const getSkillDescription = (type: SkillType): React.JSX.Element => {
+export const getSkillDescription = (type: SkillType): React.JSX.Element => {
 
   if (type === SkillType.Luck) {
     return (

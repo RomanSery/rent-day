@@ -1,7 +1,7 @@
-import React, { TouchEvent } from "react";
+import React from "react";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { areObjectIdsEqual, dollarFormatter, getIconProp } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
 import { faBiohazard, faRobot } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
@@ -12,61 +12,44 @@ interface Props {
   clearPlayer: () => void;
 }
 
+/**
+ * One row of the player list: piece, name and money, with class (and your own
+ * per-turn costs) underneath. The player whose turn it is gets a coloured edge.
+ */
 export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer }) => {
 
   const gameState = useGameStateStore(state => state.data);
 
-  const getColorStyle = (): React.CSSProperties => {
-    if (isPlayersTurn()) {
-      return { borderColor: player.color };
-    }
-    return { borderWidth: 0 };
-  };
+  const isTheirTurn = !!(gameState?.nextPlayerToAct && areObjectIdsEqual(player._id, gameState.nextPlayerToAct));
+  const isMe = areObjectIdsEqual(player._id, getMyUserId());
+  const bankrupt = player.state === PlayerState.BANKRUPT;
 
-  const getNameColorStyle = (): React.CSSProperties => {
-    return { color: player.color };
-  };
-
-  const isPlayersTurn = () => {
-    return gameState && gameState.nextPlayerToAct && areObjectIdsEqual(player._id, gameState.nextPlayerToAct);
-  }
-
-
-  const setPlayerToView = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (player && player._id) {
-      viewPlayer(player);
-    }
-  };
-  const setPlayerToView2 = (event: TouchEvent<HTMLDivElement>) => {
-    if (player && player._id) {
-      viewPlayer(player);
-    }
-  };
-  const leavePlayer = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    clearPlayer();
-  };
-
+  const className = ["player-info", isTheirTurn ? "their-turn" : "", isMe ? "is-me" : "", bankrupt ? "bankrupt" : ""]
+    .filter(Boolean).join(" ");
 
   return (
-    <React.Fragment>
-      <div className="player-info" style={getColorStyle()} onTouchStart={setPlayerToView2} onClick={setPlayerToView} onMouseEnter={setPlayerToView} onMouseLeave={leavePlayer}>
-        <div className="container">
-          <div className="name">
-            <FontAwesomeIcon icon={getIconProp(player.type)} size="2x" color={player.color} />
-            {player.state === PlayerState.IN_ISOLATION ? <FontAwesomeIcon icon={faBiohazard} size="2x" color="black" /> : null}
-            {player.isBot ? <FontAwesomeIcon icon={faRobot} size="1x" color="#555" title="Computer player" /> : null}
-            <div className="ping">{player.playerClass}</div>
-          </div>
-          <div className="sub-name" style={getNameColorStyle()}>
-            {player.name}
-            {player.state !== PlayerState.BANKRUPT ?
-              <div className="money">{dollarFormatter.format(player.money)}</div> :
-              <div className="money-bankrupt">BANKRUPT</div>}
-          </div>
-        </div>
+    <div className={className} style={isTheirTurn ? { borderLeftColor: player.color } : undefined}
+      onTouchStart={() => viewPlayer(player)} onClick={() => viewPlayer(player)}
+      onMouseEnter={() => viewPlayer(player)} onMouseLeave={() => clearPlayer()}>
 
+      <div className="player-row-main">
+        <FontAwesomeIcon className="player-piece" icon={getIconProp(player.type)} color={player.color} fixedWidth />
+        <span className="player-name" style={{ color: player.color }}>{player.name}</span>
+        {bankrupt
+          ? <span className="money money-bankrupt">Bankrupt</span>
+          : <span className="money">{dollarFormatter.format(player.money)}</span>}
       </div>
-    </React.Fragment>
+
+      <div className="player-row-sub">
+        {player.state === PlayerState.IN_ISOLATION && <FontAwesomeIcon icon={faBiohazard} color="#c62828" title="In quarantine" />}
+        {player.isBot && <FontAwesomeIcon icon={faRobot} title="Computer player" />}
+        <span>{player.playerClass}</span>
+        {isMe && !bankrupt && player.taxesPerTurn + player.electricityCostsPerTurn > 0 &&
+          <span className="player-costs" title="Tax and electricity you pay each turn">
+            −{dollarFormatter.format(player.taxesPerTurn + player.electricityCostsPerTurn)}/turn
+          </span>}
+      </div>
+    </div>
   );
 
 };

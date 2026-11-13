@@ -10,6 +10,8 @@ interface GameStateStore {
   data: GameState | undefined;
   actionMode: ActionMode;
   squareToView: number | undefined;
+  /** what the game screen's info card shows: the square or the player last pointed at */
+  infoFocus: "square" | "player";
   playerIdToMove: string;
   frames: Array<number>;
 
@@ -80,6 +82,7 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
   data: undefined,
   actionMode: ActionMode.None,
   squareToView: undefined,
+  infoFocus: "square",
   playerIdToMove: "",
   frames: [],
   snackOpen: false,
@@ -113,7 +116,7 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
   },
 
   setPlayerToView: (newData: string | undefined): void => {
-    set({ playerToView: newData });
+    set({ playerToView: newData, infoFocus: newData ? "player" : "square" });
   },
   setForceDie1: (newData: number | undefined): void => {
     set({ forceDie1: newData });
@@ -164,7 +167,7 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
     set({ data: newData });
   },
   setSquareToView: (square: number): void => {
-    set({ squareToView: square });
+    set({ squareToView: square, infoFocus: "square" });
   },
   setPlayerIdToMove: (playerId: string): void => {
     set({ playerIdToMove: playerId });

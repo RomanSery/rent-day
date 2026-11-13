@@ -1,12 +1,12 @@
 import React from "react";
 import { Player } from "../../core/types/Player";
 import { DisplayPlayer } from "./DisplayPlayer";
-import { getMyUserId, getObjectIdAsHexString } from "../helpers";
+import { getObjectIdAsHexString } from "../helpers";
 import useGameStateStore from "../stores/gameStateStore";
 
 /**
  * The list of players with their money. Hovering or tapping one shows them in
- * the player viewer; leaving goes back to showing yourself. Rendered twice by
+ * the info card; leaving goes back to what it showed before. Rendered twice by
  * the game board (beside the controls, and in the middle of the board on
  * portrait phones) with CSS deciding which one is visible.
  */
@@ -19,8 +19,9 @@ export const DisplayPlayers: React.FC = () => {
     setPlayerToView(player._id);
   };
 
+  // the info card goes back to the square (or yourself) it showed before
   const clearPlayer = () => {
-    setPlayerToView(gameState?.players ? (getMyUserId() ?? undefined) : undefined);
+    setPlayerToView(undefined);
   };
 
   return (

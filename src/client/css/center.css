@@ -1,54 +1,189 @@
+/* The middle of the board.
+
+   In a game: a column on the left with four light cards (turn bar, auction
+   or lotto when one is running, the info card, the log strip) and the player
+   list on the right. One surface style, one set of text sizes, spacing
+   instead of black rules. */
+
 .center-square {
-  background: #eaeaea;
+  background: #eef0f2;
   grid-row-start: 2;
   grid-row-end: 11;
   grid-column-start: 2;
   grid-column-end: 11;
-  padding: 5px 5px 5px 5px;
+  padding: 10px;
+  min-height: 0;
 
   display: flex;
   flex-direction: row;
+  gap: 10px;
 }
 
 /* Menus and forms outside a game: scroll inside the middle of the board
    instead of spilling over the bottom row when the window is short. */
 .static-center {
+  overflow-y: auto;
+}
+
+.center-square .center-left-side {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  /* short windows during an auction: scroll rather than spill over the board */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.center-square > .players-display {
+  flex: 0 0 clamp(170px, 20%, 250px);
   min-height: 0;
   overflow-y: auto;
 }
 
-.center-square .players-display {
-  flex-basis: 15%;
+/* shared card surface */
+.turn-bar,
+.turn-stage,
+.info-card,
+.log-strip,
+.player-info {
+  background: #fff;
+  border: 1px solid #dde1e5;
+  border-radius: 8px;
 }
 
-.center-square .center-left-side {
-  flex-basis: 85%;
-  flex-direction: column;
+/* ---- turn bar ---------------------------------------------------------- */
+
+.turn-bar {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  padding: 8px 12px;
+  flex: none;
 }
 
-.game-results {
+.turn-bar .game-results {
+  flex: 1 1 260px;
+  min-width: 0;
+  min-height: 48px;
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  align-items: center;
+  gap: 12px;
 }
 
-.game-results .dice-roll {
+.game-results .dice-roll,
+.game-results .animated-die-container {
   display: flex;
+  flex: none;
 }
 
 .game-results .description {
   text-align: left;
-  font-size: calc(0.7rem + 0.4vw + 0.5vh);
+  font-size: 15px;
+  line-height: 1.35;
+  min-width: 0;
 }
 
-.auction-container .auction-header {
-  font-weight: bold;
+.turn-bar .die-face {
+  width: 38px;
+  height: 38px;
+  margin: 2px;
+  padding: 5px;
+  box-shadow: inset 0 3px white, inset 0 -3px #bbb, inset 3px 0 #d7d7d7, inset -3px 0 #d7d7d7;
 }
 
+.turn-bar .pip {
+  width: 8px;
+  height: 8px;
+  box-shadow: inset 0 2px #111, inset 0 -2px #555;
+}
+
+.player-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-mode-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 3px 3px 3px 10px;
+  border-radius: 6px;
+  background: #e3f2fd;
+  font-size: 14px;
+}
+
+/* the turn timer: a thin bar across the bottom of the turn bar */
+.turn-timer {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.turn-timer-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #e3e7eb;
+  overflow: hidden;
+}
+
+.turn-timer-fill {
+  height: 100%;
+  background: #1976d2;
+  transition: width 1s linear;
+}
+
+.turn-timer-text {
+  min-width: 32px;
+  text-align: right;
+  font-size: 12px;
+  color: #5f6b76;
+  font-variant-numeric: tabular-nums;
+}
+
+.turn-timer.low .turn-timer-fill {
+  background: #d32f2f;
+}
+
+.turn-timer.low .turn-timer-text {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.dev-dice {
+  display: flex;
+  gap: 8px;
+}
+
+/* ---- auction and lotto -------------------------------------------------- */
+
+.turn-stage {
+  padding: 10px 0;
+  flex: none;
+}
+
+.auction-container .auction-header,
 .lotto-container .header {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 16px;
 }
+
+.auction-container .auction-sub-header {
+  font-size: 13px;
+  color: #5f6b76;
+  margin-bottom: 8px;
+}
+
+.auction-container .bid-table {
+  margin-bottom: 8px;
+}
+
 .lotto-container .lotto-options {
   display: flex;
   flex-direction: row;
@@ -75,137 +210,287 @@
   margin-top: 10px;
 }
 
-.second-row {
+.lotto-result {
+  font-size: 130%;
+  font-weight: bold;
+}
+
+/* ---- info card (a square or a player) --------------------------------- */
+
+.info-card {
+  flex: none;
+  overflow: hidden;
+  text-align: left;
+}
+
+.info-card-header {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-left: 4px solid transparent;
+  border-bottom: 1px solid #e3e7eb;
 }
 
-.second-row .player-viewer {
-  flex-basis: 50%;
-  border: 1px solid black;
+/* player headers; square headers use the board's group colour classes */
+.info-card-header:not(.square-header) {
+  background: #f6f7f9;
 }
 
-.second-row .property-viewer {
-  flex-basis: 60%;
+.info-card-title {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.info-card-sub {
+  margin-left: auto;
+  font-size: 12px;
+  color: #5f6b76;
+}
+
+/* square headers take the property group colour (board.css colour classes) */
+.square-header {
+  border-left: 0;
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.square-header .info-card-sub {
+  color: inherit;
+}
+
+.square-header.station {
+  background: #37474f;
+}
+
+.square-header.light-blue,
+.square-header.yellow,
+.square-header.plain {
+  color: #1d2126;
+  text-shadow: none;
+}
+
+.square-header.plain {
+  background: #f6f7f9;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: 6px 14px;
+  padding: 8px 12px 10px;
+}
+
+.info-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7782;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.info-houses {
+  color: #2e7d32;
+  letter-spacing: 1px;
+}
+
+.info-card-text {
+  margin: 8px 12px 10px;
+  font-size: 14px;
+  color: #37424c;
+}
+
+/* ---- log and chat strip ------------------------------------------------ */
+
+.log-strip {
+  margin-top: auto;
+  flex: none;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  border: 1px solid black;
+  padding: 4px 8px 8px;
+  min-height: 0;
 }
 
-.property-viewer .property-name {
-  border: 1px solid black;
-  color: white;
-  font-weight: bold;
+.log-strip.expanded {
+  flex: 1 1 auto;
+  margin-top: 0;
 }
 
-.property-viewer .train-station-name,
-.utility-name {
-  border: 1px solid black;
-  color: white;
-  font-weight: bold;
-  background-color: black;
-}
-
-.property-viewer .utility-icon {
-  margin-top: 5px;
-  margin-bottom: 5px;
-}
-
-.property-viewer .info-tables {
+.log-strip-head {
   display: flex;
-  flex-direction: row;
+  align-items: center;
+  gap: 4px;
 }
 
-.property-viewer .rent-info {
-  border-right: 3px solid black;
+.log-strip-head .MuiButton-root {
+  min-width: 0;
+  padding: 2px 10px;
+  text-transform: none;
+  font-weight: 600;
+  color: #5f6b76;
 }
 
-.player-viewer .rent-info {
-  border-right: 3px solid black;
+.log-strip-head .MuiButton-root.active {
+  color: #1976d2;
+  background: #e3f2fd;
 }
 
-.player-viewer .player-name {
-  border: 1px solid black;
-  color: white;
-  font-weight: bold;
+.log-strip-toggle {
+  margin-left: auto !important;
 }
 
-.player-viewer .info-tables {
-  display: flex;
-  flex-direction: row;
+.log-strip-list {
+  overflow: hidden;
 }
 
-.player-actions {
-  display: flex;
-  padding-bottom: 5px;
-  padding-top: 5px;
+.log-strip.expanded .log-strip-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
-/* players */
+.chat-messages {
+  list-style: none;
+  margin: 0;
+  padding: 2px 4px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #37424c;
+}
+
+.log-empty {
+  color: #8a949d;
+  font-style: italic;
+}
+
+.log-strip .MuiTextField-root {
+  margin-top: 6px;
+}
+
+/* ---- player list ------------------------------------------------------- */
+
 .players-display {
   display: flex;
   flex-direction: column;
-  flex-wrap: nowrap;
+  gap: 6px;
 }
 
 .player-info {
-  margin: 3px;
-  padding: 0;
-  text-align: center;
-  border-style: groove;
-  border-width: 5px;
-  flex-basis: 10%;
+  border-left: 4px solid transparent;
+  padding: 6px 8px;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
 }
 
-.player-info .container {
-  flex-direction: column;
-  justify-content: flex-start;
+.player-info:hover {
+  border-color: #c5ccd3;
 }
 
-.player-info .name {
-  margin-top: 5px;
+.player-info.their-turn {
+  background: #fffdf2;
+}
+
+.player-info.bankrupt {
+  opacity: 0.55;
+}
+
+.player-row-main {
   display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  font-weight: bold;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 }
 
-.player-info .sub-name {
-  margin-top: 5px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: calc(0.4rem + 0.4vw + 0.5vh);
+.player-piece {
+  font-size: 18px;
+  flex: none;
 }
 
-.player-info .trade {
-  display: flex;
-  font-size: calc(1rem + 0.4vw + 0.5vh);
-}
-
-.player-info .player-chip .MuiChip-label {
-  font-size: calc(0.4rem + 0.4vw + 0.5vh);
+.player-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 .player-info .money {
-  font-weight: bold;
-  font-size: calc(0.6rem + 0.4vw + 0.5vh);
-}
-.player-info .ping {
-  font-size: 60%;
-}
-.money-bankrupt {
-  color: red;
+  flex: none;
+  font-weight: 700;
+  font-size: 15px;
+  color: #1d2126;
+  font-variant-numeric: tabular-nums;
 }
 
-.square-viewer-header-row {
-  background-color: rgb(77, 75, 75);
-  color: white !important;
+.player-info .money-bankrupt {
+  color: #c62828;
+  font-size: 13px;
 }
+
+.player-row-sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  padding-left: 29px;
+  font-size: 12px;
+  color: #6b7782;
+}
+
+.player-costs {
+  margin-left: auto;
+  color: #a15c00;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---- skill points dialog ---------------------------------------------- */
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid #eceff1;
+}
+
+.skill-row-text {
+  flex: 1;
+}
+
+.skill-row-name {
+  font-weight: 600;
+}
+
+.skill-row-level {
+  display: inline-block;
+  min-width: 22px;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #eef0f2;
+  font-size: 12px;
+  text-align: center;
+}
+
+.skill-row-desc {
+  font-size: 13px;
+  color: #5f6b76;
+}
+
+/* ---- dialogs ------------------------------------------------------------ */
 
 .trade-dialog-cont {
   display: flex;
@@ -214,36 +499,6 @@
 
 .trade-item {
   padding: 0px 5px 0px 0px !important;
-}
-
-.upgrade-skill {
-  padding-right: 5px;
-}
-
-.utility-description {
-  padding-top: 8px;
-}
-
-.chat-row {
-  height: 100%;
-  padding-top: 5px;
-  border-top: 2px solid;
-  overflow: scroll;
-}
-
-.chat-messages {
-  text-align: left;
-}
-
-.chat-messages ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.lotto-result {
-  font-size: 130%;
-  font-weight: bold;
 }
 
 .game-over-overview .MuiListItemText-primary {

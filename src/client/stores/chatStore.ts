@@ -14,7 +14,7 @@ interface ChatStore {
 
 const useChatStore = create<ChatStore>()((set, get) => ({
   sendChatMsg: undefined,
-  showChat: true,
+  showChat: false,
   messages: [],
 
   setSendChatMsg: (newData: string | undefined): void => {
