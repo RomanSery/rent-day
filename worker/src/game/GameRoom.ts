@@ -34,6 +34,7 @@ import { PlayerState } from "@core/enums/PlayerState";
 import { areIdsEqual } from "./controllers/helpers";
 import { BotPlayer, isBotId } from "./bots/BotPlayer";
 import { movementDurationMs } from "@core/movementTiming";
+import { FINAL_SNAPSHOT_KEY, SNAPSHOT_PREFIX, TurnSnapshot, unpackSnapshot } from "./snapshots";
 
 /** Result of a game action: errMsg is "" on success. */
 export interface ActionResult {
@@ -54,6 +55,7 @@ type Job = { attempts?: number } & (
   | { kind: "botStep"; at: number; botId: string }
   | { kind: "botBids"; at: number }
   | { kind: "botTrade"; at: number; tradeId: string }
+  | { kind: "purge"; at: number }
 );
 
 const MAX_JOB_ATTEMPTS = 3;
@@ -68,6 +70,11 @@ interface LegacyPendingEvent {
 const MAX_BOT_STEPS_PER_TURN = 60;
 /** a bots-only simulation that has not ended by then is scored by assets */
 const MAX_SIMULATION_TURNS = 400;
+/**
+ * A finished game, its snapshots, auctions and trades are deleted this long
+ * after it ends, so storage does not grow forever on the free plan.
+ */
+const PURGE_FINISHED_AFTER_SECONDS = 30 * 24 * 60 * 60;
 
 interface IndexState {
   status: GameStatus;
@@ -136,11 +143,13 @@ export class GameRoom extends DurableObject<Env> {
   private readonly store: DurableObjectGameStore;
   private readonly gamesIndex: GamesIndexRepo;
   private readonly gameCtx: GameContext;
+  private readonly purgeAfterMs: number;
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
     this.store = new DurableObjectGameStore(ctx.storage, new UsersRepo(env.DB));
     this.gamesIndex = new GamesIndexRepo(env.DB);
+    this.purgeAfterMs = devSeconds(env, env.DEV_PURGE_SECONDS, PURGE_FINISHED_AFTER_SECONDS) * 1000;
     this.gameCtx = {
       store: this.store,
       isDev: isDevEnv(env),
@@ -233,6 +242,16 @@ export class GameRoom extends DurableObject<Env> {
 
   async getGame(): Promise<GameInstanceDocument | null> {
     return toClientGame(await this.store.getGame());
+  }
+
+  /** The game's per-turn snapshots, oldest first, the final one last. */
+  async getSnapshots(): Promise<TurnSnapshot[]> {
+    const game = await this.store.getGame();
+    if (!game) {
+      return [];
+    }
+    const stored = await this.ctx.storage.list<string>({ prefix: SNAPSHOT_PREFIX });
+    return Array.from(stored, ([key, raw]) => unpackSnapshot(game, raw, key === FINAL_SNAPSHOT_KEY));
   }
 
   async getStatus(): Promise<GameStatus | null> {
@@ -795,6 +814,21 @@ export class GameRoom extends DurableObject<Env> {
           await this.afterAction();
         });
         return;
+      case "purge":
+        await this.run(async () => {
+          const game = await this.store.getGame();
+          if (game && game.status !== GameStatus.FINISHED) {
+            return;
+          }
+          if (game) {
+            await this.gamesIndex.remove(game._id);
+          }
+          // everything this object stores: game, snapshots, auctions, lottos,
+          // trades and pending jobs
+          await this.ctx.storage.deleteAlarm();
+          await this.ctx.storage.deleteAll();
+        });
+        return;
       default:
         return;
     }
@@ -807,6 +841,10 @@ export class GameRoom extends DurableObject<Env> {
   private async afterAction(): Promise<void> {
     try {
       const game = await this.store.getGame();
+      if (game && game.status === GameStatus.FINISHED) {
+        await this.schedulePurge();
+        return;
+      }
       if (!game || game.status !== GameStatus.ACTIVE) {
         return;
       }
@@ -817,6 +855,7 @@ export class GameRoom extends DurableObject<Env> {
         await BotPlayer.finishWithoutHumans(this.gameCtx, game);
         await this.gameCtx.events.refreshGameState();
         await this.syncIndex();
+        await this.schedulePurge();
         return;
       }
 
@@ -849,6 +888,11 @@ export class GameRoom extends DurableObject<Env> {
     } catch (e) {
       console.log("afterAction failed", e);
     }
+  }
+
+  /** Book the deletion of a finished game (once; later calls change nothing). */
+  private async schedulePurge(): Promise<void> {
+    await this.scheduleOnce({ kind: "purge", at: Date.now() + this.purgeAfterMs });
   }
 
   /** Send every connected player their own view of an auction. */

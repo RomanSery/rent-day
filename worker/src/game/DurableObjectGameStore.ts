@@ -7,6 +7,8 @@ import {
   UserDocument,
 } from "./model";
 import { UsersRepo } from "../db/users";
+import { GameStatus } from "@core/enums/GameStatus";
+import { FINAL_SNAPSHOT_KEY, packSnapshot, snapshotKey } from "./snapshots";
 
 export const GAME_KEY = "game";
 
@@ -20,6 +22,9 @@ export class DurableObjectGameStore implements GameStore {
     private readonly users: UsersRepo
   ) {}
 
+  /** the last snapshot written by this instance (turn number, or "end") */
+  private lastSnapshot: number | "end" | undefined;
+
   async getGame(): Promise<GameInstanceDocument | null> {
     const game = await this.storage.get<GameInstanceDocument>(GAME_KEY);
     return game ?? null;
@@ -30,6 +35,35 @@ export class DurableObjectGameStore implements GameStore {
     // The game logic keeps class instances (DiceRoll) in the state while a
     // request runs; persist plain JSON like the old Mongo documents were.
     await this.storage.put(GAME_KEY, JSON.parse(JSON.stringify(game)));
+    await this.snapshotIfNewTurn(game);
+  }
+
+  /**
+   * One snapshot per turn, taken by the first save of that turn, and one when
+   * the game ends. Later saves in the same turn write nothing, so this costs
+   * one extra storage write per turn. See snapshots.ts.
+   */
+  private async snapshotIfNewTurn(game: GameInstanceDocument): Promise<void> {
+    let marker: number | "end";
+    if (game.status === GameStatus.ACTIVE) {
+      marker = game.turnNumber ?? 0;
+    } else if (game.status === GameStatus.FINISHED) {
+      marker = "end";
+    } else {
+      return;
+    }
+    if (marker === this.lastSnapshot) {
+      return;
+    }
+    const key = marker === "end" ? FINAL_SNAPSHOT_KEY : snapshotKey(marker);
+    // a fresh instance (after the object was evicted) does not know what was
+    // written before: keep the snapshot taken at the start of the turn
+    const alreadyTaken =
+      this.lastSnapshot === undefined && (await this.storage.get(key)) !== undefined;
+    if (!alreadyTaken) {
+      await this.storage.put(key, packSnapshot(game));
+    }
+    this.lastSnapshot = marker;
   }
 
   async getAuction(auctionId: string | null | undefined): Promise<AuctionDocument | null> {

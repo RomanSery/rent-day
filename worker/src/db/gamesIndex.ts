@@ -47,6 +47,10 @@ export class GamesIndexRepo {
       .run();
   }
 
+  async remove(id: string): Promise<void> {
+    await this.db.prepare(`DELETE FROM games WHERE id = ?`).bind(id).run();
+  }
+
   async listJoining(createdAfterIso: string): Promise<GameToJoin[]> {
     const result = await this.db
       .prepare(

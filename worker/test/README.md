@@ -37,6 +37,15 @@ fast bot pace so it finishes in under a minute:
 npx wrangler dev --var DEV_BOT_PACE_MS:30
 ```
 
+`npm run test:api:snapshots` plays a bots-only game to the end, checks
+there is one snapshot per turn plus a final one (and prints their size),
+then waits for the finished game to be deleted. Start the Worker with fast
+bots and a short clean-up delay:
+
+```bash
+npx wrangler dev --var DEV_BOT_PACE_MS:0 --var DEV_PURGE_SECONDS:20
+```
+
 `npm run sim` (test/sim.mjs) is not a pass/fail test but a measuring tool:
 it plays many bots-only games and reports win rate, average rank and final
 assets per skill level, so a change to `BotBrain.ts` can be compared before

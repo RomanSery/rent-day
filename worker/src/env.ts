@@ -14,6 +14,8 @@ export interface Env {
   DEV_AUCTION_SECONDS?: string;
   /** development only: base delay between computer player actions (ms) */
   DEV_BOT_PACE_MS?: string;
+  /** development only: delete finished games after this many seconds */
+  DEV_PURGE_SECONDS?: string;
 }
 
 export const isDevEnv = (env: Env): boolean =>

@@ -380,6 +380,19 @@ app.post("/api/getGame", async (c) => {
   return c.json({ game });
 });
 
+// per-turn snapshots of a game, for replays and net-worth charts
+app.post("/api/getSnapshots", async (c) => {
+  const body = await readBody(c);
+  if (!isValidId(body.gameId)) {
+    return validationError(c, "invalid gameId", "gameId");
+  }
+  if (!(await requireUserId(c))) {
+    return invalidAuth(c);
+  }
+  const snapshots = await roomFor(c, body.gameId).getSnapshots();
+  return c.json({ snapshots });
+});
+
 app.post("/api/getGameStatus", async (c) => {
   const body = await readBody(c);
   if (!isValidId(body.gameId)) {
