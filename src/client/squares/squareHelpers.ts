@@ -1,25 +1,13 @@
 import { NyThemeData } from "../../core/config/NyTheme";
-import { SquareConfigDataMap } from "../../core/config/SquareData";
-import { SquareType } from "../../core/enums/SquareType";
 import { GameState } from "../../core/types/GameState";
 import { SquareGameData } from "../../core/types/SquareGameData";
 import { SquareThemeData } from "../../core/types/SquareThemeData";
 import { areObjectIdsEqual } from "../helpers";
 
-/** names for squares the theme doesn't name */
-const SQUARE_TYPE_NAMES: Partial<Record<SquareType, string>> = {
-  [SquareType.Chance]: "Chance",
-  [SquareType.Lotto]: "NY Lotto",
-  [SquareType.CentralPark]: "Central Park",
-  [SquareType.PayDay]: "Pay Day",
-  [SquareType.Isolation]: "Quarantine",
-  [SquareType.GoToIsolation]: "Big Brother",
-};
-
 /**
- * A square's display name. The game's theme only names properties, stations
- * and utilities; other squares (Chance, Lotto, the corners) fall back to a
- * name for their type, so callers can ask about any square without crashing.
+ * A square's display name. Every square is named in the theme, but games
+ * created before Chance, Lotto and the corners were added to it store an older
+ * copy without them, so those fall back to the built-in theme.
  */
 export const getSquareTxt = (
   gameInfo: GameState | undefined,
@@ -31,12 +19,7 @@ export const getSquareTxt = (
   }
 
   const data: SquareThemeData | undefined = NyThemeData.get(squareId);
-  if (data?.name) {
-    return data.name;
-  }
-
-  const type = SquareConfigDataMap.get(squareId)?.type;
-  return (type && SQUARE_TYPE_NAMES[type]) || "";
+  return data?.name ?? "";
 };
 
 export const getSquareStyle = (
