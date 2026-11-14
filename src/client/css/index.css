@@ -765,8 +765,8 @@ td.lb-rank.bronze { color: #8d5420; }
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.gl-section { display: grid; gap: 10px; border-top: 1px solid #e6e9ec; padding-top: 14px; }
-.gl-section h2 { margin: 0; font-size: 17px; }
+.gl-tabs { border-bottom: 1px solid #e6e9ec; min-height: 40px !important; }
+.gl-tabs .MuiTab-root { min-height: 40px; text-transform: none; font-weight: 600; font-size: 15px; }
 
 .gl-empty {
   text-align: center;

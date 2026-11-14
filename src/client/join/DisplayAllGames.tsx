@@ -1,7 +1,7 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@mui/material";
+import { Button, Tab, Tabs } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faLock, faRobot, faRotateRight, faUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../components/BackLink";
@@ -84,10 +84,19 @@ const LiveGames: React.FC<{ live: GameToWatch[] }> = ({ live }) => {
   );
 };
 
+type ListTab = "join" | "watch";
+
 export const DisplayAllGames: React.FC = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
   const navigate = useNavigate();
+
+  // the open tab lives in the URL (?tab=watch), so Back and links keep it
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab: ListTab = searchParams.get("tab") === "watch" ? "watch" : "join";
+  const onChangeTab = (_: React.SyntheticEvent, next: ListTab) => {
+    setSearchParams(next === "watch" ? { tab: "watch" } : {}, { replace: true });
+  };
 
   const onJoinGame = (gameId: string) => {
     leaveCurrentGameIfJoined(null, () => {
@@ -114,7 +123,10 @@ export const DisplayAllGames: React.FC = () => {
       return <p className="gl-note">Couldn't load the games: {gamesQuery.error!.message}</p>;
     }
     if (gamesQuery.isLoading) {
-      return <p className="gl-note">Looking for open games&hellip;</p>;
+      return <p className="gl-note">{tab === "watch" ? "Looking for games in progress" : "Looking for open games"}&hellip;</p>;
+    }
+    if (tab === "watch") {
+      return <LiveGames live={live} />;
     }
     if (games.length === 0) {
       return (
@@ -163,9 +175,11 @@ export const DisplayAllGames: React.FC = () => {
       <header className="gl-head">
         <div>
           <BackLink to="/dashboard" label="Lobby" />
-          <h1>Join a game</h1>
+          <h1>{tab === "watch" ? "Watch a game" : "Join a game"}</h1>
           <p className="gl-sub">
-            {gamesQuery.isSuccess ? `${games.length} open ${games.length === 1 ? "game" : "games"}` : " "}
+            {!gamesQuery.isSuccess ? " "
+              : tab === "watch" ? `${live.length} ${live.length === 1 ? "game" : "games"} in progress`
+                : `${games.length} open ${games.length === 1 ? "game" : "games"}`}
           </p>
         </div>
         <div className="gl-actions">
@@ -178,13 +192,15 @@ export const DisplayAllGames: React.FC = () => {
           </Button>
         </div>
       </header>
-      {body()}
 
-      {gamesQuery.isSuccess &&
-        <section className="gl-section">
-          <h2>Watch a game in progress</h2>
-          <LiveGames live={live} />
-        </section>}
+      <Tabs value={tab} onChange={onChangeTab} className="gl-tabs" aria-label="Open games or games in progress">
+        <Tab value="join" label={"Join" + (gamesQuery.isSuccess ? ` (${games.length})` : "")} id="gl-tab-join" aria-controls="gl-panel" />
+        <Tab value="watch" label={"Watch live" + (gamesQuery.isSuccess ? ` (${live.length})` : "")} id="gl-tab-watch" aria-controls="gl-panel" />
+      </Tabs>
+
+      <div id="gl-panel" role="tabpanel" aria-labelledby={tab === "watch" ? "gl-tab-watch" : "gl-tab-join"}>
+        {body()}
+      </div>
     </div>
   );
 }

@@ -142,7 +142,7 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   const onLeaveGame = () => {
     if (isWatching()) {
       // a spectator has no seat to give up
-      navigate("/find");
+      navigate("/find?tab=watch");
       return;
     }
     leaveCurrentGameIfJoined(socketService, () => {

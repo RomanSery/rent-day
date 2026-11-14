@@ -9,7 +9,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faCheckCircle, faTrain, faCaretDown, faEye } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faCheckCircle, faTrain, faCaretDown, faEye, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
@@ -305,11 +305,12 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const getWatcherActions = () => (
     <React.Fragment>
       <span className="watching-label"><FontAwesomeIcon icon={faEye} /> Watching</span>
+      <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faRightFromBracket} />}
+        onClick={() => navigate("/find?tab=watch")}>Stop watching</Button>
       <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="watch-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
       <Menu id="watch-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
         <MenuItem onClick={onViewStats}>Stats</MenuItem>
         <MenuItem onClick={onViewHelp}>Help</MenuItem>
-        <MenuItem onClick={() => navigate("/find")}>Stop watching</MenuItem>
       </Menu>
       {getWatchersBadge()}
     </React.Fragment>

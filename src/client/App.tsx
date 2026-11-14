@@ -183,7 +183,7 @@ const WatchDisplay: React.FC = () => {
     return (
       <Page maxWidth="sm">
         <div className="game-list">
-          <BackLink to="/find" label="Games" />
+          <BackLink to="/find?tab=watch" label="Games" />
           <h1>Can't watch this game</h1>
           <p className="gl-sub">It may have finished, not started yet, or need a password. Only games in progress can be watched.</p>
         </div>
