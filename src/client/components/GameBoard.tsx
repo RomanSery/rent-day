@@ -20,6 +20,12 @@ import { SoundType } from "../../core/enums/SoundType";
 import { yourTurnSound } from "../gameSounds";
 import { SoundMsg } from "../../core/types/SoundMsg";
 import useGameStateStore from "../stores/gameStateStore";
+import { movementDurationMs } from "../../core/movementTiming";
+
+/** a beat after the piece lands before the Chance card covers the board */
+const CHANCE_AFTER_LANDING_MS = 600;
+/** open the card anyway if the move never reports that it finished */
+const CHANCE_MAX_WAIT_EXTRA_MS = 3000;
 
 interface Props {
   socketService: SocketService;
@@ -100,11 +106,50 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       }
     }));
 
-    off.push(socketService.listenForEvent(GameEvent.SEND_CHANCE_EVENT, (data: Array<ChanceEvent>) => {
-      if (data && data.length > 0) {
-        setChanceEvent(data[0]);
-        setChanceOpen(true);
+    // The server sends the card a fixed time after the roll, but a long walk
+    // (or a card that moves the piece on) can still be animating then, so
+    // hold the card until the piece has landed.
+    let stopWaitingForLanding: (() => void) | null = null;
+    let landedTimer: ReturnType<typeof setTimeout> | null = null;
+    let maxWaitTimer: ReturnType<typeof setTimeout> | null = null;
+    const cancelPendingChance = () => {
+      stopWaitingForLanding?.();
+      stopWaitingForLanding = null;
+      if (landedTimer) {
+        clearTimeout(landedTimer);
+        landedTimer = null;
       }
+      if (maxWaitTimer) {
+        clearTimeout(maxWaitTimer);
+        maxWaitTimer = null;
+      }
+    };
+    const openChance = (event: ChanceEvent) => {
+      cancelPendingChance();
+      setChanceEvent(event);
+      setChanceOpen(true);
+    };
+    off.push(cancelPendingChance);
+
+    off.push(socketService.listenForEvent(GameEvent.SEND_CHANCE_EVENT, (data: Array<ChanceEvent>) => {
+      if (!data || data.length === 0) {
+        return;
+      }
+      const event = data[0];
+      cancelPendingChance();
+      const { playerIdToMove, frames } = useGameStateStore.getState();
+      if (!playerIdToMove) {
+        openChance(event);
+        return;
+      }
+      stopWaitingForLanding = useGameStateStore.subscribe((state) => {
+        if (!state.playerIdToMove && !landedTimer) {
+          stopWaitingForLanding?.();
+          stopWaitingForLanding = null;
+          landedTimer = setTimeout(() => openChance(event), CHANCE_AFTER_LANDING_MS);
+        }
+      });
+      maxWaitTimer = setTimeout(() => openChance(event), movementDurationMs(frames) + CHANCE_MAX_WAIT_EXTRA_MS);
     }));
 
     off.push(socketService.listenForEvent(GameEvent.PLAY_SOUND_EFFECT, (data: Array<SoundMsg>) => {
