@@ -1,6 +1,6 @@
 # Block Barons board game (formerly Fat Cats / Rent Day)
 
-Code for https://rentdaygame.coderdreams.com
+Code for https://blockbarons.coderdreams.com
 
 A multiplayer Monopoly-style game. The React client talks to a backend that
 runs entirely on Cloudflare's free tier: no server to keep running.
@@ -47,7 +47,7 @@ be listed from a terminal:
 
 ```bash
 cd worker
-npx wrangler d1 execute rentday-db --remote --command "SELECT created_at, email, subject, message FROM contact_messages ORDER BY created_at DESC LIMIT 20"
+npx wrangler d1 execute block-barons-db --remote --command "SELECT created_at, email, subject, message FROM contact_messages ORDER BY created_at DESC LIMIT 20"
 ```
 
 ### Computer players
@@ -188,7 +188,7 @@ development uses Turnstile's published test keys (in `.env.development` and
 
 1. In the Cloudflare dashboard, go to **Turnstile** → **Add widget**, choose
    **Managed** mode, and add the hostname players use (for example
-   `rentdaygame.coderdreams.com`, plus the `*.workers.dev` hostname if that is
+   `blockbarons.coderdreams.com`, plus the `*.workers.dev` hostname if that is
    served too). This gives a **site key** and a **secret key**.
 2. Put the site key in `.env.production.local` in the repo root (it is
    public, but that file is git-ignored):

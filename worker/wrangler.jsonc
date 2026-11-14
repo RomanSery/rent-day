@@ -2,11 +2,16 @@
   // Cloudflare Workers configuration for the Block Barons backend.
   // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "rent-day",
+  "name": "block-barons",
   "main": "src/index.ts",
   "tsconfig": "tsconfig.json",
   "compatibility_date": "2025-10-01",
   "compatibility_flags": ["nodejs_compat"],
+
+  // Served at blockbarons.coderdreams.com. `wrangler deploy` creates the
+  // custom domain (DNS record and certificate) itself; coderdreams.com must
+  // be a zone in the same Cloudflare account.
+  "routes": [{ "pattern": "blockbarons.coderdreams.com", "custom_domain": true }],
 
   // The React build (../build) is served as static assets by the same
   // Worker. Only /api/* and /ws reach the Worker script; everything else is
@@ -31,7 +36,7 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "rentday-db",
+      "database_name": "block-barons-db",
       "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
       "migrations_dir": "migrations"
     }
@@ -48,7 +53,7 @@
     // players use it. Never list localhost here.
     // The Turnstile secret key is a secret, not a var:
     //   npx wrangler secret put TURNSTILE_SECRET_KEY
-    "TURNSTILE_HOSTNAMES": "rentdaygame.coderdreams.com"
+    "TURNSTILE_HOSTNAMES": "blockbarons.coderdreams.com"
   },
 
   // Per-IP limits on /api/logIn and /api/createAccount (per Cloudflare
