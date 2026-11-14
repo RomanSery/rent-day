@@ -84,7 +84,7 @@ let n = 0;
 const newUser = async (label) => {
   const c = new Client(label);
   const u = `${label}${suffix}${n++}`.slice(0, 10);
-  const r = await c.post("createAccount", { email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1" });
+  const r = await c.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX", email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1" });
   if (r.status !== 200) throw new Error("createAccount failed: " + JSON.stringify(r.data));
   c.id = r.data.id;
   return c;

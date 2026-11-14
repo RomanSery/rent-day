@@ -51,7 +51,7 @@ const PASSWORD = "pw-contact-test-1";
 /** The admin account: created on the first run, logged into after that. */
 const adminClient = async () => {
   const c = new Client();
-  let r = await c.post("createAccount", { email: ADMIN_EMAIL, username: "inboxadm", password: PASSWORD, confirmPassword: PASSWORD });
+  let r = await c.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX", email: ADMIN_EMAIL, username: "inboxadm", password: PASSWORD, confirmPassword: PASSWORD });
   if (r.status !== 200) {
     r = await c.post("logIn", { username: ADMIN_EMAIL, password: PASSWORD });
   }
@@ -61,7 +61,7 @@ const adminClient = async () => {
 
 const anon = new Client();
 const member = new Client();
-let r = await member.post("createAccount", { email: `cm${suffix}@t.com`, username: `cm${suffix}`, password: PASSWORD, confirmPassword: PASSWORD });
+let r = await member.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX", email: `cm${suffix}@t.com`, username: `cm${suffix}`, password: PASSWORD, confirmPassword: PASSWORD });
 check(r.status === 200, "member account created");
 check(r.data.isAdmin === false, "member is not an admin");
 const memberName = r.data.userName;

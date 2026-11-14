@@ -147,7 +147,7 @@ const suffix = Date.now().toString(36).slice(-4);
 const signUp = async (label) => {
   const p = new Player(label);
   const u = `${label}${suffix}${n++}`.slice(0, 10);
-  const r = await p.post("createAccount", { email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1", remember: true });
+  const r = await p.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX", email: `${u}@t.com`, username: u, password: "pw-test-1", confirmPassword: "pw-test-1", remember: true });
   if (r.status !== 200) throw new Error("sign up failed: " + JSON.stringify(r.data));
   p.id = r.data.id;
   return p;

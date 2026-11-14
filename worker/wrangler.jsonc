@@ -41,7 +41,14 @@
     "ENVIRONMENT": "production",
     // PBKDF2 iterations for password hashing. Lower it if logins hit the
     // free plan's CPU limit.
-    "PBKDF2_ITERATIONS": "100000"
+    "PBKDF2_ITERATIONS": "100000",
+    // Hostnames the sign-up page is served from (comma-separated). The
+    // Turnstile check refuses tokens solved anywhere else, and sign-up is
+    // refused while this is empty. Add the *.workers.dev hostname too if
+    // players use it. Never list localhost here.
+    // The Turnstile secret key is a secret, not a var:
+    //   npx wrangler secret put TURNSTILE_SECRET_KEY
+    "TURNSTILE_HOSTNAMES": "rentdaygame.coderdreams.com"
   },
 
   // Per-IP limits on /api/logIn and /api/createAccount (per Cloudflare

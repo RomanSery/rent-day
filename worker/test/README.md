@@ -28,6 +28,15 @@ failed logins. The per-IP rate limits are off in development; to check them,
 start the Worker with `npx wrangler dev --var DEV_RATE_LIMIT:true` and run
 `RATE_LIMIT=1 npm run test:api:auth`.
 
+Sign-ups need a Turnstile token. The tests send Turnstile's test token
+(`XXXX.DUMMY.TOKEN.XXXX`), which the always-pass test secret in
+`.dev.vars.example` accepts; Siteverify is a real network call, so the tests
+need internet access. `test:api:auth` also checks that sign-ups without a
+token are refused. To check that a token Siteverify rejects blocks the
+sign-up, start the Worker with
+`npx wrangler dev --var TURNSTILE_SECRET_KEY:2x0000000000000000000000000000000AA`
+and run `TURNSTILE_FAIL=1 npm run test:api:auth`.
+
 `npm run test:api:abuse` plays the cheater: watching or chatting in games
 you are not in, faking dice for everyone, rolling away an open auction,
 listing one property several times in a trade, and creating games outside

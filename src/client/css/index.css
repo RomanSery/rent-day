@@ -197,6 +197,12 @@ body {
   content: "⚠ ";
 }
 
+/* Cloudflare Turnstile widget on the sign-up form (65px tall when shown) */
+.turnstile {
+  margin-top: 10px;
+  min-height: 65px;
+}
+
 .game-grid-header {
   background-color: rgb(209, 206, 206);
 }

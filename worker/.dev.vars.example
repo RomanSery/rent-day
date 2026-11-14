@@ -6,6 +6,17 @@ PBKDF2_ITERATIONS=100000
 # Dev shortcut: the second player starts owning every property
 DEV_PREOWN_PROPERTIES=false
 
+# Cloudflare Turnstile (the "verify you are human" check on sign-up).
+# This is Turnstile's published test secret that accepts every token; it
+# pairs with the test site key in the client's .env.development. In
+# production set the real one with `wrangler secret put TURNSTILE_SECRET_KEY`.
+# To see sign-up refused, use the always-fail test secret instead:
+#   TURNSTILE_SECRET_KEY=2x0000000000000000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+# Optional in development: hostnames whose tokens are accepted (ignored for
+# test-key results)
+# TURNSTILE_HOSTNAMES=localhost
+
 # Development only: shorten the timers (seconds) to test timeout flows
 # DEV_TURN_SECONDS=6
 # DEV_AUCTION_SECONDS=6

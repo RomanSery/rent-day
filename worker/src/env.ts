@@ -14,6 +14,19 @@ export interface Env {
    * so the addresses stay out of the repository; locally, in .dev.vars.
    */
   ADMIN_EMAILS?: string;
+  /**
+   * Cloudflare Turnstile secret key for the sign-up form's bot check. Set it
+   * as a secret, `wrangler secret put TURNSTILE_SECRET_KEY`; locally, in
+   * .dev.vars (Turnstile's test secret works there). Without it sign-up is
+   * refused.
+   */
+  TURNSTILE_SECRET_KEY?: string;
+  /**
+   * Comma-separated hostnames the sign-up page is served from. Siteverify
+   * reports where the widget was solved, and tokens from anywhere else are
+   * refused. Required in production; optional in development.
+   */
+  TURNSTILE_HOSTNAMES?: string;
   ENVIRONMENT?: string;
   PBKDF2_ITERATIONS?: string;
   /** development only: "true" turns the per-IP rate limits on (they are off in development) */

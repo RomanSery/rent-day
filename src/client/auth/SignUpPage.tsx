@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { BackLink } from "../components/BackLink";
 import { handleApiError, hasPendingInvite, setCurrSessionInfo, takeReturnTo } from "../helpers";
 import { InviteNote } from "./InviteNote";
+import { Turnstile, TurnstileHandle } from "./Turnstile";
 import _ from "lodash/fp";
 
 
@@ -25,6 +26,16 @@ export const SignUpPage: React.FC<Props> = () => {
 
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<Inputs>();
+  const [turnstileToken, setTurnstileToken] = React.useState<string | null>(null);
+  const [captchaMissing, setCaptchaMissing] = React.useState(false);
+  const [submitting, setSubmitting] = React.useState(false);
+  const turnstile = React.useRef<TurnstileHandle>(null);
+  const onTurnstileToken = React.useCallback((token: string | null) => {
+    setTurnstileToken(token);
+    if (token) {
+      setCaptchaMissing(false);
+    }
+  }, []);
 
   // react-hook-form 7: wire register() into MUI TextField via inputRef
   const field = (name: keyof Inputs, rules?: Parameters<typeof register>[1]) => {
@@ -34,12 +45,22 @@ export const SignUpPage: React.FC<Props> = () => {
 
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email, remember: !!data.remember })
+    if (!turnstileToken) {
+      setCaptchaMissing(true);
+      return;
+    }
+    setSubmitting(true);
+    API.post("createAccount", { username: data.username, password: data.password, confirmPassword: data.confirmPassword, email: data.email, remember: !!data.remember, turnstileToken })
       .then(function (response) {
         setCurrSessionInfo(response.data);
         navigate(takeReturnTo());
       })
-      .catch(handleApiError);
+      .catch((error) => {
+        // the token was spent on this attempt; get a fresh one for the retry
+        turnstile.current?.reset();
+        handleApiError(error);
+      })
+      .finally(() => setSubmitting(false));
   };
 
 
@@ -100,7 +121,12 @@ export const SignUpPage: React.FC<Props> = () => {
           label="Remember me"
         />
 
-        <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit">Create</Button>
+        <Turnstile ref={turnstile} action="signup" onToken={onTurnstileToken} />
+        {captchaMissing && (
+          <p className="field-error">Please complete the "verify you are human" check</p>
+        )}
+
+        <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit" disabled={submitting}>Create</Button>
       </form>
 
     </React.Fragment>

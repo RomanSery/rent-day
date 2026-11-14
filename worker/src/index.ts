@@ -10,6 +10,7 @@ import { PlayerInfo } from "@core/types/PlayerInfo";
 import { Env, isDevEnv } from "./env";
 import { clearSessionCookie, createSession, endAllSessions, endSession, getSession } from "./auth/session";
 import { allowByIp, clearFailures, lockedForSeconds, recordFailure, tooManyRequests } from "./auth/throttle";
+import { verifyTurnstile } from "./auth/turnstile";
 import { DEFAULT_ITERATIONS, hashPassword, isLegacyHash, verifyPassword } from "./auth/password";
 import { UsersRepo } from "./db/users";
 import { GamesIndexRepo } from "./db/gamesIndex";
@@ -213,6 +214,22 @@ app.post("/api/createAccount", async (c) => {
   }
   if (password !== confirmPassword) {
     return validationError(c, "Passwords do not match", "confirmPassword");
+  }
+
+  // the bot check comes before the lookup below, so a script can't use this
+  // endpoint to find out which emails and usernames are taken
+  const captcha = await verifyTurnstile(c, body.turnstileToken, "signup");
+  if (!captcha.ok) {
+    if (captcha.reason === "unavailable") {
+      return c.text("Sign-up is not available right now. Please try again later.", 503);
+    }
+    return validationError(
+      c,
+      captcha.reason === "missing"
+        ? "Please complete the \"verify you are human\" check"
+        : "The \"verify you are human\" check failed or expired. Please try it again.",
+      "turnstileToken"
+    );
   }
 
   const users = new UsersRepo(c.env.DB);

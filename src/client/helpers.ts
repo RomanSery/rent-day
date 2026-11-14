@@ -314,17 +314,34 @@ export const areObjectIdsEqual = (
   return false;
 };
 
+/**
+ * The text to show for an error response. The Worker sends either plain text
+ * or { errors: [{ msg }] }; anything else (a JSON object from some other
+ * server, an HTML error page from a proxy) gets a generic message rather
+ * than "[object Object]" or raw HTML.
+ */
+const apiErrorMessage = (status: number | undefined, data: unknown): string => {
+  const generic = `Something went wrong${status ? ` (error ${status})` : ""}. Please try again.`;
+  if (typeof data === "string") {
+    const text = data.trim();
+    return text && !text.startsWith("<") ? text : generic;
+  }
+  if (data && typeof data === "object") {
+    const body = data as { errors?: { msg?: unknown }[]; error?: unknown; message?: unknown };
+    const candidates = [body.errors?.[0]?.msg, body.message, body.error];
+    const text = candidates.find((c): c is string => typeof c === "string" && c.trim() !== "");
+    if (text) {
+      return text;
+    }
+  }
+  return generic;
+};
+
 export const handleApiError = (error: any) => {
   if (error.response) {
     // The request was made and the server responded with a status code
     // that falls out of the range of 2xx
-    if (error.response.data) {
-      if (error.response.data.errors && error.response.data.errors.length > 0) {
-        alert(error.response.data.errors[0].msg);
-      } else {
-        alert(error.response.data);
-      }
-    }
+    alert(apiErrorMessage(error.response.status, error.response.data));
   } else if (error.request) {
     // The request was made but no response was received
     // `error.request` is an instance of XMLHttpRequest in the browser and an instance of

@@ -176,7 +176,29 @@ npm run db:create                 # prints a database_id
 # paste the database_id into worker/wrangler.jsonc
 npm run db:migrate:remote
 npx wrangler secret put ADMIN_EMAILS   # your account's email (comma-separate several)
+npx wrangler secret put TURNSTILE_SECRET_KEY   # see "Bot check on sign-up" below
 ```
+
+#### Bot check on sign-up (Cloudflare Turnstile)
+
+The Create Account form shows a Cloudflare Turnstile widget, and the Worker
+checks its token with Siteverify before creating the account. Local
+development uses Turnstile's published test keys (in `.env.development` and
+`worker/.dev.vars.example`), so it runs without an account. Before deploying:
+
+1. In the Cloudflare dashboard, go to **Turnstile** → **Add widget**, choose
+   **Managed** mode, and add the hostname players use (for example
+   `rentdaygame.coderdreams.com`, plus the `*.workers.dev` hostname if that is
+   served too). This gives a **site key** and a **secret key**.
+2. Put the site key in `.env.production.local` in the repo root (it is
+   public, but that file is git-ignored):
+   `VITE_TURNSTILE_SITE_KEY=0x...`. `npm run build` warns when it is missing.
+3. Store the secret key in the Worker: `npx wrangler secret put
+   TURNSTILE_SECRET_KEY` (in `worker/`).
+4. Check `TURNSTILE_HOSTNAMES` in `worker/wrangler.jsonc` lists the same
+   hostnames. Tokens solved on any other hostname are refused, and a
+   production Worker refuses sign-ups while the secret or this list is
+   missing, or when given test-key tokens.
 
 `ADMIN_EMAILS` decides who can read Contact Us messages. It is a secret
 rather than a `vars` entry so the address stays out of the repository.

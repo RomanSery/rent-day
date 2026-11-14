@@ -1,5 +1,6 @@
-// Auth checks: password rules, remember-me cookies, revocable sessions
-// (log out, log out everywhere) and the per-email lockout.
+// Auth checks: password rules, the Turnstile bot check on sign-up,
+// remember-me cookies, revocable sessions (log out, log out everywhere) and
+// the per-email lockout.
 //
 //   npm run dev          # in worker/
 //   npm run test:api:auth
@@ -7,6 +8,12 @@
 // With the Worker started with `--var DEV_RATE_LIMIT:true`, set RATE_LIMIT=1
 // to check only the per-IP login and sign-up limits (the other checks make
 // enough requests to trip them).
+//
+// Sign-ups send Turnstile's test token. The Worker's .dev.vars uses the
+// always-pass test secret, so they succeed. With the Worker started with
+// `--var TURNSTILE_SECRET_KEY:2x0000000000000000000000000000000AA` (the
+// always-fail test secret), set TURNSTILE_FAIL=1 to check that a token
+// Siteverify rejects blocks the sign-up.
 
 const BASE = process.env.BASE || "http://localhost:8787";
 const suffix = Date.now().toString(36).slice(-6);
@@ -50,12 +57,16 @@ class Client {
 }
 
 const PW = "pw-test-1";
+// what Turnstile's test site key hands the browser
+const TEST_TOKEN = "XXXX.DUMMY.TOKEN.XXXX";
 const account = (tag) => ({
   email: `${tag}${suffix}@t.com`,
   username: `${tag}${suffix}`.slice(0, 10),
   password: PW,
   confirmPassword: PW,
+  turnstileToken: TEST_TOKEN,
 });
+const isCaptchaError = (r) => r.status === 400 && r.data?.errors?.[0]?.param === "turnstileToken";
 
 if (process.env.RATE_LIMIT) {
   console.log("per-IP limits");
@@ -74,6 +85,36 @@ if (process.env.RATE_LIMIT) {
   check(limited, "many sign-ups from one IP get limited");
   console.log(failures ? `\n${failures} check(s) failed` : "\nall rate-limit checks passed");
   process.exit(failures ? 1 : 0);
+}
+
+if (process.env.TURNSTILE_FAIL) {
+  console.log("Turnstile (always-fail test secret)");
+  const c = new Client();
+  const acct = account("tf");
+  let r = await c.post("createAccount", acct);
+  check(isCaptchaError(r) && /failed or expired/.test(r.data.errors[0].msg), "token rejected by Siteverify -> " + r.status);
+  r = await c.post("logIn", { username: acct.email, password: PW });
+  check(r.status !== 200, "no account was created");
+  console.log(failures ? `\n${failures} check(s) failed` : "\nall Turnstile checks passed");
+  process.exit(failures ? 1 : 0);
+}
+
+console.log("Turnstile bot check");
+{
+  const c = new Client();
+  const { turnstileToken, ...noToken } = account("tm");
+  let r = await c.post("createAccount", noToken);
+  check(isCaptchaError(r) && /complete/.test(r.data.errors[0].msg), "sign-up without a token rejected -> " + r.status);
+  r = await c.post("createAccount", { ...noToken, turnstileToken: "" });
+  check(isCaptchaError(r), "empty token rejected -> " + r.status);
+  r = await c.post("createAccount", { ...noToken, turnstileToken: 12345 });
+  check(isCaptchaError(r), "non-string token rejected -> " + r.status);
+  r = await c.post("createAccount", { ...noToken, turnstileToken: "x".repeat(2049) });
+  check(isCaptchaError(r) && /failed or expired/.test(r.data.errors[0].msg), "oversized token rejected -> " + r.status);
+  r = await c.post("logIn", { username: noToken.email, password: PW });
+  check(r.status !== 200, "no account was created");
+  r = await c.post("createAccount", account("tm"));
+  check(r.status === 200, "the same sign-up with a token succeeds -> " + r.status);
 }
 
 console.log("password rules");

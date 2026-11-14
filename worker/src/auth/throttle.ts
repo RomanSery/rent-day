@@ -15,7 +15,7 @@ export const LOCKOUT_WINDOW_SECONDS = 15 * 60;
 
 const nowSeconds = (): number => Math.floor(Date.now() / 1000);
 
-const clientIp = (c: Ctx): string =>
+export const clientIp = (c: Ctx): string =>
   c.req.header("CF-Connecting-IP") ?? c.req.header("X-Forwarded-For")?.split(",")[0].trim() ?? "unknown";
 
 /** True when this IP may go ahead; false when it is over the limit. */

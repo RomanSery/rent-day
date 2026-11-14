@@ -82,7 +82,7 @@ const bob = new Client("bob");
 const pw = "pw-test-1234";
 
 console.log("== accounts");
-let r = await alice.post("createAccount", {
+let r = await alice.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX",
   email: `alice${suffix}@test.com`,
   username: `al${suffix}`,
   password: pw,
@@ -91,7 +91,7 @@ let r = await alice.post("createAccount", {
 check(r.status === 200 && r.data.id, "alice createAccount -> " + r.status);
 alice.id = r.data.id;
 
-r = await bob.post("createAccount", {
+r = await bob.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX",
   email: `bob${suffix}@test.com`,
   username: `bo${suffix}`,
   password: pw,
@@ -100,7 +100,7 @@ r = await bob.post("createAccount", {
 check(r.status === 200 && r.data.id, "bob createAccount -> " + r.status);
 bob.id = r.data.id;
 
-r = await alice.post("createAccount", {
+r = await alice.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX",
   email: `alice${suffix}@test.com`,
   username: `zz${suffix}`,
   password: pw,
@@ -108,7 +108,7 @@ r = await alice.post("createAccount", {
 });
 check(r.status === 403, "duplicate email rejected -> " + r.status);
 
-r = await alice.post("createAccount", {
+r = await alice.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX",
   email: "not-an-email",
   username: `zz${suffix}`,
   password: pw,
