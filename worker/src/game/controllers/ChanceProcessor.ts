@@ -51,7 +51,7 @@ export class ChanceProcessor {
     this.events.push({
       isGood: false,
       headline: "Dentist appointment",
-      subLine: "You don't have insurance, pay dentist <b>$150</b>",
+      subLine: "You don't have insurance. Pay the dentist <b>$150</b>",
       chanceId: 1,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 150;
@@ -115,7 +115,7 @@ export class ChanceProcessor {
       isGood: false,
       headline: "Building repairs",
       subLine:
-        "Your buildings have fallen into disrepair.  Pay <b>$40 per building</b>",
+        "Your buildings have fallen into disrepair. Pay <b>$40 per building</b>",
       chanceId: 4,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const playerOwnedSquaresWithHouses: SquareGameData[] = game.squareState.filter(
@@ -184,7 +184,7 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: false,
-      headline: "Carbon Tax",
+      headline: "Carbon tax",
       subLine:
         "Everyone must do their part for the environment. Pay <b>5% of your money</b> for your carbon emissions",
       chanceId: 6,
@@ -206,8 +206,8 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: false,
-      headline: "Vehicle Mileage Tax",
-      subLine: "Pay $5 for each square you just moved",
+      headline: "Vehicle mileage tax",
+      subLine: "Pay <b>$5</b> for each square you just moved",
       chanceId: 8,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const lastRoll: DiceRoll = player.rollHistory[0];
@@ -246,7 +246,7 @@ export class ChanceProcessor {
     this.events.push({
       isGood: true,
       headline: "It's your birthday!",
-      subLine: "Every active player gives you a $30 gift card",
+      subLine: "Every active player gives you a <b>$30</b> gift card",
       chanceId: 21,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
@@ -283,7 +283,7 @@ export class ChanceProcessor {
       isGood: true,
       headline: "Tax refund!",
       subLine:
-        "The city has made an error and your properties have been overtaxed.  <br> Get a refund of $45 for each unmortgaged taxable property you own",
+        "The city made an error and overtaxed your properties. Get a refund of <b>$45</b> for each unmortgaged taxable property you own",
       chanceId: 22,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
@@ -334,7 +334,7 @@ export class ChanceProcessor {
     this.events.push({
       isGood: true,
       headline: "Take a college course",
-      subLine: "Gain a skill point",
+      subLine: "Gain <b>a skill point</b>",
       chanceId: 23,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.numAbilityPoints += 1;
@@ -348,7 +348,7 @@ export class ChanceProcessor {
     this.events.push({
       isGood: true,
       headline: "Stimulus check",
-      subLine: "Recieve a $200 handout",
+      subLine: "Receive a <b>$200</b> handout",
       chanceId: 24,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 200;
@@ -363,7 +363,7 @@ export class ChanceProcessor {
       isGood: true,
       headline: "Snitched",
       subLine:
-        "You snitched on your neighbor for hosting a small indoor gathering. Recieve a $55 reward",
+        "You snitched on your neighbor for hosting a small indoor gathering. Receive a <b>$55</b> reward",
       chanceId: 27,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 55;
@@ -376,9 +376,9 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: true,
-      headline: "Government First",
+      headline: "Government first",
       subLine:
-        "Your reported your parents to the authorities for not wearing their masks.  Collect a $70 reward",
+        "You reported your parents to the authorities for not wearing their masks. Collect a <b>$70</b> reward",
       chanceId: 28,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 70;
@@ -392,7 +392,7 @@ export class ChanceProcessor {
     //move to events
     this.events.push({
       isGood: true,
-      headline: "Travel",
+      headline: "Ferry to Governors Island",
       subLine: "Take the ferry to Governors Island!",
       chanceId: 666,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
@@ -405,7 +405,7 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: true,
-      headline: "Travel",
+      headline: "Trip to Wall Street",
       subLine: "Go to Wall Street to tour the stock exchange!",
       chanceId: 667,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
