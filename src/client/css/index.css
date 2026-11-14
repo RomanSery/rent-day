@@ -51,18 +51,161 @@ body {
   padding-left: 10px;
 }
 
-.chance-event-info {
+/* Chance card (dialogs/ChanceEventDialog.tsx). The card sets its own colours so it
+   reads the same whatever sits behind it; `.dark` follows the MUI palette mode. */
+.chance-dialog {
+  --chance-orange: #f59e0b;
+  --chance-orange-deep: #c2410c;
+  --chance-paper: #fffaf0;
+  --chance-ink: #1f2328;
+  --chance-muted: #4b5563;
+  --chance-accent: #15803d;
+  --chance-accent-soft: #dcfce7;
+}
+.chance-dialog.dark {
+  --chance-paper: #1f1b16;
+  --chance-ink: #f5f1ea;
+  --chance-muted: #c9c2b8;
+}
+.chance-dialog .chance-card.bad { --chance-accent: #b91c1c; --chance-accent-soft: #fee2e2; }
+.chance-dialog.dark .chance-card.good { --chance-accent: #4ade80; --chance-accent-soft: rgba(74, 222, 128, 0.16); }
+.chance-dialog.dark .chance-card.bad { --chance-accent: #f87171; --chance-accent-soft: rgba(248, 113, 113, 0.16); }
+
+.chance-dialog .MuiDialog-paper {
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.chance-card {
+  position: relative;
+  background: var(--chance-paper);
+  color: var(--chance-ink);
+  border-radius: 14px;
+  border: 3px solid var(--chance-orange);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  text-align: center;
+}
+
+.chance-card-band {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--chance-orange), var(--chance-orange-deep));
+  color: #fff;
+}
+.chance-card-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--chance-orange-deep);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+}
+.chance-card-kind {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.chance-card-tone {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--chance-orange-deep);
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chance-card-body {
+  padding: 22px 24px 8px;
+}
+.chance-card-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--chance-accent-soft);
+  color: var(--chance-accent);
+  font-size: 36px;
+}
+.chance-card-headline {
+  margin: 14px 0 6px;
+  font-family: "Oswald", sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--chance-ink);
+}
+.chance-card-text {
+  margin: 0 auto;
+  max-width: 32ch;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--chance-muted);
+}
+.chance-card-text b {
+  color: var(--chance-accent);
+  font-weight: 700;
+}
+
+.chance-card-actions {
   display: flex;
   justify-content: center;
+  padding: 16px 24px 20px;
+}
+.chance-dialog .chance-card-close {
+  min-width: 140px;
+  background: var(--chance-orange-deep);
+  color: #fff;
+  font-weight: 600;
+  border-radius: 999px;
+}
+.chance-dialog .chance-card-close:hover {
+  background: #9a3412;
 }
 
-.chance-event-info .headline {
-  font-weight: bold;
-  font-size: 120%;
+@media (prefers-reduced-motion: no-preference) {
+  .chance-card {
+    animation: chance-card-in 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+  .chance-card-icon {
+    animation: chance-icon-pop 360ms cubic-bezier(0.34, 1.6, 0.64, 1) 180ms both;
+  }
+}
+@keyframes chance-card-in {
+  from { opacity: 0; transform: translateY(24px) rotate(-4deg) scale(0.9); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes chance-icon-pop {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.chance-event-info .chance-txt {
-  padding-left: 20px;
+/* phones: use more of the width */
+@media (max-width: 480px) {
+  .chance-dialog .MuiDialog-paper {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  .chance-card-band { padding: 9px 12px; gap: 8px; }
+  .chance-card-kind { font-size: 18px; }
+  .chance-card-body { padding: 18px 16px 6px; }
+  .chance-card-headline { font-size: 24px; }
+  .chance-card-actions { padding: 14px 16px 16px; }
 }
 
 .help-page-cont {

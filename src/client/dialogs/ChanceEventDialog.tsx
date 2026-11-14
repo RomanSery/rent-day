@@ -1,9 +1,7 @@
 import React from "react";
-import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
+import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSmile, faFrownOpen } from "@fortawesome/free-regular-svg-icons";
 import useGameStateStore from "../stores/gameStateStore";
@@ -12,40 +10,40 @@ interface Props {
 
 }
 
+/** The Chance card a player draws on landing on a Chance square (styles: .chance-* in index.css) */
 export const ChanceEventDialog: React.FC<Props> = () => {
 
   const chanceOpen = useGameStateStore(state => state.chanceOpen);
   const chanceEvent = useGameStateStore(state => state.chanceEvent);
   const setChanceOpen = useGameStateStore(state => state.setChanceOpen);
+  const mode = useTheme().palette.mode;
 
-  const getChanceCard = () => {
-    if (!chanceEvent) {
-      return null;
-    }
-
-    return (
-      <div className="chance-event-info">
-        <div className="type">
-          <FontAwesomeIcon icon={chanceEvent.isGood ? faSmile : faFrownOpen} size="3x" />
-        </div>
-        <div className="chance-txt">
-          <div className="headline">{chanceEvent.headline}</div>
-          <div className="sub-line" dangerouslySetInnerHTML={{ __html: chanceEvent.subLine }}></div>
-        </div>
-      </div>
-    );
-  };
-
+  const close = () => setChanceOpen(false);
+  const tone = chanceEvent?.isGood ? "good" : "bad";
 
   return (
-    <Dialog fullWidth={true} maxWidth="sm" onClose={() => setChanceOpen(false)} aria-labelledby="chance-dialog-title" open={chanceOpen}>
-      <DialogTitle id="chance-dialog-title">Chance Event</DialogTitle>
-      <DialogContent>
-        {getChanceCard()}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={() => setChanceOpen(false)} color="primary">Close</Button>
-      </DialogActions>
+    <Dialog fullWidth={true} maxWidth="xs" onClose={close} aria-labelledby="chance-dialog-title" open={chanceOpen}
+      className={`chance-dialog ${mode === "dark" ? "dark" : ""}`}>
+      {chanceEvent &&
+        // keyed by card so a new draw replays the entrance animation
+        <div key={chanceEvent.chanceId} className={`chance-card ${tone}`}>
+          <div className="chance-card-band">
+            <span className="chance-card-mark" aria-hidden="true">?</span>
+            <span className="chance-card-kind">Chance</span>
+            <span className="chance-card-tone">{chanceEvent.isGood ? "Good news" : "Bad news"}</span>
+          </div>
+          <div className="chance-card-body">
+            <div className="chance-card-icon" aria-hidden="true">
+              <FontAwesomeIcon icon={chanceEvent.isGood ? faSmile : faFrownOpen} />
+            </div>
+            <h2 id="chance-dialog-title" className="chance-card-headline">{chanceEvent.headline}</h2>
+            <p className="chance-card-text" dangerouslySetInnerHTML={{ __html: chanceEvent.subLine }}></p>
+          </div>
+          <div className="chance-card-actions">
+            <Button onClick={close} variant="contained" disableElevation={true} className="chance-card-close">Close</Button>
+          </div>
+        </div>
+      }
     </Dialog>
   );
 
