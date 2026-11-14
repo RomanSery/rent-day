@@ -1,62 +1,104 @@
 import React from "react";
 import { Button, TextField, FormControl, InputLabel, NativeSelect, Typography } from "@mui/material";
 import { BackLink } from "./components/BackLink";
+import API from "./api";
+import { isLoggedIn } from "./helpers";
+import { CONTACT_SUBJECTS } from "../core/types/ContactMessage";
 
+const MAX_MESSAGE = 2000;
 
+/** The server's reason for refusing, from a validation error or a plain-text reply. */
+const errorText = (error: any): string => {
+  const data = error?.response?.data;
+  if (data?.errors?.length) {
+    return data.errors[0].msg;
+  }
+  if (typeof data === "string" && data) {
+    return data;
+  }
+  return "Couldn't send your message. Please try again.";
+};
 
-interface Props {
+/** Contact Us: messages are stored by POST /api/contact and read on /admin/messages. */
+export const ContactUsPage: React.FC = () => {
 
-}
+  const [email, setEmail] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [subject, setSubject] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  // never shown: only bots fill it in
+  const [website, setWebsite] = React.useState("");
 
-export const ContactUsPage: React.FC<Props> = () => {
+  const [sending, setSending] = React.useState(false);
+  const [sent, setSent] = React.useState(false);
+  const [error, setError] = React.useState("");
 
-  const [success, setSuccess] = React.useState(false);
-
-  React.useEffect(() => {
-    if (window.location.search.includes('success=true')) {
-      setSuccess(true);
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (sending) {
+      return;
     }
-  }, []);
+    setSending(true);
+    setError("");
+    API.post("contact", { email, name, subject, message, website })
+      .then(() => {
+        setSent(true);
+        setMessage("");
+        setSubject("");
+      })
+      .catch((err) => setError(errorText(err)))
+      .finally(() => setSending(false));
+  };
 
   return (
-    <React.Fragment>
+    <div className="contact-page">
 
-      <BackLink to="/dashboard" label="Lobby" />
+      <BackLink to={isLoggedIn() ? "/dashboard" : "/auth"} label={isLoggedIn() ? "Lobby" : "Back"} />
 
       <Typography component="h2" variant="h5">Contact Us</Typography>
 
-      {success && (
-        <p><strong>Thanks for your message! We will get back to you soon.</strong></p>
+      {sent ? (
+        <div className="contact-sent" role="status">
+          <p><strong>Thanks for your message!</strong> We'll reply to {email} as soon as we can.</p>
+          <Button variant="outlined" onClick={() => setSent(false)}>Send another message</Button>
+        </div>
+      ) : (
+        <form className="contact-form" onSubmit={onSubmit} noValidate={false}>
+          <TextField label="Your email" type="email" fullWidth required name="email" autoComplete="email"
+            value={email} onChange={(e) => setEmail(e.target.value)} slotProps={{ htmlInput: { maxLength: 254 } }} />
+
+          <TextField label="Your name" fullWidth name="name" autoComplete="name"
+            value={name} onChange={(e) => setName(e.target.value)} slotProps={{ htmlInput: { maxLength: 60 } }} />
+
+          <FormControl fullWidth required>
+            <InputLabel htmlFor="contact-subject" shrink>Subject</InputLabel>
+            <NativeSelect id="contact-subject" name="subject" required value={subject} onChange={(e) => setSubject(e.target.value)}>
+              <option value="" disabled>Pick one</option>
+              {Object.entries(CONTACT_SUBJECTS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </NativeSelect>
+          </FormControl>
+
+          <TextField label="Your message" fullWidth required multiline minRows={5} name="message"
+            value={message} onChange={(e) => setMessage(e.target.value)}
+            helperText={`${message.length} / ${MAX_MESSAGE}`}
+            slotProps={{ htmlInput: { maxLength: MAX_MESSAGE } }} />
+
+          {/* honeypot: hidden from people, tempting to bots */}
+          <input className="contact-hp" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true"
+            value={website} onChange={(e) => setWebsite(e.target.value)} />
+
+          {error && <p className="contact-error" role="alert">{error}</p>}
+
+          <div>
+            <Button variant="contained" color="primary" type="submit" disabled={sending}>
+              {sending ? "Sending…" : "Send message"}
+            </Button>
+          </div>
+        </form>
       )}
 
-      <form name="contact-us" method="POST" data-netlify="true" action="/contact/?success=true">
-        <input type="hidden" name="form-name" value="contact-us" />
-        <TextField label="Your Email" fullWidth={true} name="youremail" required={true} />
-
-        <TextField label="Your Name" fullWidth={true} name="yourname" />
-
-        <FormControl fullWidth >
-          <InputLabel htmlFor="class-type">Subject</InputLabel>
-          <NativeSelect name="subject" required={true} fullWidth={true}>
-            <option aria-label="None" value="" />
-            <option value="general">General</option>
-            <option value="feedback">Feedback / Suggestions</option>
-            <option value="questions">Questions</option>
-            <option value="bugs">Bug Report</option>
-            <option value="other">Other</option>
-          </NativeSelect>
-        </FormControl>
-
-        <br />
-        <br />
-
-
-        <textarea name="msg" placeholder="Your message" className="contact-us-msg" rows={5}></textarea>
-
-
-        <Button variant="contained" color="primary" type="submit">Submit</Button>
-      </form>
-
-    </React.Fragment>
+    </div>
   );
 }

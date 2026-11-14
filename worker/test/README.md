@@ -103,6 +103,13 @@ properties, and that a game is recorded once. Start the Worker with
 watch a public game in progress (`/ws?gameId=...&watch=1`), receives the same
 events as the players, can't chat, act or read snapshots, is counted in the
 "watching" number, and can't open password-protected or finished games.
+`npm run test:api:contact` checks the Contact Us form and inbox: signed-out
+and signed-in visitors can send, bad input is refused, the honeypot drops
+bots, messages come back as plain text, and only `ADMIN_EMAILS` accounts can
+list or delete them. Start the Worker with
+`npx wrangler dev --var ADMIN_EMAILS:inbox-admin@t.com` (or set
+`ADMIN_EMAIL=` to match your own entry).
+
 To also check that abandoned games leave the list, start the Worker with
 `npx wrangler dev --var DEV_WATCH_IDLE_SECONDS:6 --var DEV_ACTIVITY_TOUCH_SECONDS:2`
 and run `WATCH_IDLE=1 npm run test:api:watch`.

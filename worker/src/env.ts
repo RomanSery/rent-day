@@ -7,6 +7,13 @@ export interface Env {
   /** per-IP limits on the login and sign-up endpoints (wrangler.jsonc "ratelimits") */
   LOGIN_LIMITER?: RateLimit;
   SIGNUP_LIMITER?: RateLimit;
+  CONTACT_LIMITER?: RateLimit;
+  /**
+   * Comma-separated emails of the accounts that may read Contact Us messages
+   * (/admin/messages). Set it as a secret, `wrangler secret put ADMIN_EMAILS`,
+   * so the addresses stay out of the repository; locally, in .dev.vars.
+   */
+  ADMIN_EMAILS?: string;
   ENVIRONMENT?: string;
   PBKDF2_ITERATIONS?: string;
   /** development only: "true" turns the per-IP rate limits on (they are off in development) */

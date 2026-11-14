@@ -47,6 +47,7 @@ export enum StorageConstants {
   PLAYER_NAME = "myPlayerName",
   USER_ID = "myUserId",
   LOGGED_IN = "isLoggedIn",
+  IS_ADMIN = "isAdmin",
 }
 
 export const getMyGameId = (): string | null => {
@@ -130,6 +131,11 @@ export const setCurrSessionInfo = (data: any): void => {
   sessionStorage.setItem(StorageConstants.USER_ID, data.id);
   sessionStorage.setItem(StorageConstants.PLAYER_NAME, data.userName);
   localStorage.setItem(StorageConstants.LOGGED_IN, "1");
+  if (data.isAdmin) {
+    sessionStorage.setItem(StorageConstants.IS_ADMIN, "1");
+  } else {
+    sessionStorage.removeItem(StorageConstants.IS_ADMIN);
+  }
 
   const gameId: string = data.currGameId;
   if (gameId && gameId.length > 0) {
@@ -147,6 +153,9 @@ export const setJoinedGameStorage = (gameId: string): void => {
     getObjectIdAsHexString(gameId)
   );
 };
+
+/** Shows the Messages link; the server decides who may actually read them. */
+export const isAdmin = (): boolean => sessionStorage.getItem(StorageConstants.IS_ADMIN) === "1";
 
 export const isLoggedIn = (): boolean => {
   return localStorage.getItem(StorageConstants.LOGGED_IN) != null;

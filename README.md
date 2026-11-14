@@ -32,6 +32,24 @@ send nothing except a request for the current state, so spectators can't
 chat or act. Auctions show spectators who has bid, never the amounts. Players
 and spectators see how many people are watching; a game takes up to 50.
 
+### Contact Us messages
+
+The Contact Us page (`/contact`, open to signed-out visitors too) posts to
+`/api/contact`, which stores the message in D1 (`contact_messages`,
+migration 0007). Sending is limited to 3 per minute per IP and 200 per day
+overall, and a hidden honeypot field drops most bot submissions.
+
+To read them, sign in with an account whose email is listed in the
+`ADMIN_EMAILS` secret: the lobby then shows a MESSAGES button that opens
+`/admin/messages`, newest first, with "Reply by email" and Delete. Anyone
+else gets a 404 from the inbox API. Without the page, the same messages can
+be listed from a terminal:
+
+```bash
+cd worker
+npx wrangler d1 execute rentday-db --remote --command "SELECT created_at, email, subject, message FROM contact_messages ORDER BY created_at DESC LIMIT 20"
+```
+
 ### Computer players
 
 A game can include computer players: choose how many when creating a game,
@@ -157,7 +175,13 @@ cd worker
 npm run db:create                 # prints a database_id
 # paste the database_id into worker/wrangler.jsonc
 npm run db:migrate:remote
+npx wrangler secret put ADMIN_EMAILS   # your account's email (comma-separate several)
 ```
+
+`ADMIN_EMAILS` decides who can read Contact Us messages. It is a secret
+rather than a `vars` entry so the address stays out of the repository.
+After pulling new migrations, run `npm run db:migrate:remote` again before
+deploying.
 
 Then, from the repo root, every deploy is:
 

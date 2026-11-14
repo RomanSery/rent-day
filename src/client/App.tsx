@@ -2,7 +2,7 @@ import React from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, getMyUserId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, setWatchingGameId, tryToRedirectToGame } from './helpers';
+import { getMyGameId, getMyUserId, handleApiError, hasPendingInvite, isAdmin, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, setWatchingGameId, tryToRedirectToGame } from './helpers';
 import { InviteNote } from './auth/InviteNote';
 import {
   Routes, Route, Navigate, useNavigate, useLocation, useParams, Link
@@ -22,6 +22,7 @@ import API from "./api";
 import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
+import { AdminMessagesPage } from "./AdminMessagesPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GameStatus } from "../core/enums/GameStatus";
 import useGameStateStore from "./stores/gameStateStore";
@@ -234,6 +235,7 @@ const DashboardDisplay: React.FC = () => {
           {getMyUserId() && <MenuLink to={"/profile/" + getMyUserId()} state={profileFrom("/dashboard", "Lobby")}>MY PROFILE</MenuLink>}
           <MenuLink to="/help">HELP / RULES</MenuLink>
           <MenuLink to="/contact">CONTACT US</MenuLink>
+          {isAdmin() && <MenuLink to="/admin/messages">MESSAGES</MenuLink>}
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={() => onLogout(false)}> LOG OUT</Button>
           <Button fullWidth size="small" sx={{ mb: "10px" }} color="inherit" onClick={() => onLogout(true)}>Log out on all devices</Button>
@@ -348,6 +350,19 @@ const CreateGamePage: React.FC = () => {
   );
 };
 
+const AdminMessages: React.FC = () => {
+  if (!isLoggedIn()) {
+    return <Navigate to="/auth" replace />;
+  }
+  return (
+    <Page>
+      <QueryClientProvider client={queryClient}>
+        <AdminMessagesPage />
+      </QueryClientProvider>
+    </Page>
+  );
+};
+
 const SignUp: React.FC = () => (
   <Page maxWidth="xs">
     <SignUpPage />
@@ -434,6 +449,7 @@ export const App: React.FC = () => {
       <Route path="/create" element={<CreateGamePage />} />
       <Route path="/help" element={<HelpPage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/admin/messages" element={<AdminMessages />} />
 
       <Route path="/newuser" element={<SignUp />} />
       <Route path="/login" element={<LogIn />} />

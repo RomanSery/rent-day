@@ -14,6 +14,8 @@ import { DEFAULT_ITERATIONS, hashPassword, isLegacyHash, verifyPassword } from "
 import { UsersRepo } from "./db/users";
 import { GamesIndexRepo } from "./db/gamesIndex";
 import { HistoryRepo } from "./db/history";
+import { ContactRepo } from "./db/contact";
+import { CONTACT_SUBJECTS, ContactMessage } from "@core/types/ContactMessage";
 import { PlayerProfile } from "@core/types/PlayerProfile";
 import { isValidId, newId } from "./game/ids";
 import { UserDocument } from "./game/model";
@@ -99,10 +101,20 @@ const cleanText = (value: unknown, max: number): string =>
     .trim()
     .substring(0, max);
 
-const sessionResponse = (user: UserDocument, currGameId: string | null) => ({
+/** The accounts that may read Contact Us messages (ADMIN_EMAILS). */
+const isAdmin = (env: Env, user: UserDocument): boolean =>
+  (env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(user.email.toLowerCase());
+
+const sessionResponse = (env: Env, user: UserDocument, currGameId: string | null) => ({
   id: user._id,
   userName: user.username,
   currGameId,
+  // only shows the inbox link; the admin routes check for themselves
+  isAdmin: isAdmin(env, user),
 });
 
 /** a game without a move for this long leaves the watch list */
@@ -230,7 +242,7 @@ app.post("/api/createAccount", async (c) => {
   await users.create(user);
 
   await createSession(c, user._id, wantsRemember(body));
-  return c.json(sessionResponse(user, null));
+  return c.json(sessionResponse(c.env, user, null));
 });
 
 // Checked when the email has no account, so a wrong email takes as long as a
@@ -290,7 +302,7 @@ const login = async (c: AppContext) => {
 
   const currGameId = await resolveCurrentGame(c, users, user);
   await createSession(c, user._id, wantsRemember(body));
-  return c.json(sessionResponse(user, currGameId));
+  return c.json(sessionResponse(c.env, user, currGameId));
 };
 app.post("/api/login", login);
 app.post("/api/logIn", login); // the React client calls this spelling
@@ -324,7 +336,104 @@ app.post("/api/current-session", async (c) => {
     return c.body(null, 401);
   }
   const currGameId = await resolveCurrentGame(c, users, user);
-  return c.json(sessionResponse(user, currGameId));
+  return c.json(sessionResponse(c.env, user, currGameId));
+});
+
+// ---------------------------------------------------------------------------
+// contact us: anyone may send a message; admins read them
+// ---------------------------------------------------------------------------
+
+const CONTACT_LIMITS = {
+  name: 60,
+  message: 2000,
+  /** messages kept per rolling 24 hours, from everyone: a cap on floods */
+  perDay: 200,
+  /** messages an admin's inbox shows */
+  inbox: 200,
+};
+
+/** Plain text for storage (React escapes it when shown): no control characters but line breaks. */
+const plainText = (value: unknown, max: number): string =>
+  String(value ?? "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, "")
+    .trim()
+    .substring(0, max);
+
+app.post("/api/contact", async (c) => {
+  const body = await readBody(c);
+  // a field people never see: only bots fill it in. Pretend it worked.
+  if (body.website) {
+    return c.json({ status: "success" });
+  }
+  if (!(await allowByIp(c, c.env.CONTACT_LIMITER, "contact"))) {
+    return tooManyRequests(c, 60, "Too many messages. Please wait a minute and try again.");
+  }
+
+  const email = String(body.email ?? "").toLowerCase().trim();
+  if (!EMAIL_PATTERN.test(email) || email.length > 254) {
+    return validationError(c, "Please enter a valid email address so we can reply", "email");
+  }
+  const subject = String(body.subject ?? "");
+  if (!Object.prototype.hasOwnProperty.call(CONTACT_SUBJECTS, subject)) {
+    return validationError(c, "Please pick a subject", "subject");
+  }
+  const message = plainText(body.message, CONTACT_LIMITS.message);
+  if (!message) {
+    return validationError(c, "Please write a message", "message");
+  }
+  if (String(body.message ?? "").trim().length > CONTACT_LIMITS.message) {
+    return validationError(c, `Messages can be up to ${CONTACT_LIMITS.message} characters`, "message");
+  }
+
+  const repo = new ContactRepo(c.env.DB);
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  if ((await repo.countSince(dayAgo)) >= CONTACT_LIMITS.perDay) {
+    return c.text("We've received a lot of messages today. Please try again tomorrow.", 429);
+  }
+
+  const session = await getSession(c);
+  await repo.insert({
+    id: newId(),
+    createdAt: new Date().toISOString(),
+    email,
+    name: plainText(body.name, CONTACT_LIMITS.name),
+    subject,
+    message,
+    userId: session?.id,
+    username: session?.userName,
+  });
+  return c.json({ status: "success" });
+});
+
+/** The signed-in admin, or null (the routes then answer 404, as if they didn't exist). */
+const requireAdmin = async (c: AppContext): Promise<UserDocument | null> => {
+  const userId = await requireUserId(c);
+  if (!userId) {
+    return null;
+  }
+  const user = await new UsersRepo(c.env.DB).findById(userId);
+  return user && isAdmin(c.env, user) ? user : null;
+};
+
+app.post("/api/admin/messages", async (c) => {
+  if (!(await requireAdmin(c))) {
+    return c.text("Not found", 404);
+  }
+  const messages: ContactMessage[] = await new ContactRepo(c.env.DB).list(CONTACT_LIMITS.inbox);
+  return c.json({ messages });
+});
+
+app.post("/api/admin/messages/delete", async (c) => {
+  if (!(await requireAdmin(c))) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  if (!isValidId(body.id)) {
+    return c.text("invalid id", 400);
+  }
+  await new ContactRepo(c.env.DB).remove(body.id);
+  return c.json({ status: "success" });
 });
 
 // ---------------------------------------------------------------------------

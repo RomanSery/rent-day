@@ -22,7 +22,7 @@ const clientIp = (c: Ctx): string =>
 export const allowByIp = async (
   c: Ctx,
   limiter: RateLimit | undefined,
-  action: "login" | "signup"
+  action: "login" | "signup" | "contact"
 ): Promise<boolean> => {
   if (!limiter || (isDevEnv(c.env) && c.env.DEV_RATE_LIMIT !== "true")) {
     return true;

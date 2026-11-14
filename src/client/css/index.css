@@ -91,9 +91,29 @@ body {
   margin: 0 0 0 0;
 }
 
-.contact-us-msg {
-  width: 100%;
-}
+/* Contact Us (ContactUsPage.tsx) */
+.contact-page { display: grid; gap: 14px; justify-items: start; text-align: left; padding-bottom: 16px; }
+.contact-page > * { justify-self: stretch; }
+.contact-page .back-link { justify-self: start; }
+.contact-form { display: grid; gap: 16px; }
+.contact-hp { position: absolute; left: -10000px; width: 1px; height: 1px; opacity: 0; }
+.contact-error { margin: 0; color: #b3261e; font-size: 14px; }
+.contact-sent { display: grid; gap: 12px; justify-items: start; padding: 14px 16px; border-radius: 8px; background: #e8f5e9; }
+.contact-sent p { margin: 0; }
+
+/* Admin inbox (AdminMessagesPage.tsx) */
+.inbox { display: grid; gap: 14px; }
+.inbox-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.inbox-item { border: 1px solid #dde1e5; border-radius: 8px; padding: 12px 14px; background: #fafbfc; display: grid; gap: 8px; min-width: 0; }
+.inbox-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-size: 13px; color: #5f6b76; }
+.inbox-from { overflow-wrap: anywhere; }
+.inbox-from b { color: #2b333b; }
+.inbox-when { margin-left: auto; white-space: nowrap; }
+.inbox-subject { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 999px; background: #e3f2fd; color: #0d47a1; }
+.inbox-subject.s-bugs { background: #fde7e5; color: #b3261e; }
+.inbox-subject.s-feedback { background: #e8f5e9; color: #1b5e20; }
+.inbox-text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; color: #2b333b; }
+.inbox-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 
 .MuiDataGrid-colCellTitleContainer {
   overflow: visible !important;
