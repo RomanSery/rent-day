@@ -5,7 +5,7 @@ import React from "react";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { SquareGameData } from "../../core/types/SquareGameData";
-import { areObjectIdsEqual, dollarFormatter } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, formatDollarsWithCents } from "../helpers";
 import useGameStateStore from "../stores/gameStateStore";
 import { InfoItem } from "./PlayerViewer";
 
@@ -94,7 +94,7 @@ export const SquareViewer: React.FC = () => {
             <InfoItem label={houses(4)}>{money(data.rent4)}</InfoItem>
             <InfoItem label={<FontAwesomeIcon icon={faHotel} />}>{money(data.rent5)}</InfoItem>
             <InfoItem label="House cost">{money(data.houseCost)}</InfoItem>
-            <InfoItem label="Electricity">{data.electricityCost ? dollarFormatter.format(data.electricityCost) : "$0"}</InfoItem>
+            <InfoItem label="Electricity">{data.electricityCost ? formatDollarsWithCents(data.electricityCost) : "$0"}</InfoItem>
             <InfoItem label="Tax">{taxText()}</InfoItem>
             {ownerItems()}
           </div>

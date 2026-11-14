@@ -15,6 +15,19 @@ export const dollarFormatterServer = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const centsFormatterServer = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Whole dollars as "$3", anything with cents as "$1.50". */
+export const formatDollarsWithCents = (amount: number): string =>
+  Number.isInteger(amount)
+    ? dollarFormatterServer.format(amount)
+    : centsFormatterServer.format(amount);
+
 export const doesOwnAllPropertiesInGroup = (
   game: GameInstanceDocument,
   squareId: number,

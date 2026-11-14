@@ -4,7 +4,12 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { conEd_position, corruptionAdjustment } from "@core/constants";
 import { PlayerClass } from "@core/enums/PlayerClass";
 import { GameInstanceDocument } from "../model";
-import { areIdsEqual, canTravel, dollarFormatterServer } from "./helpers";
+import {
+  areIdsEqual,
+  canTravel,
+  dollarFormatterServer,
+  formatDollarsWithCents,
+} from "./helpers";
 import { Traits } from "../traits/Traits";
 import { MoneyCalculator } from "./MoneyCalculator";
 
@@ -74,7 +79,7 @@ export class PlayerCostsCalculator {
       const cost = s.numHouses * s.electricityCost!;
       total += cost;
 
-      details.push(s.squareId + "," + dollarFormatterServer.format(cost));
+      details.push(s.squareId + "," + formatDollarsWithCents(cost));
     }
 
     player.electricityTooltip = details.join(";");

@@ -95,7 +95,7 @@ SquareConfigDataMap.set(7, {
   groupId: 2,
 
   houseCost: 50,
-  electricityCost: 1,
+  electricityCost: 0.5,
   tax: 1.0,
   rent: new Map<number, number>([
     [0, 15],
@@ -116,7 +116,7 @@ SquareConfigDataMap.set(9, {
   groupId: 2,
 
   houseCost: 50,
-  electricityCost: 1,
+  electricityCost: 0.5,
   tax: 1.0,
   rent: new Map<number, number>([
     [0, 15],
@@ -133,7 +133,7 @@ SquareConfigDataMap.set(10, {
   groupId: 2,
 
   houseCost: 50,
-  electricityCost: 1,
+  electricityCost: 0.5,
   tax: 1.0,
   rent: new Map<number, number>([
     [0, 20],
@@ -288,7 +288,7 @@ SquareConfigDataMap.set(22, {
   groupId: 5,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.7,
   rent: new Map<number, number>([
     [0, 35],
@@ -309,7 +309,7 @@ SquareConfigDataMap.set(24, {
   groupId: 5,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.7,
   rent: new Map<number, number>([
     [0, 35],
@@ -326,7 +326,7 @@ SquareConfigDataMap.set(25, {
   groupId: 5,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.7,
   rent: new Map<number, number>([
     [0, 40],
@@ -358,7 +358,7 @@ SquareConfigDataMap.set(27, {
   groupId: 6,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.9,
   rent: new Map<number, number>([
     [0, 40],
@@ -379,7 +379,7 @@ SquareConfigDataMap.set(29, {
   groupId: 6,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.9,
   rent: new Map<number, number>([
     [0, 40],
@@ -396,7 +396,7 @@ SquareConfigDataMap.set(30, {
   groupId: 6,
 
   houseCost: 150,
-  electricityCost: 2,
+  electricityCost: 1.5,
   tax: 1.9,
   rent: new Map<number, number>([
     [0, 50],

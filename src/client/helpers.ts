@@ -22,6 +22,19 @@ export const dollarFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+const centsFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Whole dollars as "$3", anything with cents as "$1.50". */
+export const formatDollarsWithCents = (amount: number): string =>
+  Number.isInteger(amount)
+    ? dollarFormatter.format(amount)
+    : centsFormatter.format(amount);
+
 /*
  * The game this tab is watching as a spectator (the /watch page), kept in
  * memory only: it is not the player's own game, so it must never replace
