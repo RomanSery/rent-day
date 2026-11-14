@@ -66,6 +66,10 @@ interface GameStateStore {
   setTaxesViewOpen: (newData: boolean) => void;
   setHelpOpen: (newData: boolean) => void;
 
+  /** signed-in users watching the game (server's WATCHERS event) */
+  watchers: number;
+  setWatchers: (count: number) => void;
+
   showDiceAnimation: boolean;
   setShowDiceAnimation: (newData: boolean) => void;
   animDiceRollResult: DiceRollResult | undefined;
@@ -73,6 +77,11 @@ interface GameStateStore {
 }
 
 const useGameStateStore = create<GameStateStore>()((set, get) => ({
+  watchers: 0,
+  setWatchers: (count: number): void => {
+    set({ watchers: Number.isFinite(count) && count > 0 ? count : 0 });
+  },
+
   showDiceAnimation: false,
   animDiceRollResult: undefined,
   setShowDiceAnimation: (newData: boolean): void => {

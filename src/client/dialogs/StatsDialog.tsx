@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBiohazard, faHandshake, faRobot, faTrain, faBolt, faCheck, faChevronDown } from "@fortawesome/free-solid-svg-icons";
-import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId, isWatching } from "../helpers";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { SquareType } from "../../core/enums/SquareType";
@@ -118,7 +118,8 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
   // the trend lines come from the game's turn-by-turn snapshots
   const gameId = gameState?._id;
   useEffect(() => {
-    if (!statsViewOpen || !gameId) {
+    // per-turn snapshots are for the game's players only
+    if (!statsViewOpen || !gameId || isWatching()) {
       return;
     }
     let live = true;

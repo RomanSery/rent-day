@@ -6,7 +6,7 @@ import { ChatMsg } from "../../core/types/ChatMsg";
 import { GameEvent } from "../../core/types/GameEvent";
 import { newChatMsgSound } from "../gameSounds";
 import useGameStateStore from "../stores/gameStateStore";
-import { getMyPlayerName } from "../helpers";
+import { getMyPlayerName, isWatching } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 import useChatStore from "../stores/chatStore";
 
@@ -69,8 +69,11 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
     setUnread(0);
   };
 
+  // spectators read the chat; only the players talk
+  const canChat = !isWatching();
+
   const sendChatEvent = () => {
-    if (gameState && sendChatMsg && getMyPlayerName()) {
+    if (canChat && gameState && sendChatMsg && getMyPlayerName()) {
       const newMsg: ChatMsg = {
         msg: sendChatMsg,
         player: getMyPlayerName()!
@@ -100,13 +103,16 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
         <ul className="chat-messages">
           {showChat
             ? (messages.length === 0
-              ? <li className="log-empty">No messages yet. Say hi!</li>
+              ? <li className="log-empty">{canChat ? "No messages yet. Say hi!" : "No messages yet."}</li>
               : visible(messages).map((m, index) => <li key={index}><b>{m.player}</b> {m.msg}</li>))
             : visible(log).map((m, index) => <li key={index} dangerouslySetInnerHTML={{ __html: m.msg }} />)}
         </ul>
       </div>
 
-      {showChat &&
+      {showChat && !canChat &&
+        <div className="log-strip-note">Spectators can read the chat but not send messages.</div>}
+
+      {showChat && canChat &&
         <TextField size="small" onChange={(e) => setSendChatMsg(e.currentTarget.value)}
           onKeyDown={(ev) => {
             if (ev.key === 'Enter') {

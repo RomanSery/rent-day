@@ -44,6 +44,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
   const setChanceOpen = useGameStateStore(state => state.setChanceOpen);
   const snackOpen = useGameStateStore(state => state.snackOpen);
   const snackMsg = useGameStateStore(state => state.snackMsg);
+  const setWatchers = useGameStateStore(state => state.setWatchers);
 
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -87,7 +88,11 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       updateData(data);
     });
 
-    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER, (data: Array<ServerMsg>) => {
+    socketService.listenForEvent(GameEvent.WATCHERS, (count: number) => {
+      setWatchers(count);
+    });
+
+    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER,(data: Array<ServerMsg>) => {
       if (data && data.length > 0) {
         setServerMsg(data[0]);
         setServerMsgModalOpen(true);

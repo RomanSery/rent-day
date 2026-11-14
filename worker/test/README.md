@@ -98,3 +98,8 @@ history and summed up into profiles (`/api/getProfile`): win and loss by
 class, head-to-head records, the line for computer players, favourite
 properties, and that a game is recorded once. Start the Worker with
 `npx wrangler dev --var DEV_BOT_PACE_MS:30`.
+
+`npm run test:api:watch` checks spectating: a signed-in user can find and
+watch a public game in progress (`/ws?gameId=...&watch=1`), receives the same
+events as the players, can't chat, act or read snapshots, is counted in the
+"watching" number, and can't open password-protected or finished games.

@@ -22,8 +22,22 @@ export const dollarFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
+/*
+ * The game this tab is watching as a spectator (the /watch page), kept in
+ * memory only: it is not the player's own game, so it must never replace
+ * the stored GAME_ID that leaving, resigning and redirects rely on.
+ */
+let watchingGameId: string | null = null;
+
+export const setWatchingGameId = (gameId: string | null): void => {
+  watchingGameId = gameId;
+};
+
+/** True on the /watch page: the board is read-only and nothing is sent. */
+export const isWatching = (): boolean => watchingGameId !== null;
+
 export const getGameContextFromLocalStorage = (): GameContext => {
-  const gid = getMyGameId();
+  const gid = watchingGameId ?? getMyGameId();
 
   return { gameId: gid };
 };

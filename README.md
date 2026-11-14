@@ -18,6 +18,17 @@ runs entirely on Cloudflare's free tier: no server to keep running.
 Delayed server events (the 5s chance-card reveal, the subway mugging message)
 use Durable Object alarms instead of `setTimeout`.
 
+### Spectators
+
+Any signed-in user can watch a game in progress from the Join page's
+"Watch a game in progress" list (`/watch/:gameId`). Games with a password
+can't be watched, and nobody but the players can open a finished game (no
+replays; per-turn snapshots stay players-only). A spectator's socket
+(`/ws?gameId=...&watch=1`) receives the same broadcasts as the players but may
+send nothing except a request for the current state, so spectators can't
+chat or act. Auctions show spectators who has bid, never the amounts. Players
+and spectators see how many people are watching; a game takes up to 50.
+
 ### Computer players
 
 A game can include computer players: choose how many when creating a game,

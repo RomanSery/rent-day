@@ -4,7 +4,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
-import { areObjectIdsEqual, getIconProp } from "../helpers";
+import { areObjectIdsEqual, getIconProp, isWatching } from "../helpers";
 import { DataGrid, GridColDef, GridRowsProp, GridRowModel, GridRenderCellParams } from '@mui/x-data-grid';
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -114,7 +114,8 @@ export const GameOverDialog: React.FC<Props> = ({ open, onLeaveGame }) => {
         </Container>
 
 
-        {open && gameState && <NetWorthChart gameId={gameState._id} players={gameState.players} />}
+        {/* built from the per-turn snapshots, which only players may read */}
+        {open && gameState && !isWatching() && <NetWorthChart gameId={gameState._id} players={gameState.players} />}
 
         <div style={{ height: 400, width: '100%' }}>
           <DataGrid rows={getDataRows()} columns={columns} initialState={{ pagination: { paginationModel: { pageSize: 10 } } }} pageSizeOptions={[10]} autoHeight={true} density="compact"
@@ -124,7 +125,7 @@ export const GameOverDialog: React.FC<Props> = ({ open, onLeaveGame }) => {
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onLeaveGame} color="primary" variant="contained">LEAVE</Button>
+        <Button onClick={onLeaveGame} color="primary" variant="contained">{isWatching() ? "BACK TO GAMES" : "LEAVE"}</Button>
       </DialogActions>
     </Dialog>
   );

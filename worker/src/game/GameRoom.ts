@@ -51,6 +51,8 @@ export interface ActionResult {
 interface WsAttachment {
   userId: string;
   playerName: string;
+  /** connected to watch a game in progress, not to play (see isWatchable) */
+  watcher?: boolean;
 }
 
 /** Work the object has scheduled for itself through its alarm. */
@@ -136,6 +138,10 @@ const WS_ABUSE_FACTOR = 3;
 /** close code for "you are not a player in this game" (the client stops reconnecting) */
 export const WS_CLOSE_NOT_A_PLAYER = 4003;
 const WS_CLOSE_TOO_MANY = 4008;
+/** WebSocket tag shared by every spectator's sockets */
+const WATCH_TAG = "watch";
+/** spectators one game takes; each one is another socket every event goes to */
+const MAX_WATCHERS = 50;
 const WS_CLOSE_ABUSE = 4029;
 
 /** Counts one socket's messages in the current window (kept in memory only). */
@@ -326,15 +332,34 @@ export class GameRoom extends DurableObject<Env> {
 
   /**
    * What a user may see: a game's players see everything; anyone may look
-   * at a lobby (to decide whether to join); nobody else sees the game.
+   * at a lobby (to decide whether to join) or watch a live public game;
+   * nobody else sees the game.
    */
   private canView(game: GameInstanceDocument, userId: string): boolean {
     return (
       game.status === GameStatus.JOINING ||
+      this.isWatchable(game) ||
       // bots-only simulations (development only) have no players to restrict to
       !!game.settings.botsOnly ||
       game.players.some((p) => areIdsEqual(p._id, userId))
     );
+  }
+
+  /**
+   * Signed-in users may watch a game while it is being played, unless it has
+   * a password. Finished games are not replayed to anyone but their players.
+   */
+  private isWatchable(game: GameInstanceDocument | null): boolean {
+    return !!game && game.status === GameStatus.ACTIVE && !game.settings.password;
+  }
+
+  /**
+   * Whether a spectator's socket may stay open: while the game is watchable,
+   * and once it finishes, so they see how it ended (no new spectators then).
+   */
+  private watcherMayStay(game: GameInstanceDocument | null): boolean {
+    return !!game && !game.settings.password &&
+      (game.status === GameStatus.ACTIVE || game.status === GameStatus.FINISHED);
   }
 
   private isPlayer(game: GameInstanceDocument | null, userId: string): boolean {
@@ -370,14 +395,17 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   async getAuction(auctionId: string, userId: string): Promise<AuctionDocument | null> {
-    if (!this.isPlayer(await this.store.getGame(), userId)) {
+    const game = await this.store.getGame();
+    // spectators get the same view as a player who isn't bidding: no amounts
+    if (!this.isPlayer(game, userId) && !this.isWatchable(game)) {
       return null;
     }
     return AuctionProcessor.getAuction(this.gameCtx, auctionId, userId);
   }
 
   async getLotto(lottoId: string, userId: string): Promise<LottoDocument | null> {
-    if (!this.isPlayer(await this.store.getGame(), userId)) {
+    const game = await this.store.getGame();
+    if (!this.isPlayer(game, userId) && !this.isWatchable(game)) {
       return null;
     }
     return LottoProcessor.getLotto(this.gameCtx, lottoId);
@@ -658,16 +686,21 @@ export class GameRoom extends DurableObject<Env> {
       return new Response("Unauthorized", { status: 401 });
     }
 
-    // Players only, except that anyone may watch a lobby (the join page
-    // listens for "X has joined" before its user has taken a seat). Watchers
-    // are disconnected when the game starts; see dropNonPlayers().
+    // Players, anyone looking at a lobby (the join page listens for "X has
+    // joined" before its user has taken a seat; they are disconnected when
+    // the game starts, see dropNonPlayers()), and spectators of a live public
+    // game, who ask for it with ?watch=1 and may only listen.
     const game = await this.store.getGame();
     if (!game) {
       return new Response("Game not found", { status: 404 });
     }
     const isPlayer = game.players.some((p) => areIdsEqual(p._id, userId));
-    if (!isPlayer && game.status !== GameStatus.JOINING) {
+    const watching = !isPlayer && new URL(request.url).searchParams.get("watch") === "1";
+    if (!isPlayer && game.status !== GameStatus.JOINING && !(watching && this.isWatchable(game))) {
       return new Response("Not a player in this game", { status: 403 });
+    }
+    if (watching && this.ctx.getWebSockets(userTag(userId)).length === 0 && this.watcherCount() >= MAX_WATCHERS) {
+      return new Response("This game has as many spectators as it can take", { status: 429 });
     }
 
     // one user, a handful of sockets: close the oldest beyond the cap
@@ -684,9 +717,12 @@ export class GameRoom extends DurableObject<Env> {
     const pair = new WebSocketPair();
     const [client, server] = Object.values(pair);
 
-    this.ctx.acceptWebSocket(server, [tag]);
-    const attachment: WsAttachment = { userId, playerName };
+    this.ctx.acceptWebSocket(server, watching ? [tag, WATCH_TAG] : [tag]);
+    const attachment: WsAttachment = { userId, playerName, watcher: watching };
     server.serializeAttachment(attachment);
+    if (watching) {
+      this.broadcastWatcherCount();
+    }
 
     return new Response(null, { status: 101, webSocket: client });
   }
@@ -721,13 +757,17 @@ export class GameRoom extends DurableObject<Env> {
     return !isChat || budget.chat <= WS_MAX_CHAT;
   }
 
-  /** Once a game has started, only its players may stay connected. */
+  /** Once a game has started, only its players and spectators may stay connected. */
   private async dropNonPlayers(game: GameInstanceDocument): Promise<void> {
     if (game.status === GameStatus.JOINING) {
       return;
     }
+    const watchersWelcome = this.watcherMayStay(game);
     for (const socket of this.ctx.getWebSockets()) {
-      const { userId } = this.attachmentOf(socket);
+      const { userId, watcher } = this.attachmentOf(socket);
+      if (watcher && watchersWelcome) {
+        continue;
+      }
       if (!game.players.some((p) => areIdsEqual(p._id, userId))) {
         try {
           socket.close(WS_CLOSE_NOT_A_PLAYER, "not a player in this game");
@@ -764,12 +804,14 @@ export class GameRoom extends DurableObject<Env> {
       return;
     }
 
-    // A lobby watcher who hasn't joined may only ask for the current state;
-    // everything else (chat, announcements, refresh requests) is for players.
+    // A lobby watcher who hasn't joined, or a spectator, may only ask for the
+    // current state; everything else (chat, announcements, refresh requests)
+    // is for players.
     const current = await this.store.getGame();
     const isPlayer = !!current && current.players.some((p) => areIdsEqual(p._id, me.userId));
     if (!isPlayer) {
-      if (current && current.status !== GameStatus.JOINING) {
+      const spectating = me.watcher && this.watcherMayStay(current);
+      if (!spectating && current && current.status !== GameStatus.JOINING) {
         // the game started after this socket connected
         await this.dropNonPlayers(current);
         return;
@@ -802,6 +844,7 @@ export class GameRoom extends DurableObject<Env> {
           const auction = await this.store.getAuction(game.auctionId);
           this.sendTo(ws, GameEvent.AUCTION_UPDATE, AuctionProcessor.viewFor(auction, me.userId));
         }
+        this.sendTo(ws, GameEvent.WATCHERS, this.watcherCount());
         if (isPlayer) {
           this.broadcastOthers(ws, GameEvent.SHOW_SNACK_MSG, me.playerName + " re-connected");
         }
@@ -913,6 +956,9 @@ export class GameRoom extends DurableObject<Env> {
 
   async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): Promise<void> {
     const me = this.attachmentOf(ws);
+    if (me.watcher) {
+      this.broadcastWatcherCount(ws);
+    }
     const game = await this.store.getGame();
     if (game && game.players.some((p) => areIdsEqual(p._id, me.userId))) {
       this.broadcastOthers(
@@ -1274,6 +1320,26 @@ export class GameRoom extends DurableObject<Env> {
       await this.storage.put(INDEX_STATE_KEY, current);
     } catch (e) {
       console.log("failed to update lobby index", e);
+    }
+  }
+
+  /** Distinct users watching (several tabs count once); `except` is closing. */
+  private watcherCount(except?: WebSocket): number {
+    const users = new Set<string>();
+    for (const socket of this.ctx.getWebSockets(WATCH_TAG)) {
+      if (socket !== except) {
+        users.add(this.attachmentOf(socket).userId);
+      }
+    }
+    return users.size;
+  }
+
+  private broadcastWatcherCount(except?: WebSocket): void {
+    const count = this.watcherCount(except);
+    for (const ws of this.ctx.getWebSockets()) {
+      if (ws !== except) {
+        this.sendTo(ws, GameEvent.WATCHERS, count);
+      }
     }
   }
 

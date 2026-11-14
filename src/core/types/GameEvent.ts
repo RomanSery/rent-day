@@ -27,4 +27,7 @@ export enum GameEvent {
   SEND_CHANCE_EVENT = "showChanceEvent",
 
   PLAY_SOUND_EFFECT = "playSoundEffect",
+
+  /** server -> clients: how many signed-in users are watching the game */
+  WATCHERS = "watchers",
 }

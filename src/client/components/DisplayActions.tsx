@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from "react";
 import { Button, CircularProgress, Menu, MenuItem } from "@mui/material";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, isWatching, leaveCurrentGameIfJoined, resignCurrGame } from "../helpers";
 import { useNavigate } from "react-router-dom";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
@@ -9,7 +9,7 @@ import { GameEvent } from "../../core/types/GameEvent";
 import { SocketService } from "../sockets/SocketService";
 import { Player } from "../../core/types/Player";
 import { PlayerState } from "../../core/enums/PlayerState";
-import { faDice, faCheckCircle, faTrain, faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import { faDice, faCheckCircle, faTrain, faCaretDown, faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
@@ -42,6 +42,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const setStatsViewOpen = useGameStateStore(state => state.setStatsViewOpen);
   const setTaxesViewOpen = useGameStateStore(state => state.setTaxesViewOpen);
   const setHelpOpen = useGameStateStore(state => state.setHelpOpen);
+  const watchers = useGameStateStore(state => state.watchers);
 
 
   const getMyPlayer = (): Player | undefined => {
@@ -288,7 +289,36 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   }
 
 
+  /** how many are watching, for players and spectators alike */
+  const getWatchersBadge = () => {
+    if (watchers <= 0) {
+      return null;
+    }
+    return (
+      <span className="watchers-badge" title={watchers + (watchers === 1 ? " person is" : " people are") + " watching this game"}>
+        <FontAwesomeIcon icon={faEye} /> {watchers}
+      </span>
+    );
+  };
+
+  /** a spectator can look around but not act */
+  const getWatcherActions = () => (
+    <React.Fragment>
+      <span className="watching-label"><FontAwesomeIcon icon={faEye} /> Watching</span>
+      <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="watch-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
+      <Menu id="watch-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
+        <MenuItem onClick={onViewStats}>Stats</MenuItem>
+        <MenuItem onClick={onViewHelp}>Help</MenuItem>
+        <MenuItem onClick={() => navigate("/find")}>Stop watching</MenuItem>
+      </Menu>
+      {getWatchersBadge()}
+    </React.Fragment>
+  );
+
   const getMyActions = () => {
+    if (isWatching()) {
+      return getWatcherActions();
+    }
     const myTurn = !!isMyTurn();
     const me = getMyPlayer();
 
@@ -333,6 +363,8 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           {myTurn && stillActivePlayer() && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to resign?')) { onResign(); } }}>Give Up</MenuItem>}
           {!stillActivePlayer() && <MenuItem onClick={() => { if (window.confirm('Are you sure you wish to leave the game?')) { onLeaveGame(); } }}>Leave</MenuItem>}
         </Menu>
+
+        {getWatchersBadge()}
 
       </React.Fragment>
     );

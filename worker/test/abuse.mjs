@@ -147,9 +147,7 @@ check(mallory.closeCode === 4003, "watcher disconnected when the game started (c
 console.log("non-players once the game is on");
 {
   const m2 = await newUser("mb");
-  check(!(await m2.connect(gameId)), "non-player socket refused");
-  r = await m2.post("getGame", { gameId });
-  check(r.status === 403, "getGame refused -> " + r.status);
+  check(!(await m2.connect(gameId)), "non-player socket refused (spectators ask with watch=1, see watch.mjs)");
   r = await m2.post("getSnapshots", { gameId });
   check(r.status === 403, "getSnapshots refused -> " + r.status);
   check(!(await m2.connect("0123456789abcdef01234567")), "socket to a game that doesn't exist refused");
@@ -198,7 +196,8 @@ console.log("fake dice");
   check(r.status === 200 && r.data.auction, "players can read the auction");
   const m3 = await newUser("mc");
   r = await m3.post("getAuction", { auctionId: game.auctionId, ...ctx(gameId) });
-  check(r.status === 200 && r.data.auction === null, "non-players can't");
+  check(r.status === 200 && r.data.auction && r.data.auction.bidders.every((b) => !b.bid),
+    "spectators can, without the bid amounts");
 }
 
 console.log("trades");

@@ -113,6 +113,12 @@ export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
     return false;
   }
 
+  /** spectators (and players out of the game) see the auction but don't bid */
+  const isBidder = (): boolean => {
+    const uid = getMyUserId();
+    return !!uid && !!auctionState?.bidders.some((b) => areObjectIdsEqual(b._id, uid));
+  };
+
   const getBidderIcon = (bidder: Bidder) => {
     if (auctionState?.finished) {
       if (auctionState.winnerId && areObjectIdsEqual(bidder._id, auctionState.winnerId)) {
@@ -221,7 +227,7 @@ export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
           </Table>
         </TableContainer>
 
-        {alreadySubmittedBid() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
+        {alreadySubmittedBid() || !isBidder() ? null : <Button color="primary" variant="contained" onClick={onSubmitBid}>Submit Bid</Button>}
 
         {isAuctionFinished() ? <CircleLoader socketService={socketService} /> : null}
       </Container>

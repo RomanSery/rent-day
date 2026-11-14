@@ -755,6 +755,19 @@ td.lb-rank.bronze { color: #8d5420; }
 .gl-seat-text { font-size: 13px; color: #44505b; }
 .gl-join { flex-shrink: 0; min-width: 88px !important; }
 
+.gl-live {
+  font-size: 11px;
+  font-weight: 700;
+  color: #b3261e;
+  background: #fde7e5;
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.gl-section { display: grid; gap: 10px; border-top: 1px solid #e6e9ec; padding-top: 14px; }
+.gl-section h2 { margin: 0; font-size: 17px; }
+
 .gl-empty {
   text-align: center;
   padding: 28px 16px;

@@ -1,5 +1,5 @@
 import React from "react";
-import { areObjectIdsEqual, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, getMyUserId, isWatching } from "../helpers";
 import useGameStateStore from "../stores/gameStateStore";
 import { PlayerViewer } from "./PlayerViewer";
 import { SquareViewer } from "./SquareViewer";
@@ -52,7 +52,9 @@ export const InfoCard: React.FC = () => {
 
   const focusedPlayer = infoFocus === "player" ? findPlayer(playerToView) : undefined;
   const showSquare = !focusedPlayer && squareToView != null;
-  const player = focusedPlayer ?? (showSquare ? undefined : findPlayer(getMyUserId()));
+  // spectators have no player of their own: show whoever's turn it is
+  const fallback = isWatching() ? findPlayer(gameState.nextPlayerToAct) : findPlayer(getMyUserId());
+  const player = focusedPlayer ?? (showSquare ? undefined : fallback);
 
   return (
     <div className="info-card">

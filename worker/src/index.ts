@@ -327,9 +327,12 @@ app.post("/api/findGames", async (c) => {
   if (!(await requireUserId(c))) {
     return invalidAuth(c);
   }
+  const repo = new GamesIndexRepo(c.env.DB);
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  const games = await new GamesIndexRepo(c.env.DB).listJoining(since);
-  return c.json({ games });
+  // games in progress to watch: created in the last 3 days
+  const liveSince = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+  const [games, live] = await Promise.all([repo.listJoining(since), repo.listWatchable(liveSince)]);
+  return c.json({ games, live });
 });
 
 app.post("/api/findPlayers", async (c) => {

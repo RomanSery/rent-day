@@ -104,7 +104,8 @@ export class SocketService {
     }
 
     const url =
-      getWsBase() + "/ws?gameId=" + encodeURIComponent(this.gameId);
+      getWsBase() + "/ws?gameId=" + encodeURIComponent(this.gameId) +
+      (this.pageType === PageType.Watch ? "&watch=1" : "");
     const ws = new WebSocket(url);
     this.ws = ws;
 

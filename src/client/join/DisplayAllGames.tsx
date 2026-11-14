@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLock, faRobot, faRotateRight, faUser, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faLock, faRobot, faRotateRight, faUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../components/BackLink";
 import API from '../api';
 import { GameToJoin } from "../../core/types/GameToJoin";
+import { GameToWatch } from "../../core/types/GameToWatch";
 import { getGameContextFromLocalStorage, getObjectIdAsHexString, leaveCurrentGameIfJoined } from "../helpers";
 import { GameContext } from "../../core/types/GameContext";
 
@@ -39,6 +40,50 @@ const Seats: React.FC<{ game: GameToJoin }> = ({ game }) => {
   );
 };
 
+interface FoundGames {
+  games: GameToJoin[];
+  live: GameToWatch[];
+}
+
+/** Games being played right now, with a button to watch. */
+const LiveGames: React.FC<{ live: GameToWatch[] }> = ({ live }) => {
+  const navigate = useNavigate();
+  if (live.length === 0) {
+    return <p className="gl-note">No public games are being played right now.</p>;
+  }
+  return (
+    <ul className="gl-list">
+      {live.map((g) => {
+        const humans = Math.max(0, g.playersJoined - g.bots);
+        return (
+          <li key={getObjectIdAsHexString(g.gameId)} className="gl-card">
+            <div className="gl-main">
+              <div className="gl-title">
+                <span className="gl-name">{g.name}</span>
+                <span className="gl-live">Live</span>
+              </div>
+              <div className="gl-meta">
+                {g.hostName ? <>Hosted by <b>{g.hostName}</b> · </> : null}
+                started {age(g.startedAt)}
+              </div>
+              <div className="gl-seat-row">
+                <span className="gl-seat-text">
+                  {humans} {humans === 1 ? "player" : "players"}
+                  {g.bots > 0 && <> · {g.bots} computer</>}
+                </span>
+              </div>
+            </div>
+            <Button variant="outlined" color="secondary" className="gl-join" startIcon={<FontAwesomeIcon icon={faEye} />}
+              onClick={() => navigate("/watch/" + getObjectIdAsHexString(g.gameId))}>
+              Watch
+            </Button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
 export const DisplayAllGames: React.FC = () => {
 
   const context: GameContext = getGameContextFromLocalStorage();
@@ -50,16 +95,19 @@ export const DisplayAllGames: React.FC = () => {
     });
   };
 
-  const gamesQuery = useQuery<GameToJoin[], Error>({
+  const gamesQuery = useQuery<FoundGames, Error>({
     queryKey: ["getAllGames"],
-    queryFn: () => API.post("findGames", { context }).then(function (response) { return response.data.games; }),
+    queryFn: () => API.post("findGames", { context }).then(function (response) {
+      return { games: response.data.games ?? [], live: response.data.live ?? [] };
+    }),
     // loaded when the page opens; the Refresh button reloads it. No polling,
     // and no reload on tab focus: each one is a Worker request and a D1 read.
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
 
-  const games = gamesQuery.data ?? [];
+  const games = gamesQuery.data?.games ?? [];
+  const live = gamesQuery.data?.live ?? [];
 
   const body = () => {
     if (gamesQuery.isError) {
@@ -131,6 +179,12 @@ export const DisplayAllGames: React.FC = () => {
         </div>
       </header>
       {body()}
+
+      {gamesQuery.isSuccess &&
+        <section className="gl-section">
+          <h2>Watch a game in progress</h2>
+          <LiveGames live={live} />
+        </section>}
     </div>
   );
 }

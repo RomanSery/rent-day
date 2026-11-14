@@ -8,7 +8,7 @@ import { InfoCard } from "./InfoCard";
 import API from '../api';
 import { GameContext } from "../../core/types/GameContext";
 import { GameEvent } from "../../core/types/GameEvent";
-import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, leaveCurrentGameIfJoined } from "../helpers";
+import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError, isWatching, leaveCurrentGameIfJoined } from "../helpers";
 import { Player } from "../../core/types/Player";
 import { DisplayAuction } from "./DisplayAuction";
 import { DisplayLotto } from "./DisplayLotto";
@@ -140,6 +140,11 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   }
 
   const onLeaveGame = () => {
+    if (isWatching()) {
+      // a spectator has no seat to give up
+      navigate("/find");
+      return;
+    }
     leaveCurrentGameIfJoined(socketService, () => {
       navigate("/dashboard");
     });
@@ -172,7 +177,8 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
   };
 
   const onCountdownComplete = (timeDelta: CountdownTimeDelta) => {
-    if (!gameState) {
+    // the players' clients move things along when time runs out
+    if (!gameState || isWatching()) {
       return;
     }
     const playerToAct = gameState.players.find((p: Player) => areObjectIdsEqual(p._id, gameState.nextPlayerToAct));

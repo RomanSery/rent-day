@@ -2,10 +2,10 @@ import React from "react";
 
 import CssBaseline from "@mui/material/CssBaseline";
 import { GameBoard } from "./components/GameBoard";
-import { getMyGameId, getMyUserId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, tryToRedirectToGame } from './helpers';
+import { getMyGameId, getMyUserId, handleApiError, hasPendingInvite, isLoggedIn, logOut, redirectToHomeIfGameNotFound, rememberReturnTo, setCurrSessionInfo, setWatchingGameId, tryToRedirectToGame } from './helpers';
 import { InviteNote } from './auth/InviteNote';
 import {
-  Routes, Route, Navigate, useNavigate, useLocation, Link
+  Routes, Route, Navigate, useNavigate, useLocation, useParams, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
 import { StaticBoard } from "./join/StaticBoard";
@@ -23,6 +23,9 @@ import queryString from "query-string";
 import { HelpPageContent } from "./HelpPageContent";
 import { ContactUsPage } from "./ContactUsPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GameStatus } from "../core/enums/GameStatus";
+import useGameStateStore from "./stores/gameStateStore";
+import { BackLink } from "./components/BackLink";
 
 // Route components live at module level so that a navigation re-rendering
 // App does not give them a new identity (which would remount them and, for
@@ -120,6 +123,82 @@ const GameDisplay: React.FC = () => {
   );
 };
 
+type WatchCheck = "checking" | "ok" | "unavailable";
+
+/**
+ * Spectating a game in progress: the game board, read-only. Only for live
+ * games without a password; finished games are not replayed.
+ */
+const WatchDisplay: React.FC = () => {
+  const { gameId } = useParams();
+  const validId = !!gameId && /^[0-9a-f]{24}$/i.test(gameId);
+  const [check, setCheck] = React.useState<WatchCheck>(validId ? "checking" : "unavailable");
+
+  // set before the board renders: its components read the game id from here
+  if (validId) {
+    setWatchingGameId(gameId!);
+  }
+  React.useEffect(() => {
+    if (!validId) {
+      return;
+    }
+    setWatchingGameId(gameId!);
+    return () => {
+      setWatchingGameId(null);
+      // don't flash this game on the next board this tab opens
+      useGameStateStore.setState({ data: undefined, watchers: 0 });
+    };
+  }, [gameId, validId]);
+
+  React.useEffect(() => {
+    if (!validId) {
+      return;
+    }
+    let live = true;
+    API.post("getGame", { gameId })
+      .then((response) => {
+        const game = response.data.game;
+        if (live) {
+          setCheck(game && game.status === GameStatus.ACTIVE ? "ok" : "unavailable");
+        }
+      })
+      .catch(() => { if (live) setCheck("unavailable"); });
+    return () => { live = false; };
+  }, [gameId, validId]);
+
+  const socket = React.useMemo(
+    () => (validId && check === "ok" ? new SocketService(PageType.Watch, gameId!) : null),
+    [gameId, validId, check]
+  );
+
+  if (!isLoggedIn()) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (check === "checking") {
+    return null;
+  }
+
+  if (check === "unavailable" || !socket) {
+    return (
+      <Page maxWidth="sm">
+        <div className="game-list">
+          <BackLink to="/find" label="Games" />
+          <h1>Can't watch this game</h1>
+          <p className="gl-sub">It may have finished, not started yet, or need a password. Only games in progress can be watched.</p>
+        </div>
+      </Page>
+    );
+  }
+
+  return (
+    <React.Fragment>
+      <CssBaseline />
+      <GameBoard socketService={socket} />
+    </React.Fragment>
+  );
+};
+
 const DashboardDisplay: React.FC = () => {
   const navigate = useNavigate();
   useRedirectToGame(PageType.Home);
@@ -150,7 +229,7 @@ const DashboardDisplay: React.FC = () => {
           </div>
 
           <MenuLink to="/create">CREATE NEW GAME</MenuLink>
-          <MenuLink to="/find">JOIN GAME</MenuLink>
+          <MenuLink to="/find">JOIN OR WATCH A GAME</MenuLink>
           <MenuLink to="/players">PLAYERS</MenuLink>
           {getMyUserId() && <MenuLink to={"/profile/" + getMyUserId()}>MY PROFILE</MenuLink>}
           <MenuLink to="/help">HELP / RULES</MenuLink>
@@ -347,6 +426,7 @@ export const App: React.FC = () => {
       <Route path="/dashboard" element={<DashboardDisplay />} />
 
       <Route path="/gameinstance" element={<GameDisplay />} />
+      <Route path="/watch/:gameId" element={<WatchDisplay />} />
       <Route path="/join" element={<DisplayJoinGamePage />} />
       <Route path="/players" element={<DisplayPlayersPage />} />
       <Route path="/profile/:playerId" element={<ProfilePage />} />
