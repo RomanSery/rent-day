@@ -93,7 +93,16 @@ const PURGE_FINISHED_AFTER_SECONDS = 30 * 24 * 60 * 60;
 interface IndexState {
   status: GameStatus;
   playersJoined: number;
+  /** when the lobby index last heard of a move in this game (ms) */
+  touchedAt?: number;
 }
+
+/**
+ * How often a game in progress tells the lobby index it is still being
+ * played, so the watch list can leave out abandoned games. One D1 write per
+ * interval of play at most.
+ */
+const ACTIVITY_TOUCH_SECONDS = 5 * 60;
 
 const devSeconds = (env: Env, value: string | undefined, fallback: number): number => {
   if (!isDevEnv(env) || !value) {
@@ -195,6 +204,7 @@ export class GameRoom extends DurableObject<Env> {
   private readonly history: HistoryRepo;
   private readonly gameCtx: GameContext;
   private readonly purgeAfterMs: number;
+  private readonly activityTouchMs: number;
   /** ctx.storage, metered in development (see dev/usage.ts) */
   private readonly storage: DurableObjectStorage;
   /** development only: what this object has cost so far */
@@ -215,6 +225,7 @@ export class GameRoom extends DurableObject<Env> {
     this.gamesIndex = new GamesIndexRepo(db);
     this.history = new HistoryRepo(db);
     this.purgeAfterMs = devSeconds(env, env.DEV_PURGE_SECONDS, PURGE_FINISHED_AFTER_SECONDS) * 1000;
+    this.activityTouchMs = devSeconds(env, env.DEV_ACTIVITY_TOUCH_SECONDS, ACTIVITY_TOUCH_SECONDS) * 1000;
     this.gameCtx = {
       store: this.store,
       isDev: isDevEnv(env),
@@ -306,6 +317,7 @@ export class GameRoom extends DurableObject<Env> {
       await this.storage.put<IndexState>(INDEX_STATE_KEY, {
         status: game.status,
         playersJoined: game.players.length,
+        touchedAt: Date.now(),
       });
       if (game.status === GameStatus.JOINING) {
         // lobbies nobody fills would otherwise stay in storage forever
@@ -1292,17 +1304,31 @@ export class GameRoom extends DurableObject<Env> {
     });
   }
 
+  /**
+   * Keeps the game's lobby index row current: on a change of status or
+   * player count, and every few minutes of play (its updated_at is the
+   * "last move" the watch list filters on). Called after every game action.
+   */
   private async syncIndex(): Promise<void> {
     const game = await this.store.getGame();
     if (!game) {
       return;
     }
+    const now = Date.now();
     const current: IndexState = {
       status: game.status,
       playersJoined: game.players.length,
+      touchedAt: now,
     };
     const last = await this.storage.get<IndexState>(INDEX_STATE_KEY);
-    if (last && last.status === current.status && last.playersJoined === current.playersJoined) {
+    const unchanged = !!last && last.status === current.status && last.playersJoined === current.playersJoined;
+    const touchedAt = last?.touchedAt ?? 0;
+    // only a real move counts: something was saved since the index last
+    // heard of the game (a refused action, e.g. a spectator's, saves nothing)
+    const lastMoveAt = Math.max(Date.parse(game.updatedAt ?? "") || 0, this.store.lastChangeAt);
+    const movedSince = lastMoveAt > touchedAt;
+    const touchDue = game.status === GameStatus.ACTIVE && movedSince && now - touchedAt >= this.activityTouchMs;
+    if (unchanged && !touchDue) {
       return;
     }
     try {
@@ -1316,6 +1342,8 @@ export class GameRoom extends DurableObject<Env> {
         bots: game.players.filter((p) => p.isBot).length,
         createdBy: game.createdBy,
         createdAt: game.createdAt,
+        // the time of the move itself, which may predate this action
+        updatedAt: new Date(lastMoveAt || now).toISOString(),
       });
       await this.storage.put(INDEX_STATE_KEY, current);
     } catch (e) {

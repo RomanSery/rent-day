@@ -105,6 +105,14 @@ const sessionResponse = (user: UserDocument, currGameId: string | null) => ({
   currGameId,
 });
 
+/** a game without a move for this long leaves the watch list */
+const WATCH_IDLE_SECONDS = 30 * 60;
+
+const devIdleSeconds = (env: Env): number => {
+  const n = isDevEnv(env) ? parseInt(env.DEV_WATCH_IDLE_SECONDS ?? "", 10) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : WATCH_IDLE_SECONDS;
+};
+
 const pbkdf2Iterations = (env: Env): number => {
   const n = parseInt(env.PBKDF2_ITERATIONS ?? "", 10);
   return Number.isFinite(n) && n > 0 ? n : DEFAULT_ITERATIONS;
@@ -329,9 +337,12 @@ app.post("/api/findGames", async (c) => {
   }
   const repo = new GamesIndexRepo(c.env.DB);
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-  // games in progress to watch: created in the last 3 days
-  const liveSince = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
-  const [games, live] = await Promise.all([repo.listJoining(since), repo.listWatchable(liveSince)]);
+  // games in progress to watch: created in the last week, with a move in
+  // the last half hour (games record their latest move every few minutes)
+  const createdSince = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const idleSeconds = devIdleSeconds(c.env);
+  const activeSince = new Date(Date.now() - idleSeconds * 1000).toISOString();
+  const [games, live] = await Promise.all([repo.listJoining(since), repo.listWatchable(createdSince, activeSince)]);
   return c.json({ games, live });
 });
 

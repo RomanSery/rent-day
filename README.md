@@ -21,7 +21,10 @@ use Durable Object alarms instead of `setTimeout`.
 ### Spectators
 
 Any signed-in user can watch a game in progress from the Join page's
-"Watch a game in progress" list (`/watch/:gameId`). Games with a password
+"Watch a game in progress" list (`/watch/:gameId`). The list leaves out
+games with no move in the last 30 minutes, since a game whose players all
+leave never finishes: each game records its latest move in the D1 `games`
+row (`updated_at`) at most every 5 minutes of play. Games with a password
 can't be watched, and nobody but the players can open a finished game (no
 replays; per-turn snapshots stay players-only). A spectator's socket
 (`/ws?gameId=...&watch=1`) receives the same broadcasts as the players but may

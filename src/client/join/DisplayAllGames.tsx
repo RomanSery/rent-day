@@ -64,7 +64,7 @@ const LiveGames: React.FC<{ live: GameToWatch[] }> = ({ live }) => {
               </div>
               <div className="gl-meta">
                 {g.hostName ? <>Hosted by <b>{g.hostName}</b> · </> : null}
-                started {age(g.startedAt)}
+                last move {age(g.lastMoveAt)}
               </div>
               <div className="gl-seat-row">
                 <span className="gl-seat-text">

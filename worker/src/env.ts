@@ -22,6 +22,10 @@ export interface Env {
   DEV_PURGE_SECONDS?: string;
   /** development only: delete lobbies that haven't filled after this many seconds (default 24h) */
   DEV_LOBBY_SECONDS?: string;
+  /** development only: how often a game records its latest move in the lobby index (default 5 min) */
+  DEV_ACTIVITY_TOUCH_SECONDS?: string;
+  /** development only: games without a move for this long leave the watch list (default 30 min) */
+  DEV_WATCH_IDLE_SECONDS?: string;
 }
 
 /**

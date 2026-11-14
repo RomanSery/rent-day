@@ -25,13 +25,21 @@ export class DurableObjectGameStore implements GameStore {
   /** the last snapshot written by this instance (turn number, or "end") */
   private lastSnapshot: number | "end" | undefined;
 
+  /**
+   * When this instance last saved anything (ms, 0 if nothing yet): a bid or
+   * a trade saves no game document, but is still a move. In memory only;
+   * read in the same request as the save (GameRoom.syncIndex).
+   */
+  lastChangeAt = 0;
+
   async getGame(): Promise<GameInstanceDocument | null> {
     const game = await this.storage.get<GameInstanceDocument>(GAME_KEY);
     return game ?? null;
   }
 
   async saveGame(game: GameInstanceDocument): Promise<void> {
-    game.updatedAt = new Date().toISOString();
+    this.lastChangeAt = Date.now();
+    game.updatedAt = new Date(this.lastChangeAt).toISOString();
     // The game logic keeps class instances (DiceRoll) in the state while a
     // request runs; persist plain JSON like the old Mongo documents were.
     await this.storage.put(GAME_KEY, JSON.parse(JSON.stringify(game)));
@@ -75,6 +83,7 @@ export class DurableObjectGameStore implements GameStore {
   }
 
   async saveAuction(auction: AuctionDocument): Promise<void> {
+    this.lastChangeAt = Date.now();
     await this.storage.put(`auction:${auction._id}`, auction);
   }
 
@@ -87,6 +96,7 @@ export class DurableObjectGameStore implements GameStore {
   }
 
   async saveLotto(lotto: LottoDocument): Promise<void> {
+    this.lastChangeAt = Date.now();
     await this.storage.put(`lotto:${lotto._id}`, lotto);
   }
 
@@ -99,6 +109,7 @@ export class DurableObjectGameStore implements GameStore {
   }
 
   async saveTrade(trade: TradeDocument): Promise<void> {
+    this.lastChangeAt = Date.now();
     await this.storage.put(`trade:${trade._id}`, trade);
   }
 

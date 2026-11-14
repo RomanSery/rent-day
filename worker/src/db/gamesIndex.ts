@@ -12,6 +12,8 @@ export interface GameIndexRow {
   bots: number;
   createdBy: string;
   createdAt: string;
+  /** when the game last changed (its latest move); defaults to now */
+  updatedAt?: string;
 }
 
 /**
@@ -22,7 +24,7 @@ export class GamesIndexRepo {
   constructor(private readonly db: D1Database) {}
 
   async upsert(row: GameIndexRow): Promise<void> {
-    const now = new Date().toISOString();
+    const now = row.updatedAt ?? new Date().toISOString();
     await this.db
       .prepare(
         `INSERT INTO games (id, name, status, max_players, players_joined, has_password, bots, created_by, created_at, updated_at)
@@ -91,21 +93,23 @@ export class GamesIndexRepo {
 
   /**
    * Games in progress that anyone signed in may watch: started, no password,
-   * at least one person playing. Bounded by creation date so the status +
-   * julianday(created_at) index serves it, and so games abandoned without
-   * ever finishing drop off the list.
+   * at least one person playing, and a move made since `activeAfterIso`
+   * (games abandoned without finishing never leave ACTIVE). Also bounded by
+   * creation date, so the status + julianday(created_at) index limits the
+   * rows scanned.
    */
-  async listWatchable(createdAfterIso: string): Promise<GameToWatch[]> {
+  async listWatchable(createdAfterIso: string, activeAfterIso: string): Promise<GameToWatch[]> {
     const result = await this.db
       .prepare(
         `SELECT g.id, g.name, g.players_joined, g.bots, g.updated_at, u.username AS host_name
          FROM games g LEFT JOIN users u ON u.id = g.created_by
          WHERE g.status = ? AND julianday(g.created_at) > julianday(?)
            AND g.has_password = 0 AND g.players_joined > g.bots
-         ORDER BY julianday(g.created_at) DESC
+           AND julianday(g.updated_at) > julianday(?)
+         ORDER BY julianday(g.updated_at) DESC
          LIMIT 50`
       )
-      .bind(GameStatus.ACTIVE, createdAfterIso)
+      .bind(GameStatus.ACTIVE, createdAfterIso, activeAfterIso)
       .all<{
         id: string; name: string; players_joined: number; bots: number;
         updated_at: string; host_name: string | null;
@@ -116,7 +120,7 @@ export class GamesIndexRepo {
       name: r.name,
       playersJoined: r.players_joined,
       bots: r.bots,
-      startedAt: r.updated_at,
+      lastMoveAt: r.updated_at,
       hostName: r.host_name ?? undefined,
     }));
   }

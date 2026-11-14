@@ -179,6 +179,37 @@ console.log("password-protected games");
   check(!(await v2.connect(pwGame, true)), "spectator socket refused");
 }
 
+if (process.env.WATCH_IDLE) {
+  // needs the Worker started with --var DEV_WATCH_IDLE_SECONDS:6 --var DEV_ACTIVITY_TOUCH_SECONDS:2
+  console.log("abandoned games leave the list");
+  await sleep(7000);
+  r = await viv.post("findGames");
+  check(!r.data.live?.some((g) => g.gameId === gameId), "no move for a while: not listed");
+  // refused actions are not moves, whoever tries them
+  r = await viv.post("actions/roll", { context: { gameId } });
+  check(r.status === 400, "spectator's roll refused -> " + r.status);
+  game = (await alice.post("getGame", { gameId })).data.game;
+  const mover = game.nextPlayerToAct === alice.id ? alice : bob;
+  r = await mover.post("actions/upgradeSkill", { context: { gameId }, skillType: "Fake" });
+  check(r.status === 400, "player's bad request refused -> " + r.status);
+  r = await viv.post("findGames");
+  check(!r.data.live?.some((g) => g.gameId === gameId), "still not listed after refused actions");
+  // a real move: a bid if an auction is open, else a roll or ending the turn.
+  // The index records moves at most every DEV_ACTIVITY_TOUCH_SECONDS: wait that out
+  await sleep(2500);
+  if (game.auctionId) {
+    r = await alice.post("actions/bid", { context: { gameId }, bid: 1 });
+  } else {
+    const moverPlayer = game.players.find((p) => p._id === mover.id);
+    r = await mover.post(moverPlayer.hasRolled ? "actions/completeTurn" : "actions/roll", { context: { gameId } });
+  }
+  check(r.status === 200, "a player moves -> " + r.status + " " + JSON.stringify(r.data).slice(0, 60));
+  r = await viv.post("findGames");
+  const listed = r.data.live?.find((g) => g.gameId === gameId);
+  check(!!listed, "listed again after the move");
+  check(listed && Date.now() - Date.parse(listed.lastMoveAt) < 5000, "lastMoveAt is the latest move: " + listed?.lastMoveAt);
+}
+
 console.log("once the game is over");
 alice.events = [];
 viv.events = [];

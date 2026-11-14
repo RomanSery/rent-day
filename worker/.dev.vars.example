@@ -13,6 +13,11 @@ DEV_PREOWN_PROPERTIES=false
 # Development only: base delay between computer player actions (ms, default 1600)
 # DEV_BOT_PACE_MS=30
 
+# Development only: games without a move for this long leave the watch list
+# (default 1800), and how often a game records its latest move (default 300)
+# DEV_WATCH_IDLE_SECONDS=6
+# DEV_ACTIVITY_TOUCH_SECONDS=2
+
 # Development only: the per-IP login/sign-up rate limits are off in
 # development (the tests create many accounts); set to true to try them
 # DEV_RATE_LIMIT=true

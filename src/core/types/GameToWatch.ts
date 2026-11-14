@@ -5,8 +5,8 @@ export interface GameToWatch {
   /** seats taken, computer players included */
   readonly playersJoined: number;
   readonly bots: number;
-  /** when the game last changed status: when it started, for a live game */
-  readonly startedAt: string;
+  /** roughly when the latest move was made (recorded every few minutes of play) */
+  readonly lastMoveAt: string;
   /** who created the game, when their account still exists */
   readonly hostName?: string;
 }
