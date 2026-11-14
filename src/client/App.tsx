@@ -12,7 +12,7 @@ import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
 import { DisplayAllPlayers } from "./join/DisplayAllPlayers";
-import { PlayerProfilePage } from "./join/PlayerProfilePage";
+import { PlayerProfilePage, profileFrom } from "./join/PlayerProfilePage";
 import { PageType } from "../core/enums/PageType";
 import { CreateGame } from "./join/CreateGame";
 import { Button, Container } from "@mui/material";
@@ -34,8 +34,8 @@ import { BackLink } from "./components/BackLink";
 const queryClient = new QueryClient();
 
 /** Dashboard menu entry: a router link drawn as a full-width MUI button. */
-const MenuLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, children }) => (
-  <Button component={Link} to={to} fullWidth variant="contained" color="primary" sx={{ my: "10px" }}>{children}</Button>
+const MenuLink: React.FC<{ to: string; state?: unknown; children: React.ReactNode }> = ({ to, state, children }) => (
+  <Button component={Link} to={to} state={state} fullWidth variant="contained" color="primary" sx={{ my: "10px" }}>{children}</Button>
 );
 
 /** Game id from the ?gid query parameter, falling back to the stored one. */
@@ -231,7 +231,7 @@ const DashboardDisplay: React.FC = () => {
           <MenuLink to="/create">CREATE NEW GAME</MenuLink>
           <MenuLink to="/find">JOIN OR WATCH A GAME</MenuLink>
           <MenuLink to="/players">PLAYERS</MenuLink>
-          {getMyUserId() && <MenuLink to={"/profile/" + getMyUserId()}>MY PROFILE</MenuLink>}
+          {getMyUserId() && <MenuLink to={"/profile/" + getMyUserId()} state={profileFrom("/dashboard", "Lobby")}>MY PROFILE</MenuLink>}
           <MenuLink to="/help">HELP / RULES</MenuLink>
           <MenuLink to="/contact">CONTACT US</MenuLink>
 

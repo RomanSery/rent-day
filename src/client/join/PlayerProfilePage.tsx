@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay, faFire, faRobot, faTrophy } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,28 @@ import { BackLink } from "../components/BackLink";
 import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
 import { HistoryGame, PlayerProfile } from "../../core/types/PlayerProfile";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
+
+/** Where a profile's back link goes, passed as router state by the link that opened it. */
+export interface ProfileBack {
+  to: string;
+  label: string;
+}
+
+/** Router state for a link to a profile: `<Link to=... state={profileFrom(...)}>`. */
+export const profileFrom = (to: string, label: string): { back: ProfileBack } => ({ back: { to, label } });
+
+const LOBBY: ProfileBack = { to: "/dashboard", label: "Lobby" };
+const LEADERBOARD: ProfileBack = { to: "/players", label: "Leaderboard" };
+
+/** the back target from router state, if it is a plain in-app path */
+const backFromState = (state: unknown): ProfileBack | null => {
+  const back = (state as { back?: Partial<ProfileBack> } | null)?.back;
+  if (back && typeof back.to === "string" && typeof back.label === "string" &&
+    back.to.startsWith("/") && !back.to.startsWith("//")) {
+    return { to: back.to, label: back.label };
+  }
+  return null;
+};
 
 const pct = (wins: number, games: number): string =>
   games > 0 ? Math.round((wins / games) * 100) + "%" : "—";
@@ -51,7 +73,7 @@ const Section: React.FC<{ title: string; className?: string; children: React.Rea
   </section>
 );
 
-const GameRow: React.FC<{ game: HistoryGame; playerId: string }> = ({ game, playerId }) => {
+const GameRow: React.FC<{ game: HistoryGame; playerId: string; back: ProfileBack }> = ({ game, playerId, back }) => {
   const seats = [...game.seats].sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
   return (
     <li className="pf-game">
@@ -69,7 +91,7 @@ const GameRow: React.FC<{ game: HistoryGame; playerId: string }> = ({ game, play
               <i style={{ background: s.color }} aria-hidden="true" />
               {s.bot || areObjectIdsEqual(s.id, playerId)
                 ? <span>{s.name}{s.bot && <FontAwesomeIcon icon={faRobot} className="pf-bot" title="Computer player" />}</span>
-                : <Link to={"/profile/" + s.id}>{s.name}</Link>}
+                : <Link to={"/profile/" + s.id} state={{ back }}>{s.name}</Link>}
               <span className="pf-seat-worth">{s.worth === 0 && s.rank !== 1 ? "out" : dollarFormatter.format(s.worth)}</span>
             </li>
           ))}
@@ -82,6 +104,11 @@ const GameRow: React.FC<{ game: HistoryGame; playerId: string }> = ({ game, play
 export const PlayerProfilePage: React.FC = () => {
   const { playerId = "" } = useParams();
   const isMe = areObjectIdsEqual(playerId, getMyUserId());
+  // back to wherever the profile was opened from (kept while hopping between
+  // profiles); opened directly, your own goes to the lobby, others' to the
+  // leaderboard
+  const location = useLocation();
+  const back = backFromState(location.state) ?? (isMe ? LOBBY : LEADERBOARD);
 
   const query = useQuery<PlayerProfile, Error>({
     queryKey: ["profile", playerId],
@@ -94,7 +121,7 @@ export const PlayerProfilePage: React.FC = () => {
     const notFound = (query.error as any)?.response?.status === 404;
     return (
       <div className="profile">
-        <BackLink to="/players" label="Leaderboard" />
+        <BackLink to={back.to} label={back.label} />
         <p className="lb-note">{notFound ? "There's no player with that link." : "Couldn't load this profile: " + query.error.message}</p>
       </div>
     );
@@ -111,7 +138,7 @@ export const PlayerProfilePage: React.FC = () => {
   return (
     <div className="profile">
       <header className="pf-head">
-        <BackLink to="/players" label="Leaderboard" />
+        <BackLink to={back.to} label={back.label} />
         <h1>
           {p.name}
           {isMe && <span className="lb-you">you</span>}
@@ -172,7 +199,7 @@ export const PlayerProfilePage: React.FC = () => {
                 <tbody>
                   {people.map((o) => (
                     <tr key={o.playerId}>
-                      <td><Link to={"/profile/" + o.playerId}>{o.name}</Link></td>
+                      <td><Link to={"/profile/" + o.playerId} state={{ back }}>{o.name}</Link></td>
                       <td className="num">{o.games}</td>
                       <td className={"num " + (o.ahead > o.behind ? "up" : o.ahead < o.behind ? "down" : "")}>{o.ahead}–{o.behind}</td>
                     </tr>
@@ -204,7 +231,7 @@ export const PlayerProfilePage: React.FC = () => {
 
           <Section title="Recent games" className="pf-wide">
             <ol className="pf-games">
-              {p.recentGames.map((g) => <GameRow key={g.gameId} game={g} playerId={p.playerId} />)}
+              {p.recentGames.map((g) => <GameRow key={g.gameId} game={g} playerId={p.playerId} back={back} />)}
             </ol>
           </Section>
         </div>}
