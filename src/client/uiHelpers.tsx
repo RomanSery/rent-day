@@ -8,7 +8,6 @@ import { SkillType } from "../core/enums/SkillType";
 import {
   corruptionAdjustment,
   luckAdjustment,
-  maxTimeoutsAllowed,
   negotiationAdjustment,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
@@ -253,7 +252,7 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Rent from railroads you own is doubled" />
+          <ListItemText primary="Rent from subway stations you own is doubled" />
         </ListItem>
         <ListItem>
           <ListItemIcon>
@@ -408,135 +407,5 @@ export const getMovementKeyFrames = (
 
 
 
-export const getHelpContent = (): React.JSX.Element => {
-  return (
-    <div>
-      <h4>PLAYER CLASSES</h4>
-
-      <b>Gambler</b>
-      <div className="player-class-description">
-        {getPlayerClassDescription(PlayerClass.Gambler)}
-      </div>
-
-      <b>Conductor</b>
-      <div className="player-class-description">
-        {getPlayerClassDescription(PlayerClass.Conductor)}
-      </div>
-
-      <b>Governor</b>
-      <div className="player-class-description">
-        {getPlayerClassDescription(PlayerClass.Governor)}
-      </div>
-
-      <b>Banker</b>
-      <div className="player-class-description">
-        {getPlayerClassDescription(PlayerClass.Banker)}
-      </div>
-
-      <hr />
-
-      <p>
-        Each player must pick a 'player class' that suits their style of play.
-        Each class gives you special perks, and sometimes some drawbacks.
-          </p>
-      <p>
-        Each class starts with a different set of skill points.
-        Make your decision carefully.
-          </p>
-
-      <hr />
-
-      <h4>SKILL POINTS</h4>
-      <p>
-        Each player starts with <b>5</b> skill points that can be distributed among the three skills:
-            <ul>
-          <li>Negotiation - {getSkillDescription(SkillType.Negotiation)}</li>
-          <li>Luck - {getSkillDescription(SkillType.Luck)}</li>
-          <li>Corruption - {getSkillDescription(SkillType.Corruption)}</li>
-        </ul>
-      </p>
-      <p>
-        Some skills are much more beneficial for certain player classes than others,
-        so distribute your points carefully.  For example, the gambler greatly benefits from Luck.
-          </p>
-      <p>
-        You gain an additional skill point every time you pass PAYDAY.
-          </p>
-
-      <hr />
-
-      <h4>GAME SETTINGS</h4>
-      <p>
-        Turn timers are enabled by default, however you have the option to disable them.  <b>If a player times out {maxTimeoutsAllowed} times consecutively, they will automatically lose the game.</b>
-      </p>
-      <p>This is to prevent players that abandon the game without quitting from ruining the game for everyone else.</p>
-
-      <hr />
-
-      <h4>AUCTIONS</h4>
-      <p>
-        Whenever a player lands on an unowned property, it immediately goes to auction.
-            Each player places a bid and the highest bid wins the auction.  <b>The winner purchases the property for
-            the amount of the 2nd highest bid.</b>
-      </p>
-      <p>
-        This forces the other players to carefully consider their bids even if they are not interested in purchasing the property.
-          </p>
-
-      <hr />
-
-      <h4>PROPERTY</h4>
-      <p>
-        The purchase price of a property is important, it will determine the mortgage amount which is <b>40% of the purchase price</b>.
-          </p>
-      <p>
-        If you want to redeem the property in the future, it will cost you the <b>mortgage amount plus an additional 10%</b>.
-          </p>
-      <p>
-        The cost of building houses on your property is listed on the property card.  Selling houses gives you back half of the build cost.
-          </p>
-
-      <hr />
-
-      <h4>PROPERTY TAXES</h4>
-      <p>
-        Each property has a tax rate that you must pay <b>each turn you own that property</b> if it is unmortgaged.
-          </p>
-      <p>
-        The amount of tax due is calculated as the <b>purchase price * the tax rate.</b>  Player
-            classes and skills can effect the amount of taxes you owe.
-            <br />
-        <b>Property taxes are collected at the start of your turn.</b>
-        <br />
-        <b>You don't have to pay while you are in quarantine.</b>
-      </p>
-      <p>
-        Pay special attention to the purchase price of properties, if you later acquire a property thru trade, you might be stuck with a hefty tax bill.
-          </p>
-
-      <hr />
-
-      <h4>ELECTRICITY COSTS</h4>
-      <p>
-        In addition to property taxes, if you've built any houses on your properties you must pay electricity costs.
-            <br />
-            Each property has an electricity cost that you must pay<b> per house per turn</b>.
-            <br />
-        <b>Electricity costs are collected at the start of your turn.</b>
-        <br />
-        <b>You don't have to pay while you are in quarantine.</b>
-      </p>
-
-      <hr />
-
-      <h4>COMPANIES</h4>
-      <p>
-        There are two companies available for purchase that can greatly help you depending on your player class.
-            <br />
-            Pay special attention to these and how they fit in with your play style!
-          </p>
-    </div>
-  );
-}
 
 

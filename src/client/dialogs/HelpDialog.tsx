@@ -4,28 +4,19 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Button from '@mui/material/Button';
-import { getHelpContent } from "../uiHelpers";
+import { HelpContent } from "../HelpContent";
 import useGameStateStore from "../stores/gameStateStore";
 
-interface Props {
-
-}
-
-export const HelpDialog: React.FC<Props> = () => {
+export const HelpDialog: React.FC = () => {
 
   const helpOpen = useGameStateStore(state => state.helpOpen);
   const setHelpOpen = useGameStateStore(state => state.setHelpOpen);
 
   return (
-    <Dialog maxWidth="md" onClose={() => setHelpOpen(false)} aria-labelledby="help-dialog-title" open={helpOpen}>
-      <DialogTitle id="help-dialog-title">Help</DialogTitle>
-      <DialogContent>
-        <div style={{ height: 400, width: '80%' }}>
-
-          {getHelpContent()}
-
-        </div>
-
+    <Dialog maxWidth="md" fullWidth scroll="paper" onClose={() => setHelpOpen(false)} aria-labelledby="help-dialog-title" open={helpOpen}>
+      <DialogTitle id="help-dialog-title">How to play</DialogTitle>
+      <DialogContent dividers className="help-dialog-content">
+        <HelpContent />
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setHelpOpen(false)} color="primary">Close</Button>

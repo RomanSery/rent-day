@@ -1,24 +1,18 @@
 import { Typography } from "@mui/material";
 import React from "react";
 import { BackLink } from "./components/BackLink";
-import { getHelpContent } from "./uiHelpers";
+import { HelpContent } from "./HelpContent";
 
-
-
-interface Props {
-
-}
-
-export const HelpPageContent: React.FC<Props> = () => {
+export const HelpPageContent: React.FC = () => {
 
   return (
     <div className="help-page-cont">
 
       <BackLink to="/dashboard" label="Lobby" />
 
-      <Typography component="h2" variant="h2">Help</Typography>
+      <Typography component="h2" variant="h2">How to play</Typography>
 
-      {getHelpContent()}
+      <HelpContent syncHash />
 
     </div>
   );
