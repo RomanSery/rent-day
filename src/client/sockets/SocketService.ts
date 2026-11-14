@@ -65,11 +65,23 @@ export class SocketService {
     // throw a render away; an eagerly opened socket would then leak.
   }
 
-  public listenForEvent(event: GameEvent, fn: Function): void {
+  /**
+   * Calls fn for every `event` from the server. Returns a function that
+   * removes the listener again; call it from the effect's cleanup, or the
+   * listener outlives the component and every remount adds another one.
+   */
+  public listenForEvent(event: GameEvent, fn: Function): () => void {
+    const listener = fn as Listener;
     const existing = this.listeners.get(event) || [];
-    existing.push(fn as Listener);
+    existing.push(listener);
     this.listeners.set(event, existing);
     this.ensureConnected();
+    return () => {
+      const current = this.listeners.get(event);
+      if (current) {
+        this.listeners.set(event, current.filter((l) => l !== listener));
+      }
+    };
   }
 
   private ensureConnected(): void {
@@ -122,13 +134,20 @@ export class SocketService {
     };
 
     ws.onmessage = (ev: MessageEvent) => {
-      this.dispatch(ev.data);
+      // a replaced socket still delivering messages would repeat every event
+      if (this.ws === ws) {
+        this.dispatch(ev.data);
+      }
     };
 
     ws.onclose = (ev: CloseEvent) => {
-      if (this.ws === ws) {
-        this.ws = null;
+      if (this.ws !== ws) {
+        // an old socket (closed by disconnect() and since replaced, as when
+        // React StrictMode mounts twice): reconnecting from here would open
+        // a second live socket next to the current one
+        return;
       }
+      this.ws = null;
       // the server closed it on purpose (not a player in this game, too many
       // tabs open, too many messages): reconnecting would only repeat that
       if (STOP_RECONNECT_CODES.includes(ev.code)) {

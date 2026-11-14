@@ -114,8 +114,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
 
   useEffect(() => {
+    const off: Array<() => void> = [];
 
-    socketService.listenForEvent(GameEvent.JOINED_GAME, (data: JoinedGameMsg) => {
+    off.push(socketService.listenForEvent(GameEvent.JOINED_GAME, (data: JoinedGameMsg) => {
       if (data.allJoined) {
         navigate("/gameinstance");
       } else {
@@ -123,25 +124,26 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
         setSnackMsg(data.playerName + " has joined");
         setSnackOpen(true);
       }
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
+    off.push(socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
       setSnackMsg(data);
       setSnackOpen(true);
       gameInfoQuery.refetch();
-    });
+    }));
 
     // sent on (re)connect so a returning player sees who has joined meanwhile
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (game: GameState) => {
+    off.push(socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (game: GameState) => {
       if (game && game.status === GameStatus.ACTIVE) {
         navigate("/gameinstance");
       } else {
         gameInfoQuery.refetch();
       }
-    });
+    }));
 
 
     return function cleanup() {
+      off.forEach((stop) => stop());
       if (socketService) {
         socketService.disconnect();
       }

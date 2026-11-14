@@ -53,36 +53,38 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
 
 
   useEffect(() => {
+    const off: Array<() => void> = [];
 
-    socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: TradeOffer) => {
+    off.push(socketService.listenForEvent(GameEvent.SEND_TRADE_OFFER, (data: TradeOffer) => {
       if (areObjectIdsEqual(data.participant2.playerId, getMyUserId())) {
         setTradeOffer(data);
         setReviewTradeOpen(true);
       }
-    });
+    }));
 
 
-    socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (gameId: any) => {
+    off.push(socketService.listenForEvent(GameEvent.STOP_ANIMATE_DICE, (gameId: any) => {
       setTimeout(() => {
         if (countdownEl.current) {
           countdownEl.current.start();
         }
       }, 5000);
-    });
+    }));
 
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (gameId: any, completedTurn?: boolean) => {
+    off.push(socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (gameId: any, completedTurn?: boolean) => {
       if (completedTurn) {
         if (countdownEl.current) {
           countdownEl.current.stop();
         }
       }
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.TRADE_OFFER_REVIEWED, (data: TradeOffer) => {
+    off.push(socketService.listenForEvent(GameEvent.TRADE_OFFER_REVIEWED, (data: TradeOffer) => {
       setTradeOffer(data);
       setTradeReviewedOpen(true);
-    });
+    }));
+    return () => off.forEach((stop) => stop());
   }, []);
 
   const onRollDice = async () => {

@@ -45,7 +45,9 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
   }, [gameState, initMessages]);
 
   React.useEffect(() => {
-    socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
+    // the server sends NEW_CHAT_MSG to everyone but the sender, who adds
+    // their own message in sendChatEvent
+    return socketService.listenForEvent(GameEvent.NEW_CHAT_MSG, (msg: ChatMsg) => {
       addNewMsg(msg);
       if (!useChatStore.getState().showChat) {
         setUnread((n) => n + 1);

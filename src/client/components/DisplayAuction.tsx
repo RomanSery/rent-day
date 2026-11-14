@@ -50,14 +50,16 @@ export const DisplayAuction: React.FC<Props> = ({ socketService }) => {
   }, []);
 
   useEffect(() => {
+    const off: Array<() => void> = [];
     if (isMountedRef.current) {
-      socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: AuctionState) => {
+      off.push(socketService.listenForEvent(GameEvent.AUCTION_UPDATE, (data: AuctionState) => {
         setAuctionState(data);
         if (data && data.finished && !data.isTie && data.winnerId && areObjectIdsEqual(data.winnerId, getMyUserId())) {
           celebrateAuctionWin(data._id);
         }
-      });
+      }));
     }
+    return () => off.forEach((stop) => stop());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

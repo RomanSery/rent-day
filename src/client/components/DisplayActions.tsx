@@ -56,10 +56,12 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const [endingTurn, setEndingTurn] = React.useState(false);
 
   React.useEffect(() => {
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
+    const off: Array<() => void> = [];
+    off.push(socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: any) => {
       setRollBtnHidden(false);
       setEndingTurn(false);
-    });
+    }));
+    return () => off.forEach((stop) => stop());
   }, []);
 
   const onClickRoll = async () => {

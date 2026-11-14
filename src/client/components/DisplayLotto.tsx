@@ -40,11 +40,13 @@ export const DisplayLotto: React.FC<Props> = ({ socketService }) => {
   }, []);
 
   useEffect(() => {
+    const off: Array<() => void> = [];
     if (isMountedRef.current) {
-      socketService.listenForEvent(GameEvent.LOTTO_UPDATE, (data: LottoState) => {
+      off.push(socketService.listenForEvent(GameEvent.LOTTO_UPDATE, (data: LottoState) => {
         setLottoState(data);
-      });
+      }));
     }
+    return () => off.forEach((stop) => stop());
   }, []);
 
 

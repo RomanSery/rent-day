@@ -70,43 +70,44 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
 
 
   useEffect(() => {
+    const off: Array<() => void> = [];
 
-    socketService.listenForEvent(GameEvent.SHOW_SNACK_MSG, (data: any) => {
+    off.push(socketService.listenForEvent(GameEvent.SHOW_SNACK_MSG, (data: any) => {
       setSnackMsg(data);
       setSnackOpen(true);
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
+    off.push(socketService.listenForEvent(GameEvent.LEAVE_GAME, (data: any, game: GameState) => {
       updateData(game);
       setSnackMsg(data);
       setSnackOpen(true);
-    });
+    }));
 
 
-    socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
+    off.push(socketService.listenForEvent(GameEvent.UPDATE_GAME_STATE, (data: GameState) => {
       clearMovement();
       updateData(data);
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.WATCHERS, (count: number) => {
+    off.push(socketService.listenForEvent(GameEvent.WATCHERS, (count: number) => {
       setWatchers(count);
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER,(data: Array<ServerMsg>) => {
+    off.push(socketService.listenForEvent(GameEvent.SHOW_MSG_FROM_SERVER,(data: Array<ServerMsg>) => {
       if (data && data.length > 0) {
         setServerMsg(data[0]);
         setServerMsgModalOpen(true);
       }
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.SEND_CHANCE_EVENT, (data: Array<ChanceEvent>) => {
+    off.push(socketService.listenForEvent(GameEvent.SEND_CHANCE_EVENT, (data: Array<ChanceEvent>) => {
       if (data && data.length > 0) {
         setChanceEvent(data[0]);
         setChanceOpen(true);
       }
-    });
+    }));
 
-    socketService.listenForEvent(GameEvent.PLAY_SOUND_EFFECT, (data: Array<SoundMsg>) => {
+    off.push(socketService.listenForEvent(GameEvent.PLAY_SOUND_EFFECT, (data: Array<SoundMsg>) => {
       if (data && data.length > 0) {
         const msg = data[0];
         if (areObjectIdsEqual(getMyUserId(), msg.playerId)) {
@@ -115,9 +116,10 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
           }
         }
       }
-    });
+    }));
 
     return function cleanup() {
+      off.forEach((stop) => stop());
       if (socketService) {
         socketService.disconnect();
       }
