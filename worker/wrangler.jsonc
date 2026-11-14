@@ -37,7 +37,7 @@
     {
       "binding": "DB",
       "database_name": "block-barons-db",
-      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID",
+      "database_id": "57e89a3f-9539-40dd-bf24-cd733c3adba7",
       "migrations_dir": "migrations"
     }
   ],
