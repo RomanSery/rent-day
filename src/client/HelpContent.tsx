@@ -367,7 +367,12 @@ const ChanceLottoTopic = () => (
     <p>
       Landing on Chance draws a random event. Some are good news, some are bad: you might
       collect money, pay a bill, gain a skill point or be sent somewhere else on the board.
-      The rest is for you to discover.
+      Some cards read the board and hit whoever is ahead or help whoever is behind, so
+      they can land on another player. The rest is for you to discover.
+    </p>
+    <p>
+      A few cards give you a choice. Pick an option on the card before you roll again or
+      end your turn. If your turn runs out first, the card's first option is taken for you.
     </p>
     <p>
       If a Chance card moves you onto an unowned property, it goes to auction as usual.

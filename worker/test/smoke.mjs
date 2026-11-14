@@ -220,6 +220,13 @@ for (let turn = 0; turn < 10 && game.status === "Active"; turn++) {
         "result has the price paid and every bid, highest first");
     }
 
+    if (game.pendingChance?.playerId === cur.id) {
+      console.log("    chance choice");
+      const c = await cur.post("actions/chanceChoice", { choice: game.pendingChance.choices[0].key, context: { gameId } });
+      check(c.status === 200, "chance choice accepted");
+      game = (await cur.post("getGame", { gameId })).data.game;
+    }
+
     if (game.lottoId) {
       console.log("    lotto");
       const l = await cur.post("actions/pickLotto", { opt: 1, context: { gameId } });

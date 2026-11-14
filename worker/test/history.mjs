@@ -80,6 +80,11 @@ const buyingTurn = async (human, gameId) => {
       await sleep(100);
     }
   }
+  if (g.pendingChance?.playerId === human.id) {
+    // a choice card (Detour): take the first option
+    await human.post("actions/chanceChoice", { ...ctx(gameId), choice: g.pendingChance.choices[0].key });
+    g = await getGame(human, gameId);
+  }
   if (g.lottoId) {
     await human.post("actions/pickLotto", { ...ctx(gameId), opt: 1 });
     g = await getGame(human, gameId);

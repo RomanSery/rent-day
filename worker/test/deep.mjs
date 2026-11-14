@@ -119,6 +119,12 @@ const forcedRoll = async (players, gameId, cur, d1, d2, bidFor) => {
     }
     game = await getGame(cur, gameId);
   }
+  if (game.pendingChance?.playerId === cur.id) {
+    // a choice card (Detour): take the first option
+    const c = await cur.post("actions/chanceChoice", { ...ctx(gameId), choice: game.pendingChance.choices[0].key });
+    if (c.status !== 200) console.log("    chance choice rejected: " + c.data);
+    game = await getGame(cur, gameId);
+  }
   if (game.lottoId) {
     const l = await cur.post("actions/pickLotto", { ...ctx(gameId), opt: 1 });
     if (l.status !== 200) console.log("    lotto pick rejected: " + l.data);

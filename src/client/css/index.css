@@ -177,6 +177,22 @@ body {
 .chance-dialog .chance-card-close:hover {
   background: #9a3412;
 }
+.chance-dialog .chance-card-close.Mui-disabled {
+  background: var(--chance-orange-deep);
+  color: #fff;
+  opacity: 0.6;
+}
+.chance-card-choices {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.chance-card-waiting {
+  margin: 12px 0 0;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--chance-muted);
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .chance-card {

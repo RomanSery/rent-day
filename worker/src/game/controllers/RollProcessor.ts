@@ -76,6 +76,13 @@ export class RollProcessor {
     }
   }
 
+  private forceChanceId: number | null = null;
+
+  /** development only, like the forced dice: the Chance card to draw */
+  public setForceChanceId(chanceId: number | null): void {
+    this.forceChanceId = chanceId;
+  }
+
   public getMovementKeyFrames(): Array<number> {
     return this.movementKeyframes;
   }
@@ -124,6 +131,13 @@ export class RollProcessor {
     if (this.game.lottoId && !andCompleteTurn) {
       return "Pick a lotto prize before rolling again";
     }
+    if (this.hasPendingChance()) {
+      if (!andCompleteTurn) {
+        return "Pick an option on your Chance card first";
+      }
+      // the turn timer ran out on a choice card: take its default option
+      await this.settlePendingChance(null);
+    }
 
     if (this.player.money < 0) {
       return (await this.handleNegativeMoney()) ?? "you cant roll with negative money;";
@@ -137,14 +151,41 @@ export class RollProcessor {
 
     if (ChanceProcessor.shouldCreateChance(this.player.position)) {
       const processor = new ChanceProcessor(this.game);
-      chance = await processor.createChanceEvent();
+      const forced = this.ctx.isDev && this.forceChanceId != null ? processor.getEvent(this.forceChanceId) : undefined;
+      chance = forced ?? (await processor.createChanceEvent(this.player));
       if (chance) {
-        const moveToPos = chance.makeItHappen(this.game, this.player);
+        // read the board before the card changes it
+        chance.subLine = chance.getSubLine(this.game, this.player);
+        if (chance.getIsGood) {
+          chance.isGood = chance.getIsGood(this.game, this.player);
+        }
+
+        let moveToPos: number | null = null;
+        if (chance.choice) {
+          const options = chance.choice.getOptions(this.game, this.player);
+          if (this.player.isBot || andCompleteTurn) {
+            // computer players pick at once; a timed-out turn takes the default
+            const key = this.player.isBot ? chance.choice.botPick(this.game, this.player) : options[0].key;
+            const picked = chance.choice.describe(this.game, this.player, key);
+            moveToPos = chance.choice.resolve(this.game, this.player, key);
+            chance.subLine += "<br /> (" + picked + ")";
+            this.rollDesc += " <br /> Chance: " + picked;
+          } else {
+            chance.choices = options;
+            this.game.pendingChance = {
+              ...toClientChanceEvent(chance),
+              playerId: this.player._id,
+              choices: options,
+            };
+          }
+        } else {
+          moveToPos = chance.makeItHappen(this.game, this.player);
+        }
+
         if (moveToPos) {
           this.addChanceMovementKeyFrames(moveToPos);
           this.player.position = moveToPos;
         }
-        chance.subLine = chance.getSubLine(this.game, this.player);
       }
     }
 
@@ -282,6 +323,9 @@ export class RollProcessor {
     }
     if (this.game.lottoId) {
       return "Pick a lotto prize first";
+    }
+    if (this.hasPendingChance()) {
+      return "Pick an option on your Chance card first";
     }
 
     if (squareId === this.player.position) {
@@ -572,6 +616,96 @@ export class RollProcessor {
     return this.player.rollHistory[0];
   }
 
+  /** The player picks one of the options on the Chance card they drew. */
+  public async chooseChanceOption(key: string): Promise<string> {
+    await this.init();
+
+    if (!this.game) {
+      return "game not found";
+    }
+    if (this.game.status !== GameStatus.ACTIVE) {
+      return "Game is not active";
+    }
+    if (!this.player) {
+      return "player not found";
+    }
+    if (this.player.state === PlayerState.BANKRUPT) {
+      return this.player.name + " is bankrupt";
+    }
+    if (!this.hasPendingChance()) {
+      return "There is no Chance card waiting for you";
+    }
+
+    const errMsg = await this.settlePendingChance(key);
+    if (errMsg) {
+      return errMsg;
+    }
+    await this.ctx.store.saveGame(this.game);
+    return "";
+  }
+
+  private hasPendingChance(): boolean {
+    const pending = this.game?.pendingChance;
+    return !!pending && !!this.player && areIdsEqual(pending.playerId, this.player._id);
+  }
+
+  /**
+   * Carries out an option on the player's pending Chance card (null: the
+   * card's default, its first option). Walking to a square plays out like a
+   * Chance move during a roll: payday if the piece passes it, an auction if
+   * the square is for sale.
+   */
+  private async settlePendingChance(key: string | null): Promise<string> {
+    const game = this.game!;
+    const player = this.player!;
+    const pending = game.pendingChance!;
+    const option = key == null ? pending.choices[0] : pending.choices.find((o) => o.key === key);
+    if (!option) {
+      return "That isn't one of the card's options";
+    }
+    game.pendingChance = null;
+
+    const event = new ChanceProcessor(game).getEvent(pending.chanceId);
+    if (!event?.choice) {
+      return "";
+    }
+
+    const picked = event.choice.describe(game, player, option.key);
+    const moveToPos = event.choice.resolve(game, player, option.key);
+    let desc = "Chance: " + picked;
+
+    if (moveToPos) {
+      const from = player.position;
+      this.movementKeyframes = [];
+      for (let pos = from; pos !== moveToPos; pos = (pos % last_pos) + 1) {
+        this.movementKeyframes.push(pos);
+      }
+      this.movementKeyframes.push(moveToPos);
+      player.position = moveToPos;
+      this.newPosition = moveToPos;
+
+      if (moveToPos < from) {
+        MoneyCalculator.collectSalary(player);
+        addStat(player, "paydays", 1);
+        player.numAbilityPoints++;
+        desc += " - Payday, collect your salary!";
+      }
+
+      if (AuctionProcessor.shouldCreateAuction(game, moveToPos)) {
+        const newAuction = await AuctionProcessor.createAuction(this.ctx, game, player);
+        game.auctionId = newAuction._id;
+        game.auctionSquareId = newAuction.squareId;
+        if (game.settings.useTimers) {
+          game.nextPlayerActBy = newAuction.endsAt;
+        }
+      }
+    }
+
+    game.log.push({ msg: "<b>" + player.name + "</b> - " + desc, player: "" });
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+    return "";
+  }
+
   public async completeMyTurn(
     autoComplete: boolean,
     incrementTimeouts: boolean
@@ -612,6 +746,14 @@ export class RollProcessor {
 
     if (!autoComplete && this.game.lottoId) {
       return "There is an active lotto game, pick a prize first";
+    }
+
+    if (this.hasPendingChance()) {
+      if (!autoComplete) {
+        return "Pick an option on your Chance card first";
+      }
+      // out of time: the card's default option
+      await this.settlePendingChance(null);
     }
 
     this.doCompleteTurn(autoComplete, incrementTimeouts);
@@ -665,6 +807,8 @@ export class RollProcessor {
     if (autoComplete && this.game!.lottoId) {
       this.game!.lottoId = null;
     }
+    // a choice card never outlives its player's turn
+    this.game!.pendingChance = null;
 
     if (this.game!.results) {
       const last = this.game!.results;

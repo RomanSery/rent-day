@@ -434,6 +434,9 @@ export class GameProcessor {
     losser.state = PlayerState.BANKRUPT;
     losser.hasTraveled = true;
     losser.hasRolled = true;
+    if (game.pendingChance && areIdsEqual(game.pendingChance.playerId, losser._id)) {
+      game.pendingChance = null;
+    }
 
     if (!losser.finishedRank) {
       losser.finishedRank = numPlayersStillInIt;

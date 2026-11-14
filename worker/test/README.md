@@ -62,6 +62,12 @@ the Worker started with short timers:
 npx wrangler dev --var DEV_TURN_SECONDS:6 --var DEV_AUCTION_SECONDS:6
 ```
 
+`npm run test:api:chanceboard` forces the board-reading Chance cards (dev
+only, like the forced dice): Robin Hood takes money from the leader, and the
+Detour choice card waits for its player, blocks rolling and ending the turn,
+and settles on a pick or on the turn timer. The timer check waits out the turn
+(80s by default, less with `--var DEV_TURN_SECONDS:15`).
+
 `npm run test:api:bots` plays a human against two computer players to the
 end of a game and checks the lobby controls for bots. Start the Worker with a
 fast bot pace so it finishes in under a minute:

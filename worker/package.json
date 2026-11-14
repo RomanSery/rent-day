@@ -24,7 +24,8 @@
     "test:api:seeded": "node test/seeded.mjs",
     "test:api:history": "node test/history.mjs",
     "test:api:watch": "node test/watch.mjs",
-    "test:api:contact": "node test/contact.mjs"
+    "test:api:contact": "node test/contact.mjs",
+    "test:api:chanceboard": "node test/chanceboard.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

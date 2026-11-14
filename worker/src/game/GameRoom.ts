@@ -477,10 +477,12 @@ export class GameRoom extends DurableObject<Env> {
   async roll(
     userId: string,
     forceDie1: number | null,
-    forceDie2: number | null
+    forceDie2: number | null,
+    forceChanceId: number | null = null
   ): Promise<ActionResult> {
     return this.runAction(async () => {
       const processor = new RollProcessor(this.gameCtx, userId, forceDie1, forceDie2);
+      processor.setForceChanceId(forceChanceId);
       const errMsg = await processor.roll(false, false);
       if (errMsg) {
         return fail(errMsg);
@@ -517,6 +519,26 @@ export class GameRoom extends DurableObject<Env> {
         playerId: userId,
         diceRoll: toDiceResult(processor.getLastDiceRoll()),
         frames: processor.getMovementKeyFrames(),
+      });
+    });
+  }
+
+  async chooseChance(userId: string, choice: string): Promise<ActionResult> {
+    return this.runAction(async () => {
+      const processor = new RollProcessor(this.gameCtx, userId, null, null);
+      const errMsg = await processor.chooseChanceOption(choice);
+      if (errMsg) {
+        return fail(errMsg);
+      }
+      const frames = processor.getMovementKeyFrames() ?? [];
+      if (frames.length > 0) {
+        this.lastMove = { playerId: userId, diceRoll: null, frames };
+      }
+      return ok({
+        needToAnimate: frames.length > 0,
+        playerId: userId,
+        diceRoll: null,
+        frames,
       });
     });
   }

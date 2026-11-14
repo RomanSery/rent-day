@@ -12,6 +12,7 @@ import { SquareThemeData } from "@core/types/SquareThemeData";
 import { TradeParticipant } from "@core/types/TradeParticipant";
 import { RentPaid } from "@core/types/RentPaid";
 import { AuctionResult } from "@core/types/AuctionResult";
+import { PendingChanceChoice } from "@core/types/ChanceEvent";
 
 export interface GameInstanceDocument {
   _id: string;
@@ -25,6 +26,8 @@ export interface GameInstanceDocument {
   auctionId: string | null;
   auctionSquareId: number | null;
   lottoId: string | null;
+  /** a Chance card whose player still has to pick an option (humans only) */
+  pendingChance?: PendingChanceChoice | null;
   allJoined: boolean;
   status: GameStatus;
   results: LastResult | null;

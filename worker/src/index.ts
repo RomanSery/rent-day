@@ -898,7 +898,7 @@ const squareAction = (
 app.post(
   "/api/actions/roll",
   action((room, userId, body) =>
-    room.roll(userId, toInt(body.forceDie1), toInt(body.forceDie2))
+    room.roll(userId, toInt(body.forceDie1), toInt(body.forceDie2), toInt(body.forceChanceId))
   )
 );
 
@@ -936,6 +936,17 @@ app.post(
       return { errMsg: "Opt is not valid" };
     }
     return room.pickLotto(userId, opt);
+  })
+);
+
+app.post(
+  "/api/actions/chanceChoice",
+  action(async (room, userId, body) => {
+    const choice = body.choice;
+    if (typeof choice !== "string" || choice.length === 0 || choice.length > 20) {
+      return { errMsg: "Choice is not valid" };
+    }
+    return room.chooseChance(userId, choice);
   })
 );
 

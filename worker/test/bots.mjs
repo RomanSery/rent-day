@@ -89,6 +89,11 @@ const humanTurn = async (human, gameId, bid = 0) => {
   let r = await human.post("actions/roll", ctx(gameId));
   if (r.status !== 200) return { ok: false, msg: r.data };
   let g = await getGame(human, gameId);
+  if (g.pendingChance?.playerId === human.id) {
+    // a choice card (Detour): pay rather than walk into another auction
+    await human.post("actions/chanceChoice", { ...ctx(gameId), choice: g.pendingChance.choices[0].key });
+    g = await getGame(human, gameId);
+  }
   if (g.auctionId) {
     await human.post("actions/bid", { ...ctx(gameId), bid });
     // bots bid on their own; wait for the auction to close

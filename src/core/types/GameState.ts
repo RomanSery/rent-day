@@ -7,6 +7,7 @@ import { SquareGameData } from "./SquareGameData";
 import { SquareThemeData } from "./SquareThemeData";
 import { RentPaid } from "./RentPaid";
 import { AuctionResult } from "./AuctionResult";
+import { PendingChanceChoice } from "./ChanceEvent";
 
 export interface GameState {
   readonly _id: string;
@@ -20,6 +21,8 @@ export interface GameState {
   readonly auctionId: string;
   readonly auctionSquareId: number;
   readonly lottoId: string;
+  /** a Chance card whose player still has to pick an option */
+  readonly pendingChance?: PendingChanceChoice | null;
   readonly results: LastResult;
   readonly status: GameStatus;
   readonly messages: Array<ChatMsg>;

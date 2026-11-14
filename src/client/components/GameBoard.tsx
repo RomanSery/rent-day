@@ -210,7 +210,7 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       <GamePieces socketService={socketService} />
 
 
-      <ChanceEventDialog />
+      <ChanceEventDialog socketService={socketService} />
       <ServerMsgDialog />
 
       <Snackbar
