@@ -126,6 +126,8 @@ const devMillis = (env: Env, value: string | undefined, fallback: number): numbe
  * development (the API tests run bots at 30ms).
  */
 const DEFAULT_BOT_PACE_MS = 1600;
+/** jobs due this soon run in the current alarm: alarms can fire a little early */
+const ALARM_EARLY_MS = 50;
 
 const PENDING_EVENTS_KEY = "pendingEvents";
 const INDEX_STATE_KEY = "indexState";
@@ -1061,7 +1063,7 @@ export class GameRoom extends DurableObject<Env> {
       this.devUsage().alarms++;
     }
     const jobs = await this.loadJobs();
-    const now = Date.now() + 50; // alarms can fire a few ms early
+    const now = Date.now() + ALARM_EARLY_MS; // alarms can fire a few ms early
     const due = jobs.filter((j) => j.at <= now).sort((a, b) => a.at - b.at);
     const rest = jobs.filter((j) => j.at > now);
     // persist the remainder first so handlers can schedule new work safely
@@ -1102,9 +1104,14 @@ export class GameRoom extends DurableObject<Env> {
             console.log("bot step limit reached for", job.botId);
             return;
           }
-          // the bot's piece is still moving: its next step is already booked
-          // for after it lands, so a stray earlier step must not act now
-          if (job.at < (this.botBusyUntil.get(job.botId) ?? 0)) {
+          // the bot's piece is still moving: a stray earlier step must not act
+          // now. Its next step is normally already booked for after it lands;
+          // book one anyway, or the bot would wait forever if that step had
+          // already run (alarms fire up to ALARM_EARLY_MS early)
+          const busyUntil = this.botBusyUntil.get(job.botId) ?? 0;
+          if (job.at < busyUntil) {
+            this.botSteps.set(job.botId, steps - 1);
+            await this.scheduleOnce({ kind: "botStep", botId: job.botId, at: busyUntil });
             return;
           }
           const result = await BotPlayer.step(this.gameCtx, job.botId);
@@ -1118,8 +1125,11 @@ export class GameRoom extends DurableObject<Env> {
             await this.scheduleJob({ kind: "refresh", at: landed + this.pace(0.25) });
             await this.scheduleJob({ kind: "botStep", botId: job.botId, at: nextStep });
           } else if (result === "acted") {
-            // one thing at a time (a purchase, a house, a mortgage), each easy to spot
-            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: Date.now() + this.pace(1.25) });
+            // one thing at a time (a purchase, a house, a mortgage), each easy to
+            // spot. Never before the move has finished: this step may have run
+            // early, and at a fast pace "now + a beat" can still be inside it
+            const at = Math.max(Date.now(), this.botBusyUntil.get(job.botId) ?? 0) + this.pace(1.25);
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at });
           }
           await this.syncIndex();
           await this.afterAction();
