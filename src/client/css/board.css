@@ -15,10 +15,11 @@
 }
 
 .square {
+  font-family: var(--bb-font-display);
   margin: 0;
   padding: 0;
   text-align: center;
-  border: 1px solid black;
+  border: 1px solid var(--bb-ink);
   position: relative;
 }
 
@@ -587,7 +588,7 @@
 .board .square.action-target {
   z-index: 3;
   cursor: pointer;
-  box-shadow: 0 0 0 3px #1976d2, 0 0 12px rgba(25, 118, 210, 0.55);
+  box-shadow: 0 0 0 3px var(--bb-brass), 0 0 12px color-mix(in srgb, var(--bb-brass) 55%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -597,12 +598,12 @@
 }
 
 @keyframes action-target-pulse {
-  0%, 100% { box-shadow: 0 0 0 3px #1976d2, 0 0 6px rgba(25, 118, 210, 0.35); }
-  50% { box-shadow: 0 0 0 3px #1976d2, 0 0 16px rgba(25, 118, 210, 0.75); }
+  0%, 100% { box-shadow: 0 0 0 3px var(--bb-brass), 0 0 6px color-mix(in srgb, var(--bb-brass) 35%, transparent); }
+  50% { box-shadow: 0 0 0 3px var(--bb-brass), 0 0 16px color-mix(in srgb, var(--bb-brass) 75%, transparent); }
 }
 
 .board .square.action-target:hover {
-  background-color: rgba(25, 118, 210, 0.08);
+  background-color: color-mix(in srgb, var(--bb-brass) 8%, transparent);
 }
 
 .action-chip {
@@ -614,7 +615,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #1976d2;
+  background: var(--bb-brand);
   color: #fff;
   font-size: 10px;
   box-shadow: 0 0 0 1.5px #fff;
@@ -674,8 +675,8 @@
   box-shadow: 0 0 0 1.5px #fff, 0 1px 2px rgba(0, 0, 0, 0.3);
   pointer-events: none;
 }
-.event-badge.up { background: #2e7d32; }
-.event-badge.down { background: #c62828; }
+.event-badge.up { background: var(--bb-good); }
+.event-badge.down { background: var(--bb-bad); }
 .event-badge-bottom { top: 3px; right: 3px; }
 .event-badge-top { bottom: 3px; right: 3px; }
 .event-badge-left { right: 3px; top: 3px; }

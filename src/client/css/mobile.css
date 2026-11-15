@@ -89,7 +89,7 @@
     min-height: 0;
     overflow: hidden;
     padding: 4px;
-    background: #eef0f2;
+    background: var(--bb-surface-2);
   }
 
   .board-hub .players-display {
@@ -193,7 +193,7 @@
   }
 
   .game-board .square.action-target {
-    box-shadow: 0 0 0 2px #1976d2, 0 0 8px rgba(25, 118, 210, 0.6);
+    box-shadow: 0 0 0 2px var(--bb-brass), 0 0 8px color-mix(in srgb, var(--bb-brass) 60%, transparent);
   }
 }
 

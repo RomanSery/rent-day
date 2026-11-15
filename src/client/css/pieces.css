@@ -36,7 +36,7 @@
   min-width: 14px;
   padding: 0 3px;
   border-radius: 7px;
-  background: #1d2126;
+  background: var(--bb-ink);
   color: #fff;
   font: 700 9px/13px system-ui, sans-serif;
   text-align: center;
