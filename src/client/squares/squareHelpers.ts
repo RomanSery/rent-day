@@ -22,6 +22,18 @@ export const getSquareTxt = (
   return data?.name ?? "";
 };
 
+/**
+ * A square's theme icon ("subway" for the MTA). Falls back to the built-in
+ * theme when there is no game, as on the login page's board.
+ */
+export const getSquareIcon = (
+  gameInfo: GameState | undefined,
+  squareId: number
+): string | undefined =>
+  gameInfo?.theme?.[squareId]
+    ? gameInfo.theme[squareId].icon
+    : NyThemeData.get(squareId)?.icon;
+
 
 export const getOwnerPlayer = (
   gameInfo: GameState | undefined,

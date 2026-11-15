@@ -6,7 +6,7 @@ import { SquareType } from "../../core/enums/SquareType";
 import { TradeParticipant } from "../../core/types/TradeParticipant";
 import { Player } from "../../core/types/Player";
 import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
-import { getSquareTxt } from "../squares/squareHelpers";
+import { getSquareIcon, getSquareTxt } from "../squares/squareHelpers";
 import useGameStateStore from "../stores/gameStateStore";
 
 /** A square in a trade: its group colour (or a station/utility icon) and name. */
@@ -15,7 +15,7 @@ export const TradeSquare: React.FC<{ squareId: number }> = ({ squareId }) => {
   const config = SquareConfigDataMap.get(squareId);
   const data = gameState?.squareState.find((s) => s.squareId === squareId);
   const colorClass = config?.groupId ? squareGroupColorMap.get(config.groupId) : undefined;
-  const themeIcon = gameState?.theme?.[squareId]?.icon;
+  const themeIcon = getSquareIcon(gameState, squareId);
 
   return (
     <span className="trade-square">
