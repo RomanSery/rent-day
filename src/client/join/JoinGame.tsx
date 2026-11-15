@@ -20,6 +20,7 @@ import { PlayerClass } from "../../core/enums/PlayerClass";
 import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
 import { getPlayerClassDescription } from "../uiHelpers";
 import { BackLink } from "../components/BackLink";
+import { ClassPortrait } from "../components/ClassPortrait";
 import queryString from "query-string";
 import { useQuery } from "@tanstack/react-query";
 import { Share } from "react-twitter-widgets";
@@ -69,8 +70,8 @@ const Seat: React.FC<{ player?: Player; isMe?: boolean }> = ({ player, isMe }) =
         <Typography noWrap sx={{ fontWeight: 600, lineHeight: 1.3 }}>
           {player.name}{isMe ? " (you)" : ""}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.3 }}>
-          {player.playerClass}{player.isBot ? " · computer" : ""}
+        <Typography variant="body2" color="text.secondary" className="class-tag" sx={{ lineHeight: 1.3 }}>
+          <ClassPortrait playerClass={player.playerClass} size={20} />{player.playerClass}{player.isBot ? " · computer" : ""}
         </Typography>
       </Box>
       :
@@ -368,7 +369,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                           onChange={(_e, v) => { if (v) field.onChange(v); }}
                           sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", sm: "repeat(4, 1fr)", md: "1fr 1fr", lg: "repeat(4, 1fr)" } }}>
                           {CLASSES.map((c) => (
-                            <ToggleButton key={c} value={c} sx={{ textTransform: "none", fontWeight: 600, ...pickedSx }}>{c}</ToggleButton>
+                            <ToggleButton key={c} value={c} sx={{ textTransform: "none", fontWeight: 600, flexDirection: "column", gap: 0.5, py: 1, ...pickedSx }}>
+                              <ClassPortrait playerClass={c} size={40} />{c}
+                            </ToggleButton>
                           ))}
                         </ToggleButtonGroup>
                       )} />

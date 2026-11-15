@@ -26,6 +26,7 @@ import {
 import { PlayerClass } from "../core/enums/PlayerClass";
 import { SkillType } from "../core/enums/SkillType";
 import { getPlayerClassDescription, getSkillDescription } from "./uiHelpers";
+import { ClassPortrait } from "./components/ClassPortrait";
 
 /**
  * The game rules, split into tabs. Shared by the /help page and the in-game
@@ -136,8 +137,13 @@ const ClassesTopic = () => {
       <div className="help-class-grid">
         {classes.map((c) => (
           <Paper key={c.type} variant="outlined" className="help-class-card">
-            <h3>{c.type}</h3>
-            <div className="help-class-tagline">{c.tagline}</div>
+            <div className="help-class-head">
+              <ClassPortrait playerClass={c.type} size={72} />
+              <div>
+                <h3>{c.type}</h3>
+                <div className="help-class-tagline">{c.tagline}</div>
+              </div>
+            </div>
             <div className="player-class-description">{getPlayerClassDescription(c.type)}</div>
           </Paper>
         ))}

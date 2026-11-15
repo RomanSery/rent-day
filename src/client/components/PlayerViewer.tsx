@@ -6,6 +6,7 @@ import { SkillType } from "../../core/enums/SkillType";
 import { dollarFormatter, getIconProp } from "../helpers";
 import { getElectricityTooltip, getSkillTypeTooltip, getTaxTooltip, getTotalAssetsTooltip } from "../uiHelpers";
 import useGameStateStore from "../stores/gameStateStore";
+import { ClassPortrait } from "./ClassPortrait";
 
 interface Props {
   player: Player;
@@ -29,7 +30,7 @@ export const PlayerViewer: React.FC<Props> = ({ player }) => {
       <div className="info-card-header" style={{ borderColor: player.color }}>
         <FontAwesomeIcon icon={getIconProp(player.type)} color={player.color} />
         <span className="info-card-title">{player.name}</span>
-        <span className="info-card-sub">{player.playerClass}{player.isBot ? <> · <FontAwesomeIcon icon={faRobot} /> computer</> : null}</span>
+        <span className="info-card-sub class-tag"><ClassPortrait playerClass={player.playerClass} size={18} />{player.playerClass}{player.isBot ? <> · <FontAwesomeIcon icon={faRobot} /> computer</> : null}</span>
       </div>
 
       <div className="info-grid">

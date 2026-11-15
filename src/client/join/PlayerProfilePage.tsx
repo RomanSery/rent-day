@@ -6,6 +6,7 @@ import { faCirclePlay, faFire, faRobot, faTrophy } from "@fortawesome/free-solid
 import API from "../api";
 import { BackLink } from "../components/BackLink";
 import { Baron } from "../components/BrandLogo";
+import { ClassPortrait } from "../components/ClassPortrait";
 import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
 import { HistoryGame, PlayerProfile } from "../../core/types/PlayerProfile";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
@@ -174,7 +175,7 @@ export const PlayerProfilePage: React.FC = () => {
             <ul className="pf-classes">
               {p.classes.map((c) => (
                 <li key={c.playerClass}>
-                  <span className="pf-class-name">{c.playerClass}</span>
+                  <span className="pf-class-name class-tag"><ClassPortrait playerClass={c.playerClass} size={20} />{c.playerClass}</span>
                   <span className="lb-bar" aria-hidden="true"><i style={{ width: (c.wins / c.games) * 100 + "%" }} /></span>
                   <span className="pf-class-num">{pct(c.wins, c.games)}</span>
                   <span className="pf-class-games">{c.wins} of {c.games}</span>

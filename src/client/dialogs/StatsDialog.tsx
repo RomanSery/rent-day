@@ -16,6 +16,7 @@ import { GameState } from "../../core/types/GameState";
 import { getElectricityTooltip, getTaxTooltip } from "../uiHelpers";
 import useGameStateStore from "../stores/gameStateStore";
 import API from "../api";
+import { ClassPortrait } from "../components/ClassPortrait";
 
 interface Props {
   tradeWithPlayer: (player: Player) => void;
@@ -189,7 +190,8 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
             </span>
             {isMe && <span className="pstat-you">you</span>}
             {showDetails &&
-              <small>
+              <small className="class-tag">
+                <ClassPortrait playerClass={p.playerClass} size={16} />
                 {p.playerClass}
                 {p.isBot && <> · <FontAwesomeIcon icon={faRobot} /> computer</>}
                 {p.state === PlayerState.IN_ISOLATION && <> · <FontAwesomeIcon icon={faBiohazard} color="#c62828" /> in quarantine</>}

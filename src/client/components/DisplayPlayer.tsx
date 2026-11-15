@@ -5,6 +5,7 @@ import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "..
 import { faBiohazard, faRobot } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
+import { ClassPortrait } from "./ClassPortrait";
 
 interface Props {
   player: Player;
@@ -45,7 +46,7 @@ export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer
       <div className="player-row-sub">
         {player.state === PlayerState.IN_ISOLATION && <FontAwesomeIcon icon={faBiohazard} color="#c62828" title="In quarantine" />}
         {player.isBot && <FontAwesomeIcon icon={faRobot} title="Computer player" />}
-        <span>{player.playerClass}</span>
+        <span className="class-tag"><ClassPortrait playerClass={player.playerClass} size={18} />{player.playerClass}</span>
         {!bankrupt && perTurn > 0 &&
           <span className="player-costs" title={(isMe ? "Tax and electricity you pay" : "Tax and electricity " + player.name + " pays") + " each turn"}>
             −{dollarFormatter.format(perTurn)}/turn
