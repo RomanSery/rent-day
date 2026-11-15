@@ -473,11 +473,20 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   async leaveGame(userId: string): Promise<void> {
-    await this.runAction(() => GameProcessor.leaveGame(this.gameCtx, userId));
+    await this.runAction(() => this.withAuctionViews(() => GameProcessor.leaveGame(this.gameCtx, userId)));
   }
 
   async resignGame(userId: string): Promise<void> {
-    await this.runAction(() => GameProcessor.resignGame(this.gameCtx, userId));
+    await this.runAction(() => this.withAuctionViews(() => GameProcessor.resignGame(this.gameCtx, userId)));
+  }
+
+  /** Runs fn; if an auction was open, sends everyone its view afterwards (an elimination can close it). */
+  private async withAuctionViews(fn: () => Promise<void>): Promise<void> {
+    const auctionId = (await this.store.getGame())?.auctionId ?? null;
+    await fn();
+    if (auctionId) {
+      await this.broadcastAuctionViews(auctionId);
+    }
   }
 
   async roll(
@@ -1265,6 +1274,23 @@ export class GameRoom extends DurableObject<Env> {
       }
       if (!game || game.status !== GameStatus.ACTIVE) {
         return;
+      }
+
+      // debt taken on mid-turn (a card, a subway mugging) can leave the
+      // player owing more than they can raise; rolling and ending the turn
+      // both need money >= 0, so they could never act again. Not while an
+      // auction or lotto is open: those settle first.
+      const current = game.players.find((p) => areIdsEqual(p._id, game.nextPlayerToAct));
+      if (!game.auctionId && !game.lottoId && current && current.state !== PlayerState.BANKRUPT && GameProcessor.isBeyondRecovery(current)) {
+        await GameProcessor.bankruptIfBeyondRecovery(this.gameCtx, game, current._id);
+        await this.store.saveGame(game);
+        await this.gameCtx.events.refreshGameState();
+        await this.syncIndex();
+        // bankruptPlayer may have ended the game (status narrowed above)
+        if ((game.status as GameStatus) === GameStatus.FINISHED) {
+          await this.onFinished(game);
+          return;
+        }
       }
 
       const humanLeft = game.players.some((p) => !p.isBot && p.state !== PlayerState.BANKRUPT);

@@ -152,6 +152,51 @@ export class AuctionProcessor {
     return "";
   }
 
+  /**
+   * A bidder was eliminated while this auction is open. Their bid becomes
+   * "no bid" ($0, left out of the price), so they can't win, and the auction
+   * closes now if they were the last one still to bid. Works on the caller's
+   * game document, which the caller saves.
+   */
+  public static async withdrawBidder(
+    ctx: GameContext,
+    game: GameInstanceDocument,
+    playerId: string
+  ): Promise<void> {
+    if (!game.auctionId) {
+      return;
+    }
+    const auction = await ctx.store.getAuction(game.auctionId);
+    if (!auction || auction.finished) {
+      return;
+    }
+    const bidder = auction.bidders.find((b) => b._id && areIdsEqual(b._id, playerId));
+    if (!bidder) {
+      return;
+    }
+    bidder.bid = 0;
+    bidder.submittedBid = true;
+    bidder.autoBid = true;
+
+    const processor = new AuctionProcessor(ctx, 0, playerId);
+    processor.game = game;
+    processor.auction = auction;
+    if (game.status !== GameStatus.ACTIVE) {
+      // the game ended with this elimination: nobody buys the square
+      auction.finished = true;
+      game.auctionId = null;
+      game.auctionSquareId = null;
+    } else if (processor.isAuctionDone()) {
+      processor.determineWinner();
+      game.auctionId = null;
+      game.auctionSquareId = null;
+      if (game.settings.useTimers) {
+        game.nextPlayerActBy = formatISO(addSeconds(new Date(), ctx.turnTimeLimit));
+      }
+    }
+    await ctx.store.saveAuction(auction);
+  }
+
   private isAuctionDone(): boolean {
     return this.auction!.bidders.every((b) => b.bid != null);
   }

@@ -31,6 +31,7 @@ import { Traits } from "../traits/Traits";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { RollProcessor } from "./RollProcessor";
 import { PlayerProcessor } from "./PlayerProcessor";
+import { AuctionProcessor } from "./AuctionProcessor";
 import { hashPassword, verifyPassword } from "../../auth/password";
 import { BotLevel } from "@core/enums/BotLevel";
 import { createBotPlayer } from "../bots/BotPlayer";
@@ -483,6 +484,9 @@ export class GameProcessor {
       ctx.events.send(GameEvent.SHOW_MSG_FROM_SERVER, msg);
     }
 
+    // out of any open auction (they can resign or leave mid-auction)
+    await AuctionProcessor.withdrawBidder(ctx, game, losser._id);
+
     if (game.nextPlayerToAct && !areIdsEqual(game.nextPlayerToAct, losser._id)) {
       return;
     }
@@ -522,9 +526,11 @@ export class GameProcessor {
   }
 
   /**
-   * Called when the turn reaches a player: eliminate them now if they can
-   * never pay their way, so the turn doesn't sit with someone who can't act.
-   * bankruptPlayer passes the turn on (and calls this for the next player).
+   * Eliminate the player now if they can never pay their way, so the turn
+   * doesn't sit with someone who can't act. Called when the turn reaches a
+   * player and after every action (GameRoom.afterAction), which catches debt
+   * taken on mid-turn (a card, a subway mugging). bankruptPlayer passes the
+   * turn on (and calls this for the next player).
    */
   public static async bankruptIfBeyondRecovery(
     ctx: GameContext,

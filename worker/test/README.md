@@ -67,7 +67,11 @@ who owes more than selling and mortgaging everything would raise (left that
 way by the forced "It's your birthday!" card, or set up directly) is
 eliminated as soon as the turn reaches them; one whose debt exactly matches
 what they can raise mortgages down to $0 and plays on, by hand or by the turn
-timer; and a computer player in debt mortgages and keeps playing. It sets
+timer; a Chance card that sinks a player mid-turn past what they can raise
+eliminates them at once; rent equal to everything a player has leaves them at
+$0 rather than out; a player who gives up mid-auction loses their bid and
+the auction closes without waiting for them; and a computer player in debt
+mortgages and keeps playing. It sets
 money and gives squares through the development-only `/api/dev/setPlayer`
 route (body: `{ gameId, playerId, money?, squareIds?, purchasePrice? }`).
 Start the Worker with

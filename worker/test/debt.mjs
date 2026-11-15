@@ -248,6 +248,123 @@ section("a bot that starts its turn in debt mortgages and plays on; beyond recov
   check(g.status === "Finished" && g.winner === H.username, "the human wins -> " + g.status + " " + g.winner);
 }
 
+// =========================================================================
+section("a Chance card mid-turn leaves the player owing more than they can raise: eliminated at once");
+{
+  const { gameId, cur: P, other: Q } = await twoPlayerGame("dentist", false);
+  await setPlayer(Q, gameId, P.id, { money: 100 });
+  // 1 -> 8 (Word on the Street) with "Dentist appointment" (-$150) forced
+  const r = await P.post("actions/roll", { ...ctx(gameId), forceDie1: 3, forceDie2: 4, forceChanceId: 1 });
+  check(r.status === 200, "P lands on Word on the Street -> " + r.status);
+  const g = await getGame(Q, gameId);
+  check(playerOf(g, P).state === "Bankrupt", "P (-$50, nothing to sell) is eliminated right away instead of being left unable to end the turn -> " + playerOf(g, P).state + " " + playerOf(g, P).money);
+  check(g.status === "Finished" && g.winner === Q.username, "Q wins -> " + g.status + " " + g.winner);
+}
+
+section("a Chance card mid-turn that the player can cover: they stay in and must mortgage");
+{
+  const { gameId, cur: P, other: Q } = await twoPlayerGame("dentist2", false);
+  await setPlayer(Q, gameId, P.id, { money: 100, squareIds: [2], purchasePrice: 200 });
+  await P.post("actions/roll", { ...ctx(gameId), forceDie1: 3, forceDie2: 4, forceChanceId: 1 });
+  const g = await getGame(Q, gameId);
+  check(playerOf(g, P).state === "Active" && playerOf(g, P).money === -50, "P is at -$50 but can mortgage a square for $80 -> still in");
+  let r = await P.post("actions/completeTurn", ctx(gameId));
+  check(r.status === 400, "P can't end the turn in debt -> " + JSON.stringify(r.data));
+  await P.post("actions/mortgage", { ...ctx(gameId), squareId: 2 });
+  r = await P.post("actions/completeTurn", ctx(gameId));
+  check(r.status === 200, "after mortgaging, P ends the turn");
+}
+
+section("rent equal to everything the player has: pays down to $0 and stays in");
+{
+  // probe: what P pays to land on Q's square 4 from the start
+  const probe = await twoPlayerGame("rentprobe", false);
+  await setPlayer(probe.cur, probe.gameId, probe.other.id, { squareIds: [4], purchasePrice: 200 });
+  await probe.cur.post("actions/roll", { ...ctx(probe.gameId), forceDie1: 1, forceDie2: 2 });
+  const rent = (await getGame(probe.cur, probe.gameId)).lastRent?.amount;
+  check(rent > 0, "landing on square 4 costs $" + rent + " in rent");
+
+  const { gameId, cur: P, other: Q } = await twoPlayerGame("rentexact", false);
+  await setPlayer(P, gameId, Q.id, { squareIds: [4], purchasePrice: 200 });
+  await setPlayer(P, gameId, P.id, { money: rent });
+  await P.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 });
+  let g = await getGame(P, gameId);
+  check(g.lastRent?.amount === rent && playerOf(g, P).money === 0, "P paid all $" + rent + " and has $0 -> " + playerOf(g, P).money);
+  check(playerOf(g, P).state === "Active", "P is still in (used to be eliminated when rent >= everything they had)");
+  const r = await P.post("actions/completeTurn", ctx(gameId));
+  check(r.status === 200, "P ends the turn at $0");
+
+  const over = await twoPlayerGame("rentover", false);
+  await setPlayer(over.cur, over.gameId, over.other.id, { squareIds: [4], purchasePrice: 200 });
+  await setPlayer(over.cur, over.gameId, over.cur.id, { money: rent - 1 });
+  await over.cur.post("actions/roll", { ...ctx(over.gameId), forceDie1: 1, forceDie2: 2 });
+  g = await getGame(over.cur, over.gameId);
+  check(playerOf(g, over.cur).state === "Bankrupt", "with $1 less than the rent, P is eliminated");
+}
+
+// =========================================================================
+/** Three humans, no timers; `seats` in turn order starting with whoever acts first. */
+const threePlayerGame = async (name) => {
+  const a = await newUser("a"), b = await newUser("b"), c = await newUser("c");
+  const r = await a.post("createGame", { data: { gameName: "Debt " + name, maxPlayers: 3, initialMoney: 1500, initialSkillPoints: 5, useTimers: false }, context: {} });
+  const gameId = r.data.gameId;
+  await a.post("joinGame", { gameId, piece: "Car", playerClass: "Gambler" });
+  await b.post("joinGame", { gameId, piece: "Dog", playerClass: "Gambler" });
+  await c.post("joinGame", { gameId, piece: "Hat", playerClass: "Gambler" });
+  const game = await getGame(a, gameId);
+  const byId = new Map([a, b, c].map((x) => [x.id, x]));
+  const start = game.players.findIndex((p) => p._id === game.nextPlayerToAct);
+  const seats = [0, 1, 2].map((i) => byId.get(game.players[(start + i) % 3]._id));
+  return { gameId, seats };
+};
+
+section("resigning mid-auction after placing the top bid: the bid no longer counts");
+{
+  const { gameId, seats: [P, Q, R] } = await threePlayerGame("auctionbid");
+  let r = await P.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 }); // 1 -> 4, unowned
+  let g = await getGame(P, gameId);
+  check(r.status === 200 && g.auctionId && g.auctionSquareId === 4, "square 4 goes up for auction");
+  await P.post("actions/bid", { ...ctx(gameId), bid: 500 });
+  await P.post("resignGame", { gameId });
+  g = await getGame(Q, gameId);
+  check(playerOf(g, P).state === "Bankrupt" && g.status === "Active", "P gives up; the game goes on");
+  check(!!g.auctionId, "the auction stays open for Q and R");
+  await Q.post("actions/bid", { ...ctx(gameId), bid: 100 });
+  await R.post("actions/bid", { ...ctx(gameId), bid: 60 });
+  g = await getGame(Q, gameId);
+  check(!g.auctionId, "the auction closes once Q and R have bid");
+  check(square(g, 4).owner === Q.id, "Q wins square 4, not the eliminated P (owner " + square(g, 4).owner + ")");
+  check(g.lastAuction?.price === 60, "Q pays the second-highest live bid, $60, not P's $500 -> " + g.lastAuction?.price);
+  check(g.nextPlayerToAct === Q.id, "the turn moved on to Q");
+}
+
+section("resigning mid-auction before bidding: the auction closes instead of waiting forever");
+{
+  const { gameId, seats: [P, Q, R] } = await threePlayerGame("auctionwait");
+  await P.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 });
+  await Q.post("actions/bid", { ...ctx(gameId), bid: 100 });
+  await R.post("actions/bid", { ...ctx(gameId), bid: 0 });
+  let g = await getGame(Q, gameId);
+  check(!!g.auctionId, "the auction waits on P's bid");
+  await P.post("resignGame", { gameId });
+  g = await getGame(Q, gameId);
+  check(!g.auctionId, "with P out, the auction closes (no timers to close it otherwise)");
+  check(square(g, 4).owner === Q.id, "Q wins square 4");
+  const r = await Q.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 });
+  check(r.status === 200, "Q can take their turn -> " + JSON.stringify(r.data));
+}
+
+section("the last opponent resigns mid-auction: the game ends and nobody buys the square");
+{
+  const { gameId, cur: P, other: Q } = await twoPlayerGame("auctionend", false);
+  await P.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 });
+  await Q.post("actions/bid", { ...ctx(gameId), bid: 100 });
+  await Q.post("resignGame", { gameId });
+  const g = await getGame(P, gameId);
+  check(g.status === "Finished" && g.winner === P.username, "P wins");
+  check(!g.auctionId && !square(g, 4).owner, "auction cleared, square 4 unsold");
+}
+
 console.log(`\n${checks} checks, ${failures} failed`);
 console.log(failures === 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED");
 process.exit(failures ? 1 : 0);

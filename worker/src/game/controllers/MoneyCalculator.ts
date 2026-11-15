@@ -103,7 +103,9 @@ export class MoneyCalculator {
       return "";
     }
 
-    const cantPay = adjustedRentToPay >= player.totalAssets;
+    // rent equal to everything they could raise leaves them at $0 once they
+    // sell and mortgage, which is still in the game; only more than that is out
+    const cantPay = adjustedRentToPay > player.totalAssets;
 
     //dont pay more rent than the total assets the player has
     const finalRentToPay =
