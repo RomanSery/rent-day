@@ -19,6 +19,7 @@ import { faUsers, faCoins, faLock, faRobot, faLink, faCheck, faChair } from "@fo
 import { PlayerClass } from "../../core/enums/PlayerClass";
 import { corruptionAdjustment, luckAdjustment, negotiationAdjustment } from "../../core/constants";
 import { getPlayerClassDescription } from "../uiHelpers";
+import { BackLink } from "../components/BackLink";
 import queryString from "query-string";
 import { useQuery } from "@tanstack/react-query";
 import { Share } from "react-twitter-widgets";
@@ -267,6 +268,8 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   return (
     <React.Fragment>
+      {/* once seated, "Leave game" below is the way out (the lobby would send you back here) */}
+      {!joined && <Box sx={{ textAlign: "left", mt: 1 }}><BackLink to="/find" label="Games" /></Box>}
       <Paper elevation={2} className="lobby" sx={{ my: 1, p: { xs: 1.5, sm: 2.5 }, textAlign: "left" }}>
         {/* name and chips: stacked and centred on narrow screens, one row on wide ones */}
         <Box sx={{
