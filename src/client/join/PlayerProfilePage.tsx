@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay, faFire, faRobot, faTrophy } from "@fortawesome/free-solid-svg-icons";
 import API from "../api";
 import { BackLink } from "../components/BackLink";
+import { Baron } from "../components/BrandLogo";
 import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
 import { HistoryGame, PlayerProfile } from "../../core/types/PlayerProfile";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
@@ -161,10 +162,13 @@ export const PlayerProfilePage: React.FC = () => {
       </div>
 
       {p.historyGames === 0
-        ? <p className="pf-empty">
-          {isMe ? "You haven't" : p.name + " hasn't"} finished a game since game history began.
-          Class records, favourite properties and head-to-head results appear here after the next one.
-        </p>
+        ? <div className="pf-empty baron-note">
+          <Baron size={56} />
+          <p>
+            {isMe ? "You haven't" : p.name + " hasn't"} finished a game since game history began.
+            Class records, favourite properties and head-to-head results appear here after the next one.
+          </p>
+        </div>
         : <div className="pf-grid">
           <Section title="By class">
             <ul className="pf-classes">

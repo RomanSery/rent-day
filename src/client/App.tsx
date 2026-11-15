@@ -27,6 +27,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GameStatus } from "../core/enums/GameStatus";
 import useGameStateStore from "./stores/gameStateStore";
 import { BackLink } from "./components/BackLink";
+import { BrandLogo } from "./components/BrandLogo";
 
 // Route components live at module level so that a navigation re-rendering
 // App does not give them a new identity (which would remount them and, for
@@ -225,9 +226,7 @@ const DashboardDisplay: React.FC = () => {
       <div className="home-page-cont">
 
         <Container maxWidth="xs" className="home-page-options">
-          <div>
-            <img src="/logo_transparent_small.png" alt="Block Barons"></img>
-          </div>
+          <BrandLogo />
 
           <MenuLink to="/create">CREATE NEW GAME</MenuLink>
           <MenuLink to="/find">JOIN OR WATCH A GAME</MenuLink>
@@ -239,9 +238,6 @@ const DashboardDisplay: React.FC = () => {
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary" onClick={() => onLogout(false)}> LOG OUT</Button>
           <Button fullWidth size="small" sx={{ mb: "10px" }} color="inherit" onClick={() => onLogout(true)}>Log out on all devices</Button>
-          <div className="fat-cat-logo">
-            <img src="/fat-cat1.png" alt="Block Barons"></img>
-          </div>
         </Container>
 
         <Blurb />
@@ -262,9 +258,7 @@ const AuthDisplay: React.FC = () => {
       <div className="home-page-cont">
 
         <Container maxWidth="xs" className="home-page-options">
-          <div>
-            <img src="/logo_transparent_small.png" alt="Block Barons"></img>
-          </div>
+          <BrandLogo />
 
           {hasPendingInvite() && <InviteNote />}
 
@@ -279,10 +273,6 @@ const AuthDisplay: React.FC = () => {
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
             onClick={() => navigate("/contact")}> CONTACT US</Button>
-
-          <div className="fat-cat-logo">
-            <img src="/fat-cat1.png" alt="Block Barons"></img>
-          </div>
         </Container>
 
         <Blurb />

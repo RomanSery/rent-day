@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Container, List, ListItem, ListItemText } from "@mui/material";
 import useGameStateStore from "../stores/gameStateStore";
 import { NetWorthChart } from "../juice/NetWorthChart";
+import { Baron } from "../components/BrandLogo";
 
 
 interface Props {
@@ -102,7 +103,8 @@ export const GameOverDialog: React.FC<Props> = ({ open, onLeaveGame }) => {
       <DialogTitle id="game-over-dialog-title">Game Over</DialogTitle>
       <DialogContent>
 
-        <Container maxWidth="xs">
+        <Container maxWidth="xs" className="game-over-hero">
+          <Baron size={88} />
           <List dense={true} className="game-over-overview">
             <ListItem>
               <ListItemText primary={getWinnerName()} />

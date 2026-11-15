@@ -1094,3 +1094,59 @@ td.lb-rank.bronze { color: #8d5420; }
   .gl-actions { width: 100%; }
   .gl-head h1 { font-size: 20px; }
 }
+
+/* ---- brand (components/BrandLogo.tsx) --------------------------------- */
+
+.brand-logo {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 4px 0 14px;
+}
+.brand-logo .baron {
+  flex: none;
+  display: block;
+}
+.brand-wordmark {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--bb-font-display);
+  text-transform: uppercase;
+  line-height: 0.9;
+  padding-bottom: 6px;
+  min-width: 0;
+}
+.brand-block {
+  font-weight: 600;
+  font-size: 22px;
+  letter-spacing: 0.32em;
+  color: var(--bb-brass-strong);
+}
+.brand-barons {
+  font-weight: 700;
+  font-size: 52px;
+  letter-spacing: 0.02em;
+  color: var(--bb-brand);
+  border-top: 3px solid var(--bb-brass);
+  padding-top: 4px;
+  margin-top: 4px;
+}
+
+/* the Baron beside an empty list or a quiet message */
+.baron-note {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.baron-note .baron { flex: none; }
+.baron-note p { margin: 0; min-width: 0; }
+
+/* game over: the Baron congratulates the winner */
+.game-over-hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.game-over-hero .game-over-overview { flex: 0 1 auto; }

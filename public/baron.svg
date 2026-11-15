@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 200 194" role="img" aria-label="The Baron, a fat cat in a top hat">
+  <!-- The Baron: Block Barons' mascot. Colours are the brand tokens in src/client/theme.ts. -->
+  <ellipse cx="108" cy="176" rx="64" ry="6" fill="#1b2333" opacity="0.12"/>
+
+  <!-- tail -->
+  <path d="M58 132 C 26 136, 14 108, 26 90 C 34 78, 50 80, 50 92 C 50 100, 42 102, 38 98"
+        fill="none" stroke="#f2c230" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- body and feet -->
+  <ellipse cx="108" cy="124" rx="64" ry="50" fill="#f2c230"/>
+  <path d="M60 140 C 76 168, 140 172, 160 142 C 150 160, 72 162, 60 140 Z" fill="#e4b324"/>
+  <ellipse cx="84" cy="170" rx="15" ry="7" fill="#e6b522"/>
+  <ellipse cx="134" cy="170" rx="15" ry="7" fill="#e6b522"/>
+
+  <!-- ears -->
+  <path d="M98 66 L 102 30 L 124 50 Z" fill="#f2c230"/>
+  <path d="M146 48 L 166 30 L 168 66 Z" fill="#f2c230"/>
+  <path d="M103 58 L 105 40 L 117 51 Z" fill="#e89a8c"/>
+  <path d="M152 50 L 163 40 L 163 58 Z" fill="#e89a8c"/>
+
+  <!-- head -->
+  <circle cx="133" cy="78" r="36" fill="#f2c230"/>
+
+  <!-- top hat, tipped slightly -->
+  <g transform="rotate(-8 133 40)">
+    <rect x="104" y="38" width="58" height="8" rx="4" fill="#1b2333"/>
+    <rect x="113" y="2" width="40" height="38" rx="3" fill="#1b2333"/>
+    <rect x="113" y="30" width="40" height="7" fill="#c9971a"/>
+  </g>
+
+  <!-- eyes: one shut in contentment, one behind a monocle -->
+  <path d="M112 76 Q 118 70 124 76" fill="none" stroke="#1b2333" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="150" cy="75" r="11" fill="#fffdf8" fill-opacity="0.35" stroke="#c9971a" stroke-width="3.5"/>
+  <circle cx="150" cy="75" r="3.5" fill="#1b2333"/>
+
+  <!-- monocle chain -->
+  <path d="M152 86 C 160 108, 150 124, 156 146" fill="none" stroke="#c9971a" stroke-width="2.5"
+        stroke-linecap="round" stroke-dasharray="0.1 6"/>
+
+  <!-- nose, mouth, whiskers -->
+  <path d="M130 88 h8 l-4 4.5 Z" fill="#c46a5a"/>
+  <path d="M134 92 q -3 6 -9 3 M134 92 q 3 6 9 3" fill="none" stroke="#1b2333" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M114 88 l -18 -3 M114 93 l -18 2 M154 90 l 16 -3 M154 95 l 16 2" stroke="#1b2333" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+</svg>

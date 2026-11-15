@@ -5,6 +5,7 @@ import { Button, Tab, Tabs } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faLock, faRobot, faRotateRight, faUser, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { BackLink } from "../components/BackLink";
+import { Baron } from "../components/BrandLogo";
 import API from '../api';
 import { GameToJoin } from "../../core/types/GameToJoin";
 import { GameToWatch } from "../../core/types/GameToWatch";
@@ -131,6 +132,7 @@ export const DisplayAllGames: React.FC = () => {
     if (games.length === 0) {
       return (
         <div className="gl-empty">
+          <Baron size={72} />
           <p><b>No open games right now.</b></p>
           <p>Start one and others can join from here, or fill the seats with computer players.</p>
           <Button component={Link} to="/create" variant="contained" startIcon={<FontAwesomeIcon icon={faPlus} />}>Create a game</Button>
