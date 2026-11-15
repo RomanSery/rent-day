@@ -507,6 +507,51 @@ export class GameProcessor {
     if (nextPlayer) {
       MoneyCalculator.subtractElectricityAndTaxes(nextPlayer);
       PlayerCostsCalculator.updatePlayerCosts(game, nextPlayer);
+      await GameProcessor.bankruptIfBeyondRecovery(ctx, game, nextPlayer._id);
     }
+  }
+
+  /**
+   * In debt by more than selling every house and mortgaging every square
+   * would raise. Such a player can never act again (rolling and ending the
+   * turn both need money >= 0). Debt equal to what they can raise is not
+   * beyond recovery: they can sell down to $0 and keep playing.
+   */
+  public static isBeyondRecovery(player: Player): boolean {
+    return player.money < 0 && player.totalAssets < 0;
+  }
+
+  /**
+   * Called when the turn reaches a player: eliminate them now if they can
+   * never pay their way, so the turn doesn't sit with someone who can't act.
+   * bankruptPlayer passes the turn on (and calls this for the next player).
+   */
+  public static async bankruptIfBeyondRecovery(
+    ctx: GameContext,
+    game: GameInstanceDocument,
+    playerId: string | null
+  ): Promise<void> {
+    if (game.status !== GameStatus.ACTIVE) {
+      return;
+    }
+    const player = game.players.find((p) => p._id && areIdsEqual(p._id, playerId));
+    if (!player || player.state === PlayerState.BANKRUPT || !GameProcessor.isBeyondRecovery(player)) {
+      return;
+    }
+    game.log.push({
+      msg: "<b>" + player.name + "</b> starts their turn owing more than they can raise",
+      player: "",
+    });
+    await GameProcessor.bankruptPlayer(ctx, game, player._id);
+  }
+
+  /** Development only (test/debt.mjs): give a player a square at a set price. */
+  public static devAssignSquare(
+    game: GameInstanceDocument,
+    owner: Player,
+    squareId: number,
+    purchasePrice: number
+  ): void {
+    GameProcessor.assignSquareTesting(game, owner, squareId, purchasePrice);
   }
 }

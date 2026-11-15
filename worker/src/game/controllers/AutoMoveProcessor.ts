@@ -72,21 +72,12 @@ export class AutoMoveProcessor {
       return "";
     }
 
-    if (this.player.money < 0) {
-      if (this.player.totalAssets <= 0) {
-        await GameProcessor.bankruptPlayer(
-          this.ctx,
-          this.game,
-          this.game.nextPlayerToAct
-        );
-        await this.ctx.store.saveGame(this.game);
-        return "";
-      } else {
-        await this.autoSell();
-      }
+    // sell and mortgage to get out of debt, unless even that can't cover it
+    if (this.player.money < 0 && !GameProcessor.isBeyondRecovery(this.player)) {
+      await this.autoSell();
     }
 
-    if (this.player.money < 0 || this.player.totalAssets <= 0) {
+    if (this.player.money < 0) {
       await GameProcessor.bankruptPlayer(
         this.ctx,
         this.game,

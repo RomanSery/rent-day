@@ -194,10 +194,8 @@ section("three timeouts eliminate the idle player");
   check(r.data.currGameId === null, "finished game cleared for X");
 }
 
-// Not covered here: a player whose money is negative with no assets at all.
-// That state is only reachable through a bad chance card, which cannot be
-// forced; handleNegativeMoney and AutoMoveProcessor eliminate such a player
-// when they next try to act or time out.
+// Players who start their turn owing more than they can raise, and debt that
+// exactly matches what they can raise, are covered in test/debt.mjs.
 
 console.log(`\n${checks} checks, ${failures} failed`);
 console.log(failures === 0 ? "ALL CHECKS PASSED" : "SOME CHECKS FAILED");

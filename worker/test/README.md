@@ -62,6 +62,17 @@ the Worker started with short timers:
 npx wrangler dev --var DEV_TURN_SECONDS:6 --var DEV_AUCTION_SECONDS:6
 ```
 
+`npm run test:api:debt` covers players who start their turn in debt: one
+who owes more than selling and mortgaging everything would raise (left that
+way by the forced "It's your birthday!" card, or set up directly) is
+eliminated as soon as the turn reaches them; one whose debt exactly matches
+what they can raise mortgages down to $0 and plays on, by hand or by the turn
+timer; and a computer player in debt mortgages and keeps playing. It sets
+money and gives squares through the development-only `/api/dev/setPlayer`
+route (body: `{ gameId, playerId, money?, squareIds?, purchasePrice? }`).
+Start the Worker with
+`npx wrangler dev --var DEV_TURN_SECONDS:6 --var DEV_AUCTION_SECONDS:6 --var DEV_BOT_PACE_MS:30`.
+
 `npm run test:api:chanceboard` forces the board-reading Chance cards (dev
 only, like the forced dice): Robin Hood takes money from the leader, and the
 Detour choice card waits for its player, blocks rolling and ending the turn,

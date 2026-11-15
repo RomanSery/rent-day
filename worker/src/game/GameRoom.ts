@@ -24,6 +24,7 @@ import {
   TradeDocument,
 } from "./model";
 import { CreateGameParams, GameProcessor } from "./controllers/GameProcessor";
+import { PlayerCostsCalculator } from "./controllers/PlayerCostsCalculator";
 import { RollProcessor } from "./controllers/RollProcessor";
 import { NeighborhoodEventProcessor } from "./controllers/NeighborhoodEventProcessor";
 import { NeighborhoodEventKind } from "@core/types/NeighborhoodEvent";
@@ -716,6 +717,36 @@ export class GameRoom extends DurableObject<Env> {
       await this.store.saveGame(game);
       await this.gameCtx.events.refreshGameState();
       return ok({ event });
+    });
+  }
+
+  /**
+   * Development only (test/debt.mjs): set a player's money and give them
+   * unowned squares, to set up debt scenarios that dice alone can't reach.
+   */
+  async devSetPlayer(playerId: string, money: number | null, squareIds: number[], purchasePrice: number): Promise<ActionResult> {
+    if (!this.gameCtx.isDev) {
+      return fail("Not found");
+    }
+    return this.runAction(async () => {
+      const game = await this.store.getGame();
+      if (!game || game.status !== GameStatus.ACTIVE) {
+        return fail("Game is not active");
+      }
+      const player = game.players.find((p) => areIdsEqual(p._id, playerId));
+      if (!player) {
+        return fail("player not found");
+      }
+      for (const squareId of squareIds) {
+        GameProcessor.devAssignSquare(game, player, squareId, purchasePrice);
+      }
+      if (money != null) {
+        player.money = money;
+      }
+      game.players.forEach((p) => PlayerCostsCalculator.updatePlayerCosts(game, p));
+      await this.store.saveGame(game);
+      await this.gameCtx.events.refreshGameState();
+      return ok({ player });
     });
   }
 

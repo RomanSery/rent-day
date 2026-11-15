@@ -760,6 +760,7 @@ export class RollProcessor {
     }
 
     this.doCompleteTurn(autoComplete, incrementTimeouts);
+    await GameProcessor.bankruptIfBeyondRecovery(this.ctx, this.game, this.game.nextPlayerToAct);
 
     await this.ctx.store.saveGame(this.game);
 
@@ -839,13 +840,14 @@ export class RollProcessor {
   }
 
   /**
-   * A player with negative money and nothing left to sell or mortgage can
-   * never act again, so eliminate them instead of leaving the game stuck.
-   * Returns the message for the caller, or null if the player can still
-   * recover by selling/mortgaging.
+   * A player who owes more than they can raise can never act again, so
+   * eliminate them instead of leaving the game stuck. Usually caught when the
+   * turn reaches them (bankruptIfBeyondRecovery); this covers debt taken on
+   * during their own turn. Returns the message for the caller, or null if the
+   * player can still recover by selling/mortgaging.
    */
   private async handleNegativeMoney(): Promise<string | null> {
-    if (!this.game || !this.player || this.player.totalAssets > 0) {
+    if (!this.game || !this.player || !GameProcessor.isBeyondRecovery(this.player)) {
       return null;
     }
 

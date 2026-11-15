@@ -709,6 +709,33 @@ app.post("/api/dev/neighborhoodEvent", async (c) => {
   return c.json(data ?? {});
 });
 
+/**
+ * Development only: set a player's money and give them unowned squares.
+ * Body: { gameId, playerId, money?, squareIds?: number[], purchasePrice? }
+ */
+app.post("/api/dev/setPlayer", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  if (!isValidId(body.gameId) || typeof body.playerId !== "string") {
+    return c.text("missing gameId or playerId", 400);
+  }
+  const squareIds: number[] = Array.isArray(body.squareIds)
+    ? body.squareIds.map(toInt).filter((n: number | null): n is number => n != null)
+    : [];
+  const { errMsg, data } = await roomFor(c, body.gameId).devSetPlayer(
+    body.playerId,
+    toInt(body.money),
+    squareIds,
+    toInt(body.purchasePrice) ?? 200
+  );
+  if (errMsg) {
+    return c.text(errMsg, 400);
+  }
+  return c.json(data ?? {});
+});
+
 app.post("/api/addBot", async (c) => {
   const body = await readBody(c);
   if (!isValidId(body.gameId)) {
