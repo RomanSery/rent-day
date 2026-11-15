@@ -8,6 +8,9 @@ import { SquareGameData } from "../../core/types/SquareGameData";
 import { areObjectIdsEqual, dollarFormatter, formatDollarsWithCents } from "../helpers";
 import useGameStateStore from "../stores/gameStateStore";
 import { InfoItem } from "./PlayerViewer";
+import { PlayerState } from "../../core/enums/PlayerState";
+import { NEIGHBORHOOD_EVENTS, eventOnSquare, eventRentMultiplier, eventRoundsLeft } from "../../core/config/NeighborhoodEvents";
+import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
 
 const houses = (n: number) => (
   <span className="info-houses">{Array.from({ length: n }).map((_, i) => <FontAwesomeIcon key={i} icon={faHome} />)}</span>
@@ -36,6 +39,32 @@ export const SquareViewer: React.FC = () => {
   const themeIcon = themeEntry?.icon ?? "";
   const owner = data.owner ? gameState.players.find((p) => areObjectIdsEqual(p._id, data.owner)) : undefined;
   const money = (v: number | undefined | null) => (v ? dollarFormatter.format(v) : "–");
+
+  // a neighborhood event on the block changes every rent figure for now
+  const cityEvent = eventOnSquare(gameState.neighborhoodEvents, squareToView);
+  const multiplier = eventRentMultiplier(gameState.neighborhoodEvents, squareToView);
+  const rent = (v: number | undefined | null) => {
+    if (!v || multiplier === 1) {
+      return money(v);
+    }
+    return (
+      <span className={"event-rent " + (multiplier > 1 ? "up" : "down")} title={"Normally " + dollarFormatter.format(v)}>
+        {dollarFormatter.format(Math.round(v * multiplier))}
+      </span>
+    );
+  };
+  const eventNote = cityEvent && (
+    <p className={"info-card-text event-note " + (isRentUp(cityEvent) ? "up" : "down")}>
+      <FontAwesomeIcon icon={NEIGHBORHOOD_EVENT_ICONS[cityEvent.kind]} />{" "}
+      <b>{NEIGHBORHOOD_EVENTS[cityEvent.kind].title}</b> ({rentChangeText(cityEvent)}
+      {NEIGHBORHOOD_EVENTS[cityEvent.kind].freezesBuilding ? ", no new houses" : ""}) for{" "}
+      {(() => {
+        const playersIn = gameState.players.filter((p) => p.state !== PlayerState.BANKRUPT).length;
+        const rounds = eventRoundsLeft(cityEvent, gameState.turnNumber ?? 0, playersIn);
+        return rounds === 1 ? "the rest of this round" : rounds + " more rounds";
+      })()}.
+    </p>
+  );
 
   const taxText = () => {
     if (!data.tax) {
@@ -86,13 +115,14 @@ export const SquareViewer: React.FC = () => {
       return (
         <div className="info-card-body">
           {header(squareGroupColorMap.get(config.groupId!) ?? "")}
+          {eventNote}
           <div className="info-grid">
-            <InfoItem label="Rent">{money(data.rent0)}</InfoItem>
-            <InfoItem label={houses(1)}>{money(data.rent1)}</InfoItem>
-            <InfoItem label={houses(2)}>{money(data.rent2)}</InfoItem>
-            <InfoItem label={houses(3)}>{money(data.rent3)}</InfoItem>
-            <InfoItem label={houses(4)}>{money(data.rent4)}</InfoItem>
-            <InfoItem label={<FontAwesomeIcon icon={faHotel} />}>{money(data.rent5)}</InfoItem>
+            <InfoItem label="Rent">{rent(data.rent0)}</InfoItem>
+            <InfoItem label={houses(1)}>{rent(data.rent1)}</InfoItem>
+            <InfoItem label={houses(2)}>{rent(data.rent2)}</InfoItem>
+            <InfoItem label={houses(3)}>{rent(data.rent3)}</InfoItem>
+            <InfoItem label={houses(4)}>{rent(data.rent4)}</InfoItem>
+            <InfoItem label={<FontAwesomeIcon icon={faHotel} />}>{rent(data.rent5)}</InfoItem>
             <InfoItem label="House cost">{money(data.houseCost)}</InfoItem>
             <InfoItem label="Electricity">{data.electricityCost ? formatDollarsWithCents(data.electricityCost) : "$0"}</InfoItem>
             <InfoItem label="Tax">{taxText()}</InfoItem>
@@ -105,11 +135,12 @@ export const SquareViewer: React.FC = () => {
       return (
         <div className="info-card-body">
           {header("station", faTrain)}
+          {eventNote}
           <div className="info-grid">
-            <InfoItem label="Rent">{money(data.rent0)}</InfoItem>
-            <InfoItem label="2 stations">{money(data.rent1)}</InfoItem>
-            <InfoItem label="3 stations">{money(data.rent2)}</InfoItem>
-            <InfoItem label="All 4">{money(data.rent3)}</InfoItem>
+            <InfoItem label="Rent">{rent(data.rent0)}</InfoItem>
+            <InfoItem label="2 stations">{rent(data.rent1)}</InfoItem>
+            <InfoItem label="3 stations">{rent(data.rent2)}</InfoItem>
+            <InfoItem label="All 4">{rent(data.rent3)}</InfoItem>
             <InfoItem label="Tax">{taxText()}</InfoItem>
             {ownerItems()}
           </div>

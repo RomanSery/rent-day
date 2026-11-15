@@ -68,6 +68,15 @@ Detour choice card waits for its player, blocks rolling and ending the turn,
 and settles on a pick or on the turn timer. The timer check waits out the turn
 (80s by default, less with `--var DEV_TURN_SECONDS:15`).
 
+`npm run test:api:neighborhood` covers neighborhood events (City news).
+It forces events through the dev-only `/api/dev/neighborhoodEvent` route
+(body: `{ gameId, kind, groupId? }`, kind one of `rezoning`, `landmark`,
+`waterMain`, `subwayWork`) and checks that rezoning raises and a water main
+break halves the rent on Governors Island, that landmark status blocks
+building there, that events never share a block and end on schedule, and that
+a bots-only game starts them on its own after the first three rounds. Start
+the Worker with `npx wrangler dev --var DEV_BOT_PACE_MS:30`.
+
 `npm run test:api:bots` plays a human against two computer players to the
 end of a game and checks the lobby controls for bots. Start the Worker with a
 fast bot pace so it finishes in under a minute:

@@ -6,6 +6,7 @@ import { PieceType } from "@core/enums/PieceType";
 import { PlayerClass } from "@core/enums/PlayerClass";
 import { SkillType } from "@core/enums/SkillType";
 import { BotLevel } from "@core/enums/BotLevel";
+import { NeighborhoodEventKind } from "@core/types/NeighborhoodEvent";
 import { PlayerInfo } from "@core/types/PlayerInfo";
 import { Env, isDevEnv } from "./env";
 import { clearSessionCookie, createSession, endAllSessions, endSession, getSession } from "./auth/session";
@@ -681,6 +682,31 @@ app.post("/api/dev/game", async (c) => {
     return c.text("missing gameId", 400);
   }
   return c.json({ game: await roomFor(c, body.gameId).getGame() });
+});
+
+/**
+ * Development only: start a neighborhood event in a game right away.
+ * Body: { gameId, kind: "rezoning" | "landmark" | "waterMain" | "subwayWork", groupId? }
+ */
+app.post("/api/dev/neighborhoodEvent", async (c) => {
+  if (!isDevEnv(c.env)) {
+    return c.text("Not found", 404);
+  }
+  const body = await readBody(c);
+  if (!isValidId(body.gameId)) {
+    return c.text("missing gameId", 400);
+  }
+  if (!Object.values(NeighborhoodEventKind).includes(body.kind)) {
+    return c.text("unknown kind", 400);
+  }
+  const { errMsg, data } = await roomFor(c, body.gameId).devForceNeighborhoodEvent(
+    body.kind as NeighborhoodEventKind,
+    toInt(body.groupId) ?? undefined
+  );
+  if (errMsg) {
+    return c.text(errMsg, 400);
+  }
+  return c.json(data ?? {});
 });
 
 app.post("/api/addBot", async (c) => {

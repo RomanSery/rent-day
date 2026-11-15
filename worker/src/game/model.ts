@@ -13,6 +13,7 @@ import { TradeParticipant } from "@core/types/TradeParticipant";
 import { RentPaid } from "@core/types/RentPaid";
 import { AuctionResult } from "@core/types/AuctionResult";
 import { PendingChanceChoice } from "@core/types/ChanceEvent";
+import { NeighborhoodEvent } from "@core/types/NeighborhoodEvent";
 
 export interface GameInstanceDocument {
   _id: string;
@@ -48,6 +49,12 @@ export interface GameInstanceDocument {
   rngState?: number;
   /** completed turns so far (missing on games created before it existed) */
   turnNumber?: number;
+  /** city events changing rent on a block right now (NeighborhoodEventProcessor) */
+  neighborhoodEvents?: NeighborhoodEvent[];
+  /** the turn the next one is due; missing until the first turn ends */
+  nextNeighborhoodEventTurn?: number;
+  /** id of the last event started */
+  neighborhoodEventSeq?: number;
   createdAt: string;
   updatedAt: string;
 }

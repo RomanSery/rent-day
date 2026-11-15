@@ -8,6 +8,7 @@ import { SquareThemeData } from "./SquareThemeData";
 import { RentPaid } from "./RentPaid";
 import { AuctionResult } from "./AuctionResult";
 import { PendingChanceChoice } from "./ChanceEvent";
+import { NeighborhoodEvent } from "./NeighborhoodEvent";
 
 export interface GameState {
   readonly _id: string;
@@ -38,4 +39,6 @@ export interface GameState {
   readonly lastRent?: RentPaid;
   /** shown once the game is over */
   readonly seed?: number;
+  /** city events changing rent on a block right now */
+  readonly neighborhoodEvents?: Array<NeighborhoodEvent>;
 }

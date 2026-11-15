@@ -1,3 +1,4 @@
+import { NEIGHBORHOOD_EVENTS } from "../core/config/NeighborhoodEvents";
 import React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -229,6 +230,23 @@ const PropertyTopic = () => (
       <li><b>Owners in quarantine don't collect rent.</b></li>
       <li>The rent you pay is lowered by your Negotiation skill.</li>
     </ul>
+
+    <h3>City news</h3>
+    <p>
+      After the first few rounds, the city starts making news every few rounds. Each event changes the rent on one
+      colour group (or on the subway stations) for a few rounds. Affected squares get a badge on the board, and the
+      City news panel shows what is on and how long it has left. At most two events run at once.
+    </p>
+    <SimpleTable
+      head={["Event", "What it does", "Lasts"]}
+      rows={Object.values(NEIGHBORHOOD_EVENTS).map((d) => [
+        <b>{d.title}</b>,
+        (d.rentMultiplier > 1 ? "Rent up " : "Rent down ") + Math.round(Math.abs(d.rentMultiplier - 1) * 100) + "%" +
+          (d.target === "stations" ? " on the subway stations" : "") +
+          (d.freezesBuilding ? "; no new houses" : ""),
+        d.minRounds === d.maxRounds ? d.minRounds + " rounds" : d.minRounds + "–" + d.maxRounds + " rounds",
+      ])}
+    />
 
     <h3>Houses</h3>
     <ul>

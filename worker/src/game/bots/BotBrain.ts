@@ -2,6 +2,7 @@
 // of the game state so it can be tuned and measured (worker/test/sim.mjs)
 // without touching the turn machinery in BotPlayer.
 
+import { isBuildingFrozen } from "@core/config/NeighborhoodEvents";
 import { SquareConfigDataMap } from "@core/config/SquareData";
 import { SquareType } from "@core/enums/SquareType";
 import { BotLevel } from "@core/enums/BotLevel";
@@ -380,6 +381,9 @@ export const buildPlan = (game: GameInstanceDocument, bot: Player): number[] => 
         continue;
       }
       const ids = squaresInGroup(groupId);
+      if (ids.some((id) => isBuildingFrozen(game.neighborhoodEvents, id))) {
+        continue; // landmark status: nothing new can go up here for now
+      }
       const minHouses = Math.min(...ids.map((id) => houses.get(id) ?? 0));
       for (const id of ids) {
         const n = houses.get(id) ?? 0;

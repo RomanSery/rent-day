@@ -17,6 +17,8 @@ import { ActionEligibility, getActionEligibility } from "../squares/actionEligib
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortawesome/free-solid-svg-icons";
 import { SquarePops } from "../juice/SquarePops";
+import { NEIGHBORHOOD_EVENTS, eventOnSquare } from "../../core/config/NeighborhoodEvents";
+import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
 
 /** icon on the squares a click would work on, per action mode */
 const ACTION_ICONS: Partial<Record<ActionMode, IconDefinition>> = {
@@ -222,6 +224,9 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
       : undefined;
   const actionIcon = ACTION_ICONS[actionMode];
 
+  // a neighborhood event on this square's block
+  const cityEvent = eventOnSquare(gameState?.neighborhoodEvents, id);
+
   return (
     <React.Fragment>
       <div className={getSquareClassName()} style={ownedStyle} id={getSquareId()} onTouchStart={setSquareToView2} onClick={clickOnSquare} onMouseEnter={setSquareToView}
@@ -235,6 +240,12 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
         {owner &&
           <span className="owner-badge" style={{ background: owner.color }} title={"Owned by " + owner.name}>
             <FontAwesomeIcon icon={getIconProp(owner.type)} />
+          </span>}
+
+        {cityEvent &&
+          <span className={"event-badge event-badge-" + sectionMap.get(section) + (isRentUp(cityEvent) ? " up" : " down")}
+            title={NEIGHBORHOOD_EVENTS[cityEvent.kind].title + ": " + rentChangeText(cityEvent)}>
+            <FontAwesomeIcon icon={NEIGHBORHOOD_EVENT_ICONS[cityEvent.kind]} />
           </span>}
 
         {actionTarget?.eligible && actionIcon &&

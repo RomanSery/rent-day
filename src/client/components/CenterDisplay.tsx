@@ -19,6 +19,7 @@ import { TradeOfferReviewedDialog } from "../dialogs/TradeOfferReviewedDialog";
 import { TravelDialog } from "../dialogs/TravelDialog";
 import { GameOverDialog } from "../dialogs/GameOverDialog";
 import { AuctionResult } from "./AuctionResult";
+import { NeighborhoodNews } from "./NeighborhoodNews";
 import { GameStatus } from "../../core/enums/GameStatus";
 import { useNavigate } from "react-router-dom";
 import { useIsMountedRef } from "./useIsMountedRef";
@@ -234,6 +235,8 @@ export const CenterDisplay: React.FC<Props> = ({ socketService }) => {
             </div>
             : <AuctionResult />
           }
+
+          <NeighborhoodNews />
 
           <InfoCard />
 

@@ -32,6 +32,8 @@ import { randomInt } from "../random";
 import { ChanceProcessor } from "./ChanceProcessor";
 import { GameProcessor } from "./GameProcessor";
 import { ServerChanceEvent, toClientChanceEvent } from "./ServerChanceEvent";
+import { NeighborhoodEventProcessor } from "./NeighborhoodEventProcessor";
+import { NEIGHBORHOOD_EVENTS, describeNeighborhoodEvent } from "@core/config/NeighborhoodEvents";
 
 export class RollProcessor {
   private ctx: GameContext;
@@ -793,6 +795,14 @@ export class RollProcessor {
     this.player!.hasRolled = false;
     this.player!.hasTraveled = false;
     this.game!.turnNumber = (this.game!.turnNumber ?? 0) + 1;
+
+    const news = NeighborhoodEventProcessor.onTurnCompleted(this.game!);
+    news.started.forEach((event) => {
+      this.ctx.events.send(
+        GameEvent.SHOW_SNACK_MSG,
+        "City news - " + NEIGHBORHOOD_EVENTS[event.kind].title + ": " + describeNeighborhoodEvent(event)
+      );
+    });
 
     if (incrementTimeouts) {
       this.player!.numTimeouts++;

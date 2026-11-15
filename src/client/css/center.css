@@ -899,3 +899,89 @@
   margin-left: auto;
   font-variant-numeric: tabular-nums;
 }
+
+/* city news: neighborhood events changing rent right now (NeighborhoodNews.tsx) */
+.city-news {
+  text-align: left;
+  padding: 8px 10px 10px;
+  display: grid;
+  gap: 6px;
+}
+.city-news-head {
+  font-weight: 600;
+  font-size: 13px;
+  color: #5f6b76;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+.city-news-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.city-news-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  font: inherit;
+  color: #1f2933;
+  background: #f6f7f9;
+  border: 1px solid transparent;
+  border-left: 3px solid var(--news-accent);
+  border-radius: 6px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.city-news-item.up { --news-accent: #2e7d32; --news-soft: #e3f0e4; }
+.city-news-item.down { --news-accent: #c62828; --news-soft: #fbe5e5; }
+.city-news-item:hover { border-color: #dde1e5; border-left-color: var(--news-accent); background: #fff; }
+.city-news-item:focus-visible { outline: 2px solid #3478c8; outline-offset: 1px; }
+.city-news-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--news-soft);
+  color: var(--news-accent);
+  font-size: 13px;
+}
+.city-news-text { display: grid; min-width: 0; }
+.city-news-title { font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 6px; }
+.city-news-new {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: #3478c8;
+  border-radius: 999px;
+  padding: 0 6px;
+}
+.city-news-desc { font-size: 12.5px; color: #5f6b76; line-height: 1.35; }
+.city-news-meta { display: grid; justify-items: end; gap: 1px; white-space: nowrap; }
+.city-news-change { font-weight: 600; font-size: 13px; color: var(--news-accent); font-variant-numeric: tabular-nums; }
+.city-news-left { font-size: 12px; color: #5f6b76; }
+
+/* the info card's rent figures while an event is on (SquareViewer.tsx) */
+.event-rent { font-weight: 600; }
+.event-rent.up { color: #2e7d32; }
+.event-rent.down { color: #c62828; }
+.event-note {
+  margin: 8px 12px 0;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+.event-note.up { background: #e3f0e4; color: #1e5a22; }
+.event-note.down { background: #fbe5e5; color: #8e1c1c; }

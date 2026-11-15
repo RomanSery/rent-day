@@ -16,6 +16,7 @@ import {
 import { Traits } from "../traits/Traits";
 import { GameProcessor } from "./GameProcessor";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
+import { eventRentMultiplier } from "@core/config/NeighborhoodEvents";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -152,13 +153,15 @@ export class MoneyCalculator {
       return 0;
     }
 
+    let rent = 0;
     if (squareConfig.type === SquareType.TrainStation) {
-      return MoneyCalculator.getTrainStationRent(game, owner, squareData);
+      rent = MoneyCalculator.getTrainStationRent(game, owner, squareData);
     } else if (squareConfig.type === SquareType.Property) {
-      return MoneyCalculator.getPropertyRent(game, squareId, owner, squareData);
+      rent = MoneyCalculator.getPropertyRent(game, squareId, owner, squareData);
     }
 
-    return 0;
+    // a neighborhood event on the block (rezoning, water main break, ...)
+    return Math.round(rent * eventRentMultiplier(game.neighborhoodEvents, squareId));
   }
 
   private static getTrainStationRent(

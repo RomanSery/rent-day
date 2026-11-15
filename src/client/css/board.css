@@ -657,3 +657,35 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+/* a neighborhood event on the square's block (GameSquare.tsx): a chip on the
+   inner edge, green when rent is up, red when it is down */
+.event-badge {
+  position: absolute;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 10px;
+  box-shadow: 0 0 0 1.5px #fff, 0 1px 2px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.event-badge.up { background: #2e7d32; }
+.event-badge.down { background: #c62828; }
+.event-badge-bottom { top: 3px; right: 3px; }
+.event-badge-top { bottom: 3px; right: 3px; }
+.event-badge-left { right: 3px; top: 3px; }
+.event-badge-right { left: 3px; top: 3px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .event-badge { animation: event-badge-in 0.4s ease-out; }
+}
+@keyframes event-badge-in {
+  from { transform: scale(0); }
+  60% { transform: scale(1.25); }
+  to { transform: scale(1); }
+}

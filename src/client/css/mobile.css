@@ -196,3 +196,22 @@
     box-shadow: 0 0 0 2px #1976d2, 0 0 8px rgba(25, 118, 210, 0.6);
   }
 }
+
+/* Portrait phones: a neighborhood event is a green or red dot on the inner edge,
+   like the owner dot on the outer one (board.css) */
+@media (max-width: 700px) and (orientation: portrait) {
+  .game-board .event-badge {
+    width: 8px;
+    height: 8px;
+    box-shadow: 0 0 0 1px #fff;
+  }
+
+  .game-board .event-badge svg {
+    display: none;
+  }
+
+  .game-board .event-badge-bottom { top: 2px; right: 2px; }
+  .game-board .event-badge-top { bottom: 2px; right: 2px; }
+  .game-board .event-badge-left { right: 2px; top: 2px; }
+  .game-board .event-badge-right { left: 2px; top: 2px; }
+}

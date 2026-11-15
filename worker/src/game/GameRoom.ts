@@ -25,6 +25,8 @@ import {
 } from "./model";
 import { CreateGameParams, GameProcessor } from "./controllers/GameProcessor";
 import { RollProcessor } from "./controllers/RollProcessor";
+import { NeighborhoodEventProcessor } from "./controllers/NeighborhoodEventProcessor";
+import { NeighborhoodEventKind } from "@core/types/NeighborhoodEvent";
 import { AuctionProcessor } from "./controllers/AuctionProcessor";
 import { LottoProcessor } from "./controllers/LottoProcessor";
 import { PropertyProcessor } from "./controllers/PropertyProcessor";
@@ -171,7 +173,8 @@ export const toClientGame = (
   }
   // the generator's key and state would let a player predict the dice; the
   // seed (seeded games only) is shown once the game is over, for replays
-  const { rngState: _rngState, rngKey: _rngKey, seed, ...rest } = game;
+  // (when the next neighborhood event is due stays a surprise too)
+  const { rngState: _rngState, rngKey: _rngKey, nextNeighborhoodEventTurn: _nextEvent, seed, ...rest } = game;
   return {
     ...rest,
     seed: game.status === GameStatus.FINISHED ? seed : undefined,
@@ -694,6 +697,26 @@ export class GameRoom extends DurableObject<Env> {
       await this.ctx.storage.put(USAGE_KEY, this.usage);
     });
     return this.usage;
+  }
+
+  /** Development only: start a neighborhood event now (test/neighborhood.mjs). */
+  async devForceNeighborhoodEvent(kind: NeighborhoodEventKind, groupId?: number): Promise<ActionResult> {
+    if (!this.gameCtx.isDev) {
+      return fail("Not found");
+    }
+    return this.runAction(async () => {
+      const game = await this.store.getGame();
+      if (!game || game.status !== GameStatus.ACTIVE) {
+        return fail("Game is not active");
+      }
+      const event = NeighborhoodEventProcessor.forceEvent(game, kind, groupId);
+      if (!event) {
+        return fail("No free block for that event");
+      }
+      await this.store.saveGame(game);
+      await this.gameCtx.events.refreshGameState();
+      return ok({ event });
+    });
   }
 
   async getDevUsage(): Promise<RoomUsage | null> {
