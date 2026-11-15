@@ -3,6 +3,7 @@ import { SquareConfigDataMap } from "@core/config/SquareData";
 import { GameStatus } from "@core/enums/GameStatus";
 import { PlayerState } from "@core/enums/PlayerState";
 import { SquareType } from "@core/enums/SquareType";
+import { chanceName } from "@core/constants";
 import { Bidder } from "@core/types/Bidder";
 import { Player } from "@core/types/Player";
 import { SquareGameData } from "@core/types/SquareGameData";
@@ -418,7 +419,7 @@ export class PropertyProcessor {
     const squareConfig = SquareConfigDataMap.get(squareId);
 
     if (squareConfig && squareConfig.type === SquareType.Chance) {
-      return "Chance";
+      return chanceName;
     } else if (squareConfig && squareConfig.type === SquareType.Isolation) {
       return "Visiting Quarantine";
     } else if (squareConfig && squareConfig.type === SquareType.Lotto) {

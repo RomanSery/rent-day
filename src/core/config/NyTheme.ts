@@ -1,9 +1,10 @@
 import { SquareThemeData } from "../types/SquareThemeData";
+import { chanceName } from "../constants";
 
 export const NyThemeData = new Map<number, SquareThemeData>();
 NyThemeData.set(1, { name: "Pay Day" });
 NyThemeData.set(2, { name: "Coney Island" });
-NyThemeData.set(3, { name: "Chance" });
+NyThemeData.set(3, { name: chanceName });
 NyThemeData.set(4, { name: "Sheepshead bay" });
 
 NyThemeData.set(5, { name: "Governors Island" });
@@ -11,7 +12,7 @@ NyThemeData.set(5, { name: "Governors Island" });
 NyThemeData.set(6, { name: "Herald Sq" });
 
 NyThemeData.set(7, { name: "Canarsie" });
-NyThemeData.set(8, { name: "Chance" });
+NyThemeData.set(8, { name: chanceName });
 NyThemeData.set(9, { name: "Brownsville" });
 NyThemeData.set(10, { name: "Bushwick" });
 NyThemeData.set(11, { name: "Quarantine" });
@@ -30,7 +31,7 @@ NyThemeData.set(20, { name: "Park Slope" });
 NyThemeData.set(21, { name: "Central Park" });
 
 NyThemeData.set(22, { name: "Hell's Kitchen" });
-NyThemeData.set(23, { name: "Chance" });
+NyThemeData.set(23, { name: chanceName });
 NyThemeData.set(24, { name: "Chelsea" });
 NyThemeData.set(25, { name: "West Village" });
 
@@ -43,7 +44,7 @@ NyThemeData.set(30, { name: "Greenwich Village" });
 NyThemeData.set(31, { name: "Big Brother" });
 
 NyThemeData.set(32, { name: "Times Square" });
-NyThemeData.set(33, { name: "Chance" });
+NyThemeData.set(33, { name: chanceName });
 NyThemeData.set(34, { name: "Midtown" });
 NyThemeData.set(35, { name: "Columbus Circle" });
 

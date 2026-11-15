@@ -14,6 +14,9 @@ export const luckAdjustment: number = 5;
 export const negotiationAdjustment: number = 3;
 export const corruptionAdjustment: number = 5;
 
+/** what players see for the Chance squares and cards (code names keep "Chance") */
+export const chanceName: string = "Word on the Street";
+
 export const muggingChance: number = 15;
 export const muggingAmount: number = 200;
 

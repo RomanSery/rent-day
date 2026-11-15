@@ -21,6 +21,7 @@ import {
   payToGetOutFee,
   turnTimeLimit,
   auctionTimeLimit,
+  chanceName,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
 import { SkillType } from "../core/enums/SkillType";
@@ -97,7 +98,7 @@ const BasicsTopic = () => (
     <h3>Pay Day</h3>
     <p>
       Every time you pass or land on Pay Day you collect your salary (<b>$200</b>, or <b>$300</b> for the Banker)
-      and earn <b>1 skill point</b>. Being moved past Pay Day by a Chance card counts too.
+      and earn <b>1 skill point</b>. Being moved past Pay Day by a {chanceName} card counts too.
     </p>
 
     <h3>The board</h3>
@@ -107,7 +108,7 @@ const BasicsTopic = () => (
         ["Property (coloured)", "Unowned: goes to auction. Owned by someone else: pay rent."],
         ["Subway station (Herald Sq, Fulton St, Penn Station, Grand Central)", "Same as property. Owning stations also lets you ride the subway."],
         ["Company (MTA, Con Edison)", "Unowned: goes to auction. They never charge rent, but give their owner a special power."],
-        ["Chance", "A random good or bad event (see the Chance & Lotto tab)."],
+        [chanceName, `A random good or bad event (see the ${chanceName} & Lotto tab).`],
         ["NY Lotto", "Pick one of three prizes and try your luck."],
         ["Big Brother", "Caught breaking the rules: go to quarantine."],
         ["Quarantine", "Just visiting, unless you were sent there."],
@@ -179,7 +180,7 @@ const SkillsTopic = () => (
       <li>Every player starts with a pool of points to spend (default <b>{defaultStartSkillPoints}</b>, set when the game is created).</li>
       <li>Most classes also start with <b>2 free points</b> in one skill.</li>
       <li><b>+1 point</b> each time you pass Pay Day.</li>
-      <li>Sometimes from a lucky Chance card.</li>
+      <li>Sometimes from a lucky {chanceName} card.</li>
     </ul>
     <p>
       Unspent points show as a badge in your turn bar. You can only spend them on your turn,
@@ -381,9 +382,9 @@ const ChanceLottoTopic = () => (
       <li>If you rolled a double, pick your prize before rolling again.</li>
     </ul>
 
-    <h3>Chance</h3>
+    <h3>{chanceName}</h3>
     <p>
-      Landing on Chance draws a random event. Some are good news, some are bad: you might
+      Landing on {chanceName} draws a random event: news from the neighborhood. Some are good news, some are bad: you might
       collect money, pay a bill, gain a skill point or be sent somewhere else on the board.
       Some cards read the board and hit whoever is ahead or help whoever is behind, so
       they can land on another player. The rest is for you to discover.
@@ -393,7 +394,7 @@ const ChanceLottoTopic = () => (
       end your turn. If your turn runs out first, the card's first option is taken for you.
     </p>
     <p>
-      If a Chance card moves you onto an unowned property, it goes to auction as usual.
+      If a {chanceName} card moves you onto an unowned property, it goes to auction as usual.
       If it moves you past Pay Day, you collect your salary.
     </p>
   </>
@@ -443,7 +444,7 @@ const MoneyTopic = () => (
 
     <h3>Running out of money</h3>
     <ul>
-      <li>Bills and Chance cards can push your money below $0. You can't roll or end your turn until you get back to $0 or more by selling houses or mortgaging property.</li>
+      <li>Bills and {chanceName} cards can push your money below $0. You can't roll or end your turn until you get back to $0 or more by selling houses or mortgaging property.</li>
       <li>If you owe rent equal to or more than everything you own (your <b>total assets</b>), you pay what you can and go <b>bankrupt</b>.</li>
       <li>If your money is below $0 and you have nothing left to sell or mortgage, you are out.</li>
     </ul>
@@ -477,7 +478,7 @@ const TOPICS: Topic[] = [
   { id: "property", label: "Property & Auctions", render: PropertyTopic },
   { id: "taxes", label: "Taxes & Electricity", render: TaxesTopic },
   { id: "subway", label: "Subway & Companies", render: SubwayTopic },
-  { id: "chance", label: "Chance & Lotto", render: ChanceLottoTopic },
+  { id: "chance", label: `${chanceName} & Lotto`, render: ChanceLottoTopic },
   { id: "quarantine", label: "Quarantine", render: QuarantineTopic },
   { id: "money", label: "Trades & Bankruptcy", render: MoneyTopic },
 ];

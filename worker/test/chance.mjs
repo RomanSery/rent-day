@@ -56,7 +56,7 @@ r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie
 check(r.status === 200 && r.data.diceRoll.die1 === 1 && r.data.diceRoll.die2 === 1, "forced 1+1 roll accepted (dev mode)");
 game = (await a.post("getGame", { gameId })).data.game;
 const me = game.players.find((p) => p._id === cur.id);
-check(game.log.length === 1 && /Landed on Chance|Payday|Governors|Wall/.test(game.log[0].msg), "log entry: " + game.log[0]?.msg);
+check(game.log.length === 1 && /Landed on Word on the Street|Payday|Governors|Wall/.test(game.log[0].msg), "log entry: " + game.log[0]?.msg);
 
 check(a.events.filter((e) => e.event === "showChanceEvent").length === 0, "chance event not sent immediately");
 await sleep(6000);

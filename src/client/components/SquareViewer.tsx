@@ -1,4 +1,4 @@
-import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faLightbulb, faQuestion, faTrain, faTree } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faComments, faLightbulb, faTrain, faTree } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import React from "react";
@@ -9,6 +9,7 @@ import { areObjectIdsEqual, dollarFormatter, formatDollarsWithCents } from "../h
 import useGameStateStore from "../stores/gameStateStore";
 import { InfoItem } from "./PlayerViewer";
 import { PlayerState } from "../../core/enums/PlayerState";
+import { chanceName } from "../../core/constants";
 import { NEIGHBORHOOD_EVENTS, eventOnSquare, eventRentMultiplier, eventRoundsLeft } from "../../core/config/NeighborhoodEvents";
 import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
 
@@ -162,7 +163,7 @@ export const SquareViewer: React.FC = () => {
       );
 
     case SquareType.Chance:
-      return simple("Chance", faQuestion, "orange", "Take a chance. Maybe something good will happen, or you might regret coming here.");
+      return simple(chanceName, faComments, "orange", "Hear what the neighbors are saying. Maybe it's good news, or maybe you'll wish you hadn't stopped to listen.");
     case SquareType.Lotto:
       return simple("NY Lotto", faDollarSign, "green", "Play the lotto for a chance to win great prizes. Careful, it can be addictive.");
     case SquareType.CentralPark:

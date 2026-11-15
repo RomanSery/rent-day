@@ -4,6 +4,8 @@ import Button from '@mui/material/Button';
 import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSmile, faFrownOpen } from "@fortawesome/free-regular-svg-icons";
+import { faComments } from "@fortawesome/free-solid-svg-icons";
+import { chanceName } from "../../core/constants";
 import API from '../api';
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getMyUserId, handleApiError } from "../helpers";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -15,7 +17,7 @@ interface Props {
 }
 
 /**
- * The Chance card a player draws on landing on a Chance square (styles:
+ * The Chance card ("Word on the Street" to players) drawn on landing on a Chance square (styles:
  * .chance-* in index.css). On a choice card the player who drew it picks an
  * option here and can't dismiss the card until they do; everyone else sees
  * who is choosing.
@@ -80,8 +82,8 @@ export const ChanceEventDialog: React.FC<Props> = ({ socketService }) => {
         // keyed by card so a new draw replays the entrance animation
         <div key={chanceEvent.chanceId} className={`chance-card ${tone}`}>
           <div className="chance-card-band">
-            <span className="chance-card-mark" aria-hidden="true">?</span>
-            <span className="chance-card-kind">Chance</span>
+            <span className="chance-card-mark" aria-hidden="true"><FontAwesomeIcon icon={faComments} /></span>
+            <span className="chance-card-kind">{chanceName}</span>
             <span className="chance-card-tone">{chanceEvent.isGood ? "Good news" : "Bad news"}</span>
           </div>
           <div className="chance-card-body">

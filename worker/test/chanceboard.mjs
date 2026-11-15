@@ -68,7 +68,7 @@ const money = (game, id) => game.players.find((p) => p._id === id).money;
   check(/Sheepshead/i.test(game.pendingChance?.subLine ?? ""), "card names the nearest unowned square: " + game.pendingChance?.subLine);
 
   r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 2, forceDie2: 3 });
-  check(r.status !== 200 && /Chance card/.test(JSON.stringify(r.data)), "rolling again (after the double) is blocked: " + JSON.stringify(r.data));
+  check(r.status !== 200 && /Word on the Street card/.test(JSON.stringify(r.data)), "rolling again (after the double) is blocked: " + JSON.stringify(r.data));
   r = await cur.post("actions/completeTurn", { context: { gameId } });
   check(r.status !== 200, "ending the turn is blocked while choosing -> " + r.status);
   const nonRoller = cur === a ? b : a;

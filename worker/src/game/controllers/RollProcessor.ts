@@ -8,6 +8,7 @@ import {
   last_pos,
   muggingAmount,
   muggingChance,
+  chanceName,
   payToGetOutFee,
 } from "@core/constants";
 import { GameStatus } from "@core/enums/GameStatus";
@@ -135,7 +136,7 @@ export class RollProcessor {
     }
     if (this.hasPendingChance()) {
       if (!andCompleteTurn) {
-        return "Pick an option on your Chance card first";
+        return "Pick an option on your " + chanceName + " card first";
       }
       // the turn timer ran out on a choice card: take its default option
       await this.settlePendingChance(null);
@@ -171,7 +172,7 @@ export class RollProcessor {
             const picked = chance.choice.describe(this.game, this.player, key);
             moveToPos = chance.choice.resolve(this.game, this.player, key);
             chance.subLine += "<br /> (" + picked + ")";
-            this.rollDesc += " <br /> Chance: " + picked;
+            this.rollDesc += " <br /> " + chanceName + ": " + picked;
           } else {
             chance.choices = options;
             this.game.pendingChance = {
@@ -327,7 +328,7 @@ export class RollProcessor {
       return "Pick a lotto prize first";
     }
     if (this.hasPendingChance()) {
-      return "Pick an option on your Chance card first";
+      return "Pick an option on your " + chanceName + " card first";
     }
 
     if (squareId === this.player.position) {
@@ -635,7 +636,7 @@ export class RollProcessor {
       return this.player.name + " is bankrupt";
     }
     if (!this.hasPendingChance()) {
-      return "There is no Chance card waiting for you";
+      return "There is no " + chanceName + " card waiting for you";
     }
 
     const errMsg = await this.settlePendingChance(key);
@@ -674,7 +675,7 @@ export class RollProcessor {
 
     const picked = event.choice.describe(game, player, option.key);
     const moveToPos = event.choice.resolve(game, player, option.key);
-    let desc = "Chance: " + picked;
+    let desc = chanceName + ": " + picked;
 
     if (moveToPos) {
       const from = player.position;
@@ -752,7 +753,7 @@ export class RollProcessor {
 
     if (this.hasPendingChance()) {
       if (!autoComplete) {
-        return "Pick an option on your Chance card first";
+        return "Pick an option on your " + chanceName + " card first";
       }
       // out of time: the card's default option
       await this.settlePendingChance(null);

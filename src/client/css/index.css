@@ -105,17 +105,22 @@ body {
   background: #fff;
   color: var(--chance-orange-deep);
   font-weight: 700;
-  font-size: 20px;
+  font-size: 15px;
   line-height: 1;
+  flex-shrink: 0;
 }
 .chance-card-kind {
   font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
   text-transform: uppercase;
+  min-width: 0;
 }
 .chance-card-tone {
   margin-left: auto;
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 3px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
@@ -218,7 +223,7 @@ body {
     width: calc(100% - 32px);
   }
   .chance-card-band { padding: 9px 12px; gap: 8px; }
-  .chance-card-kind { font-size: 18px; }
+  .chance-card-kind { font-size: 16px; }
   .chance-card-body { padding: 18px 16px 6px; }
   .chance-card-headline { font-size: 24px; }
   .chance-card-actions { padding: 14px 16px 16px; }
