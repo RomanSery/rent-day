@@ -25,6 +25,13 @@ import queryString from "query-string";
 import { useQuery } from "@tanstack/react-query";
 import { Share } from "react-twitter-widgets";
 
+// Facebook's SDK (loaded in index.html) sets window.FB; ad blockers often stop it.
+declare global {
+  interface Window {
+    FB?: { ui: (params: Record<string, unknown>, callback?: (response: unknown) => void) => void };
+  }
+}
+
 interface Props {
   socketService: SocketService;
 }
@@ -153,17 +160,6 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = "/js/fb_share.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    }
-  }, []);
-
-
   const onJoinGame: SubmitHandler<Inputs> = (data) => {
 
     return API.post("joinGame", { gameId: gameToJoinId, piece: data.piece, playerClass: data.playerClass, gamePwd: data.gamePwd })
@@ -237,6 +233,15 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
 
   const shareUrl = window.location.href;
   const shareTitle = "Think you can be a Block Baron? Let's play!";
+
+  const shareOnFacebook = () => {
+    if (window.FB) {
+      window.FB.ui({ display: "popup", method: "share", quote: shareTitle, href: shareUrl });
+    } else {
+      window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareUrl),
+        "_blank", "noopener,width=600,height=500");
+    }
+  };
 
   if (gameInfoQuery.isError) {
     return (
@@ -420,7 +425,9 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                 <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: shareTitle }} />
               </div>
               <div className="social-share-cont">
-                <div id="fb-share-button">
+                <div id="fb-share-button" role="button" tabIndex={0} aria-label="Share on Facebook"
+                  onClick={shareOnFacebook}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); shareOnFacebook(); } }}>
                   <svg viewBox="0 0 12 12" preserveAspectRatio="xMidYMid meet">
                     <path className="svg-icon-path" d="M9.1,0.1V2H8C7.6,2,7.3,2.1,7.1,2.3C7,2.4,6.9,2.7,6.9,3v1.4H9L8.8,6.5H6.9V12H4.7V6.5H2.9V4.4h1.8V2.8 c0-0.9,0.3-1.6,0.7-2.1C6,0.2,6.6,0,7.5,0C8.2,0,8.7,0,9.1,0.1z"></path>
                   </svg>
