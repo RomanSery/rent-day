@@ -25,17 +25,21 @@ export const auctionTimeLimit: number = 70;
 export const maxTimeoutsAllowed: number = 3;
 
 /**
- * Player colours, handed out when a game starts. Based on the Okabe-Ito
- * colour-blind-safe palette, darkened so each reads as text on white (4.5:1+),
- * and kept apart from each other rather than echoing the property group
- * colours. Ownership on the board also shows the owner's piece, so colour is
- * never the only cue.
+ * Player colours, handed out in this order when a game starts, so the first
+ * two (the commonest game) are the most different. An owner's colour sits
+ * right beside a square's group colour bar (board.css), so each one is chosen
+ * to stay clear of all nine group colours: at least 15 CIEDE2000 apart (the
+ * old pink-purple was 6 from the purple group and read as the same colour).
+ * They are also at least 16 apart from each other, still distinct under
+ * simulated red-green and blue-yellow colour blindness, and read as text on
+ * the page (4.5:1+). Ownership on the board also shows the owner's piece, so
+ * colour is never the only cue.
  */
 export const player_colors = [
-  "#0072B2", // blue
-  "#C2410C", // vermillion
-  "#007A5A", // green
-  "#A3478F", // pink-purple
-  "#8A6100", // ochre
+  "#3730A3", // indigo
+  "#A16207", // amber
+  "#047857", // emerald
+  "#9F1239", // crimson
   "#1D2126", // charcoal
+  "#7C2D12", // rust
 ];
