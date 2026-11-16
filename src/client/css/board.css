@@ -345,6 +345,14 @@
 
 .square.central-park .icon {
   flex-basis: 90%;
+  position: relative;
+  overflow: hidden;
+}
+/* the photo, faded, on its own layer so the tape over it stays solid */
+.square.central-park .icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image: url("../images/central_park.jpg");
   background-repeat: no-repeat;
   background-size: cover;
@@ -778,8 +786,10 @@
 .lockdown-tape-left, .lockdown-tape-right { top: 80%; rotate: -5deg; }
 
 /* the park corner (CentralParkDisplay.tsx): closed until further notice,
-   taped off in an X over the faded park */
-.square.central-park .park-tape { top: 58%; }
+   taped off in an X over the faded park. The tape is a child of the photo
+   (.icon, overflow hidden): centred there and long enough to reach its
+   corners at any board size, then clipped. */
+.square.central-park .park-tape { top: 50%; left: -30%; right: -30%; }
 .square.central-park .park-tape-a { rotate: -45deg; }
 .square.central-park .park-tape-b { rotate: 45deg; }
 .square.central-park .park-tape-b span { display: none; }
