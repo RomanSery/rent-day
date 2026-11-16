@@ -944,6 +944,7 @@
 }
 .city-news-item.up { --news-accent: var(--bb-good); --news-soft: var(--bb-good-soft); }
 .city-news-item.down { --news-accent: var(--bb-bad); --news-soft: var(--bb-bad-soft); }
+.city-news-item.locked { --news-accent: var(--bb-ink); --news-soft: var(--bb-brass-soft); }
 .city-news-item:hover { border-color: var(--bb-line); border-left-color: var(--news-accent); background: var(--bb-surface); }
 .city-news-item:focus-visible { outline: 2px solid var(--bb-link); outline-offset: 1px; }
 .city-news-icon {
@@ -986,3 +987,4 @@
 }
 .event-note.up { background: var(--bb-good-soft); color: var(--bb-good-ink); }
 .event-note.down { background: var(--bb-bad-soft); color: var(--bb-bad-ink); }
+.event-note.locked { background: var(--bb-brass-soft); color: var(--bb-ink); }

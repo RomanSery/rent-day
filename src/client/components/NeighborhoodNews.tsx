@@ -1,7 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faArrowTrendDown, faArrowTrendUp, faLandmark, faNewspaper, faTrainSubway } from "@fortawesome/free-solid-svg-icons";
+import { faArrowTrendDown, faArrowTrendUp, faLandmark, faLock, faNewspaper, faTrainSubway, faUtensils } from "@fortawesome/free-solid-svg-icons";
 import useGameStateStore from "../stores/gameStateStore";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { NeighborhoodEvent, NeighborhoodEventKind } from "../../core/types/NeighborhoodEvent";
@@ -17,16 +17,29 @@ export const NEIGHBORHOOD_EVENT_ICONS: Record<NeighborhoodEventKind, IconDefinit
   [NeighborhoodEventKind.Landmark]: faLandmark,
   [NeighborhoodEventKind.WaterMain]: faArrowTrendDown,
   [NeighborhoodEventKind.SubwayWork]: faTrainSubway,
+  [NeighborhoodEventKind.Lockdown]: faLock,
+  [NeighborhoodEventKind.DiningBan]: faUtensils,
 };
 
-/** "+50% rent", "-50% rent" */
+/** "+50% rent", "-50% rent", "No rent" */
 export const rentChangeText = (event: NeighborhoodEvent): string => {
+  if (NEIGHBORHOOD_EVENTS[event.kind].rentMultiplier === 0) {
+    return "No rent";
+  }
   const pct = Math.round((NEIGHBORHOOD_EVENTS[event.kind].rentMultiplier - 1) * 100);
   return (pct > 0 ? "+" : "−") + Math.abs(pct) + "% rent";
 };
 
 export const isRentUp = (event: NeighborhoodEvent): boolean =>
   NEIGHBORHOOD_EVENTS[event.kind].rentMultiplier > 1;
+
+/** a lockdown shuts the block: no rent at all */
+export const isLockdown = (event: NeighborhoodEvent): boolean =>
+  NEIGHBORHOOD_EVENTS[event.kind].rentMultiplier === 0;
+
+/** the colour class for an event: green when rent is up, red when down, dark when locked down */
+export const eventTone = (event: NeighborhoodEvent): "up" | "down" | "locked" =>
+  isLockdown(event) ? "locked" : isRentUp(event) ? "up" : "down";
 
 /**
  * City news: the neighborhood events changing rent right now, with how long
@@ -57,7 +70,7 @@ export const NeighborhoodNews: React.FC = () => {
           const first = squaresInEventGroup(event.groupId)[0];
           return (
             <li key={event.id}>
-              <button type="button" className={"city-news-item " + (isRentUp(event) ? "up" : "down")}
+              <button type="button" className={"city-news-item " + eventTone(event)}
                 onClick={() => first && setSquareToView(first)}>
                 <span className="city-news-icon"><FontAwesomeIcon icon={NEIGHBORHOOD_EVENT_ICONS[event.kind]} /></span>
                 <span className="city-news-text">

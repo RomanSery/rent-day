@@ -16,7 +16,7 @@ import {
 import { Traits } from "../traits/Traits";
 import { GameProcessor } from "./GameProcessor";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
-import { eventRentMultiplier } from "@core/config/NeighborhoodEvents";
+import { eventRentMultiplier, eventTravelFine } from "@core/config/NeighborhoodEvents";
 
 export class MoneyCalculator {
   public static collectSalary(player: Player): void {
@@ -41,6 +41,27 @@ export class MoneyCalculator {
       }
     }
     return parts.length ? "Paid " + parts.join(", ") : "";
+  }
+
+  /**
+   * A lockdown fines anyone who lands on the block, except the square's owner,
+   * for non-essential travel. The fine goes to the bank; money can go below
+   * zero like any other charge and is settled as mid-turn debt. Returns a line
+   * for the roll's description, or "" when there is no fine.
+   */
+  public static payTravelFine(game: GameInstanceDocument, player: Player): string {
+    const squareId = player.position;
+    const fine = eventTravelFine(game.neighborhoodEvents, squareId);
+    if (fine <= 0) {
+      return "";
+    }
+    const owner = game.squareState.find((s) => s.squareId === squareId)?.owner;
+    if (owner && areIdsEqual(owner, player._id)) {
+      return "";
+    }
+    player.money -= fine;
+    PlayerCostsCalculator.updatePlayerCosts(game, player);
+    return "Fined " + dollarFormatterServer.format(fine) + " for non-essential travel to a locked-down block";
   }
 
   public static subtractElectricityAndTaxes(player: Player): void {

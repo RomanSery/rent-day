@@ -16,6 +16,8 @@ export interface NeighborhoodEventDef {
   readonly rentMultiplier: number;
   /** no new houses on the affected squares while it lasts */
   readonly freezesBuilding: boolean;
+  /** fine for landing on an affected square you don't own (0 or absent: none) */
+  readonly travelFine?: number;
   /** which squares it can hit */
   readonly target: "properties" | "stations";
   /** how long it lasts, in rounds (one turn for each player still in) */
@@ -65,6 +67,28 @@ export const NEIGHBORHOOD_EVENTS: Record<NeighborhoodEventKind, NeighborhoodEven
     minRounds: 1,
     maxRounds: 2,
     describe: (where) => `Weekend track work at ${where}: station rent is halved.`,
+  },
+  [NeighborhoodEventKind.Lockdown]: {
+    kind: NeighborhoodEventKind.Lockdown,
+    title: "Lockdown",
+    rentMultiplier: 0,
+    freezesBuilding: true,
+    travelFine: 50,
+    target: "properties",
+    minRounds: 1,
+    maxRounds: 2,
+    describe: (where) =>
+      `${where} is locked down: no rent, no building, and a $50 fine for non-essential travel there.`,
+  },
+  [NeighborhoodEventKind.DiningBan]: {
+    kind: NeighborhoodEventKind.DiningBan,
+    title: "Indoor dining ban",
+    rentMultiplier: 0.5,
+    freezesBuilding: false,
+    target: "properties",
+    minRounds: 2,
+    maxRounds: 2,
+    describe: (where) => `Indoor dining is banned in ${where}: rent there is halved.`,
   },
 };
 
@@ -132,6 +156,24 @@ export const isBuildingFrozen = (
   const event = eventOnSquare(events, squareId);
   return !!event && NEIGHBORHOOD_EVENTS[event.kind].freezesBuilding;
 };
+
+/** the fine for landing on this square right now (0 when none); the caller lets the owner off */
+export const eventTravelFine = (
+  events: readonly NeighborhoodEvent[] | undefined | null,
+  squareId: number
+): number => {
+  const event = eventOnSquare(events, squareId);
+  return event ? NEIGHBORHOOD_EVENTS[event.kind].travelFine ?? 0 : 0;
+};
+
+/** "Rent up 50%", "Rent down 50%", "No rent", with "; no new houses" and the fine, for Help */
+export const eventEffectText = (def: NeighborhoodEventDef): string =>
+  (def.rentMultiplier === 0
+    ? "No rent"
+    : (def.rentMultiplier > 1 ? "Rent up " : "Rent down ") + Math.round(Math.abs(def.rentMultiplier - 1) * 100) + "%") +
+  (def.target === "stations" ? " on the subway stations" : "") +
+  (def.freezesBuilding ? "; no new houses" : "") +
+  (def.travelFine ? "; $" + def.travelFine + " fine for landing there (owners excepted)" : "");
 
 /**
  * Rounds left, counting the round in progress: turns left shared out over the

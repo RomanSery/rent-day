@@ -1,4 +1,4 @@
-import { isBuildingFrozen } from "@core/config/NeighborhoodEvents";
+import { NEIGHBORHOOD_EVENTS, eventOnSquare, isBuildingFrozen } from "@core/config/NeighborhoodEvents";
 import { SquareConfigDataMap } from "@core/config/SquareData";
 import { GameStatus } from "@core/enums/GameStatus";
 import { PlayerState } from "@core/enums/PlayerState";
@@ -279,7 +279,8 @@ export class PropertyProcessor {
     }
 
     if (isBuildingFrozen(this.game.neighborhoodEvents, this.squareId)) {
-      return "This block has landmark status: no new houses until it ends";
+      const event = eventOnSquare(this.game.neighborhoodEvents, this.squareId)!;
+      return NEIGHBORHOOD_EVENTS[event.kind].title + " on this block: no new houses until it ends";
     }
 
     const houseCost = MoneyCalculator.getHouseCost(this.state);

@@ -207,6 +207,10 @@
     display: none;
   }
 
+  /* no room for words: the tape alone says it */
+  .game-board .lockdown-tape { height: 6px; }
+  .game-board .lockdown-tape span { display: none; }
+
   .game-board .event-badge-bottom { top: 2px; right: 2px; }
   .game-board .event-badge-top { bottom: 2px; right: 2px; }
   .game-board .event-badge-left { right: 2px; top: 2px; }

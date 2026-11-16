@@ -1,6 +1,7 @@
 // Neighborhood events: forced events change rent on their block (rezoning up,
-// water main down), landmark status blocks building, events end on schedule,
-// and a bots-only game starts them on its own.
+// water main down), landmark status blocks building, a lockdown stops rent and
+// fines visitors, events end on schedule, and a bots-only game starts them on
+// its own.
 //
 // Start the Worker with fast bots for the last part:
 //   npx wrangler dev --var DEV_BOT_PACE_MS:30
@@ -124,6 +125,24 @@ section("landmark status");
   check(r.status !== 200 && /landmark/i.test(JSON.stringify(r.data)), "building is refused: " + JSON.stringify(r.data));
   const rent = await visit(g);
   check(near(rent, baseRent * 1.25), `landmark: rent $${rent}, about 1.25 x $${baseRent}`);
+  close(g);
+}
+
+// --- lockdown ---------------------------------------------------------------------
+section("lockdown");
+{
+  const g = await setup();
+  const r = await force(g.owner, g.gameId, "lockdown", ISLAND_GROUP);
+  check(r.status === 200 && r.data.event?.kind === "lockdown", "lockdown forced on Governors Island");
+  const b = await g.owner.post("actions/buildHouse", { context: { gameId: g.gameId }, squareId: GOVERNORS_ISLAND });
+  check(b.status !== 200 && /Lockdown/.test(JSON.stringify(b.data)), "building is refused: " + JSON.stringify(b.data));
+  const before = (await getGame(g.visitor, g.gameId)).players.find((p) => p._id === g.visitor.id).money;
+  const rent = await visit(g);
+  const game = await getGame(g.visitor, g.gameId);
+  const after = game.players.find((p) => p._id === g.visitor.id).money;
+  check(rent == null, "no rent is paid on a locked-down block");
+  check(before - after === 50, `the visitor is fined $50 for travelling there ($${before} -> $${after})`);
+  check(/Fined \$50 for non-essential travel/.test(game.log.at(-1)?.msg ?? ""), "the log says why: " + game.log.at(-1)?.msg);
   close(g);
 }
 

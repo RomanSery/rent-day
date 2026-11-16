@@ -11,7 +11,7 @@ import { InfoItem } from "./PlayerViewer";
 import { PlayerState } from "../../core/enums/PlayerState";
 import { chanceName } from "../../core/constants";
 import { NEIGHBORHOOD_EVENTS, eventOnSquare, eventRentMultiplier, eventRoundsLeft } from "../../core/config/NeighborhoodEvents";
-import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
+import { NEIGHBORHOOD_EVENT_ICONS, eventTone, rentChangeText } from "./NeighborhoodNews";
 
 const houses = (n: number) => (
   <span className="info-houses">{Array.from({ length: n }).map((_, i) => <FontAwesomeIcon key={i} icon={faHome} />)}</span>
@@ -55,10 +55,11 @@ export const SquareViewer: React.FC = () => {
     );
   };
   const eventNote = cityEvent && (
-    <p className={"info-card-text event-note " + (isRentUp(cityEvent) ? "up" : "down")}>
+    <p className={"info-card-text event-note " + eventTone(cityEvent)}>
       <FontAwesomeIcon icon={NEIGHBORHOOD_EVENT_ICONS[cityEvent.kind]} />{" "}
       <b>{NEIGHBORHOOD_EVENTS[cityEvent.kind].title}</b> ({rentChangeText(cityEvent)}
-      {NEIGHBORHOOD_EVENTS[cityEvent.kind].freezesBuilding ? ", no new houses" : ""}) for{" "}
+      {NEIGHBORHOOD_EVENTS[cityEvent.kind].freezesBuilding ? ", no new houses" : ""}
+      {NEIGHBORHOOD_EVENTS[cityEvent.kind].travelFine ? ", $" + NEIGHBORHOOD_EVENTS[cityEvent.kind].travelFine + " fine for landing here unless you own it" : ""}) for{" "}
       {(() => {
         const playersIn = gameState.players.filter((p) => p.state !== PlayerState.BANKRUPT).length;
         const rounds = eventRoundsLeft(cityEvent, gameState.turnNumber ?? 0, playersIn);

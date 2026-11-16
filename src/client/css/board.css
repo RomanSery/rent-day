@@ -725,6 +725,7 @@
 }
 .event-badge.up { background: var(--bb-good); }
 .event-badge.down { background: var(--bb-bad); }
+.event-badge.locked { background: var(--bb-ink); }
 .event-badge-bottom { top: 3px; right: 3px; }
 .event-badge-top { bottom: 3px; right: 3px; }
 .event-badge-left { right: 3px; top: 3px; }
@@ -738,3 +739,40 @@
   60% { transform: scale(1.25); }
   to { transform: scale(1); }
 }
+
+/* a locked-down block (GameSquare.tsx): caution tape across the square,
+   brass and ink like the rest of the board, reading "Locked down" */
+.lockdown-tape {
+  position: absolute;
+  z-index: 3;
+  left: -6%;
+  right: -6%;
+  top: 50%;
+  translate: 0 -50%;
+  rotate: -18deg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 15px;
+  background: repeating-linear-gradient(-45deg, var(--bb-brass) 0 7px, var(--bb-ink) 7px 14px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.lockdown-tape span {
+  background: var(--bb-brass);
+  color: var(--bb-ink);
+  font-family: var(--bb-font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 13px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0 4px;
+}
+/* clear of the square's name: below it on the top and bottom rows (the name
+   sits just inside the colour bar), along the lower edge on the side columns,
+   which are wider than tall */
+.lockdown-tape-bottom { top: 68%; }
+.lockdown-tape-top { top: 62%; }
+.lockdown-tape-left, .lockdown-tape-right { top: 80%; rotate: -5deg; }

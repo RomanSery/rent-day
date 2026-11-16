@@ -31,6 +31,8 @@ const KIND_WEIGHTS: Array<[NeighborhoodEventKind, number]> = [
   [NeighborhoodEventKind.Landmark, 2],
   [NeighborhoodEventKind.WaterMain, 3],
   [NeighborhoodEventKind.SubwayWork, 1],
+  [NeighborhoodEventKind.Lockdown, 2],
+  [NeighborhoodEventKind.DiningBan, 2],
 ];
 
 export interface NeighborhoodNews {

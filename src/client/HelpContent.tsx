@@ -1,4 +1,4 @@
-import { NEIGHBORHOOD_EVENTS } from "../core/config/NeighborhoodEvents";
+import { NEIGHBORHOOD_EVENTS, eventEffectText } from "../core/config/NeighborhoodEvents";
 import React from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -249,9 +249,7 @@ const PropertyTopic = () => (
       head={["Event", "What it does", "Lasts"]}
       rows={Object.values(NEIGHBORHOOD_EVENTS).map((d) => [
         <b>{d.title}</b>,
-        (d.rentMultiplier > 1 ? "Rent up " : "Rent down ") + Math.round(Math.abs(d.rentMultiplier - 1) * 100) + "%" +
-          (d.target === "stations" ? " on the subway stations" : "") +
-          (d.freezesBuilding ? "; no new houses" : ""),
+        eventEffectText(d),
         d.minRounds === d.maxRounds ? d.minRounds + " rounds" : d.minRounds + "–" + d.maxRounds + " rounds",
       ])}
     />

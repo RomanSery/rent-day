@@ -19,7 +19,7 @@ import { faGavel, faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortaw
 import { isBeingAuctioned } from "../squares/squareHelpers";
 import { SquarePops } from "../juice/SquarePops";
 import { NEIGHBORHOOD_EVENTS, eventOnSquare } from "../../core/config/NeighborhoodEvents";
-import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
+import { NEIGHBORHOOD_EVENT_ICONS, eventTone, isLockdown, rentChangeText } from "./NeighborhoodNews";
 
 /** icon on the squares a click would work on, per action mode */
 const ACTION_ICONS: Partial<Record<ActionMode, IconDefinition>> = {
@@ -250,9 +250,14 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
           </span>}
 
         {cityEvent &&
-          <span className={"event-badge event-badge-" + sectionMap.get(section) + (isRentUp(cityEvent) ? " up" : " down")}
+          <span className={"event-badge event-badge-" + sectionMap.get(section) + " " + eventTone(cityEvent)}
             title={NEIGHBORHOOD_EVENTS[cityEvent.kind].title + ": " + rentChangeText(cityEvent)}>
             <FontAwesomeIcon icon={NEIGHBORHOOD_EVENT_ICONS[cityEvent.kind]} />
+          </span>}
+
+        {cityEvent && isLockdown(cityEvent) &&
+          <span className={"lockdown-tape lockdown-tape-" + sectionMap.get(section)} aria-label="Locked down">
+            <span>Locked down</span>
           </span>}
 
         {actionTarget?.eligible && actionIcon &&

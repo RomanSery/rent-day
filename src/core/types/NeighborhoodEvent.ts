@@ -7,6 +7,10 @@ export enum NeighborhoodEventKind {
   WaterMain = "waterMain",
   /** weekend subway work: train station rent halved */
   SubwayWork = "subwayWork",
+  /** a block is locked down: no rent, no building, and a fine for anyone who travels there */
+  Lockdown = "lockdown",
+  /** indoor dining is banned on a block: rent halved */
+  DiningBan = "diningBan",
 }
 
 /**

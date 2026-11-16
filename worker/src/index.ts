@@ -686,7 +686,7 @@ app.post("/api/dev/game", async (c) => {
 
 /**
  * Development only: start a neighborhood event in a game right away.
- * Body: { gameId, kind: "rezoning" | "landmark" | "waterMain" | "subwayWork", groupId? }
+ * Body: { gameId, kind: "rezoning" | "landmark" | "waterMain" | "subwayWork" | "lockdown" | "diningBan", groupId? }
  */
 app.post("/api/dev/neighborhoodEvent", async (c) => {
   if (!isDevEnv(c.env)) {

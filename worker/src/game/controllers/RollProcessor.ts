@@ -229,6 +229,11 @@ export class RollProcessor {
       }
     }
 
+    const fineDesc = MoneyCalculator.payTravelFine(this.game, this.player);
+    if (fineDesc) {
+      this.rollDesc += " <br /> " + fineDesc;
+    }
+
     const payDesc = await MoneyCalculator.payRent(
       this.ctx,
       this.game,
@@ -707,6 +712,11 @@ export class RollProcessor {
         if (cityTax) {
           desc += " - " + cityTax;
         }
+      }
+
+      const fineDesc = MoneyCalculator.payTravelFine(game, player);
+      if (fineDesc) {
+        desc += " - " + fineDesc;
       }
 
       if (AuctionProcessor.shouldCreateAuction(game, moveToPos)) {

@@ -1,4 +1,4 @@
-import { isBuildingFrozen } from "../../core/config/NeighborhoodEvents";
+import { NEIGHBORHOOD_EVENTS, eventOnSquare, isBuildingFrozen } from "../../core/config/NeighborhoodEvents";
 import { SquareConfigDataMap } from "../../core/config/SquareData";
 import { ActionMode } from "../../core/enums/ActionMode";
 import { SquareType } from "../../core/enums/SquareType";
@@ -94,7 +94,8 @@ export const getActionEligibility = (
         return NO("Fully built");
       }
       if (isBuildingFrozen(game.neighborhoodEvents, squareId)) {
-        return NO("Landmark status: no new houses for now");
+        const event = eventOnSquare(game.neighborhoodEvents, squareId)!;
+        return NO(NEIGHBORHOOD_EVENTS[event.kind].title + ": no new houses for now");
       }
       if (me.money < (state.houseCost ?? 0)) {
         return NO("Not enough money for a house");
