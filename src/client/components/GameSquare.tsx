@@ -15,7 +15,8 @@ import { SocketService } from "../sockets/SocketService";
 import useGameStateStore from "../stores/gameStateStore";
 import { ActionEligibility, getActionEligibility } from "../squares/actionEligibility";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { faGavel, faHandHoldingDollar, faMinus, faPlus, faUnlock } from "@fortawesome/free-solid-svg-icons";
+import { isBeingAuctioned } from "../squares/squareHelpers";
 import { SquarePops } from "../juice/SquarePops";
 import { NEIGHBORHOOD_EVENTS, eventOnSquare } from "../../core/config/NeighborhoodEvents";
 import { NEIGHBORHOOD_EVENT_ICONS, isRentUp, rentChangeText } from "./NeighborhoodNews";
@@ -70,7 +71,10 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
     if (owner) {
       classes.push("owned", "owned-" + sectionMap.get(section));
     }
-    if (actionTarget) {
+    if (auctioned) {
+      // up for auction: the one square everyone should find (never dimmed)
+      classes.push("auctioned");
+    } else if (actionTarget) {
       // mortgaging, building, ...: the squares a click would work on stand
       // out, the rest dim (this wins over the player-list spotlight)
       classes.push(actionTarget.eligible ? "action-target" : "dimmed");
@@ -224,6 +228,9 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
       : undefined;
   const actionIcon = ACTION_ICONS[actionMode];
 
+  // being auctioned right now (properties, train stations and utilities)
+  const auctioned = !!isBeingAuctioned(gameState, id);
+
   // a neighborhood event on this square's block
   const cityEvent = eventOnSquare(gameState?.neighborhoodEvents, id);
 
@@ -250,6 +257,11 @@ export const GameSquare: React.FC<Props> = ({ id, viewSquare, socketService }) =
 
         {actionTarget?.eligible && actionIcon &&
           <span className="action-chip" aria-hidden="true"><FontAwesomeIcon icon={actionIcon} /></span>}
+
+        {auctioned &&
+          <span className={"auction-tag auction-tag-" + sectionMap.get(section)}>
+            <FontAwesomeIcon icon={faGavel} /> Auction
+          </span>}
 
         <SquarePops squareId={id} />
       </div>
