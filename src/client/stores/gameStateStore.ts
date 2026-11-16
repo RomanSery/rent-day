@@ -74,23 +74,17 @@ interface GameStateStore {
   setShowDiceAnimation: (newData: boolean) => void;
   animDiceRollResult: DiceRollResult | undefined;
   setAnimDiceRollResult: (newData: DiceRollResult | undefined) => void;
+
+  /** Back to a blank game screen; call when leaving one (see GameBoard). */
+  resetGameScreen: () => void;
 }
 
-const useGameStateStore = create<GameStateStore>()((set, get) => ({
-  watchers: 0,
-  setWatchers: (count: number): void => {
-    set({ watchers: Number.isFinite(count) && count > 0 ? count : 0 });
-  },
-
-  showDiceAnimation: false,
-  animDiceRollResult: undefined,
-  setShowDiceAnimation: (newData: boolean): void => {
-    set({ showDiceAnimation: newData });
-  },
-  setAnimDiceRollResult: (newData: DiceRollResult | undefined): void => {
-    set({ animDiceRollResult: newData });
-  },
-
+/**
+ * Everything that belongs to one game screen. The store outlives the screen,
+ * so without a reset a dialog left open (say, the "has filed for bankruptcy"
+ * message that reaches a player as they leave) pops up on the next game.
+ */
+const gameScreenDefaults = {
   data: undefined,
   actionMode: ActionMode.None,
   squareToView: undefined,
@@ -103,20 +97,42 @@ const useGameStateStore = create<GameStateStore>()((set, get) => ({
   chanceEvent: undefined,
   serverMsgModalOpen: false,
   serverMsg: undefined,
-
   playerToView: undefined,
-  forceDie1: undefined,
-  forceDie2: undefined,
   offerTradeOpen: false,
   reviewTradeOpen: false,
   tradeReviewedOpen: false,
   travelOpen: false,
   tradingWithPlayerId: null,
   tradeOffer: null,
-
   statsViewOpen: false,
   taxesViewOpen: false,
   helpOpen: false,
+  watchers: 0,
+  showDiceAnimation: false,
+  animDiceRollResult: undefined,
+} satisfies Partial<GameStateStore>;
+
+const useGameStateStore = create<GameStateStore>()((set, get) => ({
+  ...gameScreenDefaults,
+  forceDie1: undefined,
+  forceDie2: undefined,
+
+  resetGameScreen: (): void => {
+    cancelMoveSounds();
+    set(gameScreenDefaults);
+  },
+
+  setWatchers: (count: number): void => {
+    set({ watchers: Number.isFinite(count) && count > 0 ? count : 0 });
+  },
+
+  setShowDiceAnimation: (newData: boolean): void => {
+    set({ showDiceAnimation: newData });
+  },
+  setAnimDiceRollResult: (newData: DiceRollResult | undefined): void => {
+    set({ animDiceRollResult: newData });
+  },
+
   setStatsViewOpen: (newData: boolean): void => {
     set({ statsViewOpen: newData });
   },

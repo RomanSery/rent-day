@@ -168,6 +168,8 @@ export const GameBoard: React.FC<Props> = ({ socketService }) => {
       if (socketService) {
         socketService.disconnect();
       }
+      // nothing from this game (an open dialog, its state) carries over to the next
+      useGameStateStore.getState().resetGameScreen();
     };
   }, []);
 
