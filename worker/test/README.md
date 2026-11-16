@@ -84,7 +84,9 @@ and settles on a pick or on the turn timer. The timer check waits out the turn
 (80s by default, less with `--var DEV_TURN_SECONDS:15`). It also forces the
 cards that read the drawer's skills: the subway musician (die roll plus Luck),
 the flea market haggle (Negotiation), the building inspector (fine cut by
-Corruption) and Night class (a choice that moves one skill point).
+Corruption) and Night class (a choice that moves one skill point), and the
+government cards: the vaccine passport check (pay or go to quarantine),
+essential worker (double for a Conductor) and the re-education seminar.
 
 `npm run test:api:chancedeck` watches a bots-only game (`/api/dev/simulate`)
 and records every Chance card drawn: none repeats until the whole deck has

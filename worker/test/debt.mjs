@@ -130,7 +130,7 @@ section("a Chance card leaves a player with nothing: eliminated when the turn re
 {
   const { gameId, cur: P, other: Q } = await twoPlayerGame("birthday", false);
   await setPlayer(P, gameId, Q.id, { money: 10 });
-  // P: 1 -> 8 (Word on the Street) with "It's your birthday!" forced: Q pays $30
+  // P: 1 -> 8 (Word on the Street) with "Lockdown birthday" forced: Q pays $30
   let r = await P.post("actions/roll", { ...ctx(gameId), forceDie1: 3, forceDie2: 4, forceChanceId: 21 });
   check(r.status === 200, "P lands on Word on the Street -> " + r.status);
   let g = await getGame(P, gameId);
@@ -253,7 +253,7 @@ section("a Chance card mid-turn leaves the player owing more than they can raise
 {
   const { gameId, cur: P, other: Q } = await twoPlayerGame("dentist", false);
   await setPlayer(Q, gameId, P.id, { money: 100 });
-  // 1 -> 8 (Word on the Street) with "Dentist appointment" (-$150) forced
+  // 1 -> 8 (Word on the Street) with "Unapproved gathering" (-$150) forced
   const r = await P.post("actions/roll", { ...ctx(gameId), forceDie1: 3, forceDie2: 4, forceChanceId: 1 });
   check(r.status === 200, "P lands on Word on the Street -> " + r.status);
   const g = await getGame(Q, gameId);

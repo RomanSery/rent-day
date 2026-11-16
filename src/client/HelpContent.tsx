@@ -392,7 +392,8 @@ const ChanceLottoTopic = () => (
     <h3>{chanceName}</h3>
     <p>
       Landing on {chanceName} draws a random event: news from the neighborhood. Some are good news, some are bad: you might
-      collect money, pay a bill, gain a skill point or be sent somewhere else on the board.
+      collect money, pay a fine, have your skills adjusted by the state, be sent somewhere else on the board,
+      or be ordered into quarantine.
       Some cards read the board and hit whoever is ahead or help whoever is behind, so
       they can land on another player. Others read your skills: points in Luck, Negotiation or
       Corruption can make a card pay out more or cost you less. The rest is for you to discover.

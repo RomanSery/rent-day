@@ -1,5 +1,6 @@
 import { SquareConfigDataMap } from "@core/config/SquareData";
-import { island_position, last_pos } from "@core/constants";
+import { island_position, isolation_position, last_pos } from "@core/constants";
+import { PlayerClass } from "@core/enums/PlayerClass";
 import { PlayerState } from "@core/enums/PlayerState";
 import { SquareType } from "@core/enums/SquareType";
 import { GameInstanceDocument } from "../model";
@@ -158,8 +159,8 @@ export class ChanceProcessor {
   private initChanceEvents() {
     this.events.push({
       isGood: false,
-      headline: "Dentist appointment",
-      subLine: "You don't have insurance. Pay the dentist <b>$150</b>",
+      headline: "Unapproved gathering",
+      subLine: "Your backyard barbecue had 11 guests. The limit is 10. Pay a <b>$150</b> fine",
       chanceId: 1,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 150;
@@ -172,8 +173,8 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: false,
-      headline: "Flat tire",
-      subLine: "You hit a pothole. Pay <b>$120</b> to have tire replaced",
+      headline: "Checkpoint impound",
+      subLine: "Your car was towed at a travel checkpoint. Pay <b>$120</b> to get it back",
       chanceId: 2,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 120;
@@ -186,8 +187,8 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: false,
-      headline: "Pay off your debts",
-      subLine: "Pay back each active player <b>$30</b>",
+      headline: "Mutual aid mandate",
+      subLine: "The city orders you to support your neighbors. Pay each active player <b>$30</b>",
       chanceId: 3,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
@@ -271,22 +272,47 @@ export class ChanceProcessor {
 
     this.events.push({
       isGood: false,
-      headline: "Late credit card payment",
-      subLine: "Pay the bank <b>10% of your money</b> in interest",
+      headline: "Vaccine passport check",
+      subLine: "Papers, please. Pay a <b>$75</b> verification fee, or refuse and go to <b>quarantine</b>",
       chanceId: 5,
-      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
-        const subtraction = Math.round(player.money * 0.1);
-        player.money -= subtraction;
+      makeItHappen(): number | null {
+        // settled through the choice below
         return null;
       },
-      getSubLine(game: GameInstanceDocument, player: Player): string {
-        const subtraction = Math.round(player.money * 0.1);
-        return (
-          this.subLine +
-          "<br /> (" +
-          dollarFormatterServer.format(subtraction) +
-          ")"
-        );
+      getSubLine(): string {
+        return this.subLine;
+      },
+      choice: {
+        getOptions() {
+          // paying comes first: it is what a timed-out turn takes
+          return [
+            { key: "pay", label: "Pay $75" },
+            { key: "quarantine", label: "Refuse: go to quarantine" },
+          ];
+        },
+        resolve(game: GameInstanceDocument, player: Player, key: string): number | null {
+          if (key === "quarantine") {
+            // straight there, like the Go to Quarantine square: no trip
+            // round the board, so no payday, and the turn's rolling is over
+            player.state = PlayerState.IN_ISOLATION;
+            player.position = isolation_position;
+            player.numTurnsInIsolation = 0;
+            player.hasRolled = true;
+            return null;
+          }
+          player.money -= 75;
+          PlayerCostsCalculator.updatePlayerCosts(game, player);
+          return null;
+        },
+        botPick(game: GameInstanceDocument, player: Player): string {
+          // quarantine costs turns; only a bot that can't spare the fee refuses
+          return player.money >= 200 ? "pay" : "quarantine";
+        },
+        describe(game: GameInstanceDocument, player: Player, key: string): string {
+          return key === "quarantine"
+            ? "Refused the vaccine passport check and was sent to quarantine"
+            : "Paid the $75 verification fee";
+        },
       },
     });
 
@@ -337,24 +363,25 @@ export class ChanceProcessor {
 
     //GOOD ONES
 
+    const hazardPay = (p: Player): number => (p.playerClass === PlayerClass.Conductor ? 200 : 100);
     this.events.push({
       isGood: true,
-      headline: "Options trading",
-      subLine: "You shorted the market and made <b>$100</b> profit",
+      headline: "Essential worker",
+      subLine: "You kept the city running. Collect <b>$100</b> hazard pay (<b>$200</b> for a Conductor: the trains never stopped)",
       chanceId: 20,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
-        player.money += 100;
+        player.money += hazardPay(player);
         return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
-        return this.subLine;
+        return this.subLine + "<br /> (" + dollarFormatterServer.format(hazardPay(player)) + ")";
       },
     });
 
     this.events.push({
       isGood: true,
-      headline: "It's your birthday!",
-      subLine: "Every active player gives you a <b>$30</b> gift card",
+      headline: "Lockdown birthday",
+      subLine: "Your party is on a video call. Every active player sends you a <b>$30</b> gift card",
       chanceId: 21,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
@@ -440,16 +467,26 @@ export class ChanceProcessor {
     });
 
     this.events.push({
-      isGood: true,
-      headline: "Take a college course",
-      subLine: "Gain <b>a skill point</b>",
+      isGood: false,
+      headline: "Re-education seminar",
+      subLine: "Questioning authority is discouraged. Lose <b>1 Negotiation</b> point and gain <b>1 Corruption</b> point",
       chanceId: 23,
+      // with no Negotiation to lose it is only a free Corruption point
+      getIsGood(game: GameInstanceDocument, player: Player): boolean {
+        return player.negotiation === 0;
+      },
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
-        player.numAbilityPoints += 1;
+        if (player.negotiation > 0) {
+          player.negotiation -= 1;
+        }
+        player.corruption += 1;
+        PlayerCostsCalculator.updatePlayerCosts(game, player);
         return null;
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
-        return this.subLine;
+        return player.negotiation > 0
+          ? this.subLine
+          : this.subLine + "<br /> (no Negotiation to lose: Corruption +1)";
       },
     });
 

@@ -36,7 +36,7 @@ class Client {
 }
 
 const suffix = Date.now().toString(36).slice(-5);
-const newGame = async (name) => {
+const newGame = async (name, classA = "Banker", classB = "Governor") => {
   const a = new Client("a"), b = new Client("b");
   const s = suffix + name;
   let r = await a.post("createAccount", { turnstileToken: "XXXX.DUMMY.TOKEN.XXXX", email: `qa${s}@t.com`, username: `qa${s}`.slice(0, 10), password: "pw-test-1", confirmPassword: "pw-test-1" });
@@ -46,8 +46,8 @@ const newGame = async (name) => {
   r = await a.post("createGame", { data: { gameName: "Board " + name, maxPlayers: 2, initialMoney: 1500, initialSkillPoints: 5, useTimers: true }, context: {} });
   const gameId = r.data.gameId;
   await a.connect(gameId); await b.connect(gameId);
-  await a.post("joinGame", { gameId, piece: "Car", playerClass: "Banker" });
-  await b.post("joinGame", { gameId, piece: "Dog", playerClass: "Governor" });
+  await a.post("joinGame", { gameId, piece: "Car", playerClass: classA });
+  await b.post("joinGame", { gameId, piece: "Dog", playerClass: classB });
   const game = (await a.post("getGame", { gameId })).data.game;
   const cur = game.nextPlayerToAct === a.id ? a : b;
   const other = cur === a ? b : a;
@@ -249,6 +249,92 @@ const cardShown = async (c, chanceId) => {
   game = await getGame(a, gameId);
   const p1 = me(game, cur.id);
   check(r.status === 200 && p1.luck === p0.luck && p1.negotiation === p0.negotiation && p1.corruption === p0.corruption, "keeping changes nothing");
+  a.ws.close(); b.ws.close();
+}
+
+// --- government cards ---------------------------------------------------------
+
+// Vaccine passport check: pay $75, or go to quarantine
+{
+  const { a, b, gameId, cur } = await newGame("v");
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  let r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 5 });
+  check(r.status === 200, "roll onto Chance with the vaccine passport check forced -> " + r.status);
+  game = await getGame(a, gameId);
+  check(game.pendingChance?.chanceId === 5 && game.pendingChance.choices.map((o) => o.key).join(",") === "pay,quarantine",
+    "choice of paying (first, the timeout default) or quarantine: " + JSON.stringify(game.pendingChance?.choices));
+  r = await cur.post("actions/chanceChoice", { context: { gameId }, choice: "quarantine" });
+  check(r.status === 200, "refuse -> " + r.status);
+  game = await getGame(a, gameId);
+  const p = me(game, cur.id);
+  check(p.state === "In_Isolation" && p.position === 11, `sent to quarantine: ${p.state} on ${p.position}`);
+  check(p.money === before, "no fee and no payday on the way: " + before + " -> " + p.money);
+  check(p.hasRolled === true, "the double's extra roll is gone");
+  r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 2, forceDie2: 3 });
+  check(r.status !== 200, "can't roll again after being sent to quarantine -> " + r.status);
+  r = await cur.post("actions/completeTurn", { context: { gameId } });
+  check(r.status === 200, "the turn can end -> " + r.status + " " + JSON.stringify(r.data));
+  check(/Refused the vaccine passport check/.test(game.log.at(-1)?.msg ?? ""), "logged: " + game.log.at(-1)?.msg);
+  a.ws.close(); b.ws.close();
+}
+{
+  const { a, b, gameId, cur } = await newGame("x");
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 5 });
+  const r = await cur.post("actions/chanceChoice", { context: { gameId }, choice: "pay" });
+  game = await getGame(a, gameId);
+  const p = me(game, cur.id);
+  check(r.status === 200 && p.money === before - 75 && p.state !== "In_Isolation" && p.position === 3, "pay: $75 and stay put on the square");
+  a.ws.close(); b.ws.close();
+}
+
+// Essential worker: $100 hazard pay, $200 for a Conductor
+{
+  const { a, b, gameId, cur } = await newGame("e", "Conductor", "Conductor");
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 20 });
+  game = await getGame(a, gameId);
+  check(money(game, cur.id) === before + 200, "a Conductor collects $200: " + before + " -> " + money(game, cur.id));
+  a.ws.close(); b.ws.close();
+}
+{
+  const { a, b, gameId, cur } = await newGame("f", "Banker", "Banker");
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 20 });
+  game = await getGame(a, gameId);
+  check(money(game, cur.id) === before + 100, "anyone else collects $100: " + before + " -> " + money(game, cur.id));
+  a.ws.close(); b.ws.close();
+}
+
+// Re-education seminar: Negotiation -1, Corruption +1
+{
+  const { a, b, gameId, cur } = await newGame("r2");
+  await skillUp(cur, gameId, "Negotiation", 2);
+  let game = await getGame(a, gameId);
+  const p0 = me(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 23 });
+  game = await getGame(a, gameId);
+  const p1 = me(game, cur.id);
+  check(p1.negotiation === p0.negotiation - 1 && p1.corruption === p0.corruption + 1,
+    `negotiation ${p0.negotiation}->${p1.negotiation}, corruption ${p0.corruption}->${p1.corruption}`);
+  const ev = await cardShown(cur, 23);
+  check(ev && ev.isGood === false, "bad news when there was Negotiation to lose");
+  a.ws.close(); b.ws.close();
+}
+{
+  const { a, b, gameId, cur } = await newGame("r3");
+  let game = await getGame(a, gameId);
+  const p0 = me(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 23 });
+  game = await getGame(a, gameId);
+  const p1 = me(game, cur.id);
+  check(p0.negotiation === 0 && p1.negotiation === 0 && p1.corruption === p0.corruption + 1, "no Negotiation to lose: just Corruption +1");
+  const ev = await cardShown(cur, 23);
+  check(ev && ev.isGood === true && /no Negotiation to lose/.test(ev.subLine), "good news then, and the card says why: " + ev?.subLine);
   a.ws.close(); b.ws.close();
 }
 
