@@ -9,7 +9,9 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { ServerChanceEvent } from "./ServerChanceEvent";
-import { shuffled } from "../random";
+import { randomInt, shuffled } from "../random";
+import { SkillType } from "@core/enums/SkillType";
+import { skillChoice } from "../bots/BotBrain";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 
@@ -36,6 +38,39 @@ const nearestUnownedSquare = (game: GameInstanceDocument, from: number): number 
   }
   return null;
 };
+
+const SKILLS: SkillType[] = [SkillType.Luck, SkillType.Negotiation, SkillType.Corruption];
+
+const skillPoints = (p: Player, skill: SkillType): number =>
+  skill === SkillType.Luck ? p.luck : skill === SkillType.Negotiation ? p.negotiation : p.corruption;
+
+const addSkillPoints = (p: Player, skill: SkillType, n: number): void => {
+  if (skill === SkillType.Luck) {
+    p.luck += n;
+  } else if (skill === SkillType.Negotiation) {
+    p.negotiation += n;
+  } else {
+    p.corruption += n;
+  }
+};
+
+/**
+ * Night class: where a point studied in `to` comes from. The other skill
+ * with the most points (the first of them on a tie), or null when the
+ * player has no point to move into it.
+ */
+const nightClassSource = (p: Player, to: SkillType): SkillType | null => {
+  let best: SkillType | null = null;
+  for (const s of SKILLS) {
+    if (s !== to && skillPoints(p, s) > 0 && (best == null || skillPoints(p, s) > skillPoints(p, best))) {
+      best = s;
+    }
+  }
+  return best;
+};
+
+/** Building inspector: $150, $25 less per Corruption point, never below $0 */
+const inspectorFine = (p: Player): number => Math.max(0, 150 - 25 * p.corruption);
 
 /** player and square names go into card text the client renders as HTML */
 const escapeHtml = (text: string): string =>
@@ -459,6 +494,120 @@ export class ChanceProcessor {
       },
       getSubLine(game: GameInstanceDocument, player: Player): string {
         return this.subLine;
+      },
+    });
+
+    // cards that read the drawer's skills
+
+    // the die is rolled when the card's text is written (getSubLine, which
+    // RollProcessor calls first) so the text and the payout agree
+    let musicianDie: number | null = null;
+    const musicianTips = (p: Player, die: number): number => 20 * die + 20 * p.luck;
+    this.events.push({
+      isGood: true,
+      headline: "Lucky subway musician",
+      subLine: "A crowd gathers around your set on the platform. Collect <b>$20 × a die roll</b> plus <b>$20 per Luck point</b>",
+      chanceId: 32,
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
+        const die = musicianDie ?? randomInt(game, 1, 6);
+        musicianDie = null;
+        player.money += musicianTips(player, die);
+        return null;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        musicianDie = randomInt(game, 1, 6);
+        return (
+          this.subLine +
+          "<br /> (rolled a " + musicianDie + ": " +
+          dollarFormatterServer.format(musicianTips(player, musicianDie)) + ")"
+        );
+      },
+    });
+
+    const haggleAmount = (p: Player): number => 25 + 15 * p.negotiation;
+    this.events.push({
+      isGood: true,
+      headline: "Flea market haggle",
+      subLine: "You talk a seller down and flip the find for a profit. Collect <b>$25</b> plus <b>$15 per Negotiation point</b>",
+      chanceId: 33,
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
+        player.money += haggleAmount(player);
+        return null;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        return this.subLine + "<br /> (" + dollarFormatterServer.format(haggleAmount(player)) + ")";
+      },
+    });
+
+    this.events.push({
+      isGood: false,
+      headline: "Building inspector",
+      subLine: "An inspector finds violations. Pay <b>$150</b>, less <b>$25 per Corruption point</b> slipped under the table",
+      chanceId: 10,
+      getIsGood(game: GameInstanceDocument, player: Player): boolean {
+        return inspectorFine(player) === 0;
+      },
+      makeItHappen(game: GameInstanceDocument, player: Player): number | null {
+        player.money -= inspectorFine(player);
+        return null;
+      },
+      getSubLine(game: GameInstanceDocument, player: Player): string {
+        const fine = inspectorFine(player);
+        return (
+          this.subLine +
+          "<br /> (" + (fine === 0 ? "the inspector looks the other way" : dollarFormatterServer.format(fine)) + ")"
+        );
+      },
+    });
+
+    this.events.push({
+      isGood: true,
+      headline: "Night class",
+      subLine: "Retrain at night school: move <b>1 skill point</b> into another skill, or keep your skills as they are.",
+      chanceId: 34,
+      isAvailable(game: GameInstanceDocument, player: Player): boolean {
+        return player.luck + player.negotiation + player.corruption > 0;
+      },
+      makeItHappen(): number | null {
+        // settled through the choice below
+        return null;
+      },
+      getSubLine(): string {
+        return this.subLine;
+      },
+      choice: {
+        getOptions(game: GameInstanceDocument, player: Player) {
+          // keeping comes first: it is what a timed-out turn takes
+          const options = [{ key: "keep", label: "Keep my skills" }];
+          for (const to of SKILLS) {
+            const from = nightClassSource(player, to);
+            if (from) {
+              options.push({ key: "to:" + to, label: from + " → " + to });
+            }
+          }
+          return options;
+        },
+        resolve(game: GameInstanceDocument, player: Player, key: string): number | null {
+          const to = SKILLS.find((s) => key === "to:" + s);
+          // the skills may have changed since the card was drawn
+          const from = to ? nightClassSource(player, to) : null;
+          if (to && from) {
+            addSkillPoints(player, from, -1);
+            addSkillPoints(player, to, 1);
+            PlayerCostsCalculator.updatePlayerCosts(game, player);
+          }
+          return null;
+        },
+        botPick(game: GameInstanceDocument, player: Player): string {
+          // into the skill it would buy next, when that takes from a different one
+          const to = skillChoice(game, player);
+          return nightClassSource(player, to) ? "to:" + to : "keep";
+        },
+        describe(game: GameInstanceDocument, player: Player, key: string): string {
+          const to = SKILLS.find((s) => key === "to:" + s);
+          const from = to ? nightClassSource(player, to) : null;
+          return to && from ? "Moved a point from " + from + " to " + to : "Kept their skills";
+        },
       },
     });
 

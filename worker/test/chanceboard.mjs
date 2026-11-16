@@ -146,5 +146,111 @@ const money = (game, id) => game.players.find((p) => p._id === id).money;
   a.ws.close(); b.ws.close();
 }
 
+// --- cards that read the drawer's skills -------------------------------------
+const skillUp = async (c, gameId, skillType, times) => {
+  for (let i = 0; i < times; i++) {
+    const r = await c.post("actions/upgradeSkill", { context: { gameId }, skillType });
+    if (r.status !== 200) throw new Error("upgradeSkill failed: " + JSON.stringify(r.data));
+  }
+};
+const me = (game, id) => game.players.find((p) => p._id === id);
+/** the card as the table saw it (sent a few seconds after the roll) */
+const cardShown = async (c, chanceId) => {
+  for (let i = 0; i < 40; i++) {
+    const ev = c.events.filter((e) => e.event === "showChanceEvent").map((e) => e.args?.[0]?.[0]).find((e) => e?.chanceId === chanceId);
+    if (ev) return ev;
+    await sleep(250);
+  }
+  return undefined;
+};
+
+// Lucky subway musician: $20 x a die roll + $20 per Luck point
+{
+  const { a, b, gameId, cur } = await newGame("m");
+  await skillUp(cur, gameId, "Luck", 3);
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  const r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 32 });
+  check(r.status === 200, "roll onto Chance with the subway musician forced -> " + r.status);
+  game = await getGame(a, gameId);
+  const gain = money(game, cur.id) - before;
+  const tipsFromDie = gain - 60;
+  check(tipsFromDie % 20 === 0 && tipsFromDie >= 20 && tipsFromDie <= 120, "musician pays $20 x a die (1-6) + $60 for Luck 3: +" + gain);
+  const ev = await cardShown(cur, 32);
+  check(ev && ev.isGood && ev.subLine.includes("rolled a " + tipsFromDie / 20 + ": $" + gain), "card shows the roll and what it paid: " + ev?.subLine);
+  a.ws.close(); b.ws.close();
+}
+
+// Flea market haggle: $25 + $15 per Negotiation point
+{
+  const { a, b, gameId, cur } = await newGame("h");
+  await skillUp(cur, gameId, "Negotiation", 2);
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 33 });
+  game = await getGame(a, gameId);
+  check(money(game, cur.id) === before + 55, "haggle pays $25 + $30 for Negotiation 2: " + before + " -> " + money(game, cur.id));
+  a.ws.close(); b.ws.close();
+}
+
+// Building inspector: $150, $25 less per Corruption point, never below $0
+{
+  const { a, b, gameId, cur } = await newGame("i");
+  let game = await getGame(a, gameId);
+  let before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 10 });
+  game = await getGame(a, gameId);
+  check(money(game, cur.id) === before - 150, "no Corruption: the full $150 fine: " + before + " -> " + money(game, cur.id));
+  const ev = await cardShown(cur, 10);
+  check(ev && ev.isGood === false && ev.subLine.includes("$150"), "card shows the fine as bad news: " + ev?.subLine);
+  a.ws.close(); b.ws.close();
+}
+{
+  const { a, b, gameId, cur } = await newGame("j");
+  await skillUp(cur, gameId, "Corruption", 5);
+  let game = await getGame(a, gameId);
+  const before = money(game, cur.id);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 10 });
+  game = await getGame(a, gameId);
+  check(money(game, cur.id) === before - 25, "Corruption 5: the fine drops to $25: " + before + " -> " + money(game, cur.id));
+  a.ws.close(); b.ws.close();
+}
+
+// Night class: a choice card that moves one skill point
+{
+  const { a, b, gameId, cur } = await newGame("n");
+  await skillUp(cur, gameId, "Negotiation", 3);
+  await skillUp(cur, gameId, "Corruption", 1);
+  let r = await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 34 });
+  check(r.status === 200, "roll onto Chance with Night class forced -> " + r.status);
+  let game = await getGame(a, gameId);
+  const keys = game.pendingChance?.choices?.map((o) => o.key) ?? [];
+  const labels = game.pendingChance?.choices?.map((o) => o.label) ?? [];
+  check(game.pendingChance?.chanceId === 34 && keys[0] === "keep", "pending choice, keeping first (the timeout default): " + JSON.stringify(labels));
+  check(labels.includes("Negotiation → Luck") && labels.includes("Negotiation → Corruption") && labels.includes("Corruption → Negotiation"),
+    "each skill can take a point from the strongest other one: " + JSON.stringify(labels));
+  const p0 = me(game, cur.id);
+  r = await cur.post("actions/chanceChoice", { context: { gameId }, choice: "to:Luck" });
+  check(r.status === 200, "pick Negotiation -> Luck -> " + r.status);
+  game = await getGame(a, gameId);
+  const p1 = me(game, cur.id);
+  check(p1.luck === p0.luck + 1 && p1.negotiation === p0.negotiation - 1 && p1.corruption === p0.corruption,
+    `one point moved: luck ${p0.luck}->${p1.luck}, negotiation ${p0.negotiation}->${p1.negotiation}`);
+  check(!game.pendingChance && /Moved a point from Negotiation to Luck/.test(game.log.at(-1)?.msg ?? ""), "card settled and logged: " + game.log.at(-1)?.msg);
+  a.ws.close(); b.ws.close();
+}
+{
+  const { a, b, gameId, cur } = await newGame("k");
+  await skillUp(cur, gameId, "Luck", 1);
+  await cur.post("actions/roll", { context: { gameId }, forceDie1: 1, forceDie2: 1, forceChanceId: 34 });
+  let game = await getGame(a, gameId);
+  const p0 = me(game, cur.id);
+  const r = await cur.post("actions/chanceChoice", { context: { gameId }, choice: "keep" });
+  game = await getGame(a, gameId);
+  const p1 = me(game, cur.id);
+  check(r.status === 200 && p1.luck === p0.luck && p1.negotiation === p0.negotiation && p1.corruption === p0.corruption, "keeping changes nothing");
+  a.ws.close(); b.ws.close();
+}
+
 console.log(failures === 0 ? "\nALL CHECKS PASSED" : `\n${failures} CHECK(S) FAILED`);
 process.exit(failures ? 1 : 0);

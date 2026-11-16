@@ -81,7 +81,10 @@ Start the Worker with
 only, like the forced dice): Robin Hood takes money from the leader, and the
 Detour choice card waits for its player, blocks rolling and ending the turn,
 and settles on a pick or on the turn timer. The timer check waits out the turn
-(80s by default, less with `--var DEV_TURN_SECONDS:15`).
+(80s by default, less with `--var DEV_TURN_SECONDS:15`). It also forces the
+cards that read the drawer's skills: the subway musician (die roll plus Luck),
+the flea market haggle (Negotiation), the building inspector (fine cut by
+Corruption) and Night class (a choice that moves one skill point).
 
 `npm run test:api:chancedeck` watches a bots-only game (`/api/dev/simulate`)
 and records every Chance card drawn: none repeats until the whole deck has

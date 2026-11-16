@@ -393,7 +393,8 @@ const ChanceLottoTopic = () => (
       Landing on {chanceName} draws a random event: news from the neighborhood. Some are good news, some are bad: you might
       collect money, pay a bill, gain a skill point or be sent somewhere else on the board.
       Some cards read the board and hit whoever is ahead or help whoever is behind, so
-      they can land on another player. The rest is for you to discover.
+      they can land on another player. Others read your skills: points in Luck, Negotiation or
+      Corruption can make a card pay out more or cost you less. The rest is for you to discover.
     </p>
     <p>
       The cards are drawn from a shuffled deck: you'll see every card before any comes up again.
