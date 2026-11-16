@@ -98,8 +98,9 @@ const BasicsTopic = () => (
 
     <h3>Pay Day</h3>
     <p>
-      Every time you pass or land on Pay Day you collect your salary (<b>$200</b>, or <b>$300</b> for the Banker)
+      Every time you pass or land on Pay Day you collect your salary (<b>$200</b>, or <b>$250</b> for the Banker)
       and earn <b>1 skill point</b>. Being moved past Pay Day by a {chanceName} card counts too.
+      Every Governor in the game takes a <b>$15</b> city tax from it.
     </p>
 
     <h3>The board</h3>
@@ -121,7 +122,7 @@ const BasicsTopic = () => (
 
 const ClassesTopic = () => {
   const classes: Array<{ type: PlayerClass; tagline: string }> = [
-    { type: PlayerClass.Gambler, tagline: "Lives for the lotto." },
+    { type: PlayerClass.Gambler, tagline: "Lives for the lotto, and the dice." },
     { type: PlayerClass.Conductor, tagline: "Rules the subway." },
     { type: PlayerClass.Governor, tagline: "Corrupt, and proud of it." },
     { type: PlayerClass.Banker, tagline: "Low taxes and a fat paycheck." },
@@ -153,10 +154,10 @@ const ClassesTopic = () => {
       <SimpleTable
         head={["Class", "Free skill points", "Salary", "Plays well with"]}
         rows={[
-          ["Gambler", "Luck 2", "$200", "Luck, landing on NY Lotto"],
+          ["Gambler", "Luck 2", "$200", "Luck, NY Lotto, rolling doubles"],
           ["Conductor", "Negotiation 2", "$200", "Subway stations, the MTA"],
-          ["Governor", "Corruption 2", "$200", "Governors Island, building lots of houses"],
-          ["Banker", "None", "$300", "Expensive properties (half taxes)"],
+          ["Governor", "Corruption 2", "$200 (+ city tax)", "Governors Island, building lots of houses, long games"],
+          ["Banker", "None", "$250", "Expensive properties (half taxes)"],
         ]}
       />
 

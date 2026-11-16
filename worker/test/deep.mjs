@@ -379,7 +379,7 @@ section("rent: mortgaged square collects nothing, full group doubles rent");
   // A goes once around and lands on 2 (owned by O, group complete, no houses -> 10 * 2)
   g = await walkTo(players, gameId, A, 2);
   check(playerOf(g, A).position === 2, "A landed on 2");
-  const paid = aBefore + 300 - playerOf(g, A).money; // Banker payday is 300
+  const paid = aBefore + 250 - playerOf(g, A).money; // Banker payday is 250
   check(paid === 20, `A paid doubled base rent 20 (paid ${paid})`);
   check(playerOf(g, O).money === oBefore + 20, "O received the rent");
   check(/Paid .* in rent/.test(g.results.description), "rent noted in results");
@@ -620,6 +620,52 @@ section("eliminations and ranking");
   check(r.data.currGameId === null, "winner detached from finished game");
   r = await O.post("actions/roll", { ...ctx(gameId), forceDie1: 1, forceDie2: 2 });
   check(r.status === 400 && /active/.test(r.data), "no actions on a finished game");
+}
+
+section("class perks: the Gambler's lucky doubles, the Governor's city tax");
+{
+  const G = await newUser("gm"), V = await newUser("gv");
+  r = await G.post("createGame", { data: { gameName: "Perks", maxPlayers: 2, initialMoney: 1500, initialSkillPoints: 0, useTimers: false }, context: {} });
+  const pid = r.data.gameId;
+  await G.connect(pid); await V.connect(pid);
+  await G.post("joinGame", { gameId: pid, piece: "Car", playerClass: "Gambler" });
+  await V.post("joinGame", { gameId: pid, piece: "Dog", playerClass: "Governor" });
+  const perkPlayers = [G, V];
+  let pg = await untilTurnOf(perkPlayers, pid, G);
+  const start = playerOf(pg, G);
+
+  // a double (2+2) onto Governors Island: +$40, nobody bids, then a plain roll
+  ({ game: pg } = await forcedRoll(perkPlayers, pid, G, 2, 2));
+  const afterDouble = playerOf(pg, G);
+  check(afterDouble.money === start.money + 40, `lucky double pays $40: ${start.money} -> ${afterDouble.money}`);
+  check(/Lucky double: \+\$40/.test(pg.results.description), "the roll says so: " + pg.results.description);
+  const beforePlain = afterDouble.money;
+  const sum = safeSum(afterDouble.position);
+  const [p1, p2] = splitDice(sum);
+  ({ game: pg } = await forcedRoll(perkPlayers, pid, G, p1, p2));
+  check(playerOf(pg, G).money === beforePlain && !/Lucky double/.test(pg.results.description), "no bonus on a plain roll");
+  await endTurn(pid, G);
+
+  // the Governor rolls a double: no bonus for other classes
+  pg = await untilTurnOf(perkPlayers, pid, V);
+  ({ game: pg } = await forcedRoll(perkPlayers, pid, V, 1, 1));
+  check(!/Lucky double/.test(pg.results.description), "a Governor's double pays no bonus");
+  // finish the Governor's turn with a plain roll
+  const vPos = playerOf(pg, V).position;
+  const [v1, v2] = splitDice(safeSum(vPos));
+  ({ game: pg } = await forcedRoll(perkPlayers, pid, V, v1, v2));
+  await endTurn(pid, V);
+
+  // the Gambler goes round the board: $200 salary, $15 of it to the Governor
+  pg = await untilTurnOf(perkPlayers, pid, G);
+  const gBefore = playerOf(pg, G).money;
+  const logBefore = pg.log.length;
+  pg = await walkTo(perkPlayers, pid, G, 2);
+  check(playerOf(pg, G).position === 2, "Gambler walked round to square 2");
+  check(playerOf(pg, G).money === gBefore + 200 - 15, `salary $200 less $15 city tax: ${gBefore} -> ${playerOf(pg, G).money}`);
+  const taxLine = pg.log.slice(logBefore).map((m) => m.msg).find((m) => /city tax/.test(m));
+  check(taxLine && taxLine.includes("$15 city tax to " + playerOf(pg, V).name), "the log names who took it: " + taxLine);
+  G.close(); V.close();
 }
 
 section("turn timer auto-move (waits ~80s)");

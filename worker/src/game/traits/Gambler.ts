@@ -7,6 +7,11 @@ export class Gambler {
     return 200;
   }
 
+  /** paid for every double rolled (not the third, which means quarantine) */
+  public static getLuckyDoubleBonus(): number {
+    return 40;
+  }
+
   public static getInitialSkills(): SkillSettings {
     return {
       negotiation: 0,

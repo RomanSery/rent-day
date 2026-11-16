@@ -4,7 +4,7 @@ import { SquareGameData } from "@core/types/SquareGameData";
 
 export class Banker {
   public static getPaydaySalary(): number {
-    return 300;
+    return 250;
   }
 
   public static getInitialSkills(): SkillSettings {

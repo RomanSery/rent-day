@@ -8,6 +8,11 @@ export class Governor {
     return 200;
   }
 
+  /** collected from every other player each time they collect their salary */
+  public static getCityTax(): number {
+    return 15;
+  }
+
   public static getInitialSkills(): SkillSettings {
     return {
       negotiation: 0,

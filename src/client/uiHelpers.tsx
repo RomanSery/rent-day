@@ -241,6 +241,12 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
+          <ListItemText primary="Lucky doubles: collect $40 every time you roll a double" />
+        </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
           <ListItemText primary="Start with luck 2" />
         </ListItem>        
       </List>
@@ -283,6 +289,12 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           </ListItemIcon>
           <ListItemText primary="Due to wide-spread corruption, you don't have to pay for any electricity costs" />
         </ListItem>
+        <ListItem>
+          <ListItemIcon>
+            <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
+          </ListItemIcon>
+          <ListItemText primary="City tax: collect $15 from every other player each time they pass payday" />
+        </ListItem>
       </List>
     );
   } else if (type === PlayerClass.Banker) {
@@ -298,7 +310,7 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="You have a high paying job, collect $300 on payday" />
+          <ListItemText primary="You have a high paying job, collect $250 on payday" />
         </ListItem>
       </List>
     );

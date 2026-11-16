@@ -25,6 +25,24 @@ export class MoneyCalculator {
     );
   }
 
+  /**
+   * The player just collected their salary: every other Governor still in
+   * the game takes their city tax from it. Returns a line for the roll's
+   * description, or "" when nobody collects.
+   */
+  public static payCityTax(game: GameInstanceDocument, payer: Player): string {
+    const parts: string[] = [];
+    for (const p of game.players) {
+      const tax = Traits.getCityTax(p.playerClass);
+      if (tax > 0 && p.state !== PlayerState.BANKRUPT && !areIdsEqual(p._id, payer._id)) {
+        payer.money -= tax;
+        p.money += tax;
+        parts.push("$" + tax + " city tax to " + p.name);
+      }
+    }
+    return parts.length ? "Paid " + parts.join(", ") : "";
+  }
+
   public static subtractElectricityAndTaxes(player: Player): void {
     if (player.state === PlayerState.ACTIVE) {
       const total = player.electricityCostsPerTurn + player.taxesPerTurn;

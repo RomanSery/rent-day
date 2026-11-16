@@ -21,6 +21,16 @@ export class Traits {
     return 200;
   }
 
+  /** what a class collects for rolling a double (0 for most) */
+  public static getLuckyDoubleBonus(type: PlayerClass): number {
+    return type === PlayerClass.Gambler ? Gambler.getLuckyDoubleBonus() : 0;
+  }
+
+  /** what a class collects from another player passing Payday (0 for most) */
+  public static getCityTax(type: PlayerClass): number {
+    return type === PlayerClass.Governor ? Governor.getCityTax() : 0;
+  }
+
   public static modifyRentToPay(
     squareData: SquareGameData | undefined,
     playerToPay: Player,

@@ -29,6 +29,7 @@ import { PropertyProcessor } from "./PropertyProcessor";
 import { MoneyCalculator } from "./MoneyCalculator";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { areIdsEqual } from "./helpers";
+import { Traits } from "../traits/Traits";
 import { randomInt } from "../random";
 import { ChanceProcessor } from "./ChanceProcessor";
 import { GameProcessor } from "./GameProcessor";
@@ -222,6 +223,10 @@ export class RollProcessor {
       MoneyCalculator.collectSalary(this.player);
       addStat(this.player, "paydays", 1);
       this.player.numAbilityPoints++;
+      const cityTax = MoneyCalculator.payCityTax(this.game, this.player);
+      if (cityTax) {
+        this.rollDesc += " <br /> " + cityTax;
+      }
     }
 
     const payDesc = await MoneyCalculator.payRent(
@@ -494,6 +499,12 @@ export class RollProcessor {
         this.rollDesc += " <br /> Rolled a double so go again";
       }
 
+      const doubleBonus = lastRoll.isDouble() ? Traits.getLuckyDoubleBonus(this.player.playerClass) : 0;
+      if (doubleBonus > 0) {
+        this.player.money += doubleBonus;
+        this.rollDesc += " <br /> Lucky double: +$" + doubleBonus;
+      }
+
       if (lastRoll.isDouble()) {
         this.player.hasTraveled = false;
       }
@@ -692,6 +703,10 @@ export class RollProcessor {
         addStat(player, "paydays", 1);
         player.numAbilityPoints++;
         desc += " - Payday, collect your salary!";
+        const cityTax = MoneyCalculator.payCityTax(game, player);
+        if (cityTax) {
+          desc += " - " + cityTax;
+        }
       }
 
       if (AuctionProcessor.shouldCreateAuction(game, moveToPos)) {
