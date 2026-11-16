@@ -29,7 +29,8 @@
     "test:api:chanceboard": "node test/chanceboard.mjs",
     "test:api:chancedeck": "node test/chancedeck.mjs",
     "test:api:neighborhood": "node test/neighborhood.mjs",
-    "test:api:report": "node test/report.mjs"
+    "test:api:report": "node test/report.mjs",
+    "test:api:skillactions": "node test/skillactions.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

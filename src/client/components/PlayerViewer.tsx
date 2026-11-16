@@ -46,6 +46,8 @@ export const PlayerViewer: React.FC<Props> = ({ player }) => {
         <InfoItem label={getSkillTypeTooltip(SkillType.Luck)}>{player.luck}</InfoItem>
         <InfoItem label={getSkillTypeTooltip(SkillType.Corruption)}>{player.corruption}</InfoItem>
         {player.numAbilityPoints > 0 && <InfoItem label="Unspent points">{player.numAbilityPoints}</InfoItem>}
+        {player.hasForgedCard && <InfoItem label="Papers">Forged vaccine card</InfoItem>}
+        {gameState && player.hardshipTurn === (gameState.turnNumber ?? 0) && <InfoItem label="Hardship plea">Rent halved this turn</InfoItem>}
       </div>
     </div>
   );

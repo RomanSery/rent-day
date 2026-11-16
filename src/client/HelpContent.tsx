@@ -195,8 +195,27 @@ const SkillsTopic = () => (
     </ul>
     <p>
       Unspent points show as a badge in your turn bar. You can only spend them on your turn,
-      and once spent they can't be moved. Filing a report (see the Quarantine tab) uses up a Corruption point.
+      and once spent they can't be moved.
     </p>
+
+    <h3>Using up skill points</h3>
+    <p>
+      Some actions use up a point from a skill, on your turn. You lose the skill's everyday bonus for that point,
+      so spend wisely.
+    </p>
+    <SimpleTable
+      head={["Action", "Costs", "What it does"]}
+      rows={[
+        ["Forged vaccine card (Actions menu)", "1 Luck",
+          "Carry it until it's needed. The next time you would go to quarantine (Big Brother, three doubles, a believed report), you don't. It also gets you through the vaccine passport check for free. Everyone can see you carry one; you can only carry one."],
+        ["Plead hardship (Actions menu)", "1 Negotiation",
+          `Before you roll: rent you pay for the rest of the turn is halved. Once per turn.`],
+        ["Bribe the guard (turn bar, in quarantine)", "1 Corruption",
+          `Before you roll: leave quarantine for free instead of paying $${payToGetOutFee}.`],
+        ["Report a citizen (Actions menu)", "1 Corruption",
+          "Report another player to the Ministry. Believed, they go to quarantine; not, you're fined. See the Quarantine tab."],
+      ]}
+    />
 
     <h3>Examples</h3>
     <ul>
@@ -423,7 +442,10 @@ const QuarantineTopic = () => (
       <li>Roll <b>three doubles in a row</b>.</li>
       <li>Get <b>reported</b> by another player, and the Ministry believes them.</li>
     </ul>
-    <p>You go straight to quarantine without passing Stimulus Day.</p>
+    <p>
+      You go straight to quarantine without passing Stimulus Day, unless you carry a <b>forged vaccine card</b>:
+      you show it, stay where you landed, and the card is used up (see the Skills tab).
+    </p>
 
     <h3>Reporting a citizen</h3>
     <p>
@@ -437,6 +459,7 @@ const QuarantineTopic = () => (
       </li>
       <li><b>Believed:</b> they go straight to quarantine, and collect no rent until they get out.</li>
       <li><b>Not believed:</b> you pay a <b>${falseReportFine}</b> fine for filing a false report. It can push you below $0.</li>
+      <li>Someone carrying a forged vaccine card shows it and stays free, and the card is used up.</li>
       <li>You can't report someone who is already in quarantine.</li>
     </ul>
 
@@ -444,6 +467,7 @@ const QuarantineTopic = () => (
     <ul>
       <li>Roll a <b>double</b>, and move by that roll.</li>
       <li>Pay <b>${payToGetOutFee}</b> before you roll, then roll as normal.</li>
+      <li><b>Bribe the guard</b> with 1 Corruption point before you roll, then roll as normal.</li>
       <li>Wait it out: on your third turn you leave and move by whatever you roll.</li>
     </ul>
 

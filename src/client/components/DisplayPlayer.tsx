@@ -2,7 +2,7 @@ import React from "react";
 import { Player } from "../../core/types/Player";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { areObjectIdsEqual, dollarFormatter, getIconProp, getMyUserId } from "../helpers";
-import { faBiohazard, faRobot } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faHandHoldingHeart, faIdCard, faRobot } from "@fortawesome/free-solid-svg-icons";
 import { PlayerState } from "../../core/enums/PlayerState";
 import useGameStateStore from "../stores/gameStateStore";
 import { ClassPortrait } from "./ClassPortrait";
@@ -45,6 +45,8 @@ export const DisplayPlayer: React.FC<Props> = ({ player, viewPlayer, clearPlayer
 
       <div className="player-row-sub">
         {player.state === PlayerState.IN_ISOLATION && <FontAwesomeIcon icon={faBiohazard} color="#c62828" title="In quarantine" />}
+        {player.hasForgedCard && <FontAwesomeIcon icon={faIdCard} title="Carries a forged vaccine card" />}
+        {gameState && player.hardshipTurn === (gameState.turnNumber ?? 0) && <FontAwesomeIcon icon={faHandHoldingHeart} title="Hardship plea: rent halved this turn" />}
         {player.isBot && <FontAwesomeIcon icon={faRobot} title="Computer player" />}
         <span className="class-tag"><ClassPortrait playerClass={player.playerClass} size={18} />{player.playerClass}</span>
         {!bankrupt && perTurn > 0 &&

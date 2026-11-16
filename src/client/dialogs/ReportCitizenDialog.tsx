@@ -5,7 +5,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
+import { faBullhorn, faIdCard } from "@fortawesome/free-solid-svg-icons";
 import API from "../api";
 import { areObjectIdsEqual, getGameContextFromLocalStorage, getIconProp, getMyUserId, handleApiError } from "../helpers";
 import { GameEvent } from "../../core/types/GameEvent";
@@ -71,6 +71,7 @@ export const ReportCitizenDialog: React.FC<Props> = ({ open, onClose, socketServ
         <ul className="report-terms">
           <li><b>Believed:</b> they go straight to quarantine, and collect no rent while they're there.</li>
           <li><b>Not believed:</b> you pay a <b>${falseReportFine}</b> fine for filing a false report.</li>
+          <li><b>Forged papers:</b> someone carrying a forged vaccine card shows it and stays free, but the card is used up.</li>
         </ul>
 
         {noCorruption
@@ -84,7 +85,9 @@ export const ReportCitizenDialog: React.FC<Props> = ({ open, onClose, socketServ
                     <Button key={p._id} variant="outlined" disabled={!!reason || sending} onClick={() => onReport(p)}
                       className="report-target" startIcon={<FontAwesomeIcon icon={getIconProp(p.type)} color={p.color} fixedWidth />}>
                       <span className="report-target-name" style={{ color: reason ? undefined : p.color }}>{p.name}</span>
-                      {reason && <small className="report-target-why">{reason}</small>}
+                      {reason
+                        ? <small className="report-target-why">{reason}</small>
+                        : p.hasForgedCard && <small className="report-target-why"><FontAwesomeIcon icon={faIdCard} /> carries forged papers</small>}
                     </Button>
                   );
                 })}

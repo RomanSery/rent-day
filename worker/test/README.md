@@ -110,6 +110,13 @@ target to quarantine and a backfired one fines the reporter $100, that each
 uses up a Corruption point, and the refusals: no Corruption, not your turn,
 yourself, someone already in quarantine, and a second report in one turn.
 
+`npm run test:api:skillactions` covers the other actions that use up a skill
+point: a forged vaccine card (Luck) keeps its carrier out of quarantine on a
+third double onto Big Brother and against a believed report; a hardship plea
+(Negotiation) halves the rent paid that turn; bribing the guard (Corruption)
+leaves quarantine for free. It checks the refusals too: no points, not your
+turn, a second card or plea, a plea after the roll, a bribe outside quarantine.
+
 `npm run test:api:bots` plays a human against two computer players to the
 end of a game and checks the lobby controls for bots. Start the Worker with a
 fast bot pace so it finishes in under a minute:

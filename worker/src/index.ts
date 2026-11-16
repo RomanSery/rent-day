@@ -1107,6 +1107,17 @@ app.post(
 );
 
 app.post(
+  "/api/actions/skillAction",
+  action(async (room, userId, body) => {
+    const kind = body.action;
+    if (kind !== "forgeCard" && kind !== "hardshipPlea" && kind !== "bribeGuard") {
+      return { errMsg: "Invalid request" };
+    }
+    return room.skillAction(userId, kind);
+  })
+);
+
+app.post(
   "/api/actions/reportCitizen",
   action(async (room, userId, body) => {
     if (!isValidId(body.targetId)) {

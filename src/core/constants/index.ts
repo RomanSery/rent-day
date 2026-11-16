@@ -67,3 +67,6 @@ export const falseReportFine: number = 100;
 /** the chance, in percent, that a report by someone with this much Corruption is believed */
 export const reportSuccessChance = (corruption: number): number =>
   Math.min(reportMaxChance, reportBaseChance + reportChancePerCorruption * Math.max(0, corruption));
+
+/** a hardship plea (1 Negotiation) multiplies the rent you pay that turn by this */
+export const hardshipRentFactor: number = 0.5;

@@ -440,6 +440,8 @@ export class RollProcessor {
     let newPosition = this.player.position + lastRoll.sum();
     let landedOnGoToIsolation: boolean = false;
     let rolledThreeDouibles: boolean = false;
+    let usedForgedCard = false;
+    let endsRolling = false;
 
     if (this.player.state === PlayerState.IN_ISOLATION) {
       if (lastRoll.isDouble() || this.player.numTurnsInIsolation >= 2) {
@@ -459,6 +461,16 @@ export class RollProcessor {
           "/3 turns";
       }
       this.player.hasRolled = true;
+    } else if (
+      this.player.hasForgedCard &&
+      (this.hasRolledThreeConsecutiveDoubles() || newPosition === goToIsolationPosition)
+    ) {
+      // a forged vaccine card (SkillActionProcessor): caught, but waved
+      // through. The piece moves as rolled; a third double still ends the rolling.
+      this.player.hasForgedCard = false;
+      usedForgedCard = true;
+      endsRolling = this.hasRolledThreeConsecutiveDoubles();
+      updatePosition = true;
     } else if (
       this.hasRolledThreeConsecutiveDoubles() ||
       newPosition === goToIsolationPosition
@@ -497,7 +509,11 @@ export class RollProcessor {
         " <br /> Landed on " +
         PropertyProcessor.getSquareName(this.game, this.player.position);
 
-      if (!lastRoll.isDouble()) {
+      if (usedForgedCard) {
+        this.rollDesc += " <br /> Showed a forged vaccine card and stayed out of quarantine";
+      }
+
+      if (!lastRoll.isDouble() || endsRolling) {
         this.player.hasRolled = true;
         this.player.rollHistory = [lastRoll];
       } else if (!gotOutOfIsolation) {

@@ -3,7 +3,7 @@ import { addStat } from "../stats";
 import { SquareType } from "@core/enums/SquareType";
 import { Player } from "@core/types/Player";
 import { SquareGameData } from "@core/types/SquareGameData";
-import { mta_position } from "@core/constants";
+import { hardshipRentFactor, mta_position } from "@core/constants";
 import { PlayerState } from "@core/enums/PlayerState";
 import { GameInstanceDocument } from "../model";
 import { GameContext } from "../GameContext";
@@ -136,7 +136,11 @@ export class MoneyCalculator {
 
     const negotiationAdjustment = (player.negotiation * 3) / 100.0;
     const substraction = classAdjustedRentToPay * negotiationAdjustment;
-    const adjustedRentToPay = Math.round(classAdjustedRentToPay - substraction);
+    // a hardship plea (SkillActionProcessor) halves rent for the rest of the turn
+    const hardship = player.hardshipTurn != null && player.hardshipTurn === (game.turnNumber ?? 0);
+    const adjustedRentToPay = Math.round(
+      (classAdjustedRentToPay - substraction) * (hardship ? hardshipRentFactor : 1)
+    );
 
     if (adjustedRentToPay <= 0) {
       return "";

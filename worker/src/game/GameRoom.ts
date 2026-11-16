@@ -34,6 +34,7 @@ import { PropertyProcessor } from "./controllers/PropertyProcessor";
 import { TradeProcessor } from "./controllers/TradeProcessor";
 import { PlayerProcessor } from "./controllers/PlayerProcessor";
 import { ReportOutcome, ReportProcessor } from "./controllers/ReportProcessor";
+import { SkillAction, SkillActionProcessor } from "./controllers/SkillActionProcessor";
 import { AutoMoveProcessor } from "./controllers/AutoMoveProcessor";
 import { BotLevel } from "@core/enums/BotLevel";
 import { PlayerState } from "@core/enums/PlayerState";
@@ -769,6 +770,13 @@ export class GameRoom extends DurableObject<Env> {
     return this.runAction(async () => {
       const processor = new PlayerProcessor(this.gameCtx, userId);
       return this.toResult(await processor.upgradeSkill(skillType));
+    });
+  }
+
+  async skillAction(userId: string, action: SkillAction): Promise<ActionResult> {
+    return this.runAction(async () => {
+      const processor = new SkillActionProcessor(this.gameCtx, userId);
+      return this.toResult(await processor.run(action));
     });
   }
 

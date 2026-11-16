@@ -45,6 +45,10 @@ export interface Player {
   rollHistory: Array<DiceRoll>;
   numTurnsInIsolation: number;
   numTimeouts: number;
+  /** carrying a forged vaccine card: the next trip to quarantine is avoided (bought with 1 Luck) */
+  hasForgedCard?: boolean;
+  /** turn number of their hardship plea: rent they pay that turn is halved (bought with 1 Negotiation) */
+  hardshipTurn?: number;
   /** turn number of their last Report a citizen (once per turn) */
   reportedOnTurn?: number;
 

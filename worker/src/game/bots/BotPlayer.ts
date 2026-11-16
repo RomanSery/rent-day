@@ -25,6 +25,7 @@ import { PropertyProcessor } from "../controllers/PropertyProcessor";
 import { RollProcessor } from "../controllers/RollProcessor";
 import { TradeProcessor } from "../controllers/TradeProcessor";
 import { ReportProcessor } from "../controllers/ReportProcessor";
+import { SkillActionProcessor } from "../controllers/SkillActionProcessor";
 import { areIdsEqual } from "../controllers/helpers";
 import {
   acceptsTrade,
@@ -32,6 +33,9 @@ import {
   buildPlan,
   lottoChoice,
   reportTarget,
+  wantsBribe,
+  wantsForgedCard,
+  wantsHardshipPlea,
   shouldPayOut,
   skillChoice,
   tradeProposal,
@@ -169,14 +173,30 @@ export class BotPlayer {
         bot = BotPlayer.find(game, botId)!;
       }
 
-      // 3. leave quarantine when rich enough
-      if (bot.state === PlayerState.IN_ISOLATION && shouldPayOut(game, bot)) {
+      // 3. leave quarantine: bribe the guard with Corruption to spare, or pay when rich enough
+      if (wantsBribe(game, bot)) {
+        await new SkillActionProcessor(ctx, botId).run("bribeGuard");
+        game = (await ctx.store.getGame())!;
+        bot = BotPlayer.find(game, botId)!;
+      } else if (bot.state === PlayerState.IN_ISOLATION && shouldPayOut(game, bot)) {
         await new RollProcessor(ctx, botId, null, null).payToGetOut();
         game = (await ctx.store.getGame())!;
         bot = BotPlayer.find(game, botId)!;
       }
 
-      // 3a. report the runaway leader to the Ministry (a step of its own, so
+      // 3a. skill actions: carry forged papers, plead hardship before a risky roll
+      for (const [wants, action] of [[wantsForgedCard, "forgeCard"], [wantsHardshipPlea, "hardshipPlea"]] as const) {
+        if (wants(game, bot)) {
+          const errMsg = await new SkillActionProcessor(ctx, botId).run(action);
+          if (errMsg) {
+            console.log("bot " + action + " failed", errMsg);
+          }
+          game = (await ctx.store.getGame())!;
+          bot = BotPlayer.find(game, botId)!;
+        }
+      }
+
+      // 3b. report the runaway leader to the Ministry (a step of its own, so
       // the table sees the news before the bot carries on)
       const reported = reportTarget(game, bot);
       if (reported) {
@@ -187,7 +207,7 @@ export class BotPlayer {
         console.log("bot report failed", errMsg);
       }
 
-      // 3b. offer to buy the square that completes a group (rate limited)
+      // 3c. offer to buy the square that completes a group (rate limited)
       const proposal = tradeProposal(game, bot);
       const turn = game.turnNumber ?? 0;
       if (proposal && turn - (bot.botLastOfferTurn ?? -100) >= 5) {

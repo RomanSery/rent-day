@@ -19,11 +19,14 @@ import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 /** a forced outcome, honoured in development only (tests) */
 export type ReportOutcome = "believed" | "backfired";
 
+/** what happened: believed, backfired, or believed but the target showed forged papers */
+export type ReportResult = ReportOutcome | "papers";
+
 const escapeHtml = (text: string): string =>
   text.replace(/[&<>"']/g, (c) => "&#" + c.charCodeAt(0) + ";");
 
 export class ReportProcessor {
-  private outcome: ReportOutcome | null = null;
+  private outcome: ReportResult | null = null;
 
   constructor(
     private readonly ctx: GameContext,
@@ -67,7 +70,7 @@ export class ReportProcessor {
     return "";
   }
 
-  public getOutcome(): ReportOutcome | null {
+  public getOutcome(): ReportResult | null {
     return this.outcome;
   }
 
@@ -97,21 +100,27 @@ export class ReportProcessor {
     const whom = escapeHtml(target.name);
     let line: string;
     let snack: string;
-    if (believed) {
+    if (believed && target.hasForgedCard) {
+      // a forged vaccine card (SkillActionProcessor) gets them off, and is used up
+      target.hasForgedCard = false;
+      this.outcome = "papers";
+      line = who + " - Reported " + whom + " to the Ministry; " + whom + " showed forged papers and stayed free";
+      snack = reporter.name + " reported " + target.name + " to the Ministry, but " + target.name + " showed forged papers.";
+    } else if (believed) {
       // straight there, like Big Brother: no trip round the board
       target.state = PlayerState.IN_ISOLATION;
       target.position = isolation_position;
       target.numTurnsInIsolation = 0;
       target.rollHistory = [];
+      this.outcome = "believed";
       line = who + " - Reported " + whom + " to the Ministry; " + whom + " was sent to quarantine";
       snack = reporter.name + " reported " + target.name + " to the Ministry. " + target.name + " has been sent to quarantine.";
     } else {
       reporter.money -= falseReportFine;
+      this.outcome = "backfired";
       line = who + " - Filed a false report against " + whom + " and was fined $" + falseReportFine;
       snack = reporter.name + " filed a false report against " + target.name + " and was fined $" + falseReportFine + ".";
     }
-    this.outcome = believed ? "believed" : "backfired";
-
     PlayerCostsCalculator.updatePlayerCosts(game, reporter);
     PlayerCostsCalculator.updatePlayerCosts(game, target);
     game.log.push({ msg: line, player: "" });

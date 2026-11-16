@@ -456,6 +456,37 @@ export const reportTarget = (game: GameInstanceDocument, bot: Player): string | 
   return wellAhead ? leader._id : null;
 };
 
+/** Spend a Luck point on a forged vaccine card? Normal bots with Luck to spare keep one on them. */
+export const wantsForgedCard = (game: GameInstanceDocument, bot: Player): boolean =>
+  !isEasy(bot) && bot.luck >= 3 && !bot.hasForgedCard;
+
+/**
+ * Spend a Negotiation point on a hardship plea before rolling? When the next
+ * roll can land on a rent that would hurt (a Normal bot with Negotiation to spare).
+ */
+export const wantsHardshipPlea = (game: GameInstanceDocument, bot: Player): boolean => {
+  if (isEasy(bot) || bot.negotiation < 2 || bot.hasRolled || bot.state !== PlayerState.ACTIVE) {
+    return false;
+  }
+  if (bot.hardshipTurn === (game.turnNumber ?? 0)) {
+    return false;
+  }
+  return maxRentAhead(game, bot, bot.position) >= Math.max(300, bot.money * 0.3);
+};
+
+/**
+ * Bribe the guard (1 Corruption) to leave quarantine? Only with Corruption to
+ * spare, and only when the board ahead is safe enough to want out at all
+ * (the same test as paying to leave).
+ */
+export const wantsBribe = (game: GameInstanceDocument, bot: Player): boolean => {
+  if (isEasy(bot) || bot.state !== PlayerState.IN_ISOLATION || bot.corruption < 3) {
+    return false;
+  }
+  const danger = expectedRentAhead(game, bot, bot.position);
+  return danger < Math.max(40, bot.money * 0.05);
+};
+
 /** Pay to leave quarantine rather than waiting for a double? */
 export const shouldPayOut = (game: GameInstanceDocument, bot: Player): boolean => {
   if (isEasy(bot)) {

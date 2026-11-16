@@ -287,14 +287,20 @@ export class ChanceProcessor {
         return this.subLine;
       },
       choice: {
-        getOptions() {
+        getOptions(game: GameInstanceDocument, player: Player) {
           // paying comes first: it is what a timed-out turn takes
           return [
             { key: "pay", label: "Pay $75" },
+            // a forged vaccine card (SkillActionProcessor) gets you through free
+            ...(player.hasForgedCard ? [{ key: "papers", label: "Show forged papers" }] : []),
             { key: "quarantine", label: "Refuse: go to quarantine" },
           ];
         },
         resolve(game: GameInstanceDocument, player: Player, key: string): number | null {
+          if (key === "papers" && player.hasForgedCard) {
+            player.hasForgedCard = false;
+            return null;
+          }
           if (key === "quarantine") {
             // straight there, like the Go to Quarantine square: no trip
             // round the board, so no payday, and the turn's rolling is over
@@ -309,10 +315,17 @@ export class ChanceProcessor {
           return null;
         },
         botPick(game: GameInstanceDocument, player: Player): string {
-          // quarantine costs turns; only a bot that can't spare the fee refuses
-          return player.money >= 200 ? "pay" : "quarantine";
+          // quarantine costs turns; only a bot that can't spare the fee refuses,
+          // and one carrying forged papers keeps them unless money is tight
+          if (player.money >= 200) {
+            return "pay";
+          }
+          return player.hasForgedCard ? "papers" : "quarantine";
         },
         describe(game: GameInstanceDocument, player: Player, key: string): string {
+          if (key === "papers" && player.hasForgedCard) {
+            return "Showed forged papers at the vaccine passport check";
+          }
           return key === "quarantine"
             ? "Refused the vaccine passport check and was sent to quarantine"
             : "Paid the $75 verification fee";

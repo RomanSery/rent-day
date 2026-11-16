@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { ReportCitizenDialog } from "../dialogs/ReportCitizenDialog";
+import { SkillAction, SkillActionDialog } from "../dialogs/SkillActionDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
@@ -37,6 +38,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [reportOpen, setReportOpen] = React.useState(false);
+  const [skillAction, setSkillAction] = React.useState<SkillAction | null>(null);
 
   const gameState = useGameStateStore(state => state.data);
   const actionMode = useGameStateStore(state => state.actionMode);
@@ -352,6 +354,10 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
           : null}
 
+        {myTurn && canPayToGetOutOfIsolation() && me && me.corruption >= 1 ?
+          <Button variant="contained" color="primary" onClick={() => setSkillAction("bribeGuard")}>Bribe the Guard</Button>
+          : null}
+
         {myTurn ? getCompleteTurnBtn() : null}
 
         {me && <SkillPointsButton socketService={socketService} me={me} />}
@@ -363,6 +369,8 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>}
           {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setReportOpen(true); }}>Report a citizen</MenuItem>}
+          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setSkillAction("forgeCard"); }}>Forge a vaccine card</MenuItem>}
+          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setSkillAction("hardshipPlea"); }}>Plead hardship</MenuItem>}
           <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
           <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
           <MenuItem onClick={onViewHelp}>Help</MenuItem>
@@ -386,6 +394,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       <StatsDialog tradeWithPlayer={tradeWithPlayer} />
       <MyTaxesDialog />
       <ReportCitizenDialog open={reportOpen} onClose={() => setReportOpen(false)} socketService={socketService} />
+      <SkillActionDialog action={skillAction} onClose={() => setSkillAction(null)} socketService={socketService} />
     </React.Fragment>
   );
 
