@@ -7,7 +7,7 @@ import API from "../api";
 import { BackLink } from "../components/BackLink";
 import { Baron } from "../components/BrandLogo";
 import { ClassPortrait } from "../components/ClassPortrait";
-import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getMyUserId, ordinal } from "../helpers";
 import { HistoryGame, PlayerProfile } from "../../core/types/PlayerProfile";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 
@@ -35,12 +35,6 @@ const backFromState = (state: unknown): ProfileBack | null => {
 
 const pct = (wins: number, games: number): string =>
   games > 0 ? Math.round((wins / games) * 100) + "%" : "—";
-
-const ordinal = (n: number): string => {
-  const s = ["th", "st", "nd", "rd"];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-};
 
 const shortDate = (iso?: string): string => {
   if (!iso) return "—";

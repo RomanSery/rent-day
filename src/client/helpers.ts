@@ -294,6 +294,13 @@ const getGameStatus = async (gameId: string) => {
   return status;
 };
 
+/** 1 -> "1st", 2 -> "2nd", 11 -> "11th" */
+export const ordinal = (n: number): string => {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 export const getIconProp = (type: PieceType): IconDefinition => {
   if (type === PieceType.Bicycle) {
     return faBicycle;

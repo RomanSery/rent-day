@@ -479,6 +479,11 @@ export class GameProcessor {
       const msg: ServerMsg = {
         title: "Elimination",
         body: losser.name + " has filed for bankruptcy protection",
+        bankruptcy: {
+          playerId: losser._id,
+          finishedRank: losser.finishedRank ?? numPlayersStillInIt,
+          numPlayers: game.players.length,
+        },
       };
 
       ctx.events.send(GameEvent.SHOW_MSG_FROM_SERVER, msg);

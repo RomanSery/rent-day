@@ -191,6 +191,59 @@ body {
   flex-wrap: wrap;
   gap: 10px;
 }
+/* Server notices (dialogs/ServerMsgDialog.tsx): the Chance card in red */
+.chance-dialog.notice {
+  --chance-orange: #dc2626;
+  --chance-orange-deep: #991b1b;
+}
+.chance-dialog.notice .chance-card-close:hover {
+  background: #7f1d1d;
+}
+.notice-piece {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid currentColor;
+  background: color-mix(in srgb, currentColor 14%, transparent);
+  font-size: 34px;
+}
+.notice-piece-out {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--chance-paper);
+  background: var(--chance-orange-deep);
+  color: #fff;
+  font-size: 14px;
+}
+.notice-text {
+  margin: 0 auto;
+  max-width: 34ch;
+  font-family: var(--bb-font-body);
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--chance-ink);
+}
+.notice-still-in {
+  display: inline-block;
+  margin: 14px 0 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--chance-accent-soft);
+  font-family: var(--bb-font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--chance-muted);
+}
+
 .chance-card-waiting {
   margin: 12px 0 0;
   font-family: var(--bb-font-body);
