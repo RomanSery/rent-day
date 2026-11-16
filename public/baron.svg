@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 200 194" role="img" aria-label="The Baron, a fat cat in a top hat">
-  <!-- The Baron: Block Barons' mascot. Colours are the brand tokens in src/client/theme.ts. -->
+  <!-- The Baron: Rentdemic's mascot. Colours are the brand tokens in src/client/theme.ts. -->
   <ellipse cx="108" cy="176" rx="64" ry="6" fill="#1b2333" opacity="0.12"/>
 
   <!-- tail -->

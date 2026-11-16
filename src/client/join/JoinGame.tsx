@@ -232,7 +232,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
   }
 
   const shareUrl = window.location.href;
-  const shareTitle = "Think you can be a Block Baron? Let's play!";
+  const shareTitle = "Think you can survive the Rentdemic? Let's play!";
 
   const shareOnFacebook = () => {
     if (window.FB) {
@@ -422,7 +422,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
                 {copied ? "Link copied" : "Copy invite link"}
               </Button>
               <div className="social-share-cont">
-                <Share url={shareUrl} options={{ size: "large", hashtags: "blockbarons", text: shareTitle }} />
+                <Share url={shareUrl} options={{ size: "large", hashtags: "rentdemic", text: shareTitle }} />
               </div>
               <div className="social-share-cont">
                 <div id="fb-share-button" role="button" tabIndex={0} aria-label="Share on Facebook"

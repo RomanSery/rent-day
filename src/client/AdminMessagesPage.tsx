@@ -65,7 +65,7 @@ export const AdminMessagesPage: React.FC = () => {
               <p className="inbox-text">{m.message}</p>
               <div className="inbox-actions">
                 <Button size="small" variant="outlined" startIcon={<FontAwesomeIcon icon={faReply} />}
-                  href={`mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent("Re: " + subject + " (Block Barons)")}`}>
+                  href={`mailto:${encodeURIComponent(m.email)}?subject=${encodeURIComponent("Re: " + subject + " (Rentdemic)")}`}>
                   Reply by email
                 </Button>
                 <Button size="small" color="error" startIcon={<FontAwesomeIcon icon={faTrash} />} onClick={() => onDelete(m)}>

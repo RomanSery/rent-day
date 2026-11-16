@@ -1,6 +1,6 @@
 import { createTheme } from "@mui/material/styles";
 
-/* Block Barons brand tokens: the one place the game's colours and type are set.
+/* Rentdemic brand tokens: the one place the game's colours and type are set.
 
    "Night city": navy ink and brass on warm concrete, chosen to move away from
    Monopoly's red, white and green. index.tsx writes every entry below onto

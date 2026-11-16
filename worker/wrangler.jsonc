@@ -1,5 +1,8 @@
 {
-  // Cloudflare Workers configuration for the Block Barons backend.
+  // Cloudflare Workers configuration for the Rentdemic backend.
+  // (The Worker and D1 database keep their Block Barons names: renaming the
+  // Worker would deploy a new one and lose the games held in its Durable
+  // Objects.)
   // Docs: https://developers.cloudflare.com/workers/wrangler/configuration/
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "block-barons",
@@ -8,10 +11,16 @@
   "compatibility_date": "2025-10-01",
   "compatibility_flags": ["nodejs_compat"],
 
-  // Served at blockbarons.coderdreams.com. `wrangler deploy` creates the
-  // custom domain (DNS record and certificate) itself; coderdreams.com must
-  // be a zone in the same Cloudflare account.
-  "routes": [{ "pattern": "blockbarons.coderdreams.com", "custom_domain": true }],
+  // Served at rentdemic.com (and www), plus the old name
+  // blockbarons.coderdreams.com so existing links and sessions keep working.
+  // `wrangler deploy` creates each custom domain (DNS record and certificate)
+  // itself; rentdemic.com and coderdreams.com must be zones in the same
+  // Cloudflare account.
+  "routes": [
+    { "pattern": "rentdemic.com", "custom_domain": true },
+    { "pattern": "www.rentdemic.com", "custom_domain": true },
+    { "pattern": "blockbarons.coderdreams.com", "custom_domain": true }
+  ],
 
   // The React build (../build) is served as static assets by the same
   // Worker. Only /api/* and /ws reach the Worker script; everything else is
@@ -53,7 +62,7 @@
     // players use it. Never list localhost here.
     // The Turnstile secret key is a secret, not a var:
     //   npx wrangler secret put TURNSTILE_SECRET_KEY
-    "TURNSTILE_HOSTNAMES": "blockbarons.coderdreams.com"
+    "TURNSTILE_HOSTNAMES": "rentdemic.com,www.rentdemic.com,blockbarons.coderdreams.com"
   },
 
   // Per-IP limits on /api/logIn and /api/createAccount (per Cloudflare

@@ -1204,20 +1204,30 @@ td.lb-rank.bronze { color: #8d5420; }
   padding-bottom: 6px;
   min-width: 0;
 }
-.brand-block {
+.brand-tagline {
   font-weight: 600;
-  font-size: 22px;
-  letter-spacing: 0.32em;
+  font-size: 14px;
+  letter-spacing: 0.22em;
   color: var(--bb-brass-strong);
 }
-.brand-barons {
+.brand-name {
   font-weight: 700;
-  font-size: 52px;
+  font-size: 46px;
   letter-spacing: 0.02em;
-  color: var(--bb-brand);
   border-top: 3px solid var(--bb-brass);
   padding-top: 4px;
-  margin-top: 4px;
+  margin-top: 5px;
+  white-space: nowrap;
+}
+.brand-rent { color: var(--bb-brand); }
+.brand-demic { color: var(--bb-brass-strong); }
+
+/* phones: a smaller Baron and wordmark, so the logo never widens the menu */
+@media (max-width: 480px) {
+  .brand-logo { gap: 8px; }
+  .brand-logo .baron { width: 68px; height: auto; }
+  .brand-tagline { font-size: 11px; letter-spacing: 0.16em; }
+  .brand-name { font-size: 34px; border-top-width: 2px; }
 }
 
 /* the Baron beside an empty list or a quiet message */
