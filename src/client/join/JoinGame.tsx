@@ -445,7 +445,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
               <dt>Negotiation</dt>
               <dd>Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}%</b></dd>
               <dt>Corruption</dt>
-              <dd>Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}%</b></dd>
+              <dd>Each point <b>lowers</b> your taxes per turn by <b>{corruptionAdjustment}%</b>, and spends on reporting other citizens</dd>
             </Box>
           </Stack>
 

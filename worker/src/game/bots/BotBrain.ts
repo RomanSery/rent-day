@@ -11,7 +11,7 @@ import { PlayerState } from "@core/enums/PlayerState";
 import { SkillType } from "@core/enums/SkillType";
 import { Player } from "@core/types/Player";
 import { SquareGameData } from "@core/types/SquareGameData";
-import { conEd_position, mta_position, payToGetOutFee } from "@core/constants";
+import { conEd_position, falseReportFine, mta_position, payToGetOutFee } from "@core/constants";
 import { AuctionDocument, GameInstanceDocument, LottoDocument, TradeDocument } from "../model";
 import { areIdsEqual, doesGroupHaveMortgagedProperty } from "../controllers/helpers";
 import { random } from "../random";
@@ -432,6 +432,28 @@ export const skillChoice = (game: GameInstanceDocument, bot: Player): SkillType 
     return SkillType.Luck;
   }
   return SkillType.Negotiation;
+};
+
+/**
+ * Whom to report to the Ministry this turn, if anyone: a Normal bot with
+ * Corruption to spare (3 or more: a 60%+ chance) reports the leader when the
+ * leader is well ahead and out of quarantine, and only if the bot can absorb
+ * the false-report fine. A believed report keeps the leader from collecting
+ * rent while quarantined.
+ */
+export const reportTarget = (game: GameInstanceDocument, bot: Player): string | null => {
+  if (isEasy(bot) || bot.corruption < 3 || bot.reportedOnTurn === (game.turnNumber ?? 0)) {
+    return null;
+  }
+  if (bot.money < falseReportFine + reserveFor(game, bot)) {
+    return null;
+  }
+  const leader = opponentsOf(game, bot).sort((a, b) => b.totalAssets - a.totalAssets)[0];
+  if (!leader || leader.state !== PlayerState.ACTIVE) {
+    return null;
+  }
+  const wellAhead = leader.totalAssets >= bot.totalAssets * 1.3 && leader.totalAssets >= bot.totalAssets + 500;
+  return wellAhead ? leader._id : null;
 };
 
 /** Pay to leave quarantine rather than waiting for a double? */

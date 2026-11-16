@@ -51,3 +51,19 @@ export const player_colors = [
   "#1D2126", // charcoal
   "#7C2D12", // rust
 ];
+
+/**
+ * Report a citizen (ReportProcessor): on your turn, once per turn, spend one
+ * Corruption point to report another player. The Ministry believes you with
+ * this chance, in percent, counting the Corruption you had before spending:
+ * base + perCorruption × Corruption, at most max. Believed, they go to
+ * quarantine; not believed, you pay the false-report fine.
+ */
+export const reportBaseChance: number = 30;
+export const reportChancePerCorruption: number = 10;
+export const reportMaxChance: number = 80;
+export const falseReportFine: number = 100;
+
+/** the chance, in percent, that a report by someone with this much Corruption is believed */
+export const reportSuccessChance = (corruption: number): number =>
+  Math.min(reportMaxChance, reportBaseChance + reportChancePerCorruption * Math.max(0, corruption));

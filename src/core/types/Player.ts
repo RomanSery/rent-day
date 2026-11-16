@@ -45,6 +45,8 @@ export interface Player {
   rollHistory: Array<DiceRoll>;
   numTurnsInIsolation: number;
   numTimeouts: number;
+  /** turn number of their last Report a citizen (once per turn) */
+  reportedOnTurn?: number;
 
   /** running totals: rent, auctions, paydays, lotto */
   stats?: PlayerStats;

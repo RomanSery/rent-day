@@ -22,6 +22,10 @@ import {
   turnTimeLimit,
   auctionTimeLimit,
   chanceName,
+  falseReportFine,
+  reportBaseChance,
+  reportChancePerCorruption,
+  reportMaxChance,
 } from "../core/constants";
 import { PlayerClass } from "../core/enums/PlayerClass";
 import { SkillType } from "../core/enums/SkillType";
@@ -191,7 +195,7 @@ const SkillsTopic = () => (
     </ul>
     <p>
       Unspent points show as a badge in your turn bar. You can only spend them on your turn,
-      and once spent they can't be moved.
+      and once spent they can't be moved. Filing a report (see the Quarantine tab) uses up a Corruption point.
     </p>
 
     <h3>Examples</h3>
@@ -417,8 +421,24 @@ const QuarantineTopic = () => (
     <ul>
       <li>Land on <b>Big Brother</b>.</li>
       <li>Roll <b>three doubles in a row</b>.</li>
+      <li>Get <b>reported</b> by another player, and the Ministry believes them.</li>
     </ul>
     <p>You go straight to quarantine without passing Stimulus Day.</p>
+
+    <h3>Reporting a citizen</h3>
+    <p>
+      On your turn, choose <b>Actions → Report a citizen</b> to report another player to the Ministry.
+      You can file one report per turn, and it uses up <b>1 Corruption point</b>.
+    </p>
+    <ul>
+      <li>
+        The Ministry believes you <b>{reportBaseChance}%</b> of the time, plus <b>{reportChancePerCorruption}%</b> for each
+        Corruption point you have before the report, up to <b>{reportMaxChance}%</b>.
+      </li>
+      <li><b>Believed:</b> they go straight to quarantine, and collect no rent until they get out.</li>
+      <li><b>Not believed:</b> you pay a <b>${falseReportFine}</b> fine for filing a false report. It can push you below $0.</li>
+      <li>You can't report someone who is already in quarantine.</li>
+    </ul>
 
     <h3>Getting out</h3>
     <ul>

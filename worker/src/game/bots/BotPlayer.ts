@@ -24,12 +24,14 @@ import { PlayerProcessor } from "../controllers/PlayerProcessor";
 import { PropertyProcessor } from "../controllers/PropertyProcessor";
 import { RollProcessor } from "../controllers/RollProcessor";
 import { TradeProcessor } from "../controllers/TradeProcessor";
+import { ReportProcessor } from "../controllers/ReportProcessor";
 import { areIdsEqual } from "../controllers/helpers";
 import {
   acceptsTrade,
   bidFor,
   buildPlan,
   lottoChoice,
+  reportTarget,
   shouldPayOut,
   skillChoice,
   tradeProposal,
@@ -172,6 +174,17 @@ export class BotPlayer {
         await new RollProcessor(ctx, botId, null, null).payToGetOut();
         game = (await ctx.store.getGame())!;
         bot = BotPlayer.find(game, botId)!;
+      }
+
+      // 3a. report the runaway leader to the Ministry (a step of its own, so
+      // the table sees the news before the bot carries on)
+      const reported = reportTarget(game, bot);
+      if (reported) {
+        const errMsg = await new ReportProcessor(ctx, botId, reported).report();
+        if (!errMsg) {
+          return "acted";
+        }
+        console.log("bot report failed", errMsg);
       }
 
       // 3b. offer to buy the square that completes a group (rate limited)

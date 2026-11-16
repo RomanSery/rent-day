@@ -1106,6 +1106,18 @@ app.post(
   })
 );
 
+app.post(
+  "/api/actions/reportCitizen",
+  action(async (room, userId, body) => {
+    if (!isValidId(body.targetId)) {
+      return { errMsg: "Invalid player" };
+    }
+    // tests force the outcome; the room honours it in development only
+    const force = body.forceOutcome === "believed" || body.forceOutcome === "backfired" ? body.forceOutcome : null;
+    return room.reportCitizen(userId, body.targetId, force);
+  })
+);
+
 // ---------------------------------------------------------------------------
 // realtime: WebSocket per game, handled by the game's Durable Object
 // ---------------------------------------------------------------------------

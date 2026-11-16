@@ -103,6 +103,13 @@ building there, that events never share a block and end on schedule, and that
 a bots-only game starts them on its own after the first three rounds. Start
 the Worker with `npx wrangler dev --var DEV_BOT_PACE_MS:30`.
 
+`npm run test:api:report` covers Report a citizen. It forces the outcome
+(`forceOutcome: "believed"` or `"backfired"` on `actions/reportCitizen`,
+honoured in development only) and checks that a believed report sends the
+target to quarantine and a backfired one fines the reporter $100, that each
+uses up a Corruption point, and the refusals: no Corruption, not your turn,
+yourself, someone already in quarantine, and a second report in one turn.
+
 `npm run test:api:bots` plays a human against two computer players to the
 end of a game and checks the lobby controls for bots. Start the Worker with a
 fast bot pace so it finishes in under a minute:

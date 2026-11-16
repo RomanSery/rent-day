@@ -1270,3 +1270,14 @@ td.lb-rank.bronze { color: #8d5420; }
   gap: 12px;
   margin-bottom: 4px;
 }
+
+/* Report a citizen (ReportCitizenDialog.tsx) */
+.report-dialog .MuiDialogTitle-root { display: flex; align-items: center; gap: 10px; }
+.report-intro { margin-top: 0; }
+.report-terms { padding-left: 1.2em; margin: 0 0 14px; }
+.report-terms li { margin-bottom: 4px; }
+.report-blocked { font-weight: 600; }
+.report-targets { display: grid; gap: 8px; }
+.report-dialog .report-target { justify-content: flex-start; text-transform: none; font-size: 1rem; }
+.report-target-name { font-weight: 700; }
+.report-target-why { margin-left: auto; padding-left: 8px; opacity: 0.75; }

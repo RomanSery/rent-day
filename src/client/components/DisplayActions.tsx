@@ -13,6 +13,7 @@ import { faDice, faCheckCircle, faTrain, faCaretDown, faEye, faRightFromBracket 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
+import { ReportCitizenDialog } from "../dialogs/ReportCitizenDialog";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
@@ -35,6 +36,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
 
   const [rollBtnHidden, setRollBtnHidden] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [reportOpen, setReportOpen] = React.useState(false);
 
   const gameState = useGameStateStore(state => state.data);
   const actionMode = useGameStateStore(state => state.actionMode);
@@ -360,6 +362,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>}
+          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setReportOpen(true); }}>Report a citizen</MenuItem>}
           <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
           <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
           <MenuItem onClick={onViewHelp}>Help</MenuItem>
@@ -382,6 +385,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       <HelpDialog />
       <StatsDialog tradeWithPlayer={tradeWithPlayer} />
       <MyTaxesDialog />
+      <ReportCitizenDialog open={reportOpen} onClose={() => setReportOpen(false)} socketService={socketService} />
     </React.Fragment>
   );
 
