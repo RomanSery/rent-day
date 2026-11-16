@@ -78,7 +78,7 @@ const BasicsTopic = () => (
     <h3>Setting up a game</h3>
     <ul>
       <li>2 to 6 seats. Empty seats can be filled with computer players.</li>
-      <li>Everyone starts on <b>Pay Day</b> with the same money (default <b>$2,000</b>) and the same pool of skill points to spend (default <b>{defaultStartSkillPoints}</b>).</li>
+      <li>Everyone starts on <b>Stimulus Day</b> with the same money (default <b>$2,000</b>) and the same pool of skill points to spend (default <b>{defaultStartSkillPoints}</b>).</li>
       <li>Before the game starts, each player picks a <b>player class</b> (see the Classes tab).</li>
       <li>Turn order is shuffled when the game starts.</li>
     </ul>
@@ -89,17 +89,17 @@ const BasicsTopic = () => (
       <li><b>Optional, before you roll:</b> ride the subway between two stations you own, pay ${payToGetOutFee} to leave quarantine, spend skill points.</li>
       <li><b>Roll the dice</b> and move. What happens next depends on the square you land on (table below).</li>
       <li><b>Rolled a double?</b> Roll again. Three doubles in a row sends you straight to quarantine.</li>
-      <li><b>End your turn.</b> You can't end it while an auction or lotto from your roll is still open, or while your money is below $0.</li>
+      <li><b>End your turn.</b> You can't end it while an auction or Vax Lottery from your roll is still open, or while your money is below $0.</li>
     </ol>
     <p>
       Building, selling houses, mortgaging, redeeming and trading can be done at any time,
       not just on your turn. Spending skill points is only allowed on your turn.
     </p>
 
-    <h3>Pay Day</h3>
+    <h3>Stimulus Day</h3>
     <p>
-      Every time you pass or land on Pay Day you collect your salary (<b>$200</b>, or <b>$250</b> for the Banker)
-      and earn <b>1 skill point</b>. Being moved past Pay Day by a {chanceName} card counts too.
+      Every time you pass or land on Stimulus Day you collect your relief payment (<b>$200</b>, or <b>$250</b> for the Banker)
+      and earn <b>1 skill point</b>. Being moved past Stimulus Day by a {chanceName} card counts too.
       Every Governor in the game takes a <b>$15</b> city tax from it.
     </p>
 
@@ -109,12 +109,12 @@ const BasicsTopic = () => (
       rows={[
         ["Property (coloured)", "Unowned: goes to auction. Owned by someone else: pay rent."],
         ["Subway station (Herald Sq, Fulton St, Penn Station, Grand Central)", "Same as property. Owning stations also lets you ride the subway."],
-        ["Company (MTA, Con Edison)", "Unowned: goes to auction. They never charge rent, but give their owner a special power."],
-        [chanceName, `A random good or bad event (see the ${chanceName} & Lotto tab).`],
-        ["NY Lotto", "Pick one of three prizes and try your luck."],
+        ["Company (MTA, Smart Meter)", "Unowned: goes to auction. They never charge rent, but give their owner a special power."],
+        [chanceName, `A random good or bad event (see the ${chanceName} & Vax Lottery tab).`],
+        ["Vax Lottery", "Pick one of three prizes and try your luck."],
         ["Big Brother", "Caught breaking the rules: go to quarantine."],
         ["Quarantine", "Just visiting, unless you were sent there."],
-        ["Central Park", "Nothing happens. Enjoy the view."],
+        ["Park Closed", "Taped off until further notice. Nothing happens."],
       ]}
     />
   </>
@@ -154,7 +154,7 @@ const ClassesTopic = () => {
       <SimpleTable
         head={["Class", "Free skill points", "Salary", "Plays well with"]}
         rows={[
-          ["Gambler", "Luck 2", "$200", "Luck, NY Lotto, rolling doubles"],
+          ["Gambler", "Luck 2", "$200", "Luck, Vax Lottery, rolling doubles"],
           ["Conductor", "Negotiation 2", "$200", "Subway stations, the MTA"],
           ["Governor", "Corruption 2", "$200 (+ city tax)", "Governors Island, building lots of houses, long games"],
           ["Banker", "None", "$250", "Expensive properties (half taxes)"],
@@ -186,7 +186,7 @@ const SkillsTopic = () => (
     <ul>
       <li>Every player starts with a pool of points to spend (default <b>{defaultStartSkillPoints}</b>, set when the game is created).</li>
       <li>Most classes also start with <b>2 free points</b> in one skill.</li>
-      <li><b>+1 point</b> each time you pass Pay Day.</li>
+      <li><b>+1 point</b> each time you pass Stimulus Day.</li>
       <li>Sometimes from a lucky {chanceName} card.</li>
     </ul>
     <p>
@@ -197,7 +197,7 @@ const SkillsTopic = () => (
     <h3>Examples</h3>
     <ul>
       <li><b>Negotiation 3:</b> rent of $200 is lowered by {3 * negotiationAdjustment}%, so you pay ${200 - 200 * 3 * negotiationAdjustment / 100}.</li>
-      <li><b>Luck 2:</b> the small lotto prize goes from a 50% to a {50 + 2 * luckAdjustment}% chance to win.</li>
+      <li><b>Luck 2:</b> the small Vax Lottery prize goes from a 50% to a {50 + 2 * luckAdjustment}% chance to win.</li>
       <li><b>Corruption 4:</b> a $100 bill for taxes and electricity drops by {4 * corruptionAdjustment}% to ${100 - 4 * corruptionAdjustment}.</li>
     </ul>
 
@@ -302,7 +302,7 @@ const TaxesTopic = () => (
     <p>If you've built houses, you also pay for their electricity. Each property lists a cost per house.</p>
     <Formula>electricity per turn = houses × electricity cost per house</Formula>
     <ul>
-      <li><b>Own Con Edison</b> or play the <b>Governor</b>: no electricity bill at all.</li>
+      <li><b>Own the Smart Meter</b> or play the <b>Governor</b>: no electricity bill at all.</li>
       <li><b>Corruption:</b> each point takes {corruptionAdjustment}% off your total.</li>
       <li>Mortgaged properties have no houses, so they cost nothing.</li>
     </ul>
@@ -356,7 +356,7 @@ const SubwayTopic = () => (
       head={["Company", "Power"]}
       rows={[
         ["MTA", "Doubles the rent on every subway station you own."],
-        ["Con Edison", "You pay no electricity, no matter how many houses you build."],
+        ["Smart Meter", "You pay no electricity, no matter how many houses you build."],
       ]}
     />
 
@@ -371,8 +371,8 @@ const SubwayTopic = () => (
 
 const ChanceLottoTopic = () => (
   <>
-    <h3>NY Lotto</h3>
-    <p>Land on NY Lotto and choose one of three prizes. The bigger the prize, the smaller your chance of winning it. Prize amounts are random within these ranges.</p>
+    <h3>Vax Lottery</h3>
+    <p>Land on the Vax Lottery and choose one of three prizes. The bigger the prize, the smaller your chance of winning it. Prize amounts are random within these ranges.</p>
     <SimpleTable
       head={["Prize", "Amount", "Chance to win", "With Luck 2"]}
       rows={[
@@ -406,7 +406,7 @@ const ChanceLottoTopic = () => (
     </p>
     <p>
       If a {chanceName} card moves you onto an unowned property, it goes to auction as usual.
-      If it moves you past Pay Day, you collect your salary.
+      If it moves you past Stimulus Day, you collect your relief payment.
     </p>
   </>
 );
@@ -418,7 +418,7 @@ const QuarantineTopic = () => (
       <li>Land on <b>Big Brother</b>.</li>
       <li>Roll <b>three doubles in a row</b>.</li>
     </ul>
-    <p>You go straight to quarantine without passing Pay Day.</p>
+    <p>You go straight to quarantine without passing Stimulus Day.</p>
 
     <h3>Getting out</h3>
     <ul>
@@ -489,7 +489,7 @@ const TOPICS: Topic[] = [
   { id: "property", label: "Property & Auctions", render: PropertyTopic },
   { id: "taxes", label: "Taxes & Electricity", render: TaxesTopic },
   { id: "subway", label: "Subway & Companies", render: SubwayTopic },
-  { id: "chance", label: `${chanceName} & Lotto`, render: ChanceLottoTopic },
+  { id: "chance", label: `${chanceName} & Vax Lottery`, render: ChanceLottoTopic },
   { id: "quarantine", label: "Quarantine", render: QuarantineTopic },
   { id: "money", label: "Trades & Bankruptcy", render: MoneyTopic },
 ];

@@ -486,7 +486,7 @@ SquareConfigDataMap.set(36, {
 SquareConfigDataMap.set(37, {
   type: SquareType.Utility,
   section: BoardSection.Right,
-  description: "You don't have to pay any electricity costs if you own this",
+  description: "Whoever controls the meter decides who pays. Own it and you pay no electricity",
 });
 
 SquareConfigDataMap.set(38, {

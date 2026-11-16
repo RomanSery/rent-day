@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowDown, faArrowUp, faCoins, faLightbulb, faTrain } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp, faCoins, faGaugeHigh, faTrain } from "@fortawesome/free-solid-svg-icons";
 import { SquareConfigDataMap, squareGroupColorMap } from "../../core/config/SquareData";
 import { SquareType } from "../../core/enums/SquareType";
 import { TradeParticipant } from "../../core/types/TradeParticipant";
@@ -22,7 +22,7 @@ export const TradeSquare: React.FC<{ squareId: number }> = ({ squareId }) => {
       {colorClass
         ? <span className={"trade-swatch " + colorClass} />
         : <FontAwesomeIcon className="trade-square-icon" fixedWidth
-          icon={config?.type === SquareType.Utility && themeIcon !== "subway" ? faLightbulb : faTrain} />}
+          icon={config?.type === SquareType.Utility && themeIcon !== "subway" ? faGaugeHigh : faTrain} />}
       <span className="trade-square-name">{getSquareTxt(gameState, squareId)}</span>
       {data?.isMortgaged && <span className="trade-tag">mortgaged</span>}
     </span>

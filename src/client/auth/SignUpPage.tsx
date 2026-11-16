@@ -71,10 +71,10 @@ export const SignUpPage: React.FC<Props> = () => {
 
       {hasPendingInvite() && <InviteNote />}
 
-      <Typography component="h2" variant="h5">Create Account</Typography>
+      <Typography component="h2" variant="h5">Citizen Registration</Typography>
       
       <p>
-        <strong>Start playing for free!</strong> - No need to validate your email address
+        <strong>Registration is free.</strong> No need to verify your email: the Ministry already has it.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -126,7 +126,7 @@ export const SignUpPage: React.FC<Props> = () => {
           <p className="field-error">Please complete the "verify you are human" check</p>
         )}
 
-        <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit" disabled={submitting}>Create</Button>
+        <Button variant="contained" sx={{ my: "15px" }} color="primary" type="submit" disabled={submitting}>Register</Button>
       </form>
 
     </React.Fragment>

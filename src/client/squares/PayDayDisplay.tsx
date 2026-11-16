@@ -14,7 +14,7 @@ export const PayDayDisplay: React.FC<Props> = ({ id }) => {
             <div className="icon">
                 <FontAwesomeIcon icon={faHandHoldingUsd} color="green" />
             </div>
-            <div className="square-name">Payday</div>
+            <div className="square-name">Stimulus Day</div>
         </React.Fragment>
     );
 

@@ -277,8 +277,8 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
           <div><dt>Rent collected</dt><dd>{money(s?.rentCollected)}</dd></div>
           <div><dt>Rent paid</dt><dd>{money(s?.rentPaid)}</dd></div>
           <div><dt>Auctions won</dt><dd>{s ? `${s.auctionsWon} · ${dollarFormatter.format(s.auctionSpend)}` : "—"}</dd></div>
-          <div><dt>Paydays</dt><dd>{s ? s.paydays : "—"}</dd></div>
-          <div><dt>Lotto winnings</dt><dd>{money(s?.lottoWinnings)}</dd></div>
+          <div><dt>Stimulus Days</dt><dd>{s ? s.paydays : "—"}</dd></div>
+          <div><dt>Vax Lottery winnings</dt><dd>{money(s?.lottoWinnings)}</dd></div>
           <div><dt>Could raise</dt><dd title="Cash available by mortgaging everything not yet mortgaged">{dollarFormatter.format(p.mortgageableValue)}</dd></div>
           <div><dt>To redeem all</dt><dd title="Cost to pay off every mortgage">{dollarFormatter.format(p.redeemableValue)}</dd></div>
           <div><dt>Skills</dt><dd title="Negotiation · Luck · Corruption">{p.negotiation} · {p.luck} · {p.corruption}</dd></div>
@@ -316,7 +316,7 @@ export const StatsDialog: React.FC<Props> = ({ tradeWithPlayer }) => {
         <div className="pstat-grid">
           {ranked.map(playerCard)}
         </div>
-        <p className="pstat-foot">Rent, auctions, paydays and lotto are counted from when this was added, so games started earlier show partial totals or a dash.</p>
+        <p className="pstat-foot">Rent, auctions, Stimulus Days and the Vax Lottery are counted from when this was added, so games started earlier show partial totals or a dash.</p>
       </DialogContent>
       <DialogActions>
         <Button onClick={() => setStatsViewOpen(false)} color="primary">Close</Button>

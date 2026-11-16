@@ -162,7 +162,7 @@ export const DisplayLotto: React.FC<Props> = ({ socketService }) => {
       <Container maxWidth="sm" className="lotto-container">
         <div className="header">
           <div style={getNameStyle()}>{lottoState?.playerName}</div>
-          {isMyLotto() ? "Pick a lottery ticket for a chance to win the prize"
+          {isMyLotto() ? "Pick a Vax Lottery ticket for a chance to win the prize"
             : isLottoFinished() ? "picked a lottery ticket" : "is picking a lottery ticket…"}
         </div>
 

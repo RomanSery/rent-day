@@ -424,9 +424,9 @@ export class PropertyProcessor {
     } else if (squareConfig && squareConfig.type === SquareType.Isolation) {
       return "Visiting Quarantine";
     } else if (squareConfig && squareConfig.type === SquareType.Lotto) {
-      return "Lotto";
+      return "Vax Lottery";
     } else if (squareConfig && squareConfig.type === SquareType.CentralPark) {
-      return "Central Park";
+      return "Park Closed";
     } else {
       const squareTheme = gameDoc.theme[squareId.toString()];
       return squareTheme ? squareTheme.name : "";

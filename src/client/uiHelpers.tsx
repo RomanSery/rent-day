@@ -202,7 +202,7 @@ export const getSkillDescription = (type: SkillType): React.JSX.Element => {
   if (type === SkillType.Luck) {
     return (
       <React.Fragment>
-        {"Each point "} <b>{"increases"}</b> {" your chance to win lotto prizes by "} <b>{luckAdjustment}</b>{"% percentage points"}
+        {"Each point "} <b>{"increases"}</b> {" your chance to win Vax Lottery prizes by "} <b>{luckAdjustment}</b>{"% percentage points"}
       </React.Fragment>
     );
   } else if (type === SkillType.Negotiation) {
@@ -235,7 +235,7 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="Lotto prize amounts are 60% higher" />
+          <ListItemText primary="Vax Lottery prize amounts are 60% higher" />
         </ListItem>
         <ListItem>
           <ListItemIcon>
@@ -293,7 +293,7 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="City tax: collect $15 from every other player each time they pass payday" />
+          <ListItemText primary="City tax: collect $15 from every other player each time they pass Stimulus Day" />
         </ListItem>
       </List>
     );
@@ -310,7 +310,7 @@ export const getPlayerClassDescription = (type: string | undefined): React.JSX.E
           <ListItemIcon>
             <FontAwesomeIcon icon={faThumbsUp} size="2x" color="green" />
           </ListItemIcon>
-          <ListItemText primary="You have a high paying job, collect $250 on payday" />
+          <ListItemText primary="You have a high paying job, collect $250 on Stimulus Day" />
         </ListItem>
       </List>
     );

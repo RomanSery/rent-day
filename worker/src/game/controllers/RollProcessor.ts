@@ -133,7 +133,7 @@ export class RollProcessor {
       return "Wait for the auction to finish before rolling again";
     }
     if (this.game.lottoId && !andCompleteTurn) {
-      return "Pick a lotto prize before rolling again";
+      return "Pick a Vax Lottery prize before rolling again";
     }
     if (this.hasPendingChance()) {
       if (!andCompleteTurn) {
@@ -335,7 +335,7 @@ export class RollProcessor {
       return "Wait for the auction to finish first";
     }
     if (this.game.lottoId) {
-      return "Pick a lotto prize first";
+      return "Pick a Vax Lottery prize first";
     }
     if (this.hasPendingChance()) {
       return "Pick an option on your " + chanceName + " card first";
@@ -485,7 +485,7 @@ export class RollProcessor {
       if (newPosition > last_pos) {
         newPosition = newPosition - last_pos;
         this.playerPassedPayDay = true;
-        this.rollDesc += " <br /> Payday, collect your salary!";
+        this.rollDesc += " <br /> Stimulus Day, collect your relief payment!";
       } else {
         this.playerPassedPayDay = false;
       }
@@ -576,7 +576,7 @@ export class RollProcessor {
 
     if (!this.playerPassedPayDay && moveToPos < origPos) {
       this.playerPassedPayDay = true;
-      this.rollDesc += " <br /> Payday, collect your salary!";
+      this.rollDesc += " <br /> Stimulus Day, collect your relief payment!";
     }
   };
 
@@ -707,7 +707,7 @@ export class RollProcessor {
         MoneyCalculator.collectSalary(player);
         addStat(player, "paydays", 1);
         player.numAbilityPoints++;
-        desc += " - Payday, collect your salary!";
+        desc += " - Stimulus Day, collect your relief payment!";
         const cityTax = MoneyCalculator.payCityTax(game, player);
         if (cityTax) {
           desc += " - " + cityTax;
@@ -773,7 +773,7 @@ export class RollProcessor {
     }
 
     if (!autoComplete && this.game.lottoId) {
-      return "There is an active lotto game, pick a prize first";
+      return "There is an active Vax Lottery, pick a prize first";
     }
 
     if (this.hasPendingChance()) {

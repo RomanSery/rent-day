@@ -78,7 +78,7 @@ const Page: React.FC<{ maxWidth?: "xs" | "sm" | "md" | "lg"; children?: React.Re
 
 const Blurb: React.FC = () => (
   <Container maxWidth="xs" className="home-page-options home-page-left">
-    <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and become the top baron in town!</p>
+    <p><strong>A new take on a familiar game loved by millions</strong>, play with up to 5 others, buy properties, build houses, manage your finances, and be the last landlord standing while the Ministry watches!</p>
     <hr />
     <p>Choose from <strong>4 player classes</strong> suited to different play styles.  Distribute skill points across 3 abilities to further customize your playstyle. </p>
     <hr />
@@ -277,10 +277,10 @@ const AuthDisplay: React.FC = () => {
           {hasPendingInvite() && <InviteNote />}
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
-            onClick={() => navigate("/newuser")}> CREATE Account</Button>
+            onClick={() => navigate("/newuser")}> REGISTER AS A CITIZEN</Button>
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
-            onClick={() => navigate("/login")}> LOG IN</Button>
+            onClick={() => navigate("/login")}> CITIZEN LOG IN</Button>
 
           <Button fullWidth variant="contained" sx={{ my: "10px" }} color="primary"
             onClick={() => navigate("/help")}> HELP / RULES</Button>

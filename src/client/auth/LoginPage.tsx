@@ -47,7 +47,8 @@ export const LoginPage: React.FC<Props> = () => {
 
       {hasPendingInvite() && <InviteNote />}
 
-      <Typography component="h2" variant="h5">Log In</Typography>
+      <Typography component="h2" variant="h5">Citizen Check-In</Typography>
+      <p>Present your papers.</p>
 
       <form onSubmit={handleSubmit(onSubmit)}>
 

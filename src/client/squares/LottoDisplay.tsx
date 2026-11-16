@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDollarSign } from '@fortawesome/free-solid-svg-icons'
+import { faSyringe } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
     id: number;
@@ -12,9 +12,9 @@ export const LottoDisplay: React.FC<Props> = ({ id }) => {
         <React.Fragment>
             <div className="blank"></div>
             <div className="icon">
-                <FontAwesomeIcon icon={faDollarSign} size="3x" color="green" />
+                <FontAwesomeIcon icon={faSyringe} size="3x" color="green" />
             </div>
-            <div className="square-name"> NY LOTTO</div>
+            <div className="square-name"> VAX LOTTERY</div>
         </React.Fragment>
     );
 

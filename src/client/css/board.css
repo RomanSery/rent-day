@@ -776,3 +776,10 @@
 .lockdown-tape-bottom { top: 68%; }
 .lockdown-tape-top { top: 62%; }
 .lockdown-tape-left, .lockdown-tape-right { top: 80%; rotate: -5deg; }
+
+/* the park corner (CentralParkDisplay.tsx): closed until further notice,
+   taped off in an X over the faded park */
+.square.central-park .park-tape { top: 58%; }
+.square.central-park .park-tape-a { rotate: -45deg; }
+.square.central-park .park-tape-b { rotate: 45deg; }
+.square.central-park .park-tape-b span { display: none; }

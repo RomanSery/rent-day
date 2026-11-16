@@ -1,4 +1,4 @@
-import { faBiohazard, faDollarSign, faEye, faHandHoldingUsd, faHome, faHotel, faComments, faLightbulb, faTrain, faTree } from "@fortawesome/free-solid-svg-icons";
+import { faBiohazard, faDollarSign, faSyringe, faEye, faHandHoldingUsd, faHome, faHotel, faComments, faGaugeHigh, faTrain, faTree } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import React from "react";
@@ -152,7 +152,7 @@ export const SquareViewer: React.FC = () => {
     case SquareType.Utility:
       return (
         <div className="info-card-body">
-          {header("station", themeIcon === "subway" ? faTrain : faLightbulb)}
+          {header("station", themeIcon === "subway" ? faTrain : faGaugeHigh)}
           <p className="info-card-text">{config.description}</p>
           <div className="info-grid">
             <InfoItem label="Owner">
@@ -166,11 +166,11 @@ export const SquareViewer: React.FC = () => {
     case SquareType.Chance:
       return simple(chanceName, faComments, "orange", "Hear what the neighbors are saying. Maybe it's good news, or maybe you'll wish you hadn't stopped to listen.");
     case SquareType.Lotto:
-      return simple("NY Lotto", faDollarSign, "green", "Play the lotto for a chance to win great prizes. Careful, it can be addictive.");
+      return simple("Vax Lottery", faSyringe, "green", "Roll up your sleeve and pick a ticket. The Ministry rewards compliance, sometimes.");
     case SquareType.CentralPark:
-      return simple("Central Park", faTree, "green", "Enjoy a relaxing rent-free day strolling around the park.");
+      return simple("Park Closed", faTree, "green", "The park is taped off until further notice. Nothing happens here, and loitering is discouraged.");
     case SquareType.PayDay:
-      return simple("Pay Day", faHandHoldingUsd, "green", "Collect your salary plus an extra skill point.");
+      return simple("Stimulus Day", faHandHoldingUsd, "green", "Collect your relief payment plus an extra skill point.");
     case SquareType.Isolation:
       return simple("Quarantine", faBiohazard, "red", "You don't want to end up here, unless you're just visiting a friend.");
     case SquareType.GoToIsolation:

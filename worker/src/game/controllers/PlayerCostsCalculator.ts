@@ -48,7 +48,7 @@ export class PlayerCostsCalculator {
   ): void {
     if (PlayerCostsCalculator.doesPlayerOwnConEd(game, player._id)) {
       player.electricityTooltip =
-        "You own ConEd, so you don't have to pay for electricity";
+        "You own the Smart Meter, so you don't have to pay for electricity";
       player.electricityCostsPerTurn = 0;
       return;
     }

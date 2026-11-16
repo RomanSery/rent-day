@@ -441,7 +441,7 @@ export const JoinGame: React.FC<Props> = ({ socketService }) => {
             <SectionTitle>How skills work</SectionTitle>
             <Box component="dl" className="lobby-skills" sx={{ m: 0, display: "grid", gridTemplateColumns: "auto 1fr", columnGap: 2, rowGap: 0.5 }}>
               <dt>Luck</dt>
-              <dd>Each point <b>raises</b> your chance to win lotto prizes by <b>{luckAdjustment}%</b></dd>
+              <dd>Each point <b>raises</b> your chance to win Vax Lottery prizes by <b>{luckAdjustment}%</b></dd>
               <dt>Negotiation</dt>
               <dd>Each point <b>lowers</b> the rent you pay by <b>{negotiationAdjustment}%</b></dd>
               <dt>Corruption</dt>
