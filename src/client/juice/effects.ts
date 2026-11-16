@@ -1,12 +1,14 @@
 // Board effects worked out from what changed between two game states: a rent
 // pop and coin sound when rent is paid, a pop and hammer sound when a house
-// is built. Game updates reach the board only after a piece has landed, so
-// these play as the piece arrives.
+// is built, and an emergency alert tone when a player is sent to quarantine.
+// Game updates reach the board only after a piece has landed, so these play
+// as the piece arrives.
 
 import { create } from "zustand";
 import { GameState } from "../../core/types/GameState";
 import { dollarFormatter } from "../helpers";
-import { playBuildSound, playRentSound } from "./sfx";
+import { PlayerState } from "../../core/enums/PlayerState";
+import { playAlertSound, playBuildSound, playRentSound } from "./sfx";
 
 export interface SquarePop {
   id: number;
@@ -78,5 +80,13 @@ export const playEffects = (prev: GameState | undefined, next: GameState | undef
   }
   if (built) {
     playBuildSound();
+  }
+
+  const quarantined = next.players.some((p) => {
+    const before = prev.players.find((b) => b._id === p._id);
+    return p.state === PlayerState.IN_ISOLATION && !!before && before.state !== PlayerState.IN_ISOLATION;
+  });
+  if (quarantined) {
+    playAlertSound();
   }
 };

@@ -456,6 +456,10 @@ export class GameProcessor {
     });
 
     PlayerCostsCalculator.updatePlayerCosts(game, losser);
+    game.log.push({
+      msg: "<b>" + losser.name + "</b> has been declared a non-essential business and shut down",
+      player: "",
+    });
 
     const isGameOver =
       game.players.filter((p) => p.state !== PlayerState.BANKRUPT).length === 1;
@@ -478,7 +482,7 @@ export class GameProcessor {
     } else {
       const msg: ServerMsg = {
         title: "Elimination",
-        body: losser.name + " has filed for bankruptcy protection",
+        body: losser.name + " has been declared a non-essential business",
         bankruptcy: {
           playerId: losser._id,
           finishedRank: losser.finishedRank ?? numPlayersStillInIt,

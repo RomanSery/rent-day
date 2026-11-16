@@ -162,6 +162,7 @@ export class ChanceProcessor {
       headline: "Unapproved gathering",
       subLine: "Your backyard barbecue had 11 guests. The limit is 10. Pay a <b>$150</b> fine",
       chanceId: 1,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 150;
         return null;
@@ -176,6 +177,7 @@ export class ChanceProcessor {
       headline: "Checkpoint impound",
       subLine: "Your car was towed at a travel checkpoint. Pay <b>$120</b> to get it back",
       chanceId: 2,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money -= 120;
         return null;
@@ -190,6 +192,7 @@ export class ChanceProcessor {
       headline: "Mutual aid mandate",
       subLine: "The city orders you to support your neighbors. Pay each active player <b>$30</b>",
       chanceId: 3,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const activePlayers = game.players.filter(
           (p) =>
@@ -275,6 +278,7 @@ export class ChanceProcessor {
       headline: "Vaccine passport check",
       subLine: "Papers, please. Pay a <b>$75</b> verification fee, or refuse and go to <b>quarantine</b>",
       chanceId: 5,
+      official: true,
       makeItHappen(): number | null {
         // settled through the choice below
         return null;
@@ -322,6 +326,7 @@ export class ChanceProcessor {
       subLine:
         "Everyone must do their part for the environment. Pay <b>5% of your money</b> for your carbon emissions",
       chanceId: 6,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const subtraction = Math.round(player.money * 0.05);
         player.money -= subtraction;
@@ -343,6 +348,7 @@ export class ChanceProcessor {
       headline: "Vehicle mileage tax",
       subLine: "Pay <b>$5</b> for each square you just moved",
       chanceId: 8,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const lastRoll: DiceRoll = player.rollHistory[0];
         const subtraction = Math.round(lastRoll.sum() * 5);
@@ -369,6 +375,7 @@ export class ChanceProcessor {
       headline: "Essential worker",
       subLine: "You kept the city running. Collect <b>$100</b> hazard pay (<b>$200</b> for a Conductor: the trains never stopped)",
       chanceId: 20,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += hazardPay(player);
         return null;
@@ -420,6 +427,7 @@ export class ChanceProcessor {
       subLine:
         "The city made an error and overtaxed your properties. Get a refund of <b>$45</b> for each unmortgaged taxable property you own",
       chanceId: 22,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         const playerOwnedSquares: SquareGameData[] = game.squareState.filter(
           (s: SquareGameData) => {
@@ -471,6 +479,7 @@ export class ChanceProcessor {
       headline: "Re-education seminar",
       subLine: "Questioning authority is discouraged. Lose <b>1 Negotiation</b> point and gain <b>1 Corruption</b> point",
       chanceId: 23,
+      official: true,
       // with no Negotiation to lose it is only a free Corruption point
       getIsGood(game: GameInstanceDocument, player: Player): boolean {
         return player.negotiation === 0;
@@ -495,6 +504,7 @@ export class ChanceProcessor {
       headline: "Stimulus check",
       subLine: "Receive a <b>$200</b> handout",
       chanceId: 24,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 200;
         return null;
@@ -510,6 +520,7 @@ export class ChanceProcessor {
       subLine:
         "You snitched on your neighbor for hosting a small indoor gathering. Receive a <b>$55</b> reward",
       chanceId: 27,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 55;
         return null;
@@ -525,6 +536,7 @@ export class ChanceProcessor {
       subLine:
         "You reported your parents to the authorities for not wearing their masks. Collect a <b>$70</b> reward",
       chanceId: 28,
+      official: true,
       makeItHappen(game: GameInstanceDocument, player: Player): number | null {
         player.money += 70;
         return null;
@@ -581,6 +593,7 @@ export class ChanceProcessor {
       headline: "Building inspector",
       subLine: "An inspector finds violations. Pay <b>$150</b>, less <b>$25 per Corruption point</b> slipped under the table",
       chanceId: 10,
+      official: true,
       getIsGood(game: GameInstanceDocument, player: Player): boolean {
         return inspectorFine(player) === 0;
       },
@@ -687,6 +700,7 @@ export class ChanceProcessor {
       headline: "Tax audit",
       subLine: "The player worth the most is audited and pays the bank <b>15% of their cash</b>",
       chanceId: 9,
+      official: true,
       isAvailable(game: GameInstanceDocument): boolean {
         return activePlayers(game).length >= 2;
       },
@@ -712,6 +726,7 @@ export class ChanceProcessor {
       headline: "Catch-up grant",
       subLine: "The city helps out the player worth the least. They collect <b>$150</b>",
       chanceId: 30,
+      official: true,
       isAvailable(game: GameInstanceDocument): boolean {
         return activePlayers(game).length >= 2;
       },

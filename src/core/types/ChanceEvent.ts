@@ -8,6 +8,8 @@ export interface ChanceEvent {
   headline: string;
   subLine: string;
   chanceId: number;
+  /** a government card (fines, taxes, mandates, handouts): shown with the Ministry stamp */
+  official?: boolean;
   /** set on cards where the player who drew it picks what happens */
   choices?: ChanceChoiceOption[];
 }

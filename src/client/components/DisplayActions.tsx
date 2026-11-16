@@ -297,7 +297,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
       return null;
     }
     return (
-      <span className="watchers-badge" title={watchers + (watchers === 1 ? " person is" : " people are") + " watching this game"}>
+      <span className="watchers-badge" title={watchers + (watchers === 1 ? " spectator" : " spectators") + " watching this game, under surveillance"}>
         <FontAwesomeIcon icon={faEye} /> {watchers}
       </span>
     );
@@ -306,7 +306,7 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
   /** a spectator can look around but not act */
   const getWatcherActions = () => (
     <React.Fragment>
-      <span className="watching-label"><FontAwesomeIcon icon={faEye} /> Watching</span>
+      <span className="watching-label" title="Spectators can look but not act"><FontAwesomeIcon icon={faEye} /> Under surveillance</span>
       <Button variant="contained" color="primary" startIcon={<FontAwesomeIcon icon={faRightFromBracket} />}
         onClick={() => navigate("/find?tab=watch")}>Stop watching</Button>
       <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="watch-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>

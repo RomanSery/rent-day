@@ -31,5 +31,6 @@ export const toClientChanceEvent = (e: ServerChanceEvent): ChanceEvent => ({
   headline: e.headline,
   subLine: e.subLine,
   chanceId: e.chanceId,
+  ...(e.official ? { official: true } : {}),
   ...(e.choices ? { choices: e.choices } : {}),
 });

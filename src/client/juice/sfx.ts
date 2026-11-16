@@ -180,3 +180,16 @@ export const playWinSound = (): void => {
     tone(a.ac, a.out, { freq, at: i * 0.09, dur: i === 3 ? 0.6 : 0.2, type: "triangle", gain: 0.5 });
   });
 };
+
+/**
+ * someone is sent to quarantine: a short emergency-alert attention signal,
+ * the two-tone 853 Hz + 960 Hz chord in three pulses
+ */
+export const playAlertSound = (): void => {
+  const a = audio();
+  if (!a) return;
+  [0, 0.3, 0.6].forEach((at) => {
+    tone(a.ac, a.out, { freq: 853, at, dur: 0.24, type: "triangle", gain: 0.42 });
+    tone(a.ac, a.out, { freq: 960, at, dur: 0.24, type: "triangle", gain: 0.42 });
+  });
+};

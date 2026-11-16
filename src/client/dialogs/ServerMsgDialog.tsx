@@ -54,7 +54,7 @@ const BankruptcyNotice: React.FC<{ msg: ServerMsg }> = ({ msg }) => {
   const { playerId, finishedRank, numPlayers } = msg.bankruptcy!;
   const player = gameState?.players.find((p) => areObjectIdsEqual(p._id, playerId));
   const isMe = areObjectIdsEqual(playerId, getMyUserId());
-  const name = player?.name ?? msg.body.replace(/ has filed for bankruptcy protection$/, "");
+  const name = player?.name ?? msg.body.replace(/ has (filed for bankruptcy protection|been declared a non-essential business)$/, "");
   const stillIn = Math.max(0, finishedRank - 1);
 
   return (
@@ -75,7 +75,8 @@ const BankruptcyNotice: React.FC<{ msg: ServerMsg }> = ({ msg }) => {
           {isMe ? "You're out" : <><span style={{ color: player?.color }}>{name}</span> is out</>}
         </h2>
         <p className="chance-card-text">
-          {isMe ? "You" : "They"} filed for bankruptcy protection and finished <b>{ordinal(finishedRank)}</b> of {numPlayers}.
+          {isMe ? "Your business has" : "Their business has"} been declared <b>non-essential</b> and shut down.
+          {" "}{isMe ? "You" : "They"} finished <b>{ordinal(finishedRank)}</b> of {numPlayers}.
           {" "}{isMe ? "Your" : "Their"} properties go back to the bank, unowned.
         </p>
         {stillIn > 1 &&

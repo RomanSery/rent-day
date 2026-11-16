@@ -87,6 +87,12 @@ export const ChanceEventDialog: React.FC<Props> = ({ socketService }) => {
             <span className="chance-card-tone">{chanceEvent.isGood ? "Good news" : "Bad news"}</span>
           </div>
           <div className="chance-card-body">
+            {chanceEvent.official &&
+              <div className="ministry-stamp" role="img" aria-label="Ministry of Public Health: official notice">
+                <span className="ministry-stamp-org">Ministry of Public Health</span>
+                <span className="ministry-stamp-word">Official</span>
+              </div>
+            }
             <div className="chance-card-icon" aria-hidden="true">
               <FontAwesomeIcon icon={chanceEvent.isGood ? faSmile : faFrownOpen} />
             </div>
