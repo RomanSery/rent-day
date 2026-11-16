@@ -20,6 +20,14 @@ export const chanceName: string = "Word on the Street";
 export const muggingChance: number = 15;
 export const muggingAmount: number = 200;
 
+/**
+ * The lotto draw: the bar runs for lottoDrawMs, then the result stays up for
+ * lottoResultHoldMs before the panel closes. The server waits out the same
+ * time after a computer player picks, so everyone sees the draw.
+ */
+export const lottoDrawMs: number = 8000;
+export const lottoResultHoldMs: number = 3000;
+
 export const turnTimeLimit: number = 80;
 export const auctionTimeLimit: number = 70;
 export const maxTimeoutsAllowed: number = 3;

@@ -34,7 +34,7 @@ class Client {
       const ws = new WebSocket(WS_BASE + "/ws?gameId=" + gameId, { headers: { cookie: this.cookie } });
       ws.addEventListener("open", () => resolve(ws));
       ws.addEventListener("error", (e) => reject(e.error || new Error("ws error")));
-      ws.addEventListener("message", (ev) => { try { this.events.push(JSON.parse(ev.data)); } catch {} });
+      ws.addEventListener("message", (ev) => { try { this.events.push({ ...JSON.parse(ev.data), at: Date.now() }); } catch {} });
       this.ws = ws;
     });
   }
@@ -292,6 +292,37 @@ section("bots can't take the creator's seat");
   const freePiece = ["Pawn", "Hat", "Car", "Bicycle", "Cat", "Dog"].find((p) => !g.players.some((pl) => pl.type === p));
   r = await D.post("joinGame", { gameId: gid, piece: freePiece, playerClass: "Governor" });
   check(r.status === 200 && r.data.allJoined, "creator joins the kept seat and the game starts: " + r.status + " " + JSON.stringify(r.data));
+}
+
+section("a bot's lotto draw plays out before the panel closes");
+{
+  // DEV_BOT_PACE_MS:30 shrinks the 11 s draw (8 s bar + 3 s result) to ~200 ms
+  const DRAW_AT_TEST_PACE_MS = 150;
+  const L = await newUser("lo");
+  const r2 = await L.post("createGame", { data: { gameName: "Lotto", maxPlayers: 5, initialMoney: 5000, initialSkillPoints: 5, numBots: 4, botLevel: "Normal" }, context: {} });
+  const lid = r2.data.gameId;
+  await L.connect(lid);
+  let lg = await getGame(L, lid);
+  const freePiece = ["Pawn", "Hat", "Car", "Bicycle", "Cat", "Dog"].find((p) => !lg.players.some((pl) => pl.type === p));
+  await L.post("joinGame", { gameId: lid, piece: freePiece, playerClass: "Banker" });
+  const botIds = new Set(bots(await getGame(L, lid)).map((b) => b._id));
+  let drawn = null;
+  for (let turn = 0; turn < 40 && !drawn; turn++) {
+    lg = await waitForHuman(L, lid, 30000);
+    if (lg.status !== "Active") break;
+    drawn = L.received("lottoUpdate").find((e) => botIds.has(e.args[0]?.playerId) && e.args[0]?.prize != null);
+    if (!drawn) await humanTurn(L, lid);
+  }
+  check(!!drawn, "a bot landed on the lotto and its pick went out to the table");
+  if (drawn) {
+    const lotto = drawn.args[0];
+    check(lotto.optionPicked >= 1 && lotto.optionPicked <= 3 && lotto.randomNum != null,
+      "the pick carries the option and the draw: " + JSON.stringify({ opt: lotto.optionPicked, num: lotto.randomNum, prize: lotto.prize }));
+    const closed = L.received("updateGameState").find((e) => e.at >= drawn.at && e.args[0]?.lottoId == null);
+    check(!!closed && closed.at - drawn.at >= DRAW_AT_TEST_PACE_MS,
+      "the lotto stays open while the draw plays (closed " + (closed ? closed.at - drawn.at : "never") + " ms after the pick)");
+  }
+  L.close();
 }
 
 H.close();

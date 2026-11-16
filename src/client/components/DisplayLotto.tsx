@@ -161,7 +161,9 @@ export const DisplayLotto: React.FC<Props> = ({ socketService }) => {
     <React.Fragment>
       <Container maxWidth="sm" className="lotto-container">
         <div className="header">
-          <div style={getNameStyle()}>{lottoState?.playerName}</div> Pick a lottery ticket for a chance to win the prize
+          <div style={getNameStyle()}>{lottoState?.playerName}</div>
+          {isMyLotto() ? "Pick a lottery ticket for a chance to win the prize"
+            : isLottoFinished() ? "picked a lottery ticket" : "is picking a lottery ticket…"}
         </div>
 
         <div className="lotto-options">

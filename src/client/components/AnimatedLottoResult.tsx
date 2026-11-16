@@ -3,7 +3,8 @@ import { animate, useMotionValue } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import LinearProgress from '@mui/material/LinearProgress';
 import { GameEvent } from "../../core/types/GameEvent";
-import { dollarFormatter } from "../helpers";
+import { areObjectIdsEqual, dollarFormatter, getMyUserId } from "../helpers";
+import { lottoDrawMs, lottoResultHoldMs } from "../../core/constants";
 import { SocketService } from "../sockets/SocketService";
 import { LottoState } from "../../core/types/LottoState";
 import useGameStateStore from "../stores/gameStateStore";
@@ -35,16 +36,17 @@ export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, s
     if (!showResult) {
       return "";
     }
-    if (lottoState && lottoState.prize > 0) {
-      return "You Won " + dollarFormatter.format(lottoState.prize);
+    const mine = areObjectIdsEqual(lottoState.playerId, getMyUserId());
+    if (lottoState.prize > 0) {
+      return (mine ? "You won " : lottoState.playerName + " won ") + dollarFormatter.format(lottoState.prize);
     }
-    return "You lost, better luck next time!"
+    return mine ? "You lost, better luck next time!" : lottoState.playerName + " didn't win this time";
   };
 
   useEffect(() => {
     const controls = animate(x, getTargetValue(), {
       type: "tween",
-      duration: 8,
+      duration: lottoDrawMs / 1000,
       onUpdate: (value: number) => {
         setAnimValue(Math.round(value))
       },
@@ -55,7 +57,7 @@ export const AnimatedLottoResult: React.FC<Props> = ({ chanceToWin, randomNum, s
           if (socketService && gameState) {
             socketService.socket.emit(GameEvent.UPDATE_GAME_STATE, gameState._id);
           }
-        }, 3000);
+        }, lottoResultHoldMs);
       }
     });
 

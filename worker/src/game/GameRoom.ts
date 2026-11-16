@@ -9,7 +9,7 @@ import { ChatMsg } from "@core/types/ChatMsg";
 import { JoinedGameMsg } from "@core/types/messages";
 import { DiceRoll } from "@core/types/DiceRoll";
 import { DiceRollResult } from "@core/types/DiceRollResult";
-import { auctionTimeLimit, turnTimeLimit } from "@core/constants";
+import { auctionTimeLimit, lottoDrawMs, lottoResultHoldMs, turnTimeLimit } from "@core/constants";
 import { Env, isDevEnv } from "../env";
 import { UsersRepo } from "../db/users";
 import { GamesIndexRepo } from "../db/gamesIndex";
@@ -1258,10 +1258,19 @@ export class GameRoom extends DurableObject<Env> {
             // (as long as the board animation takes), then a beat to see where
             // it landed before the bot does anything else
             const landed = Date.now() + this.pace(1) + this.scaledToPace(movementDurationMs(result.frames));
-            const nextStep = landed + this.pace(1.25);
+            // landing on the lotto: give everyone a moment to read the tickets
+            const after = await this.store.getGame();
+            const nextStep = landed + this.pace(after?.lottoId ? 2.5 : 1.25);
             this.botBusyUntil.set(job.botId, nextStep);
             await this.scheduleJob({ kind: "refresh", at: landed + this.pace(0.25) });
             await this.scheduleJob({ kind: "botStep", botId: job.botId, at: nextStep });
+          } else if (typeof result === "object" && result.kind === "lotto") {
+            // clients play the draw from the LOTTO_UPDATE just sent; the new
+            // state (which closes the lotto panel) waits until it has played
+            const drawn = Date.now() + this.scaledToPace(lottoDrawMs + lottoResultHoldMs);
+            this.botBusyUntil.set(job.botId, drawn + this.pace(0.5));
+            await this.scheduleJob({ kind: "refresh", at: drawn });
+            await this.scheduleJob({ kind: "botStep", botId: job.botId, at: drawn + this.pace(0.5) });
           } else if (result === "acted") {
             // one thing at a time (a purchase, a house, a mortgage), each easy to
             // spot. Never before the move has finished: this step may have run

@@ -49,6 +49,8 @@ export const BOT_NAMES = [
 export type BotStepResult =
   /** dice thrown or a subway ride taken: wait for the piece to land, then continue */
   | { kind: "rolled"; frames: number[] }
+  /** picked a lotto ticket: wait for the draw to play out for everyone, then continue */
+  | { kind: "lotto" }
   | "acted"
   | "idle";
 
@@ -131,10 +133,12 @@ export class BotPlayer {
         if (errMsg) {
           console.log("bot lotto failed", errMsg);
         }
+        // the result only: the game state (lotto closed, prize paid) goes
+        // out once the draw has played (GameRoom), or the panel would close
+        // before anyone saw it
         const after = await ctx.store.getLotto(game.lottoId);
         ctx.events.broadcast(GameEvent.LOTTO_UPDATE, after);
-        await ctx.events.refreshGameState();
-        return "acted";
+        return { kind: "lotto" };
       }
     }
 
