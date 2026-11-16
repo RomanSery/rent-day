@@ -25,8 +25,11 @@ Any signed-in user can watch a game in progress from the Join page's
 games with no move in the last 30 minutes, since a game whose players all
 leave never finishes: each game records its latest move in the D1 `games`
 row (`updated_at`) at most every 5 minutes of play. Games with a password
-can't be watched, and nobody but the players can open a finished game (no
-replays; per-turn snapshots stay players-only). A spectator's socket
+are listed with a lock: the watch page asks for the password and
+`/api/unlockWatch` checks it; the game's Durable Object remembers who gave
+it, and a user who gives a wrong one 5 times waits 15 minutes. Nobody but
+the players can open a finished game (no replays; per-turn snapshots stay
+players-only). A spectator's socket
 (`/ws?gameId=...&watch=1`) receives the same broadcasts as the players but may
 send nothing except a request for the current state, so spectators can't
 chat or act. Auctions show spectators who has bid, never the amounts. Players

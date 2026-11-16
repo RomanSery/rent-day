@@ -762,11 +762,38 @@ app.post("/api/getGame", async (c) => {
   if (!userId) {
     return invalidAuth(c);
   }
-  const { game, forbidden } = await roomFor(c, body.gameId).getGameFor(userId);
+  const { game, forbidden, needsPassword } = await roomFor(c, body.gameId).getGameFor(userId);
+  if (needsPassword) {
+    return c.json({ needsPassword: true, message: "This game needs a password to watch" }, 403);
+  }
   if (forbidden) {
     return c.text("You are not a player in this game", 403);
   }
   return c.json({ game });
+});
+
+// watch a password-protected game in progress by giving its password
+app.post("/api/unlockWatch", async (c) => {
+  const body = await readBody(c);
+  if (!isValidId(body.gameId)) {
+    return validationError(c, "invalid gameId", "gameId");
+  }
+  const userId = await requireUserId(c);
+  if (!userId) {
+    return invalidAuth(c);
+  }
+  const gamePwd = String(body.gamePwd ?? "");
+  if (gamePwd.length === 0 || gamePwd.length > GAME_LIMITS.maxPasswordLength) {
+    return c.text("Wrong password", 400);
+  }
+  const { errMsg, retryAfterSeconds } = await roomFor(c, body.gameId).unlockWatch(userId, gamePwd);
+  if (retryAfterSeconds) {
+    return tooManyRequests(c, retryAfterSeconds, errMsg);
+  }
+  if (errMsg) {
+    return c.text(errMsg, 400);
+  }
+  return c.json({ status: "success" });
 });
 
 // per-turn snapshots of a game, for replays and net-worth charts

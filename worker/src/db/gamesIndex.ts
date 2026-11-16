@@ -92,8 +92,8 @@ export class GamesIndexRepo {
   }
 
   /**
-   * Games in progress that anyone signed in may watch: started, no password,
-   * at least one person playing, and a move made since `activeAfterIso`
+   * Games in progress that anyone signed in may watch: started (those with a
+   * password once it is given), at least one person playing, and a move made since `activeAfterIso`
    * (games abandoned without finishing never leave ACTIVE). Also bounded by
    * creation date, so the status + julianday(created_at) index limits the
    * rows scanned.
@@ -101,17 +101,17 @@ export class GamesIndexRepo {
   async listWatchable(createdAfterIso: string, activeAfterIso: string): Promise<GameToWatch[]> {
     const result = await this.db
       .prepare(
-        `SELECT g.id, g.name, g.players_joined, g.bots, g.updated_at, u.username AS host_name
+        `SELECT g.id, g.name, g.players_joined, g.bots, g.has_password, g.updated_at, u.username AS host_name
          FROM games g LEFT JOIN users u ON u.id = g.created_by
          WHERE g.status = ? AND julianday(g.created_at) > julianday(?)
-           AND g.has_password = 0 AND g.players_joined > g.bots
+           AND g.players_joined > g.bots
            AND julianday(g.updated_at) > julianday(?)
          ORDER BY julianday(g.updated_at) DESC
          LIMIT 50`
       )
       .bind(GameStatus.ACTIVE, createdAfterIso, activeAfterIso)
       .all<{
-        id: string; name: string; players_joined: number; bots: number;
+        id: string; name: string; players_joined: number; bots: number; has_password: number;
         updated_at: string; host_name: string | null;
       }>();
 
@@ -120,6 +120,7 @@ export class GamesIndexRepo {
       name: r.name,
       playersJoined: r.players_joined,
       bots: r.bots,
+      hasPassword: r.has_password === 1,
       lastMoveAt: r.updated_at,
       hostName: r.host_name ?? undefined,
     }));

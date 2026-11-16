@@ -41,6 +41,7 @@ import { BotPlayer, isBotId } from "./bots/BotPlayer";
 import { movementDurationMs } from "@core/movementTiming";
 import { FINAL_SNAPSHOT_KEY, SNAPSHOT_PREFIX, TurnSnapshot, unpackSnapshot } from "./snapshots";
 import { emptyRoomUsage, meterD1, meterStorage, RoomUsage } from "../dev/usage";
+import { verifyPassword } from "../auth/password";
 
 /** development only: where the usage meters are kept (not metered itself) */
 const USAGE_KEY = "__devUsage";
@@ -93,6 +94,10 @@ const MAX_SIMULATION_TURNS = 400;
  */
 const PURGE_FINISHED_AFTER_SECONDS = 30 * 24 * 60 * 60;
 
+interface WatchFailures {
+  [userId: string]: { count: number; since: number };
+}
+
 interface IndexState {
   status: GameStatus;
   playersJoined: number;
@@ -133,6 +138,13 @@ const DEFAULT_BOT_PACE_MS = 1600;
 const ALARM_EARLY_MS = 50;
 
 const PENDING_EVENTS_KEY = "pendingEvents";
+/** users who gave a password-protected game's password to watch it (see unlockWatch) */
+const WATCH_PASSES_KEY = "watchPasses";
+/** per user: wrong watch passwords and when the first of them was given */
+const WATCH_FAILURES_KEY = "watchPasswordFailures";
+/** wrong watch passwords a user may give before waiting out the lockout */
+const MAX_WATCH_PASSWORD_FAILURES = 5;
+const WATCH_PASSWORD_LOCKOUT_MS = 15 * 60 * 1000;
 const INDEX_STATE_KEY = "indexState";
 /** set once the finished game is in the D1 history */
 const HISTORY_RECORDED_KEY = "historyRecorded";
@@ -353,31 +365,93 @@ export class GameRoom extends DurableObject<Env> {
    * at a lobby (to decide whether to join) or watch a live public game;
    * nobody else sees the game.
    */
-  private canView(game: GameInstanceDocument, userId: string): boolean {
+  private async canView(game: GameInstanceDocument, userId: string): Promise<boolean> {
     return (
       game.status === GameStatus.JOINING ||
-      this.isWatchable(game) ||
       // bots-only simulations (development only) have no players to restrict to
       !!game.settings.botsOnly ||
-      game.players.some((p) => areIdsEqual(p._id, userId))
+      game.players.some((p) => areIdsEqual(p._id, userId)) ||
+      (await this.isWatchable(game, userId))
     );
   }
 
   /**
-   * Signed-in users may watch a game while it is being played, unless it has
-   * a password. Finished games are not replayed to anyone but their players.
+   * Signed-in users may watch a game while it is being played; a game with a
+   * password only once they have given it (unlockWatch). Finished games are
+   * not replayed to anyone but their players.
    */
-  private isWatchable(game: GameInstanceDocument | null): boolean {
-    return !!game && game.status === GameStatus.ACTIVE && !game.settings.password;
+  private async isWatchable(game: GameInstanceDocument | null, userId: string): Promise<boolean> {
+    return !!game && game.status === GameStatus.ACTIVE && (await this.hasWatchPass(game, userId));
   }
 
   /**
    * Whether a spectator's socket may stay open: while the game is watchable,
    * and once it finishes, so they see how it ended (no new spectators then).
    */
-  private watcherMayStay(game: GameInstanceDocument | null): boolean {
-    return !!game && !game.settings.password &&
-      (game.status === GameStatus.ACTIVE || game.status === GameStatus.FINISHED);
+  private async watcherMayStay(game: GameInstanceDocument | null, userId: string): Promise<boolean> {
+    return !!game &&
+      (game.status === GameStatus.ACTIVE || game.status === GameStatus.FINISHED) &&
+      (await this.hasWatchPass(game, userId));
+  }
+
+  /** Users who gave the game password to watch, kept in memory once read. */
+  private watchPasses: Set<string> | null = null;
+
+  private async getWatchPasses(): Promise<Set<string>> {
+    if (!this.watchPasses) {
+      this.watchPasses = new Set((await this.storage.get<string[]>(WATCH_PASSES_KEY)) ?? []);
+    }
+    return this.watchPasses;
+  }
+
+  /** No password to give, or this user has given it. */
+  private async hasWatchPass(game: GameInstanceDocument, userId: string): Promise<boolean> {
+    return !game.settings.password || (await this.getWatchPasses()).has(userId);
+  }
+
+  /**
+   * Let a user watch a password-protected game in progress once they give its
+   * password. A user who gives a wrong one MAX_WATCH_PASSWORD_FAILURES times
+   * waits out WATCH_PASSWORD_LOCKOUT_MS before trying again.
+   */
+  async unlockWatch(userId: string, gamePwd: string): Promise<{ errMsg: string; retryAfterSeconds?: number }> {
+    return this.run(async () => {
+      const game = await this.store.getGame();
+      if (!game || game.status !== GameStatus.ACTIVE) {
+        return { errMsg: "Only games in progress can be watched" };
+      }
+      if (this.isPlayer(game, userId) || (await this.hasWatchPass(game, userId))) {
+        return { errMsg: "" };
+      }
+
+      const now = Date.now();
+      const failures = (await this.storage.get<WatchFailures>(WATCH_FAILURES_KEY)) ?? {};
+      for (const [id, f] of Object.entries(failures)) {
+        if (now - f.since >= WATCH_PASSWORD_LOCKOUT_MS) {
+          delete failures[id];
+        }
+      }
+      const mine = failures[userId];
+      if (mine && mine.count >= MAX_WATCH_PASSWORD_FAILURES) {
+        return {
+          errMsg: "Too many wrong passwords. Try again later.",
+          retryAfterSeconds: Math.ceil((mine.since + WATCH_PASSWORD_LOCKOUT_MS - now) / 1000),
+        };
+      }
+
+      if (!(await verifyPassword(gamePwd, game.settings.password!))) {
+        failures[userId] = { count: (mine?.count ?? 0) + 1, since: mine?.since ?? now };
+        await this.storage.put(WATCH_FAILURES_KEY, failures);
+        return { errMsg: "Wrong password" };
+      }
+
+      delete failures[userId];
+      await this.storage.put(WATCH_FAILURES_KEY, failures);
+      const passes = await this.getWatchPasses();
+      passes.add(userId);
+      await this.storage.put(WATCH_PASSES_KEY, Array.from(passes));
+      return { errMsg: "" };
+    });
   }
 
   private isPlayer(game: GameInstanceDocument | null, userId: string): boolean {
@@ -385,10 +459,12 @@ export class GameRoom extends DurableObject<Env> {
   }
 
   /** The game as this user may see it; forbidden when they're not in it. */
-  async getGameFor(userId: string): Promise<{ game: GameInstanceDocument | null; forbidden: boolean }> {
+  async getGameFor(userId: string): Promise<{ game: GameInstanceDocument | null; forbidden: boolean; needsPassword?: boolean }> {
     const game = await this.store.getGame();
-    if (game && !this.canView(game, userId)) {
-      return { game: null, forbidden: true };
+    if (game && !(await this.canView(game, userId))) {
+      // a password game in progress can be watched once its password is given
+      const needsPassword = game.status === GameStatus.ACTIVE && !!game.settings.password;
+      return { game: null, forbidden: true, needsPassword };
     }
     return { game: toClientGame(game), forbidden: false };
   }
@@ -415,7 +491,7 @@ export class GameRoom extends DurableObject<Env> {
   async getAuction(auctionId: string, userId: string): Promise<AuctionDocument | null> {
     const game = await this.store.getGame();
     // spectators get the same view as a player who isn't bidding: no amounts
-    if (!this.isPlayer(game, userId) && !this.isWatchable(game)) {
+    if (!this.isPlayer(game, userId) && !(await this.isWatchable(game, userId))) {
       return null;
     }
     return AuctionProcessor.getAuction(this.gameCtx, auctionId, userId);
@@ -423,7 +499,7 @@ export class GameRoom extends DurableObject<Env> {
 
   async getLotto(lottoId: string, userId: string): Promise<LottoDocument | null> {
     const game = await this.store.getGame();
-    if (!this.isPlayer(game, userId) && !this.isWatchable(game)) {
+    if (!this.isPlayer(game, userId) && !(await this.isWatchable(game, userId))) {
       return null;
     }
     return LottoProcessor.getLotto(this.gameCtx, lottoId);
@@ -795,7 +871,7 @@ export class GameRoom extends DurableObject<Env> {
     }
     const isPlayer = game.players.some((p) => areIdsEqual(p._id, userId));
     const watching = !isPlayer && new URL(request.url).searchParams.get("watch") === "1";
-    if (!isPlayer && game.status !== GameStatus.JOINING && !(watching && this.isWatchable(game))) {
+    if (!isPlayer && game.status !== GameStatus.JOINING && !(watching && (await this.isWatchable(game, userId)))) {
       return new Response("Not a player in this game", { status: 403 });
     }
     if (watching && this.ctx.getWebSockets(userTag(userId)).length === 0 && this.watcherCount() >= MAX_WATCHERS) {
@@ -861,10 +937,9 @@ export class GameRoom extends DurableObject<Env> {
     if (game.status === GameStatus.JOINING) {
       return;
     }
-    const watchersWelcome = this.watcherMayStay(game);
     for (const socket of this.ctx.getWebSockets()) {
       const { userId, watcher } = this.attachmentOf(socket);
-      if (watcher && watchersWelcome) {
+      if (watcher && (await this.watcherMayStay(game, userId))) {
         continue;
       }
       if (!game.players.some((p) => areIdsEqual(p._id, userId))) {
@@ -909,7 +984,7 @@ export class GameRoom extends DurableObject<Env> {
     const current = await this.store.getGame();
     const isPlayer = !!current && current.players.some((p) => areIdsEqual(p._id, me.userId));
     if (!isPlayer) {
-      const spectating = me.watcher && this.watcherMayStay(current);
+      const spectating = me.watcher && (await this.watcherMayStay(current, me.userId));
       if (!spectating && current && current.status !== GameStatus.JOINING) {
         // the game started after this socket connected
         await this.dropNonPlayers(current);

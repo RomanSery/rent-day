@@ -1,5 +1,6 @@
-// Spectating: signed-in users may watch a public game while it is played,
-// read-only, and nothing once it is over (no replays).
+// Spectating: signed-in users may watch a game while it is played (one with
+// a password once they give it), read-only, and nothing once it is over (no
+// replays).
 //
 //   npm run dev                # in worker/
 //   npm run test:api:watch
@@ -171,12 +172,52 @@ console.log("password-protected games");
   const d = await newUser("pd");
   const pwGame = await startGame(c, d, { gamePwd: "secret" });
   r = await viv.post("findGames");
-  check(!r.data.live?.some((g) => g.gameId === pwGame), "not listed");
+  const listed = r.data.live?.find((g) => g.gameId === pwGame);
+  check(listed && listed.hasPassword === true, "listed with a lock -> " + JSON.stringify(listed));
+  check(r.data.live?.find((g) => g.gameId === gameId)?.hasPassword === false, "public game listed without one");
   r = await viv.post("getGame", { gameId: pwGame });
-  check(r.status === 403, "getGame refused -> " + r.status);
+  check(r.status === 403 && r.data.needsPassword === true, "getGame asks for the password -> " + r.status + " " + JSON.stringify(r.data));
   const v2 = new Client("v2");
   v2.cookie = viv.cookie;
-  check(!(await v2.connect(pwGame, true)), "spectator socket refused");
+  check(!(await v2.connect(pwGame, true)), "spectator socket refused before the password");
+
+  r = await viv.post("unlockWatch", { gameId: pwGame, gamePwd: "wrong" });
+  check(r.status === 400 && r.data === "Wrong password", "wrong password refused -> " + r.status + " " + r.data);
+  r = await viv.post("unlockWatch", { gameId: pwGame, gamePwd: "" });
+  check(r.status === 400, "empty password refused -> " + r.status);
+  r = await viv.post("getGame", { gameId: pwGame });
+  check(r.status === 403, "still locked after a wrong password -> " + r.status);
+
+  r = await viv.post("unlockWatch", { gameId: pwGame, gamePwd: "secret" });
+  check(r.status === 200, "right password accepted -> " + r.status + " " + JSON.stringify(r.data));
+  r = await viv.post("getGame", { gameId: pwGame });
+  check(r.status === 200 && r.data.game?._id === pwGame && r.data.game.settings.password === "protected",
+    "game loads after the password, hash still hidden -> " + r.status);
+  check(await v2.connect(pwGame, true), "spectator socket accepted after the password");
+  v2.send("joinGameRoom", pwGame);
+  await sleep(300);
+  check(v2.received("updateGameState").length > 0, "unlocked spectator gets the game state");
+  r = await walt.post("getGame", { gameId: pwGame });
+  check(r.status === 403 && r.data.needsPassword, "another user still needs the password -> " + r.status);
+  const w2 = new Client("w2");
+  w2.cookie = walt.cookie;
+  check(!(await w2.connect(pwGame, true)), "another user's spectator socket still refused");
+  r = await viv.post("actions/roll", { context: { gameId: pwGame } });
+  check(r.status === 400, "unlocked spectator still can't act -> " + r.status);
+  r = await c.post("unlockWatch", { gameId: pwGame, gamePwd: "anything" });
+  check(r.status === 200, "a player needs no password -> " + r.status);
+
+  console.log("wrong watch passwords lock a user out");
+  const g = await newUser("pg");
+  for (let i = 0; i < 5; i++) {
+    r = await g.post("unlockWatch", { gameId: pwGame, gamePwd: "guess" + i });
+  }
+  check(r.status === 400, "fifth wrong guess still answered -> " + r.status);
+  r = await g.post("unlockWatch", { gameId: pwGame, gamePwd: "secret" });
+  check(r.status === 429, "locked out, even with the right password -> " + r.status + " " + r.data);
+  r = await walt.post("unlockWatch", { gameId: pwGame, gamePwd: "secret" });
+  check(r.status === 200, "other users aren't locked out -> " + r.status);
+  try { v2.ws.close(); } catch {}
 }
 
 if (process.env.WATCH_IDLE) {

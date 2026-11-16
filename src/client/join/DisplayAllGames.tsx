@@ -50,7 +50,7 @@ interface FoundGames {
 const LiveGames: React.FC<{ live: GameToWatch[] }> = ({ live }) => {
   const navigate = useNavigate();
   if (live.length === 0) {
-    return <p className="gl-note">No public games are being played right now.</p>;
+    return <p className="gl-note">No games are being played right now.</p>;
   }
   return (
     <ul className="gl-list">
@@ -62,6 +62,7 @@ const LiveGames: React.FC<{ live: GameToWatch[] }> = ({ live }) => {
               <div className="gl-title">
                 <span className="gl-name">{g.name}</span>
                 <span className="gl-live">Live</span>
+                {g.hasPassword && <span className="gl-lock" title="Needs the game password to watch"><FontAwesomeIcon icon={faLock} /> Password</span>}
               </div>
               <div className="gl-meta">
                 {g.hostName ? <>Hosted by <b>{g.hostName}</b> · </> : null}

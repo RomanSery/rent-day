@@ -1125,6 +1125,8 @@ td.lb-rank.bronze { color: #8d5420; }
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
+.watch-password h1 { display: flex; align-items: center; gap: 10px; }
+.watch-password-icon { color: var(--bb-brass-ink); font-size: 0.8em; }
 .gl-tabs { border-bottom: 1px solid var(--bb-line); min-height: 40px !important; }
 .gl-tabs .MuiTab-root { min-height: 40px; text-transform: none; font-weight: 600; font-size: 15px; }
 

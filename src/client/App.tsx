@@ -8,6 +8,7 @@ import {
   Routes, Route, Navigate, useNavigate, useLocation, useParams, Link
 } from "react-router-dom";
 import { JoinGame } from "./join/JoinGame";
+import { WatchPassword } from "./join/WatchPassword";
 import { StaticBoard } from "./join/StaticBoard";
 import { SocketService } from "./sockets/SocketService";
 import { DisplayAllGames } from "./join/DisplayAllGames";
@@ -125,11 +126,12 @@ const GameDisplay: React.FC = () => {
   );
 };
 
-type WatchCheck = "checking" | "ok" | "unavailable";
+type WatchCheck = "checking" | "ok" | "password" | "unavailable";
 
 /**
  * Spectating a game in progress: the game board, read-only. Only for live
- * games without a password; finished games are not replayed.
+ * games (asking first for the password of a game that has one); finished
+ * games are not replayed.
  */
 const WatchDisplay: React.FC = () => {
   const { gameId } = useParams();
@@ -164,7 +166,11 @@ const WatchDisplay: React.FC = () => {
           setCheck(game && game.status === GameStatus.ACTIVE ? "ok" : "unavailable");
         }
       })
-      .catch(() => { if (live) setCheck("unavailable"); });
+      .catch((err) => {
+        if (live) {
+          setCheck(err?.response?.data?.needsPassword ? "password" : "unavailable");
+        }
+      });
     return () => { live = false; };
   }, [gameId, validId]);
 
@@ -181,13 +187,21 @@ const WatchDisplay: React.FC = () => {
     return null;
   }
 
+  if (check === "password") {
+    return (
+      <Page maxWidth="sm">
+        <WatchPassword gameId={gameId!} onUnlocked={() => setCheck("ok")} />
+      </Page>
+    );
+  }
+
   if (check === "unavailable" || !socket) {
     return (
       <Page maxWidth="sm">
         <div className="game-list">
           <BackLink to="/find?tab=watch" label="Games" />
           <h1>Can't watch this game</h1>
-          <p className="gl-sub">It may have finished, not started yet, or need a password. Only games in progress can be watched.</p>
+          <p className="gl-sub">It may have finished or not started yet. Only games in progress can be watched.</p>
         </div>
       </Page>
     );
