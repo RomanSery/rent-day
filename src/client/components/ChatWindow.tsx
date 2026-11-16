@@ -9,6 +9,7 @@ import useGameStateStore from "../stores/gameStateStore";
 import { getMyPlayerName, isWatching } from "../helpers";
 import { SocketService } from '../sockets/SocketService';
 import useChatStore from "../stores/chatStore";
+import { toBulletin } from "../bulletins";
 
 interface Props {
   socketService: SocketService;
@@ -107,12 +108,12 @@ export const ChatWindow: React.FC<Props> = ({ socketService }) => {
             ? (messages.length === 0
               ? <li className="log-empty">{canChat ? "No messages yet. Say hi!" : "No messages yet."}</li>
               : visible(messages).map((m, index) => <li key={index}><b>{m.player}</b> {m.msg}</li>))
-            : visible(log).map((m, index) => <li key={index} dangerouslySetInnerHTML={{ __html: m.msg }} />)}
+            : visible(log).map((m, index) => <li key={index} dangerouslySetInnerHTML={{ __html: toBulletin(m.msg) }} />)}
         </ul>
       </div>
 
       {showChat && !canChat &&
-        <div className="log-strip-note">Spectators can read the chat but not send messages.</div>}
+        <div className="log-strip-note">Spectators are under surveillance: they can read the chat but not send messages.</div>}
 
       {showChat && canChat &&
         <TextField size="small" onChange={(e) => setSendChatMsg(e.currentTarget.value)}
