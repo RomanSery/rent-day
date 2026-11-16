@@ -186,8 +186,12 @@ export const toClientGame = (
   }
   // the generator's key and state would let a player predict the dice; the
   // seed (seeded games only) is shown once the game is over, for replays
-  // (when the next neighborhood event is due stays a surprise too)
-  const { rngState: _rngState, rngKey: _rngKey, nextNeighborhoodEventTurn: _nextEvent, seed, ...rest } = game;
+  // (when the next neighborhood event is due, and the Chance cards still to
+  // come, stay a surprise too)
+  const {
+    rngState: _rngState, rngKey: _rngKey, nextNeighborhoodEventTurn: _nextEvent,
+    chanceDeck: _chanceDeck, lastChanceId: _lastChance, seed, ...rest
+  } = game;
   return {
     ...rest,
     seed: game.status === GameStatus.FINISHED ? seed : undefined,

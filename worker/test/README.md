@@ -83,6 +83,12 @@ Detour choice card waits for its player, blocks rolling and ending the turn,
 and settles on a pick or on the turn timer. The timer check waits out the turn
 (80s by default, less with `--var DEV_TURN_SECONDS:15`).
 
+`npm run test:api:chancedeck` watches a bots-only game (`/api/dev/simulate`)
+and records every Chance card drawn: none repeats until the whole deck has
+been drawn, never the same card twice in a row, and the deck itself is never
+sent to players. Start the Worker with `--var DEV_BOT_PACE_MS:30` (about a
+minute).
+
 `npm run test:api:neighborhood` covers neighborhood events (City news).
 It forces events through the dev-only `/api/dev/neighborhoodEvent` route
 (body: `{ gameId, kind, groupId? }`, kind one of `rezoning`, `landmark`,

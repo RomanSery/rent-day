@@ -9,7 +9,7 @@ import { SquareGameData } from "@core/types/SquareGameData";
 import { areIdsEqual, dollarFormatterServer } from "./helpers";
 import { PlayerCostsCalculator } from "./PlayerCostsCalculator";
 import { ServerChanceEvent } from "./ServerChanceEvent";
-import { randomPick } from "../random";
+import { shuffled } from "../random";
 import { PropertyProcessor } from "./PropertyProcessor";
 import { AuctionProcessor } from "./AuctionProcessor";
 
@@ -69,13 +69,46 @@ export class ChanceProcessor {
     return this.events.find((e) => e.chanceId === chanceId);
   }
 
+  /**
+   * Draw from a shuffled deck, like the cards in a box: every card comes up
+   * once before any comes up again, then the deck is shuffled anew. A card
+   * that doesn't apply to this player right now (isAvailable) stays where it
+   * is for a later draw.
+   */
   private getRandomEvent(player: Player): ServerChanceEvent | undefined {
     if (!this.game) {
       return undefined;
     }
     const game = this.game;
-    const deck = this.events.filter((e) => !e.isAvailable || e.isAvailable(game, player));
-    return randomPick(game, deck);
+    const fits = (id: number): boolean => {
+      const e = this.getEvent(id);
+      return !!e && (!e.isAvailable || e.isAvailable(game, player));
+    };
+
+    // cards removed from the game since the deck was shuffled drop out
+    let deck = (game.chanceDeck ?? []).filter((id) => this.getEvent(id));
+    let at = deck.findIndex(fits);
+    if (at < 0) {
+      deck = this.newDeck(game);
+      at = deck.findIndex(fits);
+    }
+    if (at < 0) {
+      game.chanceDeck = deck;
+      return undefined;
+    }
+    const [chanceId] = deck.splice(at, 1);
+    game.chanceDeck = deck;
+    game.lastChanceId = chanceId;
+    return this.getEvent(chanceId);
+  }
+
+  /** Every card, shuffled, with the one just drawn kept off the top. */
+  private newDeck(game: GameInstanceDocument): number[] {
+    const deck = shuffled(game, this.events.map((e) => e.chanceId));
+    if (deck.length > 1 && deck[0] === game.lastChanceId) {
+      deck.push(deck.shift()!);
+    }
+    return deck;
   }
 
   public static shouldCreateChance(squareId: number): boolean {

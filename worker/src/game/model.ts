@@ -29,6 +29,10 @@ export interface GameInstanceDocument {
   lottoId: string | null;
   /** a Chance card whose player still has to pick an option (humans only) */
   pendingChance?: PendingChanceChoice | null;
+  /** Chance cards still to come, in draw order (ChanceProcessor); never sent to players */
+  chanceDeck?: number[];
+  /** the last Chance card drawn, kept off the top of a fresh shuffle */
+  lastChanceId?: number;
   allJoined: boolean;
   status: GameStatus;
   results: LastResult | null;

@@ -396,6 +396,10 @@ const ChanceLottoTopic = () => (
       they can land on another player. The rest is for you to discover.
     </p>
     <p>
+      The cards are drawn from a shuffled deck: you'll see every card before any comes up again.
+      Then the deck is shuffled anew.
+    </p>
+    <p>
       A few cards give you a choice. Pick an option on the card before you roll again or
       end your turn. If your turn runs out first, the card's first option is taken for you.
     </p>
