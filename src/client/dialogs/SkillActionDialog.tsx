@@ -64,7 +64,7 @@ export const SKILL_ACTIONS: Record<SkillAction, ActionInfo> = {
     text: <>Slip the guard something and walk out of quarantine now, instead of paying <b>${payToGetOutFee}</b>. Then roll as normal.</>,
     confirm: "Bribe the guard",
     whyNot: (game, p) =>
-      p.state !== PlayerState.IN_ISOLATION ? "You are not in quarantine."
+      p.state !== PlayerState.IN_ISOLATION ? "Only while you are in quarantine."
         : p.hasRolled ? "You already rolled this turn." : null,
   },
 };

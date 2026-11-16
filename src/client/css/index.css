@@ -1281,3 +1281,9 @@ td.lb-rank.bronze { color: #8d5420; }
 .report-dialog .report-target { justify-content: flex-start; text-transform: none; font-size: 1rem; }
 .report-target-name { font-weight: 700; }
 .report-target-why { margin-left: auto; padding-left: 8px; opacity: 0.75; }
+
+/* the Skills dropdown (SkillActionsMenu.tsx): action on the left, its cost on the right */
+.MuiMenuItem-root.skill-menu-item { display: flex; flex-direction: column; align-items: stretch; }
+.skill-menu-row { display: flex; justify-content: space-between; gap: 18px; }
+.skill-menu-why { font-size: 0.78em; text-align: left; }
+.skill-menu-cost { opacity: 0.7; }

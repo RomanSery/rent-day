@@ -200,19 +200,20 @@ const SkillsTopic = () => (
 
     <h3>Using up skill points</h3>
     <p>
-      Some actions use up a point from a skill, on your turn. You lose the skill's everyday bonus for that point,
+      Some actions use up a point from a skill, on your turn. Find them in the <b>Skills</b> menu, which greys out
+      the ones you can't use right now and says why. You lose the skill's everyday bonus for that point,
       so spend wisely.
     </p>
     <SimpleTable
       head={["Action", "Costs", "What it does"]}
       rows={[
-        ["Forged vaccine card (Actions menu)", "1 Luck",
+        ["Forged vaccine card", "1 Luck",
           "Carry it until it's needed. The next time you would go to quarantine (Big Brother, three doubles, a believed report), you don't. It also gets you through the vaccine passport check for free. Everyone can see you carry one; you can only carry one."],
-        ["Plead hardship (Actions menu)", "1 Negotiation",
+        ["Hardship plea", "1 Negotiation",
           `Before you roll: rent you pay for the rest of the turn is halved. Once per turn.`],
-        ["Bribe the guard (turn bar, in quarantine)", "1 Corruption",
+        ["Bribe the guard", "1 Corruption",
           `Before you roll: leave quarantine for free instead of paying $${payToGetOutFee}.`],
-        ["Report a citizen (Actions menu)", "1 Corruption",
+        ["Report a citizen", "1 Corruption",
           "Report another player to the Ministry. Believed, they go to quarantine; not, you're fined. See the Quarantine tab."],
       ]}
     />
@@ -449,7 +450,7 @@ const QuarantineTopic = () => (
 
     <h3>Reporting a citizen</h3>
     <p>
-      On your turn, choose <b>Actions → Report a citizen</b> to report another player to the Ministry.
+      On your turn, choose <b>Skills → Report a citizen</b> to report another player to the Ministry.
       You can file one report per turn, and it uses up <b>1 Corruption point</b>.
     </p>
     <ul>
@@ -467,7 +468,7 @@ const QuarantineTopic = () => (
     <ul>
       <li>Roll a <b>double</b>, and move by that roll.</li>
       <li>Pay <b>${payToGetOutFee}</b> before you roll, then roll as normal.</li>
-      <li><b>Bribe the guard</b> with 1 Corruption point before you roll, then roll as normal.</li>
+      <li><b>Bribe the guard</b> (Skills menu) with 1 Corruption point before you roll, then roll as normal.</li>
       <li>Wait it out: on your third turn you leave and move by whatever you roll.</li>
     </ul>
 

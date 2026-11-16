@@ -15,6 +15,7 @@ import { StatsDialog } from "../dialogs/StatsDialog";
 import { MyTaxesDialog } from "../dialogs/MyTaxesDialog";
 import { ReportCitizenDialog } from "../dialogs/ReportCitizenDialog";
 import { SkillAction, SkillActionDialog } from "../dialogs/SkillActionDialog";
+import { SkillActionsMenu } from "./SkillActionsMenu";
 import { motion } from "framer-motion";
 import { HelpDialog } from "../dialogs/HelpDialog";
 import { ActionMode } from "../../core/enums/ActionMode";
@@ -354,13 +355,11 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           <Button variant="contained" color="primary" onClick={onGetOut}>Pay To Get Out</Button>
           : null}
 
-        {myTurn && canPayToGetOutOfIsolation() && me && me.corruption >= 1 ?
-          <Button variant="contained" color="primary" onClick={() => setSkillAction("bribeGuard")}>Bribe the Guard</Button>
-          : null}
-
         {myTurn ? getCompleteTurnBtn() : null}
 
         {me && <SkillPointsButton socketService={socketService} me={me} />}
+
+        {me && <SkillActionsMenu me={me} onReport={() => setReportOpen(true)} onSkillAction={setSkillAction} />}
 
         <Button endIcon={<FontAwesomeIcon icon={faCaretDown} />} variant="outlined" color="primary" aria-controls="my-action-menu" aria-haspopup="true" onClick={handleClick}>Actions</Button>
         <Menu id="my-action-menu" anchorEl={anchorEl} keepMounted open={Boolean(anchorEl)} onClose={handleClose}>
@@ -368,9 +367,6 @@ export const DisplayActions: React.FC<Props> = ({ socketService, onRollAction, o
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Redeem)}>Redeem</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Build)}>Build</MenuItem>}
           {myTurn && <MenuItem onClick={() => onSetActionMode(ActionMode.Sell)}>Sell</MenuItem>}
-          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setReportOpen(true); }}>Report a citizen</MenuItem>}
-          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setSkillAction("forgeCard"); }}>Forge a vaccine card</MenuItem>}
-          {myTurn && stillActivePlayer() && <MenuItem onClick={() => { handleClose(); setSkillAction("hardshipPlea"); }}>Plead hardship</MenuItem>}
           <MenuItem onClick={onViewStats}>Trade / Stats</MenuItem>
           <MenuItem onClick={onViewTaxes}>Taxes</MenuItem>
           <MenuItem onClick={onViewHelp}>Help</MenuItem>
